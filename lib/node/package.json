@@ -1,0 +1,22 @@
+{
+  "name": "sdl-node",
+  "version": "0.0.1",
+  "description": "A Node.js SDK for SDL connectivity.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+      "node": ">= 9.11.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smartdevicelink/sdl_javascript_suite.git"
+  },
+  "author": "Livio",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/smartdevicelink/sdl_javascript_suite/issues"
+  },
+  "homepage": "https://github.com/smartdevicelink/sdl_javascript_suite#readme"
+}
