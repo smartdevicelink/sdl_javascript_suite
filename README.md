@@ -14,15 +14,15 @@ Looking into the existing libraries, developed in Java and Objective-C, they con
 1. The **High Level Interface** is a work-in-progress developer friendly API with the purpose to provide a programming interface similar to mobile frameworks.
 2. The **Manager layer** is the current programming interface that abstracts the heavy load of dealing with application lifecycle, screen, dealing with RPCs and many more.
 3. The **Proxy layer** also known as RPC layer, is the lower level interface with the purpose of managing the connection to the remote endpoint and sending and receiving RPCs. The [RPC specification](https://github.com/smartdevicelink/rpc_spec) of the mobile API is implemented in this layer.
-4. The **SDL Session layer** is responsible for the lifecycle of service sessions for e.g. RPC/Bulk, video and audio. It packages application data and sends it to the protocol layer. 
+4. The **SDL Session layer** is responsible for the lifecycle of service sessions for e.g. RPC/Bulk, video and audio. It packages application data and sends it to the protocol layer.
 5. The **SDL protocol layer** is responsible for organizing the sending and receiving of frames as per the [Protocol specification](https://github.com/smartdevicelink/protocol_spec)
-6. The **transport layer** is the root level of SmartDeviceLink and therefore the most critical layer as it is responsible for the foundation of data transmission. 
+6. The **transport layer** is the root level of SmartDeviceLink and therefore the most critical layer as it is responsible for the foundation of data transmission.
 
 It is not realistic to develop a new SDL library that can provide the same set of features as the Android and iOS library all at once. Therefore it is important to focus on a "milestone 1" which includes the following fundamental elements:
 
 #### Included tasks in this proposal
 
-**1. Proxy layer** 
+**1. Proxy layer**
 
 Provide a Proxy class and implementations of all RPCs according to the [RPC specification v5.1](https://github.com/smartdevicelink/rpc_spec/tree/5.1.0). As this specification is XML structured it makes sense to develop a code generator to export all the RPCs, structs and enums to usable code.
 
@@ -46,14 +46,18 @@ This proposal does not include a manager layer. Managers will be introduced via 
 
 The development of this library should not be done in pure JavaScript but in TypeScript. The reason is that TypeScript allows use of data types, classes and other useful development features. This will reduce complexity and risk of issues during development. With TypeScript the maintenance of the library will be much easier compared to pure JavaScript.
 
-TypeScript will still allow JavaScript support. Whenever a new release version is planned, the TypeScript code can be transcompiled to JavaScript. This [TypeScript Playground](https://www.typescriptlang.org/play/index.html) from typescriptlang.org shows how easy TypeScript can be transcompiled into JavaScript. The export can also provide a [JavaScript Source Map](https://www.html5rocks.com/en/tutorials/developertools/sourcemaps/) for Lint and auto complete when developing JavaScript applications e.g. in VS code. 
+TypeScript will still allow JavaScript support. Whenever a new release version is planned, the TypeScript code can be transcompiled to JavaScript. This [TypeScript Playground](https://www.typescriptlang.org/play/index.html) from typescriptlang.org shows how easy TypeScript can be transcompiled into JavaScript. The export can also provide a [JavaScript Source Map](https://www.html5rocks.com/en/tutorials/developertools/sourcemaps/) for Lint and auto complete when developing JavaScript applications e.g. in VS code.
 
 ### Promise based development
 
-Just as the other existing libraries, the JavaScript library requires possibilities to perform async operations. JavaScript is very well capable of serving this task especially with using the Promise pattern. 
+Just as the other existing libraries, the JavaScript library requires possibilities to perform async operations. JavaScript is very well capable of serving this task especially with using the Promise pattern.
 
 There are many sources describing the Promise pattern with JavaScript and how it is used already in the native API and other libraries and frameworks. See [Mozilla: Promise](https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/Promise) and [You Don't Know JS - Promises](https://github.com/getify/You-Dont-Know-JS/blob/master/async%20%26%20performance/ch3.md)
 
 ### Project management
 
 The JavaScript library will be open source and stored in a new smartdevicelink repository on GitHub called sdl_javascript. The project maintainers will be responsible for maintaining and reviewing the code and the project.
+
+
+### Architecture & Contribution Guidelines
+Please see `GUIDELINES.md` for architecture and contribution guidelines defined by the Project Maintainer.
