@@ -16,8 +16,10 @@ Example projects shall be located in the `/examples/js` and `/examples/node` dir
 ### Object-oriented Programming
 - Concepts must be broken down into classes for an object-oriented programming methodology.
 - Although ECMAScript does not yet officially support private properties, properties shall be named with an underscore prefix to avoid conflict with getters and setters and to allow for an easy transition to private properties when they become available.
-- Rather than allowing property values to be directly manipulated, the use of ES6-style getters and setters (`get` and `set`) shall be implemented.
+- Rather than promoting the direct manipulation of property values, the use of prefixed `get` and `set` methods shall be used. For example: `setMajor(major)` and `getMajor()`.
+- All `set` methods should return `this` in order to support method chaining.
 - Classes must contain a constructor, but the constructor _should not_ contain parameter type/value checking as a workaround for method overloading. For example, a semantic versioning class should have a constructor which accepts 3 parameters (major, minor, patch) and assigned to properties of the same/similar names prefixed with `_`. To also allow a semantic version string (e.g. "2.1.3") as input, a new `fromString(version)` method should be added to the class definition which parses the string and sets the proper `_major`, `_minor`, and `_patch` properties. See `/lib/js/util/Version.js` in the repository for an example.
+- Constructor parameters should be optional in most cases to support utilizing class methods as a helper without the need to initialize an instance with valid parameters.
 
 
 ### Module Exports & Imports
@@ -103,7 +105,7 @@ let result = thing[key];
 - Class names shall use PascalCase. eslint: `new-cap`
 - Acronyms should either be all uppercased or lowercased.
 - Private class properties shall be indicated by using an underscore to prefix their name. These properties are still technically publicly accessible, but should not be directly accessed outside of the scope of their class definition.
-- Properties and methods which are `boolean` should be prefixed with `is` or `has`. e.g. `isEnabled()` and `hasTitle()`
+- Properties and methods which are `boolean` should be prefixed with `is`, `can`, or `has`. e.g. `isEnabled()` and `hasTitle()`
 
 
 ### Semicolons
