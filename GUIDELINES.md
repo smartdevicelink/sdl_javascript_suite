@@ -22,6 +22,9 @@ Example projects shall be located in the `/examples/js` and `/examples/node` dir
 - Constructor parameters should be optional in most cases to support utilizing class methods as a helper without the need to initialize an instance with valid parameters.
 
 
+### Enumerations
+Since JavaScript does not offer traditional enumerations, an abstract `Enum` class has been defined (see `/lib/js/util/Enum.js`) which shall be extended for the purpose of creating new enumerations. Each extended enumeration class must be named with the suffix `Type`, contain a constructor which calls `super()`, use ES6-style getters as `static` methods to support simple dot-access notation, and contain a `static valueForString(value)` method which returns a given enumeration **value** (not key) if it exists in the collection (otherwise `null`). See `/lib/js/transport/enums/TransportType.js` for an example.
+
 ### Module Exports & Imports
 
 #### Common
