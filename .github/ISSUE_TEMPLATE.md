@@ -14,7 +14,7 @@
 ##### Observed Behavior
 [Some observed behavior]
 
-##### Browswer & Version Information
+##### Browser & Version Information
 * Browser and Version:[What browser is being used including its version are you using when the bug occurred]
 * SDL JavaScript Suite Module: [What module (node, javascript, etc) were you using that is experiencing the bug?
 * SDL JavaScript Version: [What version of the library has this bug been seen on]
