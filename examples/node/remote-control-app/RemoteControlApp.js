@@ -1,5 +1,9 @@
 const SdlPsm = require('./lib/SdlPsm');
 
+const {SdlManager} = require('sdl-node');
+
+console.log(`SdlManager`,SdlManager);
+
 /**
  * Proxy session.
  *
@@ -58,6 +62,9 @@ class RemoteControlApp {
 
 
         this.requestHistory = [];
+
+
+        this.sdlManager = new SdlManager();
     }
 
 
@@ -194,6 +201,47 @@ class RemoteControlApp {
 
     }
 
+    //TODO create an app config and a lifecycle manager on startup.
+    // public void start(){
+    //     Log.i(TAG, "start");
+    //     if (lifecycleManager == null) {
+    //         if (transport != null
+    //             && (transport.getTransportType().equals(TransportType.WEB_SOCKET_SERVER) || transport.getTransportType().equals(TransportType.CUSTOM))) {
+    //             //Do the thing
+    //
+    //             LifecycleManager.AppConfig appConfig = new LifecycleManager.AppConfig();
+    //             appConfig.setAppName(appName);
+    //             //short app name
+    //             appConfig.setMediaApp(isMediaApp);
+    //             appConfig.setHmiDisplayLanguageDesired(hmiLanguage);
+    //             appConfig.setLanguageDesired(hmiLanguage);
+    //             appConfig.setAppType(hmiTypes);
+    //             appConfig.setVrSynonyms(vrSynonyms);
+    //             appConfig.setTtsName(ttsChunks);
+    //             appConfig.setDayColorScheme(dayColorScheme);
+    //             appConfig.setNightColorScheme(nightColorScheme);
+    //             appConfig.setAppID(appId);
+    //             appConfig.setMinimumProtocolVersion(minimumProtocolVersion);
+    //             appConfig.setMinimumRPCVersion(minimumRPCVersion);
+    //
+    //             lifecycleManager = new LifecycleManager(appConfig, transport, lifecycleListener);
+    //             _internalInterface = lifecycleManager.getInternalInterface(SdlManager.this);
+    //
+    //             if (sdlSecList != null && !sdlSecList.isEmpty()) {
+    //                 lifecycleManager.setSdlSecurityClassList(sdlSecList);
+    //             }
+    //
+    //             //Setup the notification queue
+    //             initNotificationQueue();
+    //
+    //             lifecycleManager.start();
+    //
+    //
+    //         }else{
+    //             throw new RuntimeException("No transport provided");
+    //         }
+    //     }
+    // }
     async initApp() {
         let self = this;
         console.log(`initializeApp`);
@@ -226,12 +274,22 @@ class RemoteControlApp {
             return {};
         }
 
-        let data = SdlPsm.buildRPC({
-                                       messageId: originalMessageId,
-                                       sessionId,
-                                       requestJSON,
-                                       buffer
-                                   });
+        // let data = SdlPsm.buildRPC({
+        //                                messageId: originalMessageId,
+        //                                sessionId,
+        //                                requestJSON,
+        //                                buffer
+        //                            });
+
+        let data = self.sdlManager.sendRPCJSON(
+            requestJSON,
+            // {
+            //                                        messageId: originalMessageId,
+                                                   // sessionId,
+                                                   // requestJSON,
+                                                   // buffer
+                                               // }
+                                               )
 
         return new Promise(function(resolve) {
             let listener = function(msg) {

@@ -21,6 +21,10 @@ module.exports = {
   {
       console.log(`hello world`);
   },
-    SdlPacket: require('./dist/js/protocol/SdlPacket'),
+  //TODO move this.
+  SdlPsm: require('./lib/js/dev-only/SdlPsm'),
+
+  SdlPacket: require('./dist/js/protocol/SdlPacket'),
+    SdlManager: require('./lib/js/manager/SdlManager'),
 
 };
