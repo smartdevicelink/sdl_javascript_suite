@@ -1,4 +1,3 @@
-
 const SdlPsm = require('./lib/SdlPsm');
 
 /**
@@ -12,24 +11,48 @@ const SdlPsm = require('./lib/SdlPsm');
 
 class RemoteControlApp {
 
+    populateApp(application) {
+        application = application || {};
+
+        application.appID = application.appID || 1;
+        application.fullAppId = application.fullAppId || application.appID;
+        application.appName = application.appName || application.appID;
+        application.appName = application.appName || application.appID;
+        application.vrSynonyms = application.vrSynonyms || [application.appName];
+        application.ttsName = application.ttsName || [application.appName];
+
+
+        application = Object.assign({
+                                        'hmiDisplayLanguageDesired': 'EN-US',
+                                        'isMediaApplication': true,
+                                        'appHMIType': [
+                                            'DEFAULT',
+                                            'MEDIA',
+                                            'REMOTE_CONTROL'
+                                        ],
+                                        'languageDesired': 'EN-US',
+                                        'majorVersion': 5,
+                                        'minorVersion': 1,
+                                        'patchVersion': 0
+                                    }, {}, application);
+
+        this.application = application;
+    }
+
     //TODO accept requests.
     constructor(opts) {
-        this.appId = opts.appId + "";
+
+        this.populateApp(opts.application);
+
         this.sessionId = null;
         this.messageId = 0;
 
         this.coreWs = opts.coreWs;
 
-        // this.baseUrl =
-
 
         this.requestHistory = [];
     }
 
-    // updateSessionId(id)
-    // {
-    //     this.sessionId = id;
-    // }
 
     getNextMessageId() {
         this.messageId++;
@@ -37,7 +60,7 @@ class RemoteControlApp {
     }
 
     static async create(opts) {
-        let obj = new RussWsApp(opts);
+        let obj = new RemoteControlApp(opts);
         await obj.init();
 
         return obj;
@@ -46,7 +69,8 @@ class RemoteControlApp {
     async getSessionInfo() {
         let {
             sessionId,
-            hmiStatus
+            hmiStatus,
+            application,
         } = this;
 
         // let { hmiLevel } = hmiStatus;
@@ -54,6 +78,7 @@ class RemoteControlApp {
         return {
             sessionId,
             hmiStatus,
+            application
             // hmiLevel
         };
     }
@@ -94,7 +119,6 @@ class RemoteControlApp {
             console.log(`received message from core`);
             console.log(fullString);
             let sdlPsm = SdlPsm.parseChunk(dataAry);
-
 
             let {
                 state,
@@ -145,95 +169,44 @@ class RemoteControlApp {
         await this.initApp();
     }
 
-
-
-    async sendInitRequest()
-    {
+    async sendInitRequest() {
         let self = this;
 
         let connectionRequest = SdlPsm.INIT_REQUEST;
-
-
-        // 65782 INFO  [17:33:13,541][ProtocolHandler] Processing incoming data of size 40 for connection 356
-        // 65783 WARN  [17:33:13,541][ProtocolHandler] Unknown version:1
-        // 65784 WARN  [17:33:13,541][ProtocolHandler] Unknown version:1
-        // 65785 INFO  [17:33:13,541][ProtocolHandler] Created and passed 1 packets
-        // 65786 WARN  [17:33:13,541][ConnectionHandler] Connection not found !
-        // 65787 INFO  [17:33:13,542][ProtocolHandler] StartSession ID 0 and Connection ID 356
-        // 65788 WARN  [17:33:13,542][ConnectionHandler] Session not found in this connection!
-        // 65789 INFO  [17:33:13,542][ProtocolHandler] Protocol Version String 5.2.0
 
         //  protocolVersion5.2.0
         self.coreWs.send(connectionRequest);
         return new Promise((r) => {
             self.coreWs.on('message', async function(data) {
-                console.log(`sendInitRequest received response`)
+                console.log(`sendInitRequest received response`);
                 // await self.handleCoreData(data);
 
                 return r();
             });
-        })
+        });
 
     }
 
-
-    async initApp()
-    {
+    async initApp() {
         let self = this;
         console.log(`initializeApp`);
         await this.sendInitRequest(); //protocolVersion5.2.0 and wait for response.
 
-
         console.log(`connection initialized`);
 
-
-        {/*<element name="COMMUNICATION" />*/}
-        {/*<element name="MEDIA" />*/}
-        {/*<element name="MESSAGING" />*/}
-        {/*<element name="NAVIGATION" />*/}
-        {/*<element name="INFORMATION" />*/}
-        {/*<element name="SOCIAL" />*/}
-        {/*<element name="BACKGROUND_PROCESS" />*/}
-        {/*<element name="TESTING" />*/}
-        {/*<element name="SYSTEM" />*/}
-        {/*<element name="PROJECTION" />*/}
-        {/*<element name="REMOTE_CONTROL" />*/}
-        // let appId = "" + Date.now();
-        let appId = this.appId;
-        let ngnMediaScreenAppName = appId;
-        let appName = appId;
         let appRequest = {
-            "method": "RegisterAppInterface",
-            "params": {
-                "fullAppID": appId,
-                "hmiDisplayLanguageDesired": "EN-US",
-                "ngnMediaScreenAppName": ngnMediaScreenAppName,
-                "appID": appId,
-                "isMediaApplication": false,
-                "vrSynonyms": [
-                    "BOCKS"
-                ],
-                "appHMIType": [
-                    "DEFAULT",
-                    "MEDIA",
-                    "REMOTE_CONTROL"
-                ],
-                "appName": appName,
-                "languageDesired": "EN-US",
-                "syncMsgVersion": {
-                    "majorVersion": 5,
-                    "minorVersion": 1,
-                    "patchVersion": 0
-                }
-            }
+            'method': 'RegisterAppInterface',
+            'params':
+            this.application,
+
         };
 
         let result = await this.doRpc(appRequest);
-        console.log(`initializeApp - RegisterAppInterface`,result)
+        console.log(`initializeApp - RegisterAppInterface`,{appRequest,result});
 
     }
 
-    async doRpc(requestJSON,buffer) {
+    async doRpc(requestJSON, buffer) {
         console.log(`BocksSession doRpc`, requestJSON);
         let coreWs = this.coreWs;
         let self = this;
@@ -280,8 +253,7 @@ class RemoteControlApp {
                 } = sdlPsm;
                 // console.log(`doRpc`,`received message`,{serviceType},requestJSON.method);
 
-                if (sdlPsm.isFinished)
-                {
+                if (sdlPsm.isFinished) {
                     sdlPsm.initData();
                 }
 
@@ -311,16 +283,13 @@ class RemoteControlApp {
                         coreWs.removeListener('message', listener);
 
                         resolve({
-                            response
+                                    response
                                 });
 
                     }
                 }
             };
 
-            // console.log(`sending ${requestJSON.method}`);
-            // console.log(SdlPsm.uint8arrayToStringMethod(data));
-            //handle
             coreWs.on('message', listener);
 
             coreWs.send(data);
