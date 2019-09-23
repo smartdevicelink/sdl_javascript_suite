@@ -14,12 +14,12 @@ class RemoteControlApp {
     populateApp(application) {
         application = application || {};
 
-        application.appID = application.appID || 1;
+        application.appID = application.appID || "1";
         application.fullAppId = application.fullAppId || application.appID;
         application.appName = application.appName || application.appID;
         application.appName = application.appName || application.appID;
         application.vrSynonyms = application.vrSynonyms || [application.appName];
-        application.ttsName = application.ttsName || [application.appName];
+        // application.ttsName = application.ttsName || [application.appName];
 
 
         application = Object.assign({
@@ -31,12 +31,19 @@ class RemoteControlApp {
                                             'REMOTE_CONTROL'
                                         ],
                                         'languageDesired': 'EN-US',
-                                        'majorVersion': 5,
-                                        'minorVersion': 1,
-                                        'patchVersion': 0
+                                        'syncMsgVersion': {
+                                            'majorVersion': 5,
+                                            'minorVersion': 1,
+                                            'patchVersion': 0
+                                        }
                                     }, {}, application);
 
         this.application = application;
+    }
+
+    getAppID()
+    {
+        return this.application.appID;
     }
 
     //TODO accept requests.
@@ -114,10 +121,10 @@ class RemoteControlApp {
 
             let payloadStr;
             const dataAry = new Uint8Array(data);
-            let fullString = SdlPsm.uint8arrayToStringMethod(dataAry);
+            // let fullString = SdlPsm.uint8arrayToStringMethod(dataAry);
 
             console.log(`received message from core`);
-            console.log(fullString);
+            // console.log(fullString);
             let sdlPsm = SdlPsm.parseChunk(dataAry);
 
             let {
@@ -200,9 +207,10 @@ class RemoteControlApp {
             this.application,
 
         };
+        console.log(`initializeApp - RegisterAppInterface`,JSON.stringify(appRequest,null,4));
 
         let result = await this.doRpc(appRequest);
-        console.log(`initializeApp - RegisterAppInterface`,{appRequest,result});
+        console.log(`initializeApp - RegisterAppInterface`,JSON.stringify(result,null,4));
 
     }
 

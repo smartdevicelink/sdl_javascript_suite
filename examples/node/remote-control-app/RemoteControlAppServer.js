@@ -6,7 +6,7 @@ const RemoteControlApp = require('./RemoteControlApp');
 
 let server;
 
-let sessions = [];
+let apps = [];
 
 //each connection initialize something new?
 class RemoteControlAppServer {
@@ -47,7 +47,7 @@ class RemoteControlAppServer {
                                                      application: req.query,
                                                      coreWs: ws,
                                                  });
-                sessions.push(app);
+                apps.push(app);
             });
 
         });
@@ -57,7 +57,7 @@ class RemoteControlAppServer {
         app.use(bodyParser.urlencoded({ extended: true }));
         app.use(bodyParser.json());
 
-        app.post('/DoRpc',
+        app.post('/DoRpc/:appID',
                  upload.single('file'),
                  async function(req, res) {
                      console.log(req.file, req.files);
@@ -72,39 +72,49 @@ class RemoteControlAppServer {
                      let { method } = request;
                      console.log(`method`, method);
 
-                     let session = sessions[0];
-                     if (!session) {
-                         return res.json({});
-                     }
 
+                     let result = {};
                      if (req.file) {
                          buffer = req.file.buffer;
 
                      }
-                     let result = await session.doRpc(request, buffer);
+                     for (let app of apps)
+                     {
+                         if (req.params.appID === app.getAppID())
+                         {
+                             console.log(`found app`,app);
+                             result = await app.doRpc(request, buffer);
+                             break;
+                         }
+                     }
+
+
                      res.json(result);
                  });
 
-        app.get('/GetSessionInfo', async function(req, res) {
+
+        app.get('/GetAppsInfo', async function(req, res) {
             let result = {
-                sessions: [],
+                apps: [],
             };
-            if (!sessions.length) {
+            if (!apps.length) {
                 return res.json(result);
             }
 
-            for (let session of sessions) {
-                result.sessions.push(await session.getSessionInfo());
+            for (let app of apps) {
+                result.apps.push({
+                                     session: await app.getSessionInfo()
+                                 });
             }
             res.json(result);
         });
 
         app.get('/GetRequestHistory', async function(req, res) {
-            let session = sessions[0];
-            if (!session) {
+            let app = apps[0];
+            if (!app) {
                 return res.json({});
             }
-            let result = await session.getRequestHistory();
+            let result = await app.getRequestHistory();
             res.json(result);
         });
     }
