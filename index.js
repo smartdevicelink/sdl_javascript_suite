@@ -14,17 +14,13 @@
 //examples hello-sdl works but only because it is handling dependencies on its own in a way that wouldn't be
 //expected for someone using this package.
 
-require = require("esm")(module/*, options*/)
+require = require("esm")(module/*, options*/);
+
+const SdlPsm = require('./lib/js/dev-only/SdlPsm');
+const SdlManager = require('./lib/js/manager/SdlManager');
 
 module.exports = {
-  helloWorld: function()
-  {
-      console.log(`hello world`);
-  },
-  //TODO move this.
-  SdlPsm: require('./lib/js/dev-only/SdlPsm'),
-
-  SdlPacket: require('./dist/js/protocol/SdlPacket'),
-    SdlManager: require('./lib/js/manager/SdlManager'),
+  SdlPsm,
+  SdlManager
 
 };

@@ -1,8 +1,12 @@
-const SdlPsm = require('./lib/SdlPsm');
+// const SdlPsm = require('./lib/SdlPsm');
 
-const {SdlManager} = require('sdl-node');
+const {SdlManager,SdlPsm} = require('sdl-node');
 
-console.log(`SdlManager`,SdlManager);
+// import SdlManager from 'sdl-node';
+
+// console.log(`SdlManager`,SdlManager);
+// console.log(`SdlPsm`,SdlPsm);
+
 
 /**
  * Proxy session.
@@ -184,12 +188,15 @@ class RemoteControlApp {
     }
 
     async sendInitRequest() {
+        console.log(`sendInitRequest`)
         let self = this;
 
         let connectionRequest = SdlPsm.INIT_REQUEST;
+        console.log(`sendInitRequest 2`,connectionRequest)
 
         //  protocolVersion5.2.0
         self.coreWs.send(connectionRequest);
+        console.log(`sendInitRequest 3`);
         return new Promise((r) => {
             self.coreWs.on('message', async function(data) {
                 console.log(`sendInitRequest received response`);
@@ -274,22 +281,24 @@ class RemoteControlApp {
             return {};
         }
 
-        // let data = SdlPsm.buildRPC({
-        //                                messageId: originalMessageId,
-        //                                sessionId,
-        //                                requestJSON,
-        //                                buffer
-        //                            });
 
-        let data = self.sdlManager.sendRPCJSON(
-            requestJSON,
+        //TODO use less raw methods. reduce code required here for the example. return an rpc struct.
+        let data = SdlPsm.buildRPC({
+                                       messageId: originalMessageId,
+                                       sessionId,
+                                       requestJSON,
+                                       buffer
+                                   });
+
+        // let data = self.sdlManager.sendRPCJSON(
+        //     requestJSON,
             // {
             //                                        messageId: originalMessageId,
                                                    // sessionId,
                                                    // requestJSON,
                                                    // buffer
                                                // }
-                                               )
+                                               // )
 
         return new Promise(function(resolve) {
             let listener = function(msg) {
