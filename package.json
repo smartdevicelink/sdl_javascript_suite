@@ -1,5 +1,5 @@
 {
-  "name": "sdl-node-dev-only",
+  "name": "sdl-node",
   "version": "0.0.1",
   "description": "A Node.js SDK for SDL connectivity. DEV only.",
   "main": "index.js",
@@ -20,10 +20,11 @@
   },
   "homepage": "https://github.com/smartdevicelink/sdl_javascript_suite#readme",
   "devDependencies": {
-    "eslint": "^5.16.0",
-    "eslint-plugin-import": "^2.18.0",
     "@types/es6-promise": "^3.3.0",
     "@types/node": "^10.12.18",
+    "dotenv": "^8.1.0",
+    "eslint": "^5.16.0",
+    "eslint-plugin-import": "^2.18.0",
     "source-map-support": "^0.5.12"
   },
   "dependencies": {
