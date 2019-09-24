@@ -58,21 +58,9 @@ class SimpleApp {
 
     }
 
-    async initAppInFocus() {
+    async testPerformInteraction()
+    {
         let self = this;
-        if (!this.isInFocus) {
-            return;
-        }
-
-        console.log(`GetVehicleData`);
-        let rpcResponse = await self.manager.sendRPCJson(`GetVehicleData`,
-                                                         { 'speed': true });
-
-        console.log(`GetVehicleData Response`, rpcResponse);
-
-        let params = rpcResponse.getParameters();
-        console.log(`get vehicle data speed:`, params.speed);
-
         let createInteractionChoiceSetParams = {
             interactionChoiceSetID: 1, //simple yes/no
             choiceSet: [
@@ -118,13 +106,26 @@ class SimpleApp {
         );
 
         console.log(`performInteractionResponse ${JSON.stringify(performInteractionResponse.getParameters())}`);
+    }
+
+    async initAppInFocus() {
+        let self = this;
+        if (!this.isInFocus) {
+            return;
+        }
+
+        console.log(`GetVehicleData`);
+        let rpcResponse = await self.manager.sendRPCJson(`GetVehicleData`,
+                                                         { 'speed': true });
+
+        console.log(`GetVehicleData Response`, rpcResponse);
+
+        let params = rpcResponse.getParameters();
+        console.log(`get vehicle data speed:`, params.speed);
 
 
+        // await this.testPerformInteraction();
 
-        // console.log(`display alert message`);
-        // let alertParameters = {
-        //     'alertText1': `perform interaction response ${JSON.stringify(performInteractionResponse.getParameters())}`
-        // };
         let alertParameters = {
             'alertText1': `Your current speed is ${params.speed}`
         };
