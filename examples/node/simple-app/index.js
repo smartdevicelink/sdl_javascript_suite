@@ -1,6 +1,7 @@
 const express = require('express');
 const enableWs = require('express-ws');
 const multer = require('multer');
+const SimpleApp = require('./SimpleApp');
 
 (async function() {
 
@@ -20,6 +21,7 @@ const multer = require('multer');
         enableWs(app, server);
         app.ws('/', async(ws, req) => {
 
+            let app = await SimpleApp.createApp(ws);
             appManagers.push(app);
         });
 

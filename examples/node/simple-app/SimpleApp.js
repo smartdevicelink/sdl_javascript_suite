@@ -29,7 +29,40 @@ class SimpleApp {
 
         this.connectedAddress = connectedAddress;
 
-        this.manager = await SdlManagerNode.createWsManager(connection,obj.appConfig)
+
+        console.log(`get manager`);
+        this.manager = await SdlManagerNode.createWsManager(connection,obj.appConfig);
+        console.log(`got manager`, this.manager);
+
+
+        this.manager.on(
+            'OnHmiStatus',function(data)
+            {
+                console.log(`new hmi status`);
+
+
+            }
+        );
+
+
+        let result = await this.manager.sendRPCJson(`GetVehicleData`,
+                                 {"speed": true});
+
+
+        console.log(`get vehicle data result`,result);
+
+        /**
+         *
+         */
+        setInterval(async function() {
+
+            let result = await this.manager.sendRPCJson(`GetVehicleData`,
+                                                        {"speed": true});
+
+            console.log(`get vehicle data result`,result);
+
+
+        },1000);
 
 
 
@@ -39,8 +72,8 @@ class SimpleApp {
     get appConfig()
     {
         return {
-            appName: 'Simple',
-            appID: 'liviosimple'
+            appName: '1',
+            appID: '1'
         }
     }
 

@@ -21,6 +21,7 @@ const SdlPsm = require('./lib/js/dev-only/SdlPsm');
 const SdlManager = require('./lib/js/manager/SdlManager');
 const RpcStruct = require('./lib/js/rpc/RpcStruct.js');
 const SdlManagerNode = require('./lib/node/manager/SdlManagerNode');
+const Application = require('./lib/js/Application.js');
 
 module.exports = {
   version: pjson.version,
@@ -28,5 +29,5 @@ module.exports = {
   SdlManager,
   RpcStruct,
   SdlManagerNode,
-
+  Application,
 };
