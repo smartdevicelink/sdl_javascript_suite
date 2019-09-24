@@ -27,44 +27,65 @@ class SimpleApp {
 
         console.log(`connectedAddress`,connectedAddress);
 
-        this.connectedAddress = connectedAddress;
-
+        obj.connectedAddress = connectedAddress;
 
         console.log(`get manager`);
-        this.manager = await SdlManagerNode.createWsManager(connection,obj.appConfig);
-        console.log(`got manager`, this.manager);
+        obj.manager = await SdlManagerNode.createWsManager(connection,obj.appConfig);
+        console.log(`got manager`);
 
 
-        this.manager.on(
-            'OnHmiStatus',function(data)
+        obj.manager.on(
+            'OnHMIStatus',function(rpcResponse)
             {
-                console.log(`new hmi status`);
+                let params = rpcResponse.getParameters();
+                console.log(`new hmi status`,params.hmiLevel);
+
+                if (params.hmiLevel === 'FULL')
+                {
+                    obj.isInFocus = true;
+                    obj.initAppInFocus();
+                }
 
 
             }
         );
 
 
-        let result = await this.manager.sendRPCJson(`GetVehicleData`,
+
+        //
+        // /**
+        //  *
+        //  */
+        // setInterval(async function() {
+        //
+        //     let result = await self.manager.sendRPCJson(`GetVehicleData`,
+        //                                                 {"speed": true});
+        //
+        //     console.log(`get vehicle data result`,result);
+        //
+        //
+        // },1000);
+
+
+
+    }
+
+    async initAppInFocus()
+    {
+        let self = this;
+        if (!this.isInFocus)
+        {
+            return;
+        }
+
+        console.log(`GetVehicleData`);
+        let rpcResponse = await self.manager.sendRPCJson(`GetVehicleData`,
                                  {"speed": true});
 
+        console.log(`GetVehicleData Response`,rpcResponse);
 
-        console.log(`get vehicle data result`,result);
-
-        /**
-         *
-         */
-        setInterval(async function() {
-
-            let result = await this.manager.sendRPCJson(`GetVehicleData`,
-                                                        {"speed": true});
-
-            console.log(`get vehicle data result`,result);
-
-
-        },1000);
-
-
+        let params = rpcResponse.getParameters();
+        console.log(`get vehicle data speed:`,params.speed);
 
     }
 
