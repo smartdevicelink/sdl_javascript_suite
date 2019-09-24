@@ -1,7 +1,8 @@
 
 
 
-
+let pjson = require('./package.json');
+console.log(pjson.version);
 
 
 //TODO https://github.com/russjohnson09/sdl_javascript_suite/blob/develop/GUIDELINES.md#module-exports--imports
@@ -18,9 +19,14 @@ require = require("esm")(module/*, options*/);
 
 const SdlPsm = require('./lib/js/dev-only/SdlPsm');
 const SdlManager = require('./lib/js/manager/SdlManager');
+const RpcStruct = require('./lib/js/rpc/RpcStruct.js');
+const SdlManagerNode = require('./lib/node/manager/SdlManagerNode');
 
 module.exports = {
+  version: pjson.version,
   SdlPsm,
-  SdlManager
+  SdlManager,
+  RpcStruct,
+  SdlManagerNode,
 
 };
