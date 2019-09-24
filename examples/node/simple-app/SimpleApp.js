@@ -1,7 +1,6 @@
 // const SdlPsm = require('./lib/SdlPsm');
 
-const {SdlManagerNode,SdlPsm} = require('sdl-node');
-
+const { SdlManagerNode, SdlPsm } = require('sdl-node');
 
 /**
  * Proxy session.
@@ -19,83 +18,132 @@ class SimpleApp {
      * @param connection
      * @returns {Promise<void>}
      */
-    static async createApp(connection)
-    {
+    static async createApp(connection) {
         let obj = new SimpleApp();
+        obj.connection = connection;
+        await obj.init();
 
-        let connectedAddress = connection.remoteAddress;
-
-        console.log(`connectedAddress`,connectedAddress);
-
-        obj.connectedAddress = connectedAddress;
-
-        console.log(`get manager`);
-        obj.manager = await SdlManagerNode.createWsManager(connection,obj.appConfig);
-        console.log(`got manager`);
-
-
-        obj.manager.on(
-            'OnHMIStatus',function(rpcResponse)
-            {
-                let params = rpcResponse.getParameters();
-                console.log(`new hmi status`,params.hmiLevel);
-
-                if (params.hmiLevel === 'FULL')
-                {
-                    obj.isInFocus = true;
-                    obj.initAppInFocus();
-                }
-
-
-            }
-        );
-
-
-
-        //
-        // /**
-        //  *
-        //  */
-        // setInterval(async function() {
-        //
-        //     let result = await self.manager.sendRPCJson(`GetVehicleData`,
-        //                                                 {"speed": true});
-        //
-        //     console.log(`get vehicle data result`,result);
-        //
-        //
-        // },1000);
-
-
+        return obj;
 
     }
 
-    async initAppInFocus()
-    {
+    async init() {
         let self = this;
-        if (!this.isInFocus)
-        {
+
+        console.log(`get manager`);
+        self.manager = await SdlManagerNode.createWsManager(self.connection, self.appConfig);
+        console.log(`got manager`);
+
+        self.HMI_LEVEL = null;
+
+        self.manager.on(
+            'OnHMIStatus', function(rpcResponse) {
+                let params = rpcResponse.getParameters();
+                console.log(`OnHMIStatus`, JSON.stringify(params));
+
+                //no hmi level change FULL {"audioStreamingState":"NOT_AUDIBLE","hmiLevel":"FULL","systemContext":"ALERT","videoStreamingState":"NOT_STREAMABLE"}
+                //no hmi level change FULL {"audioStreamingState":"NOT_AUDIBLE","hmiLevel":"FULL","systemContext":"MAIN","videoStreamingState":"NOT_STREAMABLE"}
+                if (self.HMI_LEVEL === params.hmiLevel) {
+                    console.log(`no hmi level change`, self.HMI_LEVEL);
+                } else {
+                    console.log(`new hmi level`, params.hmiLevel);
+                    self.HMI_LEVEL = params.hmiLevel;
+                    if (params.hmiLevel === 'FULL') {
+                        self.isInFocus = true;
+                        self.initAppInFocus();
+                    }
+                }
+            }
+        );
+
+    }
+
+    async initAppInFocus() {
+        let self = this;
+        if (!this.isInFocus) {
             return;
         }
 
         console.log(`GetVehicleData`);
         let rpcResponse = await self.manager.sendRPCJson(`GetVehicleData`,
-                                 {"speed": true});
+                                                         { 'speed': true });
 
-        console.log(`GetVehicleData Response`,rpcResponse);
+        console.log(`GetVehicleData Response`, rpcResponse);
 
         let params = rpcResponse.getParameters();
-        console.log(`get vehicle data speed:`,params.speed);
+        console.log(`get vehicle data speed:`, params.speed);
+
+        let createInteractionChoiceSetParams = {
+            interactionChoiceSetID: 1, //simple yes/no
+            choiceSet: [
+                {
+                    choiceID: 1,
+                    menuName: "Yes"
+                },
+                {
+                    choiceID: 2,
+                    menuName: "No"
+                }
+            ]
+        };
+
+        let createInteractionChoiceSetResponse = await self.manager.sendRPCJson(
+            `CreateInteractionChoiceSet`,
+            createInteractionChoiceSetParams
+        );
+
+        console.log(`createInteractionChoiceSetResponse ${JSON.stringify(createInteractionChoiceSetResponse.getParameters())}`);
+
+
+        let performInteractionParams = {
+            'initialText': `Do you like this example?`,
+            helpPrompt: [{
+                text: `help?`,
+                type: "TEXT",
+            }],
+            initialPrompt: [{
+                text: `Do you like this example?`,
+                type: "TEXT",
+            }],
+            interactionMode: "MANUAL_ONLY",
+            interactionChoiceSetIDList: [
+                1
+            ]
+        };
+
+
+        let performInteractionResponse = await self.manager.sendRPCJson(
+            `PerformInteraction`,
+            performInteractionParams
+        );
+
+        console.log(`performInteractionResponse ${JSON.stringify(performInteractionResponse.getParameters())}`);
+
+
+
+        // console.log(`display alert message`);
+        // let alertParameters = {
+        //     'alertText1': `perform interaction response ${JSON.stringify(performInteractionResponse.getParameters())}`
+        // };
+        let alertParameters = {
+            'alertText1': `Your current speed is ${params.speed}`
+        };
+
+
+        console.log(`Alert`, alertParameters);
+
+        let alertResponse = await self.manager.sendRPCJson(
+            `Alert`,
+            alertParameters
+        );
 
     }
 
-
-    get appConfig()
-    {
+    get appConfig() {
         return {
             appName: '1',
             appID: '1'
-        }
+        };
     }
 
 }
