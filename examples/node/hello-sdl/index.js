@@ -31,6 +31,7 @@
 */
 
 const WebsocketServer = require('../../../lib/node/transport/WebsocketServer.js');
+const WebsocketServerConfig = require('../../../lib/node/transport/WebsocketServerConfig.js');
 
-let transport = new WebsocketServer(5);
-//transport.start();
+let transport = new WebsocketServer(new WebsocketServerConfig());
+transport.start();
