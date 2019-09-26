@@ -22,5 +22,8 @@
   "devDependencies": {
     "eslint": "^5.16.0",
     "eslint-plugin-import": "^2.18.0"
+  },
+  "dependencies": {
+    "ws": "^7.1.1"
   }
 }
