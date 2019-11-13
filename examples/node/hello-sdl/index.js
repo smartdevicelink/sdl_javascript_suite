@@ -31,6 +31,9 @@
 */
 
 const WebsocketServer = require('../../../lib/node/transport/WebsocketServer.js');
+const WebsocketServerConfig = require('../../../lib/node/transport/WebsocketServerConfig.js');
 
-let transport = new WebsocketServer(5);
-//transport.start();
+import { TransportListener } from '../../../lib/js/transport/TransportListener.js';
+
+let transport = new WebsocketServer(new WebsocketServerConfig(), new TransportListener());
+transport.start();
