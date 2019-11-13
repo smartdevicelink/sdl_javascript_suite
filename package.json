@@ -11,6 +11,7 @@
     "lib": "lib"
   },
   "scripts": {
+    "build": "rollup -c",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "node_modules/.bin/eslint \"./lib/js/**\" \"./lib/node/**\"",
     "lint-js": "node_modules/.bin/eslint \"./lib/js/**\"",
@@ -32,6 +33,10 @@
   },
   "homepage": "https://github.com/smartdevicelink/sdl_javascript_suite#readme",
   "devDependencies": {
-    "eslint": "^6.6.0"
+    "@babel/preset-env": "^7.7.1",
+    "eslint": "^6.6.0",
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-babel-minify": "^9.1.1",
+    "rollup-plugin-node-resolve": "^5.2.0"
   }
 }
