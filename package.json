@@ -1,0 +1,37 @@
+{
+  "name": "sdl_javascript_suite",
+  "version": "0.1.0",
+  "description": "The official JavaScript SDK for SmartDeviceLink.",
+  "main": "index.js",
+  "engines": {
+    "node": ">= 9.11.2"
+  },
+  "directories": {
+    "example": "examples",
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "node_modules/.bin/eslint \"./lib/js/**\" \"./lib/node/**\"",
+    "lint-js": "node_modules/.bin/eslint \"./lib/js/**\"",
+    "lint-node": "node_modules/.bin/eslint \"./lib/node/**\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smartdevicelink/sdl_javascript_suite.git"
+  },
+  "keywords": [
+    "SDL",
+    "SmartDeviceLink",
+    "SDK"
+  ],
+  "author": "Livio",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/smartdevicelink/sdl_javascript_suite/issues"
+  },
+  "homepage": "https://github.com/smartdevicelink/sdl_javascript_suite#readme",
+  "devDependencies": {
+    "eslint": "^6.6.0"
+  }
+}
