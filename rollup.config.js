@@ -6,15 +6,10 @@ export default {
   input: 'lib/js/app.js',
   output: [
     {
-      file: 'lib/node/Common.js',
+      file: 'lib/js/dist/SDL.js',
       format: 'umd',
       sourcemap: 'inline',
       name: 'SDL'
-    },
-    {
-      file: 'lib/js/dist/SDL.js',
-      format: 'esm',
-      sourcemap: 'inline',
     },
   ],
   plugins: [
