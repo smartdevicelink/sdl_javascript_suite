@@ -11,7 +11,7 @@
     "lib": "lib"
   },
   "scripts": {
-    "build": "node lib/js/generate.js && rollup -c",
+    "build": "node lib/js/generate.js && node_modules/.bin/rollup -c",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "node_modules/.bin/eslint \"./lib/js/**\" \"./lib/node/**\"",
     "lint-js": "node_modules/.bin/eslint \"./lib/js/**\"",
@@ -35,6 +35,7 @@
   "devDependencies": {
     "@babel/preset-env": "^7.7.1",
     "eslint": "^6.6.0",
+    "rollup": "^1.27.0",
     "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-babel-minify": "^9.1.1",
     "rollup-plugin-node-resolve": "^5.2.0"
