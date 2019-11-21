@@ -4,12 +4,13 @@
   "description": "A barebones example of an SDL-enabled Node.js app",
   "main": "index.js",
   "dependencies": {
-    "esm": "^3.2.25"
+    "esm": "^3.2.25",
+    "ws": "^7.2.0"
   },
   "devDependencies": {},
   "scripts": {
-      "start": "node -r esm index.js",
-      "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Livio",
   "contributors": [
