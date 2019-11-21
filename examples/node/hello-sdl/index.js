@@ -30,10 +30,46 @@
 * POSSIBILITY OF SUCH DAMAGE.
 */
 
-const WebsocketServer = require('../../../lib/node/transport/WebsocketServer.js');
-const WebsocketServerConfig = require('../../../lib/node/transport/WebsocketServerConfig.js');
+const SDL = require('../../../lib/node/src/index.js');
+const config = {
+    port: 3005,
+    timeout: 5000,
+    ssl: new SDL.transport.SslConfig()
+};
 
-import { TransportListener } from '../../../lib/js/transport/TransportListener.js';
+const transport = new SDL.transport.WebSocketServer(
+    new SDL.transport.WebSocketServerConfig(
+        config.port,
+        config.timeout,
+        config.ssl
+    ),
+    new SDL.transport.TransportListener()
+);
+transport._transportListener.setOnTransportConnected(function () {
+    console.log('TODO: Sending RAI SdlPacket');
+    // transport.sendPacket();
+});
 
-let transport = new WebsocketServer(new WebsocketServerConfig(), new TransportListener());
 transport.start();
+
+
+
+
+
+
+const WebSocket = require('ws');
+
+const exampleSocket = new WebSocket(`ws://localhost:${config.port}`);
+
+exampleSocket.on('open', function() {
+    console.log("client received open event");
+    console.log("client sending text");
+    exampleSocket.send("This is text");
+    console.log("client sending binary");
+    exampleSocket.send(new Uint8Array(8));
+});
+
+setTimeout(() => {
+    console.log('client terminating connection');
+    exampleSocket.terminate();
+}, 18000);
