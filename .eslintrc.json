@@ -2,7 +2,8 @@
     "root": true,
     "env": {
         "browser": true,
-        "node": true
+        "node": true,
+        "es6": true
     },
     "extends": "eslint:recommended",
     "globals": {
@@ -31,7 +32,10 @@
         "id-length": [ "error" ],
         "indent": [
             "error",
-            4
+            4,
+            {
+                "SwitchCase": 1
+            }
         ],
         "keyword-spacing": [ "error" ],
         "linebreak-style": [
