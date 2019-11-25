@@ -120,12 +120,24 @@
             }
 
             async _registerApp() {
-                let result = await this.sendRPCJson(
-                    {
-                        method: 'RegisterAppInterface',
-                        params: this._appConfig,
-                    }
-                );
+                const version = new SDL.rpc.structs.SdlMsgVersion();
+                version.setMajorVersion(3)
+                    .setMinorVersion(1)
+                    .setPatchVersion(0);
+
+                const rai = new SDL.rpc.messages.RegisterAppInterface();
+                rai.setSdlMsgVersion(version)
+                    .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
+                    .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
+                    .setIsMediaApplication(false)
+                    .setAppName(this._appConfig.appID)
+                    .setFullAppId(this._appConfig.appID)
+                    .setAppHmiType([
+                        SDL.rpc.enums.AppHMIType.DEFAULT,
+                        SDL.rpc.enums.AppHMIType.MEDIA,
+                    ])
+
+                let result = await this.sendRPC(rai);
             }
 
             async sendRPC(rpcRequest) {
@@ -190,9 +202,7 @@
             }
 
             async _unregister() {
-                await this.sendRPCJson({
-                    'method': 'UnregisterAppInterface'
-                })
+                await this.sendRPC(new SDL.rpc.messages.UnregisterAppInterface());
             }
 
             async exit() {
@@ -229,6 +239,8 @@
                     let parameters = rpcMessage.getParameters();
                     let { hmiLevel } = parameters;
                     if (hmiLevel === 'FULL') {
+                        /*
+                        
 
                         let rpcResponse = await app.sendRPCJson(
                             {
@@ -240,11 +252,33 @@
                                 }
                             }
                         );
+                        */
+
+                        const show = new SDL.rpc.messages.Show();
+                        show.setMainField1("こんにちは")
+                            .setMainField2("你好 ( ni hao / nĭ hăo )")
+                            .setMainField3("@#$#%$^^%&**&(_     !@#$@#$~~~```");
+
+                        let rpcResponse = await app.sendRPC(show);
+
                         console.log(`show message response`, rpcResponse);
 
                         await sleep();
 
                         let count = 3;
+                        for (let i = 0; i < count; i++) {
+
+                            const showCountdown = new SDL.rpc.messages.Show();
+                            showCountdown.setMainField1("Exiting in " + (count - i).toString())
+                                .setMainField2("")
+                                .setMainField3("");
+
+                            let rpcResponse = await app.sendRPC(showCountdown);
+
+                            await sleep();
+
+                        }
+                        /*
                         for (let i = 0; i < count; i++) {
                             let rpcResponse = await app.sendRPCJson(
                                 {
@@ -261,6 +295,7 @@
                             await sleep();
 
                         }
+                        */
                         app.exit();
 
                     }
