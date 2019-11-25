@@ -5,14 +5,6 @@
 
     <script>
 
-        const SdlSession = SDL.session.WsClientSession;
-        const TransportConfig = SDL.transport.WebsocketTransportConfig;
-
-        const ServiceType = SDL.protocol.enums.ServiceType;
-        const RpcRequest = SDL.rpc.RpcRequest;
-        const RpcType = SDL.rpc.enums.RpcType;
-
-
         class EventEmitter {
             constructor() {
                 this.events = {};
@@ -72,8 +64,8 @@
 
                 this._eventListeners = [];
                 this._appConfig = appConfig;
-                let baseTransportConfig = new TransportConfig('ws://localhost', 9090);
-                this._sdlSession = new SdlSession(baseTransportConfig, this);
+                let baseTransportConfig = new SDL.transport.WebsocketTransportConfig('ws://localhost', 9090);
+                this._sdlSession = new SDL.session.WsClientSession(baseTransportConfig, this);
                 this._maxCorrelationId = 0;
             }
 
@@ -150,11 +142,11 @@
                 let { method, params, bulkData } = data;
                 let id = ++this._maxCorrelationId;
 
-                let rpcRequest = new RpcRequest(
+                let rpcRequest = new SDL.rpc.RpcRequest(
                     {
                         functionName: method,
                         parameters: params,
-                        rpcType: RpcType.REQUEST,
+                        rpcType: SDL.rpc.enums.RpcType.REQUEST,
                     }
                 );
                 rpcRequest.setCorrelationID(id);
@@ -197,7 +189,7 @@
                         return resolve();
                     });
 
-                    self._sdlSession.startService(ServiceType.RPC, 0, false);
+                    self._sdlSession.startService(SDL.protocol.enums.ServiceType.RPC, 0, false);
 
                 })
             }
