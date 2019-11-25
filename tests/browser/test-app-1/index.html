@@ -6,6 +6,7 @@
     <script>
 
         const SdlSession = SDL.session.WsClientSession;
+        const TransportConfig = SDL.transport.WebsocketTransportConfig;
 
         const ServiceType = SDL.protocol.enums.ServiceType;
         const RpcRequest = SDL.rpc.RpcRequest;
@@ -71,7 +72,7 @@
 
                 this._eventListeners = [];
                 this._appConfig = appConfig;
-                let baseTransportConfig = {};
+                let baseTransportConfig = new TransportConfig('ws://localhost', 9090);
                 this._sdlSession = new SdlSession(baseTransportConfig, this);
                 this._maxCorrelationId = 0;
             }
