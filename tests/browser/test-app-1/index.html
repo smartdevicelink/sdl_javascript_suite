@@ -101,30 +101,22 @@
             }
 
             async _setAppIcon() {
-                let fileBinary = await this._fetchImageUnit8Array('./test_icon_1.png');
-                let fileName = this._appConfig.appID + '_icon.gif';
-                let fileType = 'GRAPHIC_PNG';
+                const fileBinary = await this._fetchImageUnit8Array('./test_icon_1.png');
+                const fileName = this._appConfig.appID + '_icon.gif';
 
-                let putFile = await this.sendRPCJson({
-                    method: 'PutFile',
-                    params: {
-                        syncFileName: fileName,
-                        fileType,
-                        persistentFile: true,
-
-                    },
-                    bulkData: fileBinary //unit8 array
-
-                });
+                let putFile = await this.sendRPC(
+                    new SDL.rpc.messages.PutFile()
+                        .setFileName(fileName)
+                        .setFileType('GRAPHIC_PNG')
+                        .setPersistentFile(true)
+                        .setFileData(fileBinary)
+                );
 
 
-                let setIconResult = await this.sendRPCJson({
-                    method: 'SetAppIcon',
-                    params: {
-                        syncFileName: fileName,
-                    }
-                });
-
+                let setIconResult = await this.sendRPC(
+                    new SDL.rpc.messages.SetAppIcon()
+                        .setFileName(fileName)
+                );
             }
 
             async _registerApp() {
@@ -136,33 +128,8 @@
                 );
             }
 
-            async sendRPCJson(
-                data
-            ) {
-                let { method, params, bulkData } = data;
-                let id = ++this._maxCorrelationId;
-
-                let rpcRequest = new SDL.rpc.RpcRequest(
-                    {
-                        functionName: method,
-                        parameters: params,
-                        rpcType: SDL.rpc.enums.RpcType.REQUEST,
-                    }
-                );
-                rpcRequest.setCorrelationID(id);
-
-                //bulk data is blob.
-                if (bulkData) {
-                    rpcRequest.setBulkData(bulkData);
-                }
-
-
-                return await this.sendRPC(rpcRequest);
-
-
-            }
-
             async sendRPC(rpcRequest) {
+                rpcRequest.setCorrelationId(++this._maxCorrelationId);
 
                 const self = this;
                 return new Promise((resolve) => {
