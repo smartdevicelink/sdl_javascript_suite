@@ -31,45 +31,83 @@
 */
 
 const SDL = require('../../../lib/node/src/index.js');
-const config = {
-    port: 3005,
-    timeout: 5000,
-    ssl: new SDL.transport.SslConfig()
-};
+const CONFIG = require('./config.js');
+const MyApp = require('./MyApp.js');
 
-const transport = new SDL.transport.WebSocketServer(
+/*
+async function sleep (timeout = 1000) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, timeout);
+    });
+}
+
+(async function () {
+    console.log('start app');
+    const app = await new MyApp()._init();
+
+    console.log('app started and registered', app);
+    console.log('start listeners');
+    app.on('INCOMING_RPC', async (rpcMessage) => {
+        let functionName = rpcMessage.getFunctionName();
+
+        console.log(`INCOMING_RPC`, functionName, rpcMessage);
+
+        if (functionName === 'OnHMIStatus') {
+            let parameters = rpcMessage.getParameters();
+            let { hmiLevel } = parameters;
+            if (hmiLevel === 'FULL') {
+
+                const show = new SDL.rpc.messages.Show();
+                show.setMainField1("こんにちは")
+                    .setMainField2("你好 ( ni hao / nĭ hăo )")
+                    .setMainField3("@#$#%$^^%&**&(_     !@#$@#$~~~```");
+
+                let rpcResponse = await app.sendRPC(show);
+
+                console.log('show message response', rpcResponse);
+
+                await sleep();
+
+                let count = 3;
+                for (let i = 0; i < count; i++) {
+
+                    const showCountdown = new SDL.rpc.messages.Show();
+                    showCountdown.setMainField1("Exiting in " + (count - i).toString())
+                        .setMainField2("")
+                        .setMainField3("");
+
+                    let rpcResponse = await app.sendRPC(showCountdown);
+
+                    await sleep();
+
+                }
+                app.exit();
+            }
+        }
+    });
+})();
+*/
+
+
+
+const myApp = new SDL.transport.WebSocketServer(
     new SDL.transport.WebSocketServerConfig(
-        config.port,
-        config.timeout,
-        config.ssl
+        CONFIG.port,
+        CONFIG.timeout,
+        CONFIG.ssl
     ),
     new SDL.transport.TransportListener()
+        .setOnTransportConnected(onTransportConnected)
+        .setOnPacketReceived(onPacketReceived)
 );
-transport._transportListener.setOnTransportConnected(function () {
-    console.log('TODO: Sending RAI SdlPacket');
-    // transport.sendPacket();
-});
 
-transport.start();
+function onTransportConnected () {
+    console.log('Client connected to server');
+}
 
+function onPacketReceived (packet) {
+    console.log("packet received");
+    console.log(packet);
+}
 
-
-
-
-
-const WebSocket = require('ws');
-
-const exampleSocket = new WebSocket(`ws://localhost:${config.port}`);
-
-exampleSocket.on('open', function() {
-    console.log("client received open event");
-    console.log("client sending text");
-    exampleSocket.send("This is text");
-    console.log("client sending binary");
-    exampleSocket.send(new Uint8Array(8));
-});
-
-setTimeout(() => {
-    console.log('client terminating connection');
-    exampleSocket.terminate();
-}, 18000);
+myApp.start();
