@@ -223,7 +223,6 @@
         }
 
 
-
         (async function () {
             console.log('start app');
             let app = await TestApp1.startApp();
@@ -239,20 +238,6 @@
                     let parameters = rpcMessage.getParameters();
                     let { hmiLevel } = parameters;
                     if (hmiLevel === 'FULL') {
-                        /*
-                        
-
-                        let rpcResponse = await app.sendRPCJson(
-                            {
-                                "method": "Show",
-                                "params": {
-                                    "mainField1": "こんにちは",
-                                    "mainField2": "你好 ( ni hao / nĭ hăo )",
-                                    "mainField3": "@#$#%$^^%&**&(_     !@#$@#$~~~```"
-                                }
-                            }
-                        );
-                        */
 
                         const show = new SDL.rpc.messages.Show();
                         show.setMainField1("こんにちは")
@@ -278,34 +263,13 @@
                             await sleep();
 
                         }
-                        /*
-                        for (let i = 0; i < count; i++) {
-                            let rpcResponse = await app.sendRPCJson(
-                                {
-                                    "method": "Show",
-                                    "params": {
-                                        "mainField1": "Exiting in " + (count - i).toString(),
-                                        "mainField2": "",
-                                        "mainField3": "",
 
-                                    }
-                                }
-                            );
-
-                            await sleep();
-
-                        }
-                        */
                         app.exit();
 
                     }
 
                 }
             });
-
-            // app.on('INCOMING_RPC.OnHMIStatus', (rpcMessage) => {
-            //     console.log(`hmi status update`, rpcMessage);
-            // });
 
         })();
     </script>
