@@ -37,7 +37,6 @@
             }
         };
 
-
         class TestApp1 extends EventEmitter {
 
             constructor() {
@@ -64,8 +63,26 @@
 
                 this._eventListeners = [];
                 this._appConfig = appConfig;
-                let baseTransportConfig = new SDL.transport.WebsocketTransportConfig('ws://localhost', 9090);
-                this._sdlSession = new SDL.session.WsClientSession(baseTransportConfig, this);
+                // session listener logic
+                const sessionListener = new SDL.session.SdlSessionListener();
+                sessionListener.setOnProtocolSessionStarted(() => {
+                    this.emit('onProtocolSessionStarted')
+                });
+                sessionListener.setOnProtocolSessionEnded(() => {
+                });
+                sessionListener.setOnProtocolSessionEndedNACKed(() => {
+                });
+                sessionListener.setOnRpcMessageReceived((rpcMessage) => {
+                    let functionName = rpcMessage.getFunctionName();
+                    let parameters = rpcMessage.getParameters();
+                    this.emit('INCOMING_RPC', rpcMessage);
+                });
+                sessionListener.setOnTransportConnected(() => {
+                    this.emit('onTransportConnected', {})
+                });
+
+                let baseTransportConfig = new SDL.transport.WebsocketTransportConfig('ws://localhost', 5050);
+                this._sdlSession = new SDL.session.WsClientSession(baseTransportConfig, sessionListener);
                 this._maxCorrelationId = 0;
             }
 
@@ -181,24 +198,6 @@
                     });
                     self._sdlSession.start();
                 })
-            }
-
-            async onTransportConnected() {
-                this.emit('onTransportConnected', {})
-            }
-            async onProtocolSessionEnded() {
-            }
-            async onProtocolSessionEndedNACKed() {
-            }
-
-            async onProtocolSessionStarted() {
-                this.emit('onProtocolSessionStarted')
-            }
-
-            async onRpcMessageReceived(rpcMessage) {
-                let functionName = rpcMessage.getFunctionName();
-                let parameters = rpcMessage.getParameters();
-                this.emit('INCOMING_RPC', rpcMessage);
             }
 
             async _unregister() {
