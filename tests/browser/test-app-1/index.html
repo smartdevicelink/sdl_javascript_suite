@@ -82,7 +82,7 @@
                 });
 
                 let baseTransportConfig = new SDL.transport.WebsocketTransportConfig('ws://localhost', 5050);
-                this._sdlSession = new SDL.session.WsClientSession(baseTransportConfig, sessionListener);
+                this._sdlSession = new SDL.session.SdlSession(baseTransportConfig, sessionListener);
                 this._maxCorrelationId = 0;
             }
 
