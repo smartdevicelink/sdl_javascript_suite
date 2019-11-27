@@ -1,0 +1,282 @@
+<html>
+
+<head>
+    <script src='./SDL.js'></script>
+
+    <script>
+
+        class EventEmitter {
+            constructor() {
+                this.events = {};
+            }
+            on(event, listener) {
+                if (typeof this.events[event] !== 'object') {
+                    this.events[event] = [];
+                }
+                this.events[event].push(listener);
+                return () => this.removeListener(event, listener);
+            }
+            removeListener(event, listener) {
+                if (typeof this.events[event] === 'object') {
+                    const idx = this.events[event].indexOf(listener);
+                    if (idx > -1) {
+                        this.events[event].splice(idx, 1);
+                    }
+                }
+            }
+            emit(event, ...args) {
+                if (typeof this.events[event] === 'object') {
+                    this.events[event].forEach(listener => listener.apply(this, args));
+                }
+            }
+            once(event, listener) {
+                const remove = this.on(event, (...args) => {
+                    remove();
+                    listener.apply(this, args);
+                });
+            }
+        };
+
+        class TestApp1 extends EventEmitter {
+
+            constructor() {
+                super();
+                let appID = 'hello-sdl';
+
+                let appConfig = {
+                    "appName": 'Hello SDL',
+                    "appID": appID,
+                    "fullAppID": appID,
+                    "appHMIType": [
+                        "DEFAULT",
+                        "MEDIA"
+                    ],
+                    "hmiDisplayLanguageDesired": "EN-US",
+                    "isMediaApplication": false,
+                    "languageDesired": "EN-US",
+                    "syncMsgVersion": {
+                        "majorVersion": 5,
+                        "minorVersion": 2,
+                        "patchVersion": 0
+                    }
+                };
+
+                this._eventListeners = [];
+                this._appConfig = appConfig;
+                // session listener logic
+                const sessionListener = new SDL.session.SdlSessionListener();
+                sessionListener.setOnProtocolSessionStarted(() => {
+                    this.emit('onProtocolSessionStarted')
+                });
+                sessionListener.setOnProtocolSessionEnded(() => {
+                });
+                sessionListener.setOnProtocolSessionEndedNACKed(() => {
+                });
+                sessionListener.setOnRpcMessageReceived((rpcMessage) => {
+                    this.emit('INCOMING_RPC', rpcMessage);
+                });
+                sessionListener.setOnTransportConnected(() => {
+                    this.emit('onTransportConnected', {})
+                });
+
+                let baseTransportConfig = new SDL.transport.WebsocketTransportConfig('ws://localhost', 5050);
+                this._sdlSession = new SDL.session.SdlSession(baseTransportConfig, sessionListener);
+                this._maxCorrelationId = 0;
+            }
+
+            static async startApp() {
+                let obj = new this();
+                await obj._init();
+                return obj;
+            }
+
+            async _init() {
+                console.log('start connection');
+                await this._startConnection();
+                console.log('start service');
+                await this._startService();
+                console.log('register app');
+                await this._registerApp();
+                console.log('set app icon');
+                await this._setAppIcon();
+            }
+
+            async _fetchImageBase64(path) {
+                let img = await fetch(path);
+                let blob = await img.blob();
+                return blob;
+                // return this.blobToBase64(blob);
+            }
+
+            async _fetchImageUnit8Array(path) {
+                let img = await fetch(path);
+                let blob = await img.blob();
+                let aryBuffer = await new Response(blob).arrayBuffer();
+                return new Uint8Array(aryBuffer);
+            }
+
+            async _setAppIcon() {
+                const fileBinary = await this._fetchImageUnit8Array('./test_icon_1.png');
+                const fileName = this._appConfig.appID + '_icon.gif';
+
+                let putFile = await this.sendRPC(
+                    new SDL.rpc.messages.PutFile()
+                        .setFileName(fileName)
+                        .setFileType('GRAPHIC_PNG')
+                        .setPersistentFile(true)
+                        .setFileData(fileBinary)
+                );
+
+
+                let setIconResult = await this.sendRPC(
+                    new SDL.rpc.messages.SetAppIcon()
+                        .setFileName(fileName)
+                );
+            }
+
+            async _registerApp() {
+                const version = new SDL.rpc.structs.SdlMsgVersion();
+                version.setMajorVersion(this._appConfig.syncMsgVersion.major)
+                    .setMinorVersion(this._appConfig.syncMsgVersion.minor)
+                    .setPatchVersion(this._appConfig.syncMsgVersion.patch);
+
+                const rai = new SDL.rpc.messages.RegisterAppInterface();
+                rai.setSdlMsgVersion(version)
+                    .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
+                    .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
+                    .setIsMediaApplication(false)
+                    .setAppName(this._appConfig.appName)
+                    .setFullAppId(this._appConfig.appID)
+                    .setAppHmiType([
+                        SDL.rpc.enums.AppHMIType.DEFAULT,
+                        SDL.rpc.enums.AppHMIType.MEDIA,
+                    ])
+
+                let result = await this.sendRPC(rai);
+            }
+
+            async sendRPC(rpcRequest) {
+                rpcRequest.setCorrelationId(++this._maxCorrelationId);
+
+                const self = this;
+                return new Promise((resolve) => {
+                    let correlationId = rpcRequest.getCorrelationID();
+
+                    self.on('INCOMING_RPC', (rpcResponse) => {
+                        let responseCorrelationId = rpcResponse.getCorrelationID();
+
+                        if (responseCorrelationId === correlationId) {
+                            return resolve(rpcResponse);
+                        }
+                    });
+
+                    self._sdlSession.sendRpc(rpcRequest);
+
+                })
+            }
+
+            async _startService() {
+
+                const self = this;
+                return new Promise((resolve) => {
+                    self.on('onProtocolSessionStarted', () => {
+                        return resolve();
+                    });
+
+                    self._sdlSession.startService(SDL.protocol.enums.ServiceType.RPC, 0, false);
+
+                })
+            }
+
+            async _startConnection() {
+                const self = this;
+                return new Promise((resolve) => {
+                    self.once('onTransportConnected', () => {
+                        return resolve();
+                    });
+                    self._sdlSession.start();
+                })
+            }
+
+            async _unregister() {
+                await this.sendRPC(new SDL.rpc.messages.UnregisterAppInterface());
+            }
+
+            async exit() {
+                await this._unregister();
+                this._sdlSession.endSession();
+            }
+        }
+
+    </script>
+
+
+    <script>
+
+        async function sleep(timeout = 1000) {
+            return new Promise((resolve) => {
+                setTimeout(resolve, timeout);
+            })
+        }
+
+
+        (async function () {
+            console.log('start app');
+            let app = await TestApp1.startApp();
+
+            console.log('app started and registered', app);
+            console.log('start listeners');
+            app.on('INCOMING_RPC', async (rpcMessage) => {
+                let functionName = rpcMessage.getFunctionName();
+
+                console.log(`INCOMING_RPC`, functionName, rpcMessage);
+
+                if (functionName === 'OnHMIStatus') {
+                    let parameters = rpcMessage.getParameters();
+                    let { hmiLevel } = parameters;
+                    if (hmiLevel === 'FULL') {
+
+                        const show = new SDL.rpc.messages.Show();
+                        show.setMainField1("こんにちは")
+                            .setMainField2("你好 ( ni hao / nĭ hăo )")
+                            .setMainField3("@#$#%$^^%&**&(_     !@#$@#$~~~```");
+
+                        let rpcResponse = await app.sendRPC(show);
+
+                        console.log(`show message response`, rpcResponse);
+
+                        await sleep();
+
+                        let count = 3;
+                        for (let i = 0; i < count; i++) {
+
+                            const showCountdown = new SDL.rpc.messages.Show();
+                            showCountdown.setMainField1("Exiting in " + (count - i).toString())
+                                .setMainField2("")
+                                .setMainField3("");
+
+                            let rpcResponse = await app.sendRPC(showCountdown);
+
+                            await sleep();
+
+                        }
+
+                        app.exit();
+
+                    }
+
+                }
+            });
+
+        })();
+    </script>
+</head>
+
+
+<body>
+
+    <!-- <img src="./test_icon_1.png" /> -->
+
+</body>
+
+</html>
