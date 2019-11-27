@@ -2,7 +2,7 @@ const SDL = require('../../../lib/node/src/index.js');
 
 module.exports = {
     appId: 'hello-node',
-    appName: 'Hello Node',
+    appName: 'hello-node',
     port: process.env.APP_PORT || 3005,
     timeout: 5000,
     ssl: new SDL.transport.SslConfig(),
