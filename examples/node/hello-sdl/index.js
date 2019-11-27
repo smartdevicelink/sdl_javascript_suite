@@ -54,7 +54,6 @@ async function startApp () {
         console.log('INCOMING_RPC', functionName, parameters);
 
         if (functionName === 'OnHMIStatus') {
-            const parameters = rpcMessage.getParameters();
             const { hmiLevel, } = parameters;
             if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
                 await onHMIFull();
