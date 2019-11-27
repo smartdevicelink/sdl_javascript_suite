@@ -36,6 +36,7 @@ const SDL = require('../../../lib/node/src/index.js');
 
 const CONFIG = require('./config.js');
 const WebSocketServerTransport = SDL.transport.WebSocketServerTransport;
+const TransportCallback = SDL.transport.TransportCallback;
 const ServiceType = SDL.protocol.enums.ServiceType;
 const RpcRequest = SDL.rpc.RpcRequest;
 const RpcType = SDL.rpc.enums.RpcType;
@@ -63,19 +64,13 @@ class MyApp extends EventEmitter {
                 'patchVersion': 0,
             },
         };
-        // this._sdlSession = new SDL.session.WsClientSession(
-        //     new SDL.transport.WebsocketTransportConfig('ws://localhost', 9090),
-        //     this
-        // );
         this._maxCorrelationId = 0;
         
-        console.log(`constructor`);
         let baseTransportConfig = new CustomTransportConfig(
             new WebSocketServerTransport(
                 new WebSocketServerConfig(
                     CONFIG.port
-                )
-                ,this));
+                ), new TransportCallback()));
 
         this._sdlSession = new SdlSession(baseTransportConfig, this);
     }
@@ -97,7 +92,7 @@ class MyApp extends EventEmitter {
         await this._setAppIcon();
     }
 
-    async _fetchImageUnit8Array(path) {
+    async _fetchImageUnit8Array (path) {
         const aryBuffer = fs.readFileSync(path, null);
         return new Uint8Array(aryBuffer);
     }

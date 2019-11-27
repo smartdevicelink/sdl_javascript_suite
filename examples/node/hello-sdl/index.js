@@ -40,9 +40,10 @@ async function sleep (timeout = 1000) {
     });
 }
 
+let app = null;
 async function startApp () {
     console.log('start app');
-    let app = await MyApp.startApp();
+    app = await MyApp.startApp();
 
     console.log('app started and registered', app);
     console.log('start listeners');
@@ -56,31 +57,37 @@ async function startApp () {
             const parameters = rpcMessage.getParameters();
             const { hmiLevel, } = parameters;
             if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
-                await app.sendRPC(
-                    new SDL.rpc.messages.Show()
-                        .setMainField1('Hello')
-                        .setMainField2('こんにちは')
-                        .setMainField3('你好 ( ni hao / nĭ hăo )')
-                        .setMainField4('')
-                );
-
-                await sleep(10 * 1000);
-
-                const count = 3;
-                for (let idx = 0; idx < count; idx++) {
-                    await app.sendRPC(
-                        new SDL.rpc.messages.Show()
-                            .setMainField1(`Exiting in ${(count - idx)}`)
-                            .setMainField2('')
-                            .setMainField3('')
-                            .setMainField4('')
-                    );
-                    await sleep();
-                }
-                app.exit();
+                await onHMIFull();
             }
         }
     });
+}
+
+async function onHMIFull () {
+    await app.sendRPC(
+        new SDL.rpc.messages.Show()
+            .setMainField1('Hello')
+            .setMainField2('こんにちは')
+            .setMainField3('你好 ( ni hao / nĭ hăo )')
+            .setMainField4('')
+    );
+    await sleep(CONFIG.appLifespan * 1000);
+    await testExit();
+}
+
+async function testExit () {
+    const count = 3;
+    for (let idx = 0; idx < count; idx++) {
+        await app.sendRPC(
+            new SDL.rpc.messages.Show()
+                .setMainField1(`Exiting in ${(count - idx)}`)
+                .setMainField2('')
+                .setMainField3('')
+                .setMainField4('')
+        );
+        await sleep();
+    }
+    app.exit();
 }
 
 
