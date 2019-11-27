@@ -31,45 +31,63 @@
 */
 
 const SDL = require('../../../lib/node/src/index.js');
-const config = {
-    port: 3005,
-    timeout: 5000,
-    ssl: new SDL.transport.SslConfig()
-};
+const CONFIG = require('./config.js');
+const MyApp = require('./MyApp.js');
 
-const transport = new SDL.transport.WebSocketServer(
-    new SDL.transport.WebSocketServerConfig(
-        config.port,
-        config.timeout,
-        config.ssl
-    ),
-    new SDL.transport.TransportListener()
-);
-transport._transportListener.setOnTransportConnected(function () {
-    console.log('TODO: Sending RAI SdlPacket');
-    // transport.sendPacket();
-});
+async function sleep (timeout = 1000) {
+    return new Promise((resolve) => { 
+        setTimeout(resolve, timeout);
+    });
+}
 
-transport.start();
+let app = null;
+async function startApp () {
+    console.log('start app');
+    app = await MyApp.startApp();
+
+    console.log('app started and registered', app);
+    console.log('start listeners');
+    app.on('INCOMING_RPC', async (rpcMessage) => {
+        const functionName = rpcMessage.getFunctionName();
+        const parameters = rpcMessage.getParameters();
+
+        console.log('INCOMING_RPC', functionName, parameters);
+
+        if (functionName === 'OnHMIStatus') {
+            const { hmiLevel, } = parameters;
+            if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
+                await onHMIFull();
+            }
+        }
+    });
+}
+
+async function onHMIFull () {
+    await app.sendRPC(
+        new SDL.rpc.messages.Show()
+            .setMainField1('Hello')
+            .setMainField2('こんにちは')
+            .setMainField3('你好 ( ni hao / nĭ hăo )')
+            .setMainField4('')
+    );
+    await sleep(CONFIG.appLifespan * 1000);
+    await testExit();
+}
+
+async function testExit () {
+    const count = 3;
+    for (let idx = 0; idx < count; idx++) {
+        await app.sendRPC(
+            new SDL.rpc.messages.Show()
+                .setMainField1(`Exiting in ${(count - idx)}`)
+                .setMainField2('')
+                .setMainField3('')
+                .setMainField4('')
+        );
+        await sleep();
+    }
+    app.exit();
+}
 
 
-
-
-
-
-const WebSocket = require('ws');
-
-const exampleSocket = new WebSocket(`ws://localhost:${config.port}`);
-
-exampleSocket.on('open', function() {
-    console.log("client received open event");
-    console.log("client sending text");
-    exampleSocket.send("This is text");
-    console.log("client sending binary");
-    exampleSocket.send(new Uint8Array(8));
-});
-
-setTimeout(() => {
-    console.log('client terminating connection');
-    exampleSocket.terminate();
-}, 18000);
+startApp();
