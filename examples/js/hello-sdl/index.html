@@ -73,8 +73,6 @@
                 sessionListener.setOnProtocolSessionEndedNACKed(() => {
                 });
                 sessionListener.setOnRpcMessageReceived((rpcMessage) => {
-                    let functionName = rpcMessage.getFunctionName();
-                    let parameters = rpcMessage.getParameters();
                     this.emit('INCOMING_RPC', rpcMessage);
                 });
                 sessionListener.setOnTransportConnected(() => {
@@ -138,16 +136,16 @@
 
             async _registerApp() {
                 const version = new SDL.rpc.structs.SdlMsgVersion();
-                version.setMajorVersion(5)
-                    .setMinorVersion(2)
-                    .setPatchVersion(0);
+                version.setMajorVersion(this._appConfig.syncMsgVersion.major)
+                    .setMinorVersion(this._appConfig.syncMsgVersion.minor)
+                    .setPatchVersion(this._appConfig.syncMsgVersion.patch);
 
                 const rai = new SDL.rpc.messages.RegisterAppInterface();
                 rai.setSdlMsgVersion(version)
                     .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
                     .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
                     .setIsMediaApplication(false)
-                    .setAppName(this._appConfig.appID)
+                    .setAppName(this._appConfig.appName)
                     .setFullAppId(this._appConfig.appID)
                     .setAppHmiType([
                         SDL.rpc.enums.AppHMIType.DEFAULT,
