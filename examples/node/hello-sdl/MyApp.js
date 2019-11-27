@@ -30,14 +30,22 @@
 * POSSIBILITY OF SUCH DAMAGE.
 */
 
+const fs = require('fs');
+const EventEmitter = require('events');
 const SDL = require('../../../lib/node/src/index.js');
+
 const CONFIG = require('./config.js');
-const EventEmitter = require('./EventEmitter.js');
+const WebSocketServerTransport = SDL.transport.WebSocketServerTransport;
+const ServiceType = SDL.protocol.enums.ServiceType;
+const RpcRequest = SDL.rpc.RpcRequest;
+const RpcType = SDL.rpc.enums.RpcType;
+const WebSocketServerConfig = SDL.transport.WebSocketServerConfig;
+const SdlSession = SDL.session.SdlSession;
+const CustomTransportConfig = SDL.transport.CustomTransportConfig;
 
 class MyApp extends EventEmitter {
     constructor () {
         super();
-        this._eventListeners = [];
         this._appConfig = {
             'appName': CONFIG.appId,
             'appID': CONFIG.appId,
@@ -55,11 +63,27 @@ class MyApp extends EventEmitter {
                 'patchVersion': 0,
             },
         };
-        this._sdlSession = new SDL.session.WsClientSession(
-            new SDL.transport.WebsocketTransportConfig('ws://localhost', 9090),
-            this
-        );
+        // this._sdlSession = new SDL.session.WsClientSession(
+        //     new SDL.transport.WebsocketTransportConfig('ws://localhost', 9090),
+        //     this
+        // );
         this._maxCorrelationId = 0;
+        
+        console.log(`constructor`);
+        let baseTransportConfig = new CustomTransportConfig(
+            new WebSocketServerTransport(
+                new WebSocketServerConfig(
+                    CONFIG.port
+                )
+                ,this));
+
+        this._sdlSession = new SdlSession(baseTransportConfig, this);
+    }
+
+    static async startApp () {
+        const obj = new this();
+        await obj._init();
+        return obj;
     }
 
     async _init () {
@@ -73,17 +97,8 @@ class MyApp extends EventEmitter {
         await this._setAppIcon();
     }
 
-    async _fetchImageBase64 (path) {
-        const img = await fetch(path);
-        const blob = await img.blob();
-        return blob;
-        // return this.blobToBase64(blob);
-    }
-
-    async _fetchImageUnit8Array (path) {
-        const img = await fetch(path);
-        const blob = await img.blob();
-        const aryBuffer = await new Response(blob).arrayBuffer();
+    async _fetchImageUnit8Array(path) {
+        const aryBuffer = fs.readFileSync(path, null);
         return new Uint8Array(aryBuffer);
     }
 

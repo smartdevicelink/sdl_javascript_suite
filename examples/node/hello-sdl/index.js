@@ -34,80 +34,54 @@ const SDL = require('../../../lib/node/src/index.js');
 const CONFIG = require('./config.js');
 const MyApp = require('./MyApp.js');
 
-/*
 async function sleep (timeout = 1000) {
-    return new Promise((resolve) => {
+    return new Promise((resolve) => { 
         setTimeout(resolve, timeout);
     });
 }
 
-(async function () {
+async function startApp () {
     console.log('start app');
-    const app = await new MyApp()._init();
+    let app = await MyApp.startApp();
 
     console.log('app started and registered', app);
     console.log('start listeners');
     app.on('INCOMING_RPC', async (rpcMessage) => {
-        let functionName = rpcMessage.getFunctionName();
+        const functionName = rpcMessage.getFunctionName();
+        const parameters = rpcMessage.getParameters();
 
-        console.log(`INCOMING_RPC`, functionName, rpcMessage);
+        console.log('INCOMING_RPC', functionName, parameters);
 
         if (functionName === 'OnHMIStatus') {
-            let parameters = rpcMessage.getParameters();
-            let { hmiLevel } = parameters;
-            if (hmiLevel === 'FULL') {
+            const parameters = rpcMessage.getParameters();
+            const { hmiLevel, } = parameters;
+            if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
+                await app.sendRPC(
+                    new SDL.rpc.messages.Show()
+                        .setMainField1('Hello')
+                        .setMainField2('こんにちは')
+                        .setMainField3('你好 ( ni hao / nĭ hăo )')
+                        .setMainField4('')
+                );
 
-                const show = new SDL.rpc.messages.Show();
-                show.setMainField1("こんにちは")
-                    .setMainField2("你好 ( ni hao / nĭ hăo )")
-                    .setMainField3("@#$#%$^^%&**&(_     !@#$@#$~~~```");
+                await sleep(10 * 1000);
 
-                let rpcResponse = await app.sendRPC(show);
-
-                console.log('show message response', rpcResponse);
-
-                await sleep();
-
-                let count = 3;
-                for (let i = 0; i < count; i++) {
-
-                    const showCountdown = new SDL.rpc.messages.Show();
-                    showCountdown.setMainField1("Exiting in " + (count - i).toString())
-                        .setMainField2("")
-                        .setMainField3("");
-
-                    let rpcResponse = await app.sendRPC(showCountdown);
-
+                const count = 3;
+                for (let idx = 0; idx < count; idx++) {
+                    await app.sendRPC(
+                        new SDL.rpc.messages.Show()
+                            .setMainField1(`Exiting in ${(count - idx)}`)
+                            .setMainField2('')
+                            .setMainField3('')
+                            .setMainField4('')
+                    );
                     await sleep();
-
                 }
                 app.exit();
             }
         }
     });
-})();
-*/
-
-
-
-const myApp = new SDL.transport.WebSocketServer(
-    new SDL.transport.WebSocketServerConfig(
-        CONFIG.port,
-        CONFIG.timeout,
-        CONFIG.ssl
-    ),
-    new SDL.transport.TransportListener()
-        .setOnTransportConnected(onTransportConnected)
-        .setOnPacketReceived(onPacketReceived)
-);
-
-function onTransportConnected () {
-    console.log('Client connected to server');
 }
 
-function onPacketReceived (packet) {
-    console.log("packet received");
-    console.log(packet);
-}
 
-myApp.start();
+startApp();
