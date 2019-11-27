@@ -136,9 +136,9 @@
 
             async _registerApp() {
                 const version = new SDL.rpc.structs.SdlMsgVersion();
-                version.setMajorVersion(this._appConfig.syncMsgVersion.major)
-                    .setMinorVersion(this._appConfig.syncMsgVersion.minor)
-                    .setPatchVersion(this._appConfig.syncMsgVersion.patch);
+                version.setMajorVersion(this._appConfig.syncMsgVersion.majorVersion)
+                    .setMinorVersion(this._appConfig.syncMsgVersion.minorVersion)
+                    .setPatchVersion(this._appConfig.syncMsgVersion.patchVersion);
 
                 const rai = new SDL.rpc.messages.RegisterAppInterface();
                 rai.setSdlMsgVersion(version)
