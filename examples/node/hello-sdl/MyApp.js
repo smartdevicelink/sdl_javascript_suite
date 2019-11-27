@@ -77,19 +77,15 @@ class MyApp extends EventEmitter {
 
     static async startApp () {
         const obj = new this();
-        await obj._init();
+        obj.registerApp(); // do not wait for this method to complete!
         return obj;
     }
 
-    async _init () {
+    async registerApp () {
         console.log('start connection');
         await this._startConnection();
         console.log('start service');
         await this._startService();
-        this.registerApp(); // do not wait for this method to complete!
-    }
-
-    async registerApp () {
         console.log('register app');
         await this._registerApp();
         console.log('set app icon');
