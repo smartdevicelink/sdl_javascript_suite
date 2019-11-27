@@ -45,7 +45,7 @@ class MyApp extends EventEmitter {
     constructor () {
         super();
         this._appConfig = {
-            'appName': CONFIG.appId,
+            'appName': CONFIG.appName,
             'appID': CONFIG.appId,
             'fullAppID': CONFIG.appId,
             'appHMIType': [
@@ -56,14 +56,14 @@ class MyApp extends EventEmitter {
             'isMediaApplication': false,
             'languageDesired': 'EN-US',
             'syncMsgVersion': {
-                'majorVersion': 3,
-                'minorVersion': 1,
+                'majorVersion': 5,
+                'minorVersion': 2,
                 'patchVersion': 0,
             },
         };
         this._maxCorrelationId = 0;
         
-        let baseTransportConfig = new CustomTransportConfig(
+        const baseTransportConfig = new CustomTransportConfig(
             new WebSocketServerTransport(
                 new WebSocketServerConfig(
                     CONFIG.port
@@ -119,14 +119,14 @@ class MyApp extends EventEmitter {
             new SDL.rpc.messages.RegisterAppInterface()
                 .setSdlMsgVersion(
                     new SDL.rpc.structs.SdlMsgVersion()
-                        .setMajorVersion(3)
-                        .setMinorVersion(1)
-                        .setPatchVersion(0)
+                        .setMajorVersion(this._appConfig.syncMsgVersion.majorVersion)
+                        .setMinorVersion(this._appConfig.syncMsgVersion.minorVersion)
+                        .setPatchVersion(this._appConfig.syncMsgVersion.patchVersion)
                 )
                 .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
                 .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
                 .setIsMediaApplication(false)
-                .setAppName(this._appConfig.appID)
+                .setAppName(this._appConfig.appName)
                 .setFullAppId(this._appConfig.appID)
                 .setAppHmiType([
                     SDL.rpc.enums.AppHMIType.DEFAULT,
@@ -138,11 +138,10 @@ class MyApp extends EventEmitter {
     async sendRPC (rpcRequest) {
         rpcRequest.setCorrelationId(++this._maxCorrelationId);
 
-        const self = this;
         return new Promise((resolve) => {
             const correlationId = rpcRequest.getCorrelationID();
 
-            self.on('INCOMING_RPC', (rpcResponse) => {
+            this.on('INCOMING_RPC', (rpcResponse) => {
                 const responseCorrelationId = rpcResponse.getCorrelationID();
 
                 if (responseCorrelationId === correlationId) {
@@ -150,28 +149,26 @@ class MyApp extends EventEmitter {
                 }
             });
 
-            self._sdlSession.sendRpc(rpcRequest);
+            this._sdlSession.sendRpc(rpcRequest);
         });
     }
 
     async _startService () {
-        const self = this;
         return new Promise((resolve) => {
-            self.on('onProtocolSessionStarted', () => {
+            this.on('onProtocolSessionStarted', () => {
                 return resolve();
             });
 
-            self._sdlSession.startService(SDL.protocol.enums.ServiceType.RPC, 0, false);
+            this._sdlSession.startService(SDL.protocol.enums.ServiceType.RPC, 0, false);
         });
     }
 
     async _startConnection () {
-        const self = this;
         return new Promise((resolve) => {
-            self.once('onTransportConnected', () => {
+            this.once('onTransportConnected', () => {
                 return resolve();
             });
-            self._sdlSession.start();
+            this._sdlSession.start();
         });
     }
 
