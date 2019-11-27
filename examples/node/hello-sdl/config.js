@@ -5,5 +5,5 @@ module.exports = {
     port: process.env.APP_PORT || 3005,
     timeout: 5000,
     ssl: new SDL.transport.SslConfig(),
-    appLifespan: process.env.APP_LIFESPAN || 10 * 60, // automatically closes the app after 10 minutes
+    appLifespan: process.env.APP_LIFESPAN || 5, // automatically closes the app after 5 seconds
 };
