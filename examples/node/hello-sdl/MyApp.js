@@ -99,7 +99,7 @@ class MyApp extends EventEmitter {
 
     async _setAppIcon () {
         const fileBinary = await this._fetchImageUnit8Array('./test_icon_1.png');
-        const fileName = `${CONFIG.appId}_icon.gif`;
+        const fileName = `${CONFIG.appId}_icon.png`;
 
         // Save the image file to Core
         await this.sendRPC(
