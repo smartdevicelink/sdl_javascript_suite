@@ -4,10 +4,10 @@ Note: This is a living document managed by the SDL Project Maintainer and may ch
 ### File Structure
 
 #### Common Library
-Common library files shall be stored in the `/lib/js` directory, grouped into subdirectories by their logic type (e.g. protocol, transport, session, rpc, manager, util), similar to the Java Suite.
+Common library files shall be stored in the `/lib/js/src` directory, grouped into subdirectories by their logic type (e.g. protocol, transport, session, rpc, manager, util), similar to the Java Suite. Compressed distributions of the library shall be written to `/lib/js/dist/SDL.js`.
 
 #### Node.js Library
-Node.js library files shall be stored in the `/lib/node` directory, grouped into subdirectories in the same way as common files.
+Node.js library files shall be stored in the `/lib/node/src` directory, grouped into subdirectories in the same way as common files.
 
 #### Example Projects
 Example projects shall be located in the `/examples/js` and `/examples/node` directories, respectively.
@@ -15,15 +15,37 @@ Example projects shall be located in the `/examples/js` and `/examples/node` dir
 
 ### Object-oriented Programming
 - Concepts must be broken down into classes for an object-oriented programming methodology.
-- Although ECMAScript does not yet officially support private properties, properties shall be named with an underscore prefix to avoid conflict with getters and setters and to allow for an easy transition to private properties when they become available.
-- Rather than promoting the direct manipulation of property values, the use of prefixed `get` and `set` methods shall be used. For example: `setMajor(major)` and `getMajor()`.
+- Although ECMAScript does not yet officially support private properties, properties shall be named with an underscore prefix to allow for an easy transition to private properties when they become available.
+- Rather than promoting the direct manipulation of property values, the use of prefixed `get` and `set` methods shall be used. For example: `setMajor(major)` and `getMajor()`. The use of class "getters" and "setters" shall be avoided.
 - All `set` methods should return `this` in order to support method chaining.
-- Classes must contain a constructor, but the constructor _should not_ contain parameter type/value checking as a workaround for method overloading. For example, a semantic versioning class should have a constructor which accepts 3 parameters (major, minor, patch) and assigned to properties of the same/similar names prefixed with `_`. To also allow a semantic version string (e.g. "2.1.3") as input, a new `fromString(version)` method should be added to the class definition which parses the string and sets the proper `_major`, `_minor`, and `_patch` properties. See `/lib/js/util/Version.js` in the repository for an example.
+- Classes must contain a constructor, but the constructor _should not_ contain parameter type/value checking as a workaround for method overloading. For example, a semantic versioning class should have a constructor which accepts 3 parameters (major, minor, patch) and assigned to properties of the same/similar names prefixed with `_`. To also allow a semantic version string (e.g. "2.1.3") as input, a new `fromString(version)` method should be added to the class definition which parses the string and sets the proper `_major`, `_minor`, and `_patch` properties. See `/lib/js/src/util/Version.js` in the repository for an example.
 - Constructor parameters should be optional in most cases to support utilizing class methods as a helper without the need to initialize an instance with valid parameters.
 
 
 ### Enumerations
-Since JavaScript does not offer traditional enumerations, an abstract `Enum` class has been defined (see `/lib/js/util/Enum.js`) which shall be extended for the purpose of creating new enumerations. Each extended enumeration class must be named with the suffix `Type`, contain a constructor which calls `super()`, use ES6-style getters as `static` methods to support simple dot-access notation, and contain a `static valueForString(value)` method which returns a given enumeration **value** (not key) if it exists in the collection (otherwise `null`). See `/lib/js/transport/enums/TransportType.js` for an example.
+Since JavaScript does not offer traditional enumerations, an abstract `Enum` class has been defined (see `/lib/js/src/util/Enum.js`) which shall be extended for the purpose of creating new enumerations. Each extended enumeration class must be named to match the enum name in the RPC Spec, contain a constructor which calls `super()`, and contain a `static valueForString(key)` method which returns a given enumeration **value** if the provided **key** exists in the collection (otherwise `null`) using the `_valueForString(key)` private method found in the base `Enum` class. See `/lib/js/src/transport/enums/TransportType.js` for an example.
+
+Each enumeration class shall contain a private `_MAP` property defined as a frozen Object of key-value pairs. If an enumeration element in the RPC Spec contains an `internal_name` attribute, that value shall be used as the corresponding `_MAP` object key, otherwise the `name` shall be used as the key. The value of the pair shall be set to the value of the `hexvalue` attribute (if available), otherwise the `name` attribute.
+
+ES6-style getters as `static` methods shall be used in enum classes to support dot-access notation of `_MAP` values. The name of the getter methods shall always match the key of the corresponding `_MAP` attribute and follow the name/internal_name rules outlined above.
+
+
+### RPC Class Generation
+All RPC messages, RPC structs, and RPC enumerations, unless otherwise noted in this guidelines document, shall be created using an automated generation script which parses the [RPC Spec](https://github.com/smartdevicelink/rpc_spec/blob/master/MOBILE_API.xml) in accordance to [the RPC Generation Proposal](https://github.com/smartdevicelink/sdl_evolution/blob/master/proposals/0234-proxy-rpc-generation.md).
+
+The following special rules shall apply to the RPC generation script for the JavaScript library:
+* RPC messages of `messagetype="response"` in the RPC Spec shall generate files named with a `Response` suffix. e.g. `PutFileResponse.js`
+* RPC messages of `messagetype="request"` in the RPC Spec shall generate files named without a suffix. e.g. `PutFile.js`
+* RPC message parameter key constants shall match the RPC Spec to ensure proper functionality
+* RPC messages shall extend the `RpcRequest` or `RpcResponse` class (depending on their `messagetype` in the RPC Spec) and be stored in `/lib/js/src/rpc/messages`
+* RPC structs shall extend the `RpcStruct` class and be stored in `/lib/js/src/rpc/structs`
+* RPC enums shall extend the `Enum` class and be stored in `/lib/js/src/rpc/enums`
+* Parameters in the RPC Spec with `platform="documentation"` shall be skipped and not be included in the generated classes
+* RPC messages with zero applicable parameters shall be skipped and not written to disk. e.g. `AddSubMenuResponse`
+* Uses of the "sync" prefix shall be replaced with "sdl" (where it would not break functionality). E.g. `SyncMsgVersion -> SdlMsgVersion`
+* The `_MAP` keys and static getters of the `FunctionID` enum shall not include the `ID` suffix. e.g. `RegisterAppInterfaceID -> RegisterAppInterface`. All references to the `FunctionID` enum shall adopt this as well to ensure valid references.
+* `set` methods of RPC messages and RPC structs shall validate the type of the passed parameter by immediately calling `this.validateType([targetClass], [parameter]);`, followed by storing the passed parameter or object. Target classes used for validation must be imported into each respective message/struct file immediately following any copyright notice block comments.
+
 
 ### Module Exports & Imports
 
@@ -31,9 +53,9 @@ Since JavaScript does not offer traditional enumerations, an abstract `Enum` cla
 All common files (that is, files strictly built upon ECMA-Script 2017) shall export their components via the named convention (e.g. `export { BaseTransport };`). Likewise, imports shall always use the named convention and use relative file paths (e.g. `import { BaseTransport } from '../transport/BaseTransport.js';`).
 
 #### Node.js
-For development purposes, Node.js shall utilize the `esm` NPM module to support the common library's `import { Name } from '...'` syntax without the need for a build/transpiling process. The module is included in `/examples/node/hello-sdl/package.json` and the corresponding `npm start` command is configured to use the module upon start-up. Prior to official release, a build process may be determined by the Project Maintainer and implemented to eliminate the `esm` dependency for third-party developers.
+To utilize the common JavaScript library, you must first execute the build process to create a distribution file by running `npm run build` from the root directory. The generated distribution file (located at `/lib/js/dist/SDL.js`) is compatible with both vanilla JavaScript and Node.js.
 
-For Node.js-specific components, ES module syntax shall be used. For example, `module.exports = WebsocketServer;` for exports; `const WebsocketServer = require('../transport/WebsocketServer.js');` for imports. See `/lib/node/transport/WebsocketServer.js` for a brief example of importing a Common library class, extending it, and exporting it as an ES module.
+For Node.js-specific components, ES module syntax shall be used. For example, `module.exports = WebsocketServerTransport;` for exports; `const SDL = require('../../../js/dist/SDL.js');` for imports. See `/lib/node/src/transport/WebsocketServerTransport.js` for a brief example of importing the common SDL.js library, extending it, and exporting the extension as an ES module.
 
 
 ### Choosing asynchronous control methods
@@ -48,7 +70,7 @@ __All methods__ must be documented immediately prior to their declaration using 
 ```
 /**
     * [Description of what the method does.]
-    * @param [param_name] [param_description]
+    * @param [param_name] - [param_description]
     * @return [What the method returns.]
 */
 ```
@@ -106,7 +128,7 @@ let result = thing[key];
 - Objects, functions, and instances should use camelCase.
 - Exported constants and constant class properties should be entirely uppercased.
 - Class names shall use PascalCase. eslint: `new-cap`
-- Acronyms should either be all uppercased or lowercased.
+- Acronyms and abbreviations shall use camelCase or PascalCase in accordance with the other naming rules.
 - Private class properties shall be indicated by using an underscore to prefix their name. These properties are still technically publicly accessible, but should not be directly accessed outside of the scope of their class definition.
 - Properties and methods which are `boolean` should be prefixed with `is`, `can`, or `has`. e.g. `isEnabled()` and `hasTitle()`
 
@@ -134,8 +156,8 @@ let thing = {
 ### Spacing & Tabs
 
 - Tabs should not be used. 4 consecutive spaces should be used in lieu of a tab. eslint: `indent`
-- Function signatures should include a single space after the `function` keyword and closing parenthesis. e.g. `function a(b) { ... }`. eslint: `space-before-function-paren`, `space-before-blocks`
-- Use a single space before the opening parenthesis in control statements. e.g. `if (isEnabled) { ... }` eslint: `keyword-spacing`
+- Function signatures should include a single space after the `function` keyword, the function name, and closing parenthesis. e.g. `function a (b) { ... }`. eslint: `space-before-function-paren`, `space-before-blocks`
+- Use a single space before the opening parenthesis and after the closing parenthesis in control statements. e.g. `if (isEnabled) { ... }` eslint: `keyword-spacing`
 - Pad curly braces with spaces on each side. e.g. `const thing = { key: 'value' };` eslint: `object-curly-spacing`
 - Square brackets should not be padded with spaces. e.g. `const things = [1, 2, 3];` eslint: `array-bracket-spacing`
 - Do not pad block internals with blank lines. eslint: `padded-blocks`
