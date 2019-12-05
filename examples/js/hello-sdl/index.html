@@ -37,14 +37,14 @@
             }
         };
 
-        class TestApp1 extends EventEmitter {
+        class HelloSdl extends EventEmitter {
 
             constructor() {
                 super();
-                let appID = 'hello-sdl';
+                let appID = 'hello-js';
 
                 let appConfig = {
-                    "appName": 'Hello SDL',
+                    "appName": 'Hello JS',
                     "appID": appID,
                     "fullAppID": appID,
                     "appHMIType": [
@@ -79,7 +79,7 @@
                     this.emit('onTransportConnected', {})
                 });
 
-                let baseTransportConfig = new SDL.transport.WebsocketTransportConfig('ws://localhost', 5050);
+                let baseTransportConfig = new SDL.transport.WebsocketClientTransportConfig('ws://localhost', 5050);
                 this._sdlSession = new SDL.session.SdlSession(baseTransportConfig, sessionListener);
                 this._maxCorrelationId = 0;
             }
@@ -158,11 +158,10 @@
             async sendRPC(rpcRequest) {
                 rpcRequest.setCorrelationId(++this._maxCorrelationId);
 
-                const self = this;
                 return new Promise((resolve) => {
                     let correlationId = rpcRequest.getCorrelationID();
 
-                    self.on('INCOMING_RPC', (rpcResponse) => {
+                    this.on('INCOMING_RPC', (rpcResponse) => {
                         let responseCorrelationId = rpcResponse.getCorrelationID();
 
                         if (responseCorrelationId === correlationId) {
@@ -170,9 +169,8 @@
                         }
                     });
 
-                    self._sdlSession.sendRpc(rpcRequest);
-
-                })
+                    this._sdlSession.sendRpc(rpcRequest);
+                });
             }
 
             async _startService() {
@@ -222,7 +220,7 @@
 
         (async function () {
             console.log('start app');
-            let app = await TestApp1.startApp();
+            let app = await HelloSdl.startApp();
 
             console.log('app started and registered', app);
             console.log('start listeners');
