@@ -62,12 +62,15 @@ class MyApp extends EventEmitter {
             },
         };
         this._maxCorrelationId = 0;
-        
+
         const baseTransportConfig = new CustomTransportConfig(
             new WebSocketServerTransport(
                 new WebSocketServerConfig(
                     CONFIG.port
-                ), new TransportCallback()));
+                ),
+                new TransportCallback()
+            )
+        );
 
         this._sdlSession = new SdlSession(baseTransportConfig, this);
     }

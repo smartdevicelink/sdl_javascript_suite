@@ -1,6 +1,6 @@
 {
-  "name": "hello-sdl",
-  "version": "0.0.1",
+  "name": "hello-sdl-node",
+  "version": "0.1.0",
   "description": "A barebones example of an SDL-enabled Node.js app",
   "main": "index.js",
   "dependencies": {
