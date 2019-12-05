@@ -16,14 +16,16 @@ Example projects shall be located in the `/examples/js` and `/examples/node` dir
 ### Object-oriented Programming
 - Concepts must be broken down into classes for an object-oriented programming methodology.
 - Although ECMAScript does not yet officially support private properties, properties shall be named with an underscore prefix to allow for an easy transition to private properties when they become available.
-- Rather than promoting the direct manipulation of property values, the use of prefixed `get` and `set` methods shall be used. For example: `setMajor(major)` and `getMajor()`. The use of class "getters" and "setters" shall be avoided.
+- Rather than promoting the direct manipulation of property values, the use of prefixed `get` and `set` methods shall be used. For example: `setMajor(1)` and `getMajor()`.
+- The use of ES6-style class "getters" and "setters" shall be avoided. For example: `static get major () { return this._major; }` and `static set major (val) { this._major = val; }`. An exception to this rule is made for enumerations (see "Enumerations" section below).
 - All `set` methods should return `this` in order to support method chaining.
 - Classes must contain a constructor, but the constructor _should not_ contain parameter type/value checking as a workaround for method overloading. For example, a semantic versioning class should have a constructor which accepts 3 parameters (major, minor, patch) and assigned to properties of the same/similar names prefixed with `_`. To also allow a semantic version string (e.g. "2.1.3") as input, a new `fromString(version)` method should be added to the class definition which parses the string and sets the proper `_major`, `_minor`, and `_patch` properties. See `/lib/js/src/util/Version.js` in the repository for an example.
 - Constructor parameters should be optional in most cases to support utilizing class methods as a helper without the need to initialize an instance with valid parameters.
+- File names shall match the class name defined in the file (including capitalization), unless otherwise noted in this document.
 
 
 ### Enumerations
-Since JavaScript does not offer traditional enumerations, an abstract `Enum` class has been defined (see `/lib/js/src/util/Enum.js`) which shall be extended for the purpose of creating new enumerations. Each extended enumeration class must be named to match the enum name in the RPC Spec, contain a constructor which calls `super()`, and contain a `static valueForString(key)` method which returns a given enumeration **value** if the provided **key** exists in the collection (otherwise `null`) using the `_valueForString(key)` private method found in the base `Enum` class. See `/lib/js/src/transport/enums/TransportType.js` for an example.
+Since JavaScript does not offer traditional enumerations, an abstract `Enum` class has been defined (see `/lib/js/src/util/Enum.js`) which shall be extended for the purpose of creating new enumerations. Each extended enumeration class must contain a constructor which calls `super()` and contain a `static valueForString(key)` method which returns a given enumeration **value** if the provided **key** exists in the collection (otherwise `null`) using the `_valueForString(key)` private method found in the base `Enum` class. See `/lib/js/src/transport/enums/TransportType.js` for an example. Special rules exist for enumerations contained in the RPC Spec (see "RPC Class Generation" section below).
 
 Each enumeration class shall contain a private `_MAP` property defined as a frozen Object of key-value pairs. If an enumeration element in the RPC Spec contains an `internal_name` attribute, that value shall be used as the corresponding `_MAP` object key, otherwise the `name` shall be used as the key. The value of the pair shall be set to the value of the `hexvalue` attribute (if available), otherwise the `name` attribute.
 
@@ -37,14 +39,13 @@ The following special rules shall apply to the RPC generation script for the Jav
 * RPC messages of `messagetype="response"` in the RPC Spec shall generate files named with a `Response` suffix. e.g. `PutFileResponse.js`
 * RPC messages of `messagetype="request"` in the RPC Spec shall generate files named without a suffix. e.g. `PutFile.js`
 * RPC message parameter key constants shall match the RPC Spec to ensure proper functionality
-* RPC messages shall extend the `RpcRequest` or `RpcResponse` class (depending on their `messagetype` in the RPC Spec) and be stored in `/lib/js/src/rpc/messages`
+* RPC messages shall extend the `RpcRequest`, `RpcResponse`, or `RpcNotification` class (depending on their `messagetype` in the RPC Spec) and be stored in `/lib/js/src/rpc/messages`
 * RPC structs shall extend the `RpcStruct` class and be stored in `/lib/js/src/rpc/structs`
 * RPC enums shall extend the `Enum` class and be stored in `/lib/js/src/rpc/enums`
-* Parameters in the RPC Spec with `platform="documentation"` shall be skipped and not be included in the generated classes
-* RPC messages with zero applicable parameters shall be skipped and not written to disk. e.g. `AddSubMenuResponse`
-* Uses of the "sync" prefix shall be replaced with "sdl" (where it would not break functionality). E.g. `SyncMsgVersion -> SdlMsgVersion`
+* Uses of the "sync" prefix shall be replaced with "sdl" (where it would not break functionality). E.g. `SyncMsgVersion -> SdlMsgVersion`. This applies to member variables and their accessors. The key used when creating the RPC message JSON should match that of the RPC Spec.
 * The `_MAP` keys and static getters of the `FunctionID` enum shall not include the `ID` suffix. e.g. `RegisterAppInterfaceID -> RegisterAppInterface`. All references to the `FunctionID` enum shall adopt this as well to ensure valid references.
 * `set` methods of RPC messages and RPC structs shall validate the type of the passed parameter by immediately calling `this.validateType([targetClass], [parameter]);`, followed by storing the passed parameter or object. Target classes used for validation must be imported into each respective message/struct file immediately following any copyright notice block comments.
+* Each extended RPC enumeration class must be named to match the enum name in the RPC Spec
 
 
 ### Module Exports & Imports
