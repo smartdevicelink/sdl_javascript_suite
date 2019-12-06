@@ -35,7 +35,7 @@ const CONFIG = require('./config.js');
 const MyApp = require('./MyApp.js');
 
 async function sleep (timeout = 1000) {
-    return new Promise((resolve) => { 
+    return new Promise((resolve) => {
         setTimeout(resolve, timeout);
     });
 }
@@ -54,8 +54,7 @@ async function startApp () {
         console.log('INCOMING_RPC', functionName, parameters);
 
         if (functionName === 'OnHMIStatus') {
-            const { hmiLevel, } = parameters;
-            if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
+            if (parameters.hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
                 await onHMIFull();
             }
         }
