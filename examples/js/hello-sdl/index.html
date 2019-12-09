@@ -79,7 +79,7 @@
                     this.emit('onTransportConnected', {})
                 });
 
-                let baseTransportConfig = new SDL.transport.WebsocketClientTransportConfig('ws://localhost', 5050);
+                let baseTransportConfig = new SDL.transport.WebSocketClientConfig('ws://localhost', 5050);
                 this._sdlSession = new SDL.session.SdlSession(baseTransportConfig, sessionListener);
                 this._maxCorrelationId = 0;
             }

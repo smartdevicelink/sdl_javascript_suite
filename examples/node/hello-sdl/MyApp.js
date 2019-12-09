@@ -35,8 +35,8 @@ const EventEmitter = require('events');
 const SDL = require('../../../lib/node/src/index.js');
 const CONFIG = require('./config.js');
 const CustomTransportConfig = SDL.transport.CustomTransportConfig;
-const WebSocketServerTransportConfig = SDL.transport.WebSocketServerTransportConfig;
-const WebSocketServerTransport = SDL.transport.WebSocketServerTransport;
+const WebSocketServerConfig = SDL.transport.WebSocketServerConfig;
+const WebSocketServer = SDL.transport.WebSocketServer;
 const TransportCallback = SDL.transport.TransportCallback;
 const SdlSession = SDL.session.SdlSession;
 
@@ -63,8 +63,8 @@ class MyApp extends EventEmitter {
         this._maxCorrelationId = 0;
 
         const baseTransportConfig = new CustomTransportConfig(
-            new WebSocketServerTransport(
-                new WebSocketServerTransportConfig(
+            new WebSocketServer(
+                new WebSocketServerConfig(
                     CONFIG.port,
                     CONFIG.timeout,
                     CONFIG.ssl
