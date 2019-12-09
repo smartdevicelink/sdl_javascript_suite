@@ -33,13 +33,12 @@
 const fs = require('fs');
 const EventEmitter = require('events');
 const SDL = require('../../../lib/node/src/index.js');
-
 const CONFIG = require('./config.js');
+const CustomTransportConfig = SDL.transport.CustomTransportConfig;
+const WebSocketServerTransportConfig = SDL.transport.WebSocketServerTransportConfig;
 const WebSocketServerTransport = SDL.transport.WebSocketServerTransport;
 const TransportCallback = SDL.transport.TransportCallback;
-const WebSocketServerConfig = SDL.transport.WebSocketServerConfig;
 const SdlSession = SDL.session.SdlSession;
-const CustomTransportConfig = SDL.transport.CustomTransportConfig;
 
 class MyApp extends EventEmitter {
     constructor () {
@@ -65,8 +64,10 @@ class MyApp extends EventEmitter {
 
         const baseTransportConfig = new CustomTransportConfig(
             new WebSocketServerTransport(
-                new WebSocketServerConfig(
-                    CONFIG.port
+                new WebSocketServerTransportConfig(
+                    CONFIG.port,
+                    CONFIG.timeout,
+                    CONFIG.ssl
                 ),
                 new TransportCallback()
             )
