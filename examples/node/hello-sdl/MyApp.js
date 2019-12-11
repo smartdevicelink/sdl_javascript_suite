@@ -139,7 +139,7 @@ class MyApp extends EventEmitter {
     }
 
     async sendRPC (rpcRequest) {
-        rpcRequest.setCorrelationId(++this._maxCorrelationId);
+        rpcRequest.setCorrelationID(++this._maxCorrelationId);
 
         return new Promise((resolve) => {
             const correlationId = rpcRequest.getCorrelationID();
