@@ -139,15 +139,15 @@ class MyApp extends EventEmitter {
     }
 
     async sendRPC (rpcRequest) {
-        rpcRequest.setCorrelationID(++this._maxCorrelationId);
+        rpcRequest.setCorrelationId(++this._maxCorrelationId);
 
         return new Promise((resolve) => {
-            const correlationId = rpcRequest.getCorrelationID();
+            const correlationId = rpcRequest.getCorrelationId();
 
             this.on('INCOMING_RPC', (rpcMessage) => {
                 // notifications could be passed in here
                 if (rpcMessage instanceof SDL.rpc.RpcResponse) {
-                    const responseCorrelationId = rpcMessage.getCorrelationID();
+                    const responseCorrelationId = rpcMessage.getCorrelationId();
 
                     if (responseCorrelationId === correlationId) {
                         return resolve(rpcMessage);
