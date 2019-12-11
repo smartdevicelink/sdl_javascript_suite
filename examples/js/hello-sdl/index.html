@@ -156,16 +156,19 @@
             }
 
             async sendRPC(rpcRequest) {
-                rpcRequest.setCorrelationId(++this._maxCorrelationId);
+                rpcRequest.setCorrelationID(++this._maxCorrelationId);
 
                 return new Promise((resolve) => {
                     let correlationId = rpcRequest.getCorrelationID();
 
-                    this.on('INCOMING_RPC', (rpcResponse) => {
-                        let responseCorrelationId = rpcResponse.getCorrelationID();
+                    this.on('INCOMING_RPC', (rpcMessage) => {
+                        // notifications could be passed in here
+                        if (rpcMessage instanceof SDL.rpc.RpcResponse) {
+                            let responseCorrelationId = rpcMessage.getCorrelationID();
 
-                        if (responseCorrelationId === correlationId) {
-                            return resolve(rpcResponse);
+                            if (responseCorrelationId === correlationId) {
+                                return resolve(rpcMessage);
+                            }
                         }
                     });
 
