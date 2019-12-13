@@ -137,20 +137,27 @@ class HelloSdl {
     _asyncSendRpc (request, timeout = 5000) {
         return new Promise((resolve, reject) => {
             const functionId = SDL.rpc.enums.FunctionID.valueForString(request.getFunctionName()); // this is the number value
-
+            let correlationIdRequest;
             let listener;
+
             listener = new SDL.rpc.RpcListener().setOnRpcMessage(rpcMessage => {
-                // remove the listener once the response is received
-                this._manager.removeRpcListener(functionId, listener);
-                resolve(rpcMessage);
+                const correlationIdResponse = rpcMessage.getCorrelationId();
+                // ensure the correlation ids match
+                if (correlationIdRequest === correlationIdResponse) {
+                    // remove the listener once the correct response is received
+                    this._manager.removeRpcListener(functionId, listener);
+                    resolve(rpcMessage);
+                }
             });
+
+            this._manager.addRpcListener(functionId, listener);
+            this._manager.sendRpcMessage(request); // the request will get a correlation id after this method
+
+            correlationIdRequest = request.getCorrelationId();
 
             setTimeout(() => {
                 reject(new Error(`Response timeout for ${request.getFunctionName()}`));
             }, timeout); // timeout after so long of not getting a response
-
-            this._manager.addRpcListener(functionId, listener);
-            this._manager.sendRpcMessage(request); 
         });
     }
 }
