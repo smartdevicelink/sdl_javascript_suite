@@ -11,7 +11,7 @@
     "lib": "lib"
   },
   "scripts": {
-    "build": "node lib/js/generate.js && node_modules/.bin/rollup -c",
+    "build": "node lib/js/generate.js && rollup -c",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "node_modules/.bin/eslint \"./lib/js/**\" \"./lib/node/**\"",
     "lint-js": "node_modules/.bin/eslint \"./lib/js/**\"",
@@ -37,6 +37,7 @@
     "@babel/preset-env": "^7.7.1",
     "babel-minify-webpack-plugin": "^0.3.1",
     "bson": "^4.0.2",
+    "chai": "^4.2.0",
     "eslint": "^6.6.0",
     "esm": "^3.2.25",
     "express": "^4.17.1",
