@@ -34,10 +34,7 @@ const fs = require('fs');
 const EventEmitter = require('events');
 const SDL = require('../../../lib/node/src/index.js');
 const CONFIG = require('./config.js');
-const CustomTransportConfig = SDL.transport.CustomTransportConfig;
 const WebSocketServerConfig = SDL.transport.WebSocketServerConfig;
-const WebSocketServer = SDL.transport.WebSocketServer;
-const TransportCallback = SDL.transport.TransportCallback;
 const SdlSession = SDL.session.SdlSession;
 
 class MyApp extends EventEmitter {
@@ -62,18 +59,29 @@ class MyApp extends EventEmitter {
         };
         this._maxCorrelationId = 0;
 
-        const baseTransportConfig = new CustomTransportConfig(
-            new WebSocketServer(
-                new WebSocketServerConfig(
-                    CONFIG.port,
-                    CONFIG.timeout,
-                    CONFIG.ssl
-                ),
-                new TransportCallback()
-            )
-        );
+        const sessionListener = new SDL.session.SdlSessionListener();
+        sessionListener.setOnProtocolSessionStarted(() => {
+            this.emit('onProtocolSessionStarted');
+        });
+        sessionListener.setOnProtocolSessionEnded(() => {
+        });
+        sessionListener.setOnProtocolSessionEndedNACKed(() => {
+        });
+        sessionListener.setOnRpcMessageReceived((rpcMessage) => {
+            this.emit('INCOMING_RPC', rpcMessage);
+        });
+        sessionListener.setOnTransportConnected(() => {
+            this.emit('onTransportConnected', {});
+        });
 
-        this._sdlSession = new SdlSession(baseTransportConfig, this);
+        this._sdlSession = new SdlSession(
+            new WebSocketServerConfig(
+                CONFIG.port,
+                CONFIG.timeout,
+                CONFIG.ssl
+            ),
+            sessionListener
+        );
     }
 
     static async startApp () {
