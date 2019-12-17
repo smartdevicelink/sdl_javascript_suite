@@ -142,13 +142,16 @@ class MyApp extends EventEmitter {
         rpcRequest.setCorrelationId(++this._maxCorrelationId);
 
         return new Promise((resolve) => {
-            const correlationId = rpcRequest.getCorrelationID();
+            const correlationId = rpcRequest.getCorrelationId();
 
-            this.on('INCOMING_RPC', (rpcResponse) => {
-                const responseCorrelationId = rpcResponse.getCorrelationID();
+            this.on('INCOMING_RPC', (rpcMessage) => {
+                // notifications could be passed in here
+                if (rpcMessage instanceof SDL.rpc.RpcResponse) {
+                    const responseCorrelationId = rpcMessage.getCorrelationId();
 
-                if (responseCorrelationId === correlationId) {
-                    return resolve(rpcResponse);
+                    if (responseCorrelationId === correlationId) {
+                        return resolve(rpcMessage);
+                    }
                 }
             });
 
