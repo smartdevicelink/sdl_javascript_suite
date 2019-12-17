@@ -39,6 +39,10 @@ const CharacterSet = SDL.rpc.enums.CharacterSet;
 const HmiZoneCapabilities =  SDL.rpc.enums.HmiZoneCapabilities;
 const PrerecordedSpeech = SDL.rpc.enums.PrerecordedSpeech;
 const VrCapabilities = SDL.rpc.enums.VrCapabilities;
+const AudioStreamingState = SDL.rpc.enums.AudioStreamingState;
+const VideoStreamingState = SDL.rpc.enums.VideoStreamingState;
+const HMILevel = SDL.rpc.enums.HMILevel;
+const SystemContext = SDL.rpc.enums.SystemContext;
 
 class Test {
     constructor() {
@@ -267,6 +271,32 @@ const GENERAL_VRCAPABILITIES_LIST = Test.GENERAL_VRCAPABILITIES_LIST = [
 const GENERAL_SPEECHCAPABILITIES_LIST = Test.GENERAL_SPEECHCAPABILITIES_LIST = [
     SpeechCapabilities.SILENCE,
     SpeechCapabilities.SC_TEXT,
+];
+
+const GENERAL_AUDIOSTREAMINGSTATE = Test.GENERAL_AUDIOSTREAMINGSTATE = [
+    AudioStreamingState.AUDIBLE,
+    AudioStreamingState.ATTENUATED,
+    AudioStreamingState.NOT_AUDIBLE,
+];
+
+const GENERAL_VIDEOSTREAMINGSTATE = Test.GENERAL_VIDEOSTREAMINGSTATE = [
+    VideoStreamingState.STREAMABLE,
+    VideoStreamingState.NOT_STREAMABLE,
+];
+
+const GENERAL_HMILEVEL = Test.GENERAL_HMILEVEL = [
+    HMILevel.HMI_FULL,
+    HMILevel.HMI_LIMITED,
+    HMILevel.HMI_BACKGROUND,
+    HMILevel.HMI_NONE,
+];
+
+const GENERAL_SYSTEMCONTEXT = Test.GENERAL_SYSTEMCONTEXT = [
+    SystemContext.SYSCTXT_MAIN,
+    SystemContext.SYSCTXT_VRSESSION,
+    SystemContext.SYSCTXT_MENU,
+    SystemContext.SYSCTXT_HMI_OBSCURED,
+    SystemContext.SYSCTXT_ALERT,
 ];
 
 function createTtsChunk(type, text) {
