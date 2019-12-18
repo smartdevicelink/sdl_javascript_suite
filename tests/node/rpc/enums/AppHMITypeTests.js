@@ -11,30 +11,30 @@ function assertNotNull (msg, val) {
 describe('AppHMITypeTests', function () {
     it('testValidEnums', function (done) {
         let example = 'DEFAULT';
-        const enumDefault = AppHMIType.valueForString(example);
+        const enumDefault = AppHMIType.valueForKey(example);
 
         example = 'COMMUNICATION';
-        const enumCommunication = AppHMIType.valueForString(example);
+        const enumCommunication = AppHMIType.valueForKey(example);
         example = 'MEDIA';
-        const enumMedia = AppHMIType.valueForString(example);
+        const enumMedia = AppHMIType.valueForKey(example);
         example = 'MESSAGING';
-        const enumMessaging = AppHMIType.valueForString(example);
+        const enumMessaging = AppHMIType.valueForKey(example);
         example = 'NAVIGATION';
-        const enumNavigation = AppHMIType.valueForString(example);
+        const enumNavigation = AppHMIType.valueForKey(example);
         example = 'INFORMATION';
-        const enumInformation = AppHMIType.valueForString(example);
+        const enumInformation = AppHMIType.valueForKey(example);
         example = 'SOCIAL';
-        const enumSocial = AppHMIType.valueForString(example);
+        const enumSocial = AppHMIType.valueForKey(example);
         example = 'BACKGROUND_PROCESS';
-        const enumBackgroundProcess = AppHMIType.valueForString(example);
+        const enumBackgroundProcess = AppHMIType.valueForKey(example);
         example = 'PROJECTION';
-        const enumProjection = AppHMIType.valueForString(example);
+        const enumProjection = AppHMIType.valueForKey(example);
         example = 'TESTING';
-        const enumTesting = AppHMIType.valueForString(example);
+        const enumTesting = AppHMIType.valueForKey(example);
         example = 'SYSTEM';
-        const enumSystem = AppHMIType.valueForString(example);
+        const enumSystem = AppHMIType.valueForKey(example);
         example = 'REMOTE_CONTROL';
-        const enumRemoteControl = AppHMIType.valueForString(example);
+        const enumRemoteControl = AppHMIType.valueForKey(example);
 
         assertNotNull('DEFAULT returned null', enumDefault);
         assertNotNull('COMMUNICATION returned null', enumCommunication);
@@ -53,14 +53,14 @@ describe('AppHMITypeTests', function () {
 
     it('testInvalidEnum', function (done) {
         const example = 'deFaUlt';
-        const temp = AppHMIType.valueForString(example);
+        const temp = AppHMIType.valueForKey(example);
         expect(temp).to.be.null;
         done();
     });
 
     it('testNullEnum', function (done) {
         const example = null;
-        const temp = AppHMIType.valueForString(example);
+        const temp = AppHMIType.valueForKey(example);
         expect(temp).to.be.null;
         done();
     });
