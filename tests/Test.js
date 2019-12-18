@@ -58,7 +58,6 @@ const FALSE = Test.FALSE = 'Value should be false.';
 const NOT_NULL = Test.NOT_NULL = 'Value should not be null.';
 const JSON_FAIL = Test.JSON_FAIL = 'Json testing failed.';
 
-//sdl_javascript_suite/lib/js/src/rpc/structs/SdlMsgVersion.js
 
 const GENERAL_INT = Test.GENERAL_INT = 100;
 const GENERAL_INTEGER = Test.GENERAL_INTEGER = 100;
@@ -365,31 +364,14 @@ const GENERAL_SPEECHCAPABILITIES_LIST = Test.GENERAL_SPEECHCAPABILITIES_LIST = [
     SpeechCapabilities.SC_TEXT,
 ];
 
-const GENERAL_AUDIOSTREAMINGSTATE = Test.GENERAL_AUDIOSTREAMINGSTATE = [
-    AudioStreamingState.AUDIBLE,
-    AudioStreamingState.ATTENUATED,
-    AudioStreamingState.NOT_AUDIBLE,
-];
+const GENERAL_AUDIOSTREAMINGSTATE = Test.GENERAL_AUDIOSTREAMINGSTATE = AudioStreamingState.AUDIBLE;
 
-const GENERAL_VIDEOSTREAMINGSTATE = Test.GENERAL_VIDEOSTREAMINGSTATE = [
-    VideoStreamingState.STREAMABLE,
-    VideoStreamingState.NOT_STREAMABLE,
-];
+const GENERAL_VIDEOSTREAMINGSTATE = Test.GENERAL_VIDEOSTREAMINGSTATE = VideoStreamingState.STREAMABLE;
 
-const GENERAL_HMILEVEL = Test.GENERAL_HMILEVEL = [
-    HMILevel.HMI_FULL,
-    HMILevel.HMI_LIMITED,
-    HMILevel.HMI_BACKGROUND,
-    HMILevel.HMI_NONE,
-];
+const GENERAL_HMILEVEL = Test.GENERAL_HMILEVEL = HMILevel.HMI_FULL;
 
-const GENERAL_SYSTEMCONTEXT = Test.GENERAL_SYSTEMCONTEXT = [
-    SystemContext.SYSCTXT_MAIN,
-    SystemContext.SYSCTXT_VRSESSION,
-    SystemContext.SYSCTXT_MENU,
-    SystemContext.SYSCTXT_HMI_OBSCURED,
-    SystemContext.SYSCTXT_ALERT,
-];
+const GENERAL_SYSTEMCONTEXT = Test.GENERAL_SYSTEMCONTEXT = SystemContext.SYSCTXT_MAIN;
+
 
 function createTtsChunk(type, text) {
     const ttsChunk = new TTSChunk();

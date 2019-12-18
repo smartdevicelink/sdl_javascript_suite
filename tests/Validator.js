@@ -211,7 +211,7 @@ class Validator {
         const mediaClockFormats = item1.getMediaClockFormats();
         for (const clockFormat of mediaClockFormats) {
             expect(clockFormat).to.be.a.string;
-            expect(MediaClockFormat.valueForString(clockFormat)).to.be.a.string;
+            expect(MediaClockFormat.valueForKey(clockFormat)).to.be.a.string;
         }
 
         expect(item1.getDisplayType()).to.be.equal(item2.getDisplayType());
