@@ -136,7 +136,7 @@ class HelloSdl {
     // abstracts out the work of sending the RPC and attaching listeners to wait for a response
     _asyncSendRpc (request, timeout = 5000) {
         return new Promise((resolve, reject) => {
-            const functionId = SDL.rpc.enums.FunctionID.valueForString(request.getFunctionName()); // this is the number value
+            const functionId = SDL.rpc.enums.FunctionID.valueForKey(request.getFunctionName()); // this is the number value
             let correlationIdRequest;
             let listener;
 
