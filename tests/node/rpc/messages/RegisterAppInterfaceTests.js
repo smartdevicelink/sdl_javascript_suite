@@ -11,6 +11,7 @@ const Validator = require('./../../../Validator.js');
 const assertTrue = Validator.assertTrue.bind(Validator);
 const assertEquals = Validator.assertEquals.bind(Validator);
 const assertNull = Validator.assertNull.bind(Validator);
+const assertNullOrUndefined = Validator.assertNullOrUndefined.bind(Validator);
 const assertNotNull = Validator.assertNotNull.bind(Validator);
 const testNullBase = Validator.testNullBase.bind(Validator, 
     FunctionID.keyForValue(FunctionID.RegisterAppInterface), 
@@ -107,24 +108,26 @@ describe('RegisterAppInterfaceTests', function () {
 
         // Invalid/Null Tests
         rpcMessage = new RegisterAppInterface();
+        // TODO correlationId should be set automatically during construction using a correlation id generator.
+        rpcMessage.setCorrelationId(Test.GENERAL_INT);
         assertNotNull(Test.NOT_NULL, rpcMessage);
         testNullBase(rpcMessage);
 
-        assertNull(Test.NULL, rpcMessage.getSdlMsgVersion());
-        assertNull(Test.NULL, rpcMessage.getAppName());
-        assertNull(Test.NULL, rpcMessage.getNgnMediaScreenAppName());
-        assertNull(Test.NULL, rpcMessage.getAppId());
-        assertNull(Test.NULL, rpcMessage.getFullAppId());
-        assertNull(Test.NULL, rpcMessage.getLanguageDesired());
-        assertNull(Test.NULL, rpcMessage.getHmiDisplayLanguageDesired());
-        assertNull(Test.NULL, rpcMessage.getHashID());
-        assertNull(Test.NULL, rpcMessage.getTtsName());
-        assertNull(Test.NULL, rpcMessage.getVrSynonyms());
-        assertNull(Test.NULL, rpcMessage.getAppHmiType());
-        assertNull(Test.NULL, rpcMessage.getIsMediaApplication());
-        assertNull(Test.NULL, rpcMessage.getDeviceInfo());
-        assertNull(Test.NULL, rpcMessage.getDayColorScheme());
-        assertNull(Test.NULL, rpcMessage.getNightColorScheme());
+        assertNullOrUndefined(Test.NULL, rpcMessage.getSdlMsgVersion());
+        assertNullOrUndefined(Test.NULL, rpcMessage.getAppName());
+        assertNullOrUndefined(Test.NULL, rpcMessage.getNgnMediaScreenAppName());
+        assertNullOrUndefined(Test.NULL, rpcMessage.getAppId());
+        assertNullOrUndefined(Test.NULL, rpcMessage.getFullAppId());
+        assertNullOrUndefined(Test.NULL, rpcMessage.getLanguageDesired());
+        assertNullOrUndefined(Test.NULL, rpcMessage.getHmiDisplayLanguageDesired());
+        assertNullOrUndefined(Test.NULL, rpcMessage.getHashID());
+        assertNullOrUndefined(Test.NULL, rpcMessage.getTtsName());
+        assertNullOrUndefined(Test.NULL, rpcMessage.getVrSynonyms());
+        assertNullOrUndefined(Test.NULL, rpcMessage.getAppHmiType());
+        assertNullOrUndefined(Test.NULL, rpcMessage.getIsMediaApplication());
+        assertNullOrUndefined(Test.NULL, rpcMessage.getDeviceInfo());
+        assertNullOrUndefined(Test.NULL, rpcMessage.getDayColorScheme());
+        assertNullOrUndefined(Test.NULL, rpcMessage.getNightColorScheme());
 
         done();
     });

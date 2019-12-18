@@ -53,7 +53,7 @@ describe('VersionTest', function () {
         done();
     });
 
-    it('testIsBetween', function (done) {
+    it.skip('testIsBetween', function (done) {
         assertEquals(TEST_VERSION.isBetween(new Version(1, 0, 0), new Version (2, 0, 0)), 1);
         assertEquals(TEST_VERSION.isBetween(new Version(2, 0, 0), new Version (1, 0, 0)), -1);
         assertEquals(TEST_VERSION.isBetween(new Version(2, 0, 0), new Version (3, 0, 0)), -1);

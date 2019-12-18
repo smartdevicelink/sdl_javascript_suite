@@ -11,6 +11,7 @@ const Validator = require('./../../../Validator.js');
 const assertTrue = Validator.assertTrue.bind(Validator);
 const assertEquals = Validator.assertEquals.bind(Validator);
 const assertNull = Validator.assertNull.bind(Validator);
+const assertNullOrUndefined = Validator.assertNullOrUndefined.bind(Validator);
 const assertNotNull = Validator.assertNotNull.bind(Validator);
 const testNullBase = Validator.testNullBase.bind(Validator, 
     FunctionID.keyForValue(FunctionID.OnHMIStatus), 
@@ -70,11 +71,11 @@ describe('OnHmiStatusTests', function () {
         assertNotNull(Test.NOT_NULL, rpcMessage);
         testNullBase(rpcMessage);
 
-        assertNull(Test.NULL, rpcMessage.getAudioStreamingState());
-        assertNull(Test.NULL, rpcMessage.getVideoStreamingState());
-        assertNull(Test.NULL, rpcMessage.getHMILevel());
-        assertNull(Test.NULL, rpcMessage.getSystemContext());
-        assertNull(Test.NULL, rpcMessage.getWindowID());
+        assertNullOrUndefined(Test.NULL, rpcMessage.getAudioStreamingState());
+        assertNullOrUndefined(Test.NULL, rpcMessage.getVideoStreamingState());
+        assertNullOrUndefined(Test.NULL, rpcMessage.getHMILevel());
+        assertNullOrUndefined(Test.NULL, rpcMessage.getSystemContext());
+        assertNullOrUndefined(Test.NULL, rpcMessage.getWindowID());
 
         done();
     });
