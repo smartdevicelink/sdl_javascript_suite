@@ -99,9 +99,9 @@ class HelloSdl {
         // wait for the FULL state for more functionality
         if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
             const show = new SDL.rpc.messages.Show();
-            show.setMainField1('こんにちは')
-                .setMainField2('你好 ( ni hao / nĭ hăo )')
-                .setMainField3('@#$#%$^^%&**&(_     !@#$@#$~~~```');
+            show.setMainField1('Hello')
+                .setMainField2('こんにちは')
+                .setMainField3('你好');
 
             await this._asyncSendRpc(show);
 
@@ -114,7 +114,7 @@ class HelloSdl {
                     .setMainField2('')
                     .setMainField3('');
 
-                this._asyncSendRpc(showCountdown); //don't wait for a response
+                this._asyncSendRpc(showCountdown); // don't wait for a response
 
                 await this._sleep();
             }
