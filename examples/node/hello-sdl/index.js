@@ -31,7 +31,7 @@
 */
 
 const fs = require('fs');
-const SDL = require('../../../lib/node/src/index.js');
+const SDL = require('../../../lib/node/dist/index.js');
 const CONFIG = require('./config.js');
 
 class HelloSdl {
@@ -46,7 +46,7 @@ class HelloSdl {
                 SDL.rpc.enums.AppHMIType.DEFAULT,
             ])
             .setTransportConfig(new SDL.transport.CustomTransportConfig(
-                new SDL.transport.WebSocketServerTransport(
+                new SDL.transport.WebSocketServer(
                     new SDL.transport.WebSocketServerConfig(
                         CONFIG.port
                     ),
@@ -136,7 +136,7 @@ class HelloSdl {
     // abstracts out the work of sending the RPC and attaching listeners to wait for a response
     _asyncSendRpc (request, timeout = 5000) {
         return new Promise((resolve, reject) => {
-            const functionId = SDL.rpc.enums.FunctionID.valueForString(request.getFunctionName()); // this is the number value
+            const functionId = SDL.rpc.enums.FunctionID.valueForKey(request.getFunctionName()); // this is the number value
             let correlationIdRequest;
             let listener;
 
