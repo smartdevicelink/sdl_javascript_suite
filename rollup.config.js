@@ -5,16 +5,14 @@ import { uglify } from 'rollup-plugin-uglify';
 import builtins from 'rollup-plugin-node-builtins';
 import globals from 'rollup-plugin-node-globals';
 
-export default {
+export default [{ // Vanilla JS source
     input: 'lib/js/app.js',
-    output: [
-        {
-            file: 'lib/js/dist/SDL.js',
-            format: 'umd',
-            sourcemap: 'inline',
-            name: 'SDL',
-        },
-    ],
+    output: {
+        file: 'lib/js/dist/SDL.js',
+        format: 'umd',
+        sourcemap: 'inline',
+        name: 'SDL',
+    },
     plugins: [
         globals(),
         builtins(),
@@ -27,4 +25,16 @@ export default {
         }),
         uglify(),
     ],
-};
+}, { // NodeJS source
+    input: 'lib/node/index.js',
+    output: {
+        dir: 'lib/node/dist',
+        format: 'umd',
+        sourcemap: 'inline',
+        name: 'SDL',
+    },
+    plugins: [
+        globals(),
+        commonjs()
+    ],
+}];
