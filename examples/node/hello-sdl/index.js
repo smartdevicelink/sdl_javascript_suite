@@ -30,63 +30,143 @@
 * POSSIBILITY OF SUCH DAMAGE.
 */
 
+const fs = require('fs');
 const SDL = require('../../../lib/node/src/index.js');
 const CONFIG = require('./config.js');
-const MyApp = require('./MyApp.js');
 
-async function sleep (timeout = 1000) {
-    return new Promise((resolve) => {
-        setTimeout(resolve, timeout);
-    });
-}
+class HelloSdl {
+    constructor () {
+        this._appConfig = new SDL.manager.AppConfig()
+            .setAppId(CONFIG.appId)
+            .setAppName(CONFIG.appName)
+            .setIsMediaApp(false)
+            .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
+            .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
+            .setAppTypes([
+                SDL.rpc.enums.AppHMIType.DEFAULT,
+            ])
+            .setTransportConfig(new SDL.transport.CustomTransportConfig(
+                new SDL.transport.WebSocketServerTransport(
+                    new SDL.transport.WebSocketServerConfig(
+                        CONFIG.port
+                    ),
+                    new SDL.transport.TransportCallback()
+                )
+            ));
 
-let app = null;
-async function startApp () {
-    console.log('start app');
-    app = await MyApp.startApp();
+        const listener = new SDL.manager.lifecycle.LifecycleListener();
+        listener.setOnProxyConnected((manager) => {
+            this._onConnected();
+        });
+        listener.setOnProxyClosed((lifecycleManager, info, reason) => {});
+        listener.setOnServiceStarted((serviceType, sessionId, correlationId) => {});
+        listener.setOnServiceEnded((serviceType) => {});
+        listener.setOnError((lifecycleManager, info) => {});
 
-    console.log('app started and registered', app);
-    console.log('start listeners');
-    app.on('INCOMING_RPC', async (rpcMessage) => {
-        const functionName = rpcMessage.getFunctionName();
-        const parameters = rpcMessage.getParameters();
+        this._manager = new SDL.manager.lifecycle.LifecycleManager(this._appConfig, listener);
 
-        console.log('INCOMING_RPC', functionName, parameters);
+        const hmiFullListener = new SDL.rpc.RpcListener().setOnRpcMessage(this._onHmiStatusListener.bind(this));
 
-        if (functionName === 'OnHMIStatus') {
-            if (parameters.hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
-                await onHMIFull();
-            }
-        }
-    });
-}
-
-async function onHMIFull () {
-    await app.sendRPC(
-        new SDL.rpc.messages.Show()
-            .setMainField1('Hello')
-            .setMainField2('こんにちは')
-            .setMainField3('你好 ( ni hao / nĭ hăo )')
-            .setMainField4('')
-    );
-    await sleep(CONFIG.appLifespan * 1000);
-    await testExit();
-}
-
-async function testExit () {
-    const count = 3;
-    for (let idx = 0; idx < count; idx++) {
-        await app.sendRPC(
-            new SDL.rpc.messages.Show()
-                .setMainField1(`Exiting in ${(count - idx)}`)
-                .setMainField2('')
-                .setMainField3('')
-                .setMainField4('')
-        );
-        await sleep();
+        this._manager.addRpcListener(SDL.rpc.enums.FunctionID.OnHMIStatus, hmiFullListener);
     }
-    app.exit();
+
+    start () {
+        this._manager.start();
+    }
+
+    async _onConnected () {
+        // app starts in the NONE state
+        const fileBinary = await _fetchImageUnit8Array('./test_icon_1.png');
+        const fileName = `${this._appConfig.getAppId()}_icon.gif`;
+
+        const putFile = new SDL.rpc.messages.PutFile()
+            .setFileName(fileName)
+            .setFileType('GRAPHIC_PNG')
+            .setPersistentFile(true)
+            .setFileData(fileBinary);
+
+        await this._asyncSendRpc(putFile);
+
+        const setAppIcon = new SDL.rpc.messages.SetAppIcon()
+            .setFileName(fileName);
+
+        await this._asyncSendRpc(setAppIcon);
+    }
+
+    async _onHmiStatusListener (onHmiStatus) {
+        const hmiLevel = onHmiStatus.getHMILevel();
+
+        // wait for the FULL state for more functionality
+        if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
+            const show = new SDL.rpc.messages.Show();
+            show.setMainField1('Hello')
+                .setMainField2('こんにちは')
+                .setMainField3('你好');
+
+            await this._asyncSendRpc(show);
+
+            await this._sleep(2000);
+
+            const count = 3;
+            for (let i = 0; i < count; i++) {
+                const showCountdown = new SDL.rpc.messages.Show();
+                showCountdown.setMainField1(`Exiting in ${(count - i).toString()}`)
+                    .setMainField2('')
+                    .setMainField3('');
+
+                this._asyncSendRpc(showCountdown); // don't wait for a response
+
+                await this._sleep();
+            }
+
+            // tear down the app
+            await this._asyncSendRpc(new SDL.rpc.messages.UnregisterAppInterface())
+                .catch(() => {}); // UnregisterAppInterfaceResponse not implemented yet. catch the error
+            this._manager.stop();
+        }
+    }
+
+    async _sleep (timeout = 1000) {
+        return new Promise((resolve) => {
+            setTimeout(resolve, timeout);
+        });
+    }
+
+    // TODO: this should go into some manager class
+    // abstracts out the work of sending the RPC and attaching listeners to wait for a response
+    _asyncSendRpc (request, timeout = 5000) {
+        return new Promise((resolve, reject) => {
+            const functionId = SDL.rpc.enums.FunctionID.valueForString(request.getFunctionName()); // this is the number value
+            let correlationIdRequest;
+            let listener;
+
+            listener = new SDL.rpc.RpcListener().setOnRpcMessage(rpcMessage => {
+                const correlationIdResponse = rpcMessage.getCorrelationId();
+                // ensure the correlation ids match
+                if (correlationIdRequest === correlationIdResponse) {
+                    // remove the listener once the correct response is received
+                    this._manager.removeRpcListener(functionId, listener);
+                    resolve(rpcMessage);
+                }
+            });
+
+            this._manager.addRpcListener(functionId, listener);
+            this._manager.sendRpcMessage(request); // the request will get a correlation id after this method
+
+            correlationIdRequest = request.getCorrelationId();
+
+            setTimeout(() => {
+                reject(new Error(`Response timeout for ${request.getFunctionName()}`));
+            }, timeout); // timeout after so long of not getting a response
+        });
+    }
 }
 
+async function _fetchImageUnit8Array (path) {
+    const aryBuffer = fs.readFileSync(path, null);
+    return new Uint8Array(aryBuffer);
+}
 
-startApp();
+console.log('start app');
+const app = new HelloSdl();
+app.start();
