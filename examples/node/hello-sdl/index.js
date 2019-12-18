@@ -31,7 +31,7 @@
 */
 
 const fs = require('fs');
-const SDL = require('../../../lib/node/src/index.js');
+const SDL = require('../../../lib/node/dist/index.js');
 const CONFIG = require('./config.js');
 
 class HelloSdl {
@@ -46,7 +46,7 @@ class HelloSdl {
                 SDL.rpc.enums.AppHMIType.DEFAULT,
             ])
             .setTransportConfig(new SDL.transport.CustomTransportConfig(
-                new SDL.transport.WebSocketServerTransport(
+                new SDL.transport.WebSocketServer(
                     new SDL.transport.WebSocketServerConfig(
                         CONFIG.port
                     ),

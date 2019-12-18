@@ -11,7 +11,7 @@
     "lib": "lib"
   },
   "scripts": {
-    "build": "node lib/js/generate.js && node_modules/.bin/rollup -c",
+    "build": "node lib/js/generate.js && node lib/node/generate.js && node_modules/.bin/rollup -c",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "node_modules/.bin/eslint \"./lib/js/**\" \"./lib/node/**\"",
     "lint-js": "node_modules/.bin/eslint \"./lib/js/**\"",
@@ -41,6 +41,7 @@
     "esm": "^3.2.25",
     "express": "^4.17.1",
     "express-ws": "^4.0.0",
+    "lodash.merge": "^4.6.2",
     "openurl": "^1.1.1",
     "rollup": "^1.27.0",
     "rollup-plugin-babel": "^4.3.3",
@@ -52,5 +53,6 @@
     "rollup-plugin-uglify": "^6.0.3",
     "webpack": "3.8.1",
     "websocket": "^1.0.30"
-  }
+  },
+  "dependencies": {}
 }
