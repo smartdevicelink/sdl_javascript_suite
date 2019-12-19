@@ -20,9 +20,6 @@ const TouchEventCapabilities = SDL.rpc.structs.TouchEventCapabilities;
 const SoftButtonCapabilities = SDL.rpc.structs.SoftButtonCapabilities;
 const HMICapabilities = SDL.rpc.structs.HMICapabilities;          
 
-
-
-
 // enums
 const SpeechCapabilities = SDL.rpc.enums.SpeechCapabilities;
 const AppHMIType = SDL.rpc.enums.AppHMIType;
@@ -47,7 +44,7 @@ const HMILevel = SDL.rpc.enums.HMILevel;
 const SystemContext = SDL.rpc.enums.SystemContext;
 
 class Test {
-    constructor() {
+    constructor () {
     }
 }
 
@@ -212,7 +209,7 @@ const JSON_TTSCHUNKS = Test.JSON_TTSCHUNKS = [
 
 const GENERAL_MEDIACLOCKFORMAT_LIST = [
     MediaClockFormat.CLOCK1,
-    MediaClockFormat.CLOCK2
+    MediaClockFormat.CLOCK2,
 ];
 
 const GENERAL_TEXTFIELDNAME = TextFieldName.ETA;
@@ -229,8 +226,7 @@ const GENERAL_TEXTFIELD_LIST = [
     GENERAL_TEXTFIELD,
 ];
 
-const                 GENERAL_DISPLAYTYPE                    = DisplayType.CID;
-
+const GENERAL_DISPLAYTYPE = DisplayType.CID;
 const GENERAL_DISPLAYCAPABILITIES = Test.GENERAL_DISPLAYCAPABILITIES = new DisplayCapabilities();
 GENERAL_DISPLAYCAPABILITIES.setDisplayType(GENERAL_DISPLAYTYPE);
 GENERAL_DISPLAYCAPABILITIES.setDisplayName(GENERAL_STRING);
@@ -286,22 +282,11 @@ GENERAL_VEHICLETYPE.setModel(GENERAL_STRING);
 GENERAL_VEHICLETYPE.setModelYear(GENERAL_STRING);
 GENERAL_VEHICLETYPE.setTrim(GENERAL_STRING);
 
-// -  "vehicleType": {
-//     -    "make": "test"
-//     -    "model": "test"
-//     -    "modelYear": "test"
-//     -    "test": "trim"
-//     -  }
 const JSON_GENERAL_VEHICLETYPE = Test.JSON_GENERAL_VEHICLETYPE = {
     [VehicleType.KEY_MAKE]: GENERAL_STRING,
     [VehicleType.KEY_MODEL]: GENERAL_STRING,
     [VehicleType.KEY_MODEL_YEAR]: GENERAL_STRING,
     [VehicleType.KEY_TRIM]: GENERAL_STRING,
-
-    // "make": "test"
-    // -    "model": "test"
-    // -    "modelYear": "test"
-    // -    "test": "trim"
 };
 
 
@@ -341,7 +326,6 @@ const GENERAL_BUTTONCAPABILITIES_LIST = Test.GENERAL_BUTTONCAPABILITIES_LIST = [
 
 const JSON_GENERAL_BUTTON_CAPABILITIES = {
     [ButtonCapabilities.KEY_NAME]: ButtonName.SEEKRIGHT,
-    // [ButtonCapabilities.KEY_MODULE_INFO] : 
     [ButtonCapabilities.KEY_SHORT_PRESS_AVAILABLE] : true,
     [ButtonCapabilities.KEY_LONG_PRESS_AVAILABLE] : false,
     [ButtonCapabilities.KEY_UP_DOWN_AVAILABLE] : true,
@@ -363,7 +347,7 @@ const GENERAL_PRERECORDEDSPEECH_LIST = Test.GENERAL_PRERECORDEDSPEECH_LIST = [
 ];
 
 const GENERAL_VRCAPABILITIES_LIST = Test.GENERAL_VRCAPABILITIES_LIST = [
-    VrCapabilities.VR_TEXT
+    VrCapabilities.VR_TEXT,
 ];
 
 const GENERAL_SPEECHCAPABILITIES_LIST = Test.GENERAL_SPEECHCAPABILITIES_LIST = [
@@ -380,31 +364,16 @@ const GENERAL_HMILEVEL = Test.GENERAL_HMILEVEL = HMILevel.HMI_FULL;
 const GENERAL_SYSTEMCONTEXT = Test.GENERAL_SYSTEMCONTEXT = SystemContext.SYSCTXT_MAIN;
 
 
-function createTtsChunk(type, text) {
+function createTtsChunk (type, text) {
     const ttsChunk = new TTSChunk();
     ttsChunk.setType(type);
     ttsChunk.setText(text);
     return ttsChunk;
 }
-(function () {
-    new TTSChunk();
-})();
 
 
 GENERAL_TTSCHUNK_LIST.push(createTtsChunk(SpeechCapabilities.SC_TEXT, 'Welcome to the jungle'));
 GENERAL_TTSCHUNK_LIST.push(createTtsChunk(SpeechCapabilities.SC_TEXT, 'Say a command'));
-
-// msg.setFullAppId(Test.GENERAL_FULL_APP_ID);
-// msg.setLanguageDesired(Test.GENERAL_LANGUAGE);
-// msg.setHmiDisplayLanguageDesired(Test.GENERAL_LANGUAGE);
-// msg.setHashID(Test.GENERAL_STRING);
-// msg.setTtsName(Test.GENERAL_TTSCHUNK_LIST);
-// msg.setVrSynonyms(Test.GENERAL_STRING_LIST);
-// msg.setAppHMIType(Test.GENERAL_APPHMITYPE_LIST);
-// msg.setIsMediaApplication(Test.GENERAL_BOOLEAN);
-// msg.setDeviceInfo(Test.GENERAL_DEVICEINFO);
-// msg.setDayColorScheme(Test.GENERAL_DAYCOLORSCHEME);
-// msg.setNightColorScheme(Test.GENERAL_NIGHTCOLORSCHEME);
 
 GENERAL_DEVICEINFO.setCarrier(GENERAL_STRING);
 GENERAL_DEVICEINFO.setFirmwareRev(GENERAL_STRING);
