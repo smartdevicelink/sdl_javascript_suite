@@ -120,8 +120,8 @@ class HelloSdl {
             }
 
             // tear down the app
-            await this._asyncSendRpc(new SDL.rpc.messages.UnregisterAppInterface())
-                .catch(() => {}); // UnregisterAppInterfaceResponse not implemented yet. catch the error
+            await this._asyncSendRpc(new SDL.rpc.messages.UnregisterAppInterface());
+            
             this._manager.stop();
         }
     }
