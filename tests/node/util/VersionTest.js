@@ -53,15 +53,15 @@ describe('VersionTest', function () {
         done();
     });
 
-    it.skip('testIsBetween', function (done) {
-        assertEquals(TEST_VERSION.isBetween(new Version(1, 0, 0), new Version (2, 0, 0)), 1);
-        assertEquals(TEST_VERSION.isBetween(new Version(2, 0, 0), new Version (1, 0, 0)), -1);
-        assertEquals(TEST_VERSION.isBetween(new Version(2, 0, 0), new Version (3, 0, 0)), -1);
+    // it.skip('testIsBetween', function (done) {
+    //     assertEquals(TEST_VERSION.isBetween(new Version(1, 0, 0), new Version (2, 0, 0)), 1);
+    //     assertEquals(TEST_VERSION.isBetween(new Version(2, 0, 0), new Version (1, 0, 0)), -1);
+    //     assertEquals(TEST_VERSION.isBetween(new Version(2, 0, 0), new Version (3, 0, 0)), -1);
 
-        assertEquals(TEST_VERSION.isBetween(new Version(1, 0, 0), new Version (1, 2, 3)), 0);
-        assertEquals(TEST_VERSION.isBetween(new Version(1, 2, 3), new Version (3, 2, 3)), 0);
+    //     assertEquals(TEST_VERSION.isBetween(new Version(1, 0, 0), new Version (1, 2, 3)), 0);
+    //     assertEquals(TEST_VERSION.isBetween(new Version(1, 2, 3), new Version (3, 2, 3)), 0);
 
-        assertEquals(TEST_VERSION.isBetween(new Version(1, 2, 3), new Version (1, 2, 3)), 0);
-        done();
-    });
+    //     assertEquals(TEST_VERSION.isBetween(new Version(1, 2, 3), new Version (1, 2, 3)), 0);
+    //     done();
+    // });
 });

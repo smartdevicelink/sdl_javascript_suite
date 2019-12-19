@@ -39,6 +39,7 @@ describe('RegisterAppInterfaceResponseTests', function () {
             msg.setPrerecordedSpeech(Test.GENERAL_PRERECORDEDSPEECH_LIST);
             msg.setSupportedDiagModes(Test.GENERAL_INTEGER_LIST);
             msg.setIconResumed(Test.GENERAL_BOOLEAN);
+            msg.setHMICapabilities(Test.GENERAL_HMICAPABILITIES);
 
             return msg;
         };
@@ -62,6 +63,7 @@ describe('RegisterAppInterfaceResponseTests', function () {
             expectedParameters[RegisterAppInterfaceResponse.KEY_HMI_ZONE_CAPABILITIES] = Test.GENERAL_HMIZONECAPABILITIES_LIST;
             expectedParameters[RegisterAppInterfaceResponse.KEY_PRERECORDED_SPEECH] = Test.GENERAL_PRERECORDEDSPEECH_LIST;
             expectedParameters[RegisterAppInterfaceResponse.KEY_ICON_RESUMED] = Test.GENERAL_BOOLEAN;
+            expectedParameters[RegisterAppInterfaceResponse.KEY_HMI_CAPABILITIES] = Test.GENERAL_HMICAPABILITIES.getParameters();
 
             return expectedParameters;
         };

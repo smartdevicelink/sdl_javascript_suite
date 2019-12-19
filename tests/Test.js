@@ -18,6 +18,8 @@ const ScreenParams = SDL.rpc.structs.ScreenParams;
 const TextField = SDL.rpc.structs.TextField;
 const TouchEventCapabilities = SDL.rpc.structs.TouchEventCapabilities;
 const SoftButtonCapabilities = SDL.rpc.structs.SoftButtonCapabilities;
+const HMICapabilities = SDL.rpc.structs.HMICapabilities;          
+
 
 
 
@@ -78,6 +80,11 @@ const GENERAL_TOUCHEVENTCAPABILITIES = new TouchEventCapabilities();
 GENERAL_TOUCHEVENTCAPABILITIES.setDoublePressAvailable(GENERAL_BOOLEAN);
 GENERAL_TOUCHEVENTCAPABILITIES.setMultiTouchAvailable(GENERAL_BOOLEAN);
 GENERAL_TOUCHEVENTCAPABILITIES.setPressAvailable(GENERAL_BOOLEAN);
+
+const  GENERAL_HMICAPABILITIES = Test.GENERAL_HMICAPABILITIES = new HMICapabilities();
+GENERAL_HMICAPABILITIES.setNavigation(GENERAL_BOOLEAN);
+GENERAL_HMICAPABILITIES.setVideoStreaming(GENERAL_BOOLEAN);
+GENERAL_HMICAPABILITIES.setPhoneCall(GENERAL_BOOLEAN);
 
 const GENERAL_SCREENPARAMS = new ScreenParams();
 GENERAL_SCREENPARAMS.setResolution(GENERAL_IMAGERESOLUTION);
