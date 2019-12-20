@@ -45,13 +45,8 @@ class HelloSdl {
             .setAppTypes([
                 SDL.rpc.enums.AppHMIType.DEFAULT,
             ])
-            .setTransportConfig(new SDL.transport.CustomTransportConfig(
-                new SDL.transport.WebSocketServer(
-                    new SDL.transport.WebSocketServerConfig(
-                        CONFIG.port
-                    ),
-                    new SDL.transport.TransportCallback()
-                )
+            .setTransportConfig(new SDL.transport.WebSocketServerConfig(
+                CONFIG.port
             ));
 
         const listener = new SDL.manager.lifecycle.LifecycleListener();
@@ -121,7 +116,7 @@ class HelloSdl {
 
             // tear down the app
             await this._asyncSendRpc(new SDL.rpc.messages.UnregisterAppInterface());
-            
+
             this._manager.stop();
         }
     }
