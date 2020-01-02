@@ -1,11 +1,7 @@
 
-const expect = require('chai').expect;
 const SDL = require('./../../../lib/js/dist/SDL');
 const BitConverter = SDL.util.BitConverter;
-
-function assertEquals (val1, val2) {
-    expect(val1).to.be.deep.equal(val2);
-}
+const Validator = require('./../../Validator.js');
 
 describe('BitConverterTest', function () {
     it('testIntToByteConversions', function (done) {
@@ -22,11 +18,11 @@ describe('BitConverterTest', function () {
         const actualNullBytes = BitConverter.arrayBufferToInt32(null, 0);
 
         // Valid Tests
-        assertEquals(expectedInt, actualInt);
-        assertEquals(expectedBytes, actualBytes);
+        Validator.assertEquals(expectedInt, actualInt);
+        Validator.assertEquals(expectedBytes, actualBytes);
 
         // Invalid/Null Tests
-        assertEquals(-1, actualNullBytes);
+        Validator.assertEquals(-1, actualNullBytes);
         done();
     });
 });

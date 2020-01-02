@@ -1,22 +1,19 @@
 
-const expect = require('chai').expect;
 const SDL = require('./../../../lib/js/dist/SDL');
+const Validator = require('./../../Validator.js');
+
 const Version = SDL.util.Version;
 
 const TEST_VERSION_STRING = '1.2.3';
 const TEST_VERSION = new Version(1, 2, 3);
 
-function assertEquals (val1, val2) {
-    expect(val1).to.be.equal(val2);
-}
-
 describe('VersionTest', function () {
     it('testToString', function (done) {
         const version = new Version();
         version.fromString(TEST_VERSION_STRING);
-        assertEquals(1, version.getMajor());
-        assertEquals(2, version.getMinor());
-        assertEquals(3, version.getPatch());
+        Validator.assertEquals(1, version.getMajor());
+        Validator.assertEquals(2, version.getMinor());
+        Validator.assertEquals(3, version.getPatch());
         done();
     });
 
@@ -28,8 +25,7 @@ describe('VersionTest', function () {
         } catch (error) {
             err = error;
         }
-
-        expect(err).not.to.be.undefined;
+        Validator.assertNotNullUndefined(err);
         done();
     });
 
@@ -38,17 +34,17 @@ describe('VersionTest', function () {
         const version1 = new Version(5, 0, 0);
 
         // Supplied version is newer
-        assertEquals(-1, version1.isNewerThan(new Version(6, 0, 0)));
-        assertEquals(-1, version1.isNewerThan(new Version(5, 1, 0)));
-        assertEquals(-1, version1.isNewerThan(new Version(5, 0, 1)));
+        Validator.assertEquals(-1, version1.isNewerThan(new Version(6, 0, 0)));
+        Validator.assertEquals(-1, version1.isNewerThan(new Version(5, 1, 0)));
+        Validator.assertEquals(-1, version1.isNewerThan(new Version(5, 0, 1)));
 
         // Supplied version is older
-        assertEquals(1, version1.isNewerThan(new Version(4, 0, 0)));
-        assertEquals(1, version1.isNewerThan(new Version(4, 1, 0)));
-        assertEquals(1, version1.isNewerThan(new Version(4, 0, 1)));
+        Validator.assertEquals(1, version1.isNewerThan(new Version(4, 0, 0)));
+        Validator.assertEquals(1, version1.isNewerThan(new Version(4, 1, 0)));
+        Validator.assertEquals(1, version1.isNewerThan(new Version(4, 0, 1)));
 
         // Supplied  version is equal
-        assertEquals(0, version1.isNewerThan(new Version(5, 0, 0)));
+        Validator.assertEquals(0, version1.isNewerThan(new Version(5, 0, 0)));
 
         done();
     });

@@ -1,12 +1,7 @@
-
-const expect = require('chai').expect;
 const SDL = require('./../../../../lib/js/dist/SDL');
 
 const AppHMIType = SDL.rpc.enums.AppHMIType;
-
-function assertNotNull (msg, val) {
-    expect(val, msg).to.not.be.null;
-}
+const Validator = require('./../../../Validator.js');
 
 describe('AppHMITypeTests', function () {
     it('testValidEnums', function (done) {
@@ -36,35 +31,32 @@ describe('AppHMITypeTests', function () {
         example = 'REMOTE_CONTROL';
         const enumRemoteControl = AppHMIType.valueForKey(example);
 
-        assertNotNull('DEFAULT returned null', enumDefault);
-        assertNotNull('COMMUNICATION returned null', enumCommunication);
-        assertNotNull('MEDIA returned null', enumMedia);
-        assertNotNull('MESSAGING returned null', enumMessaging);
-        assertNotNull('NAVIGATION returned null', enumNavigation);
-        assertNotNull('INFORMATION returned null', enumInformation);
-        assertNotNull('SOCIAL returned null', enumSocial);
-        assertNotNull('BACKGROUND_PROCESS returned null', enumBackgroundProcess);
-        assertNotNull('PROJECTION returned null', enumProjection);
-        assertNotNull('TESTING returned null', enumTesting);
-        assertNotNull('SYSTEM returned null', enumSystem);
-        assertNotNull('REMOTE_CONTROL returned null', enumRemoteControl);
+        Validator.assertNotNull(enumDefault, 'DEFAULT returned null');
+        Validator.assertNotNull(enumCommunication, 'COMMUNICATION returned null');
+        Validator.assertNotNull(enumMedia, 'MEDIA returned null');
+        Validator.assertNotNull(enumMessaging, 'MESSAGING returned null');
+        Validator.assertNotNull(enumNavigation, 'NAVIGATION returned null');
+        Validator.assertNotNull(enumInformation, 'INFORMATION returned null');
+        Validator.assertNotNull(enumSocial, 'SOCIAL returned null');
+        Validator.assertNotNull(enumBackgroundProcess, 'BACKGROUND_PROCESS returned null');
+        Validator.assertNotNull(enumProjection, 'PROJECTION returned null');
+        Validator.assertNotNull(enumTesting, 'TESTING returned null');
+        Validator.assertNotNull(enumSystem, 'SYSTEM returned null');
+        Validator.assertNotNull(enumRemoteControl, 'REMOTE_CONTROL returned null');
         done();
     });
 
     it('testInvalidEnum', function (done) {
         const example = 'deFaUlt';
         const temp = AppHMIType.valueForKey(example);
-        expect(temp).to.be.null;
+        Validator.assertNull(temp);
         done();
     });
 
     it('testNullEnum', function (done) {
         const example = null;
         const temp = AppHMIType.valueForKey(example);
-        expect(temp).to.be.null;
+        Validator.assertNull(temp);
         done();
     });
-
-
-    // TODO missing test for listing of all possible enums?
 });

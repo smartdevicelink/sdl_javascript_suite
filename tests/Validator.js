@@ -9,25 +9,25 @@ const MediaClockFormat = SDL.rpc.enums.MediaClockFormat;
 class Validator {
     /**
      * Takes an RpcStruct and converts it to a json object.
-     * @param {Object} obj Either a primative value, an array, or an object with getParameters defined. 
+     * @param {Object} obj - Either a primative value, an array, or an object with getParameters defined.
      */
     static getParametersJson (obj) {
         let result;
         if (typeof obj === 'object') {
             if (typeof obj.getParameters === 'function') {
-                return this.getParametersJson(obj.getParameters());
+                return Validator.getParametersJson(obj.getParameters());
             } else {
                 if (Array.isArray(obj)) {
                     result = [];
                     for (const val of obj) {
-                        result.push(this.getParametersJson(val));
+                        result.push(Validator.getParametersJson(val));
                     }
                     return result;
                 } else {
                     result = {};
                     for (const key in obj) {
                         const val = obj[key];
-                        result[key] = this.getParametersJson(val);
+                        result[key] = Validator.getParametersJson(val);
                     }
                 }
             }
@@ -39,41 +39,87 @@ class Validator {
 
     /**
      * Validate an rpcMessage matches the given expectedParameters
-     * @param {RpcMessage} rpcMessage - ssageto validate against.
+     * @param {RpcMessage} rpcMessage - message to validate against.
      * @param {Object} expectedParameters - json object of expected parameters
      */
     static validateJson (rpcMessage, expectedParameters) {
-        const parameters = this.getParametersJson(rpcMessage.getParameters());
+        const parameters = Validator.getParametersJson(rpcMessage.getParameters());
         expect(parameters).to.be.deep.equal(expectedParameters);
+        return true;
     }
 
     /**
-     * 
      * Checks major and minor versions match. patch versions can be different.
-     * @param {SdlMsgVersion} item1 
-     * @param {SdlMsgVersion} item2 
-     * @returns {Boolean} 
+     * @param {SdlMsgVersion} item1
+     * @param {SdlMsgVersion} item2
+     * @returns {Boolean}
      */
     static validateSdlMsgVersion (item1, item2) {
-        if (item1 === null) {
-            return (item2 === null);
+        if (item1 === null || item2 === null) {
+            expect(item1).to.be.equal(item2);
+            return true;
         }
-        if (item2 === null) {
-            return (item1 === null);
-        }
+        expect(item1.getMajorVersion()).to.be.equal(item2.getMajorVersion());
+        expect(item1.getMinorVersion()).to.be.equal(item2.getMinorVersion());
 
-        if (item1.getMajorVersion() !== item2.getMajorVersion() ||
-            item1.getMinorVersion() !== item2.getMinorVersion()) {
-            return false;
-        }
         return true;
     }
 
 
+    /**
+     * ImageField equals validation.
+     * @param {ImageField} item1
+     * @param {ImageField} item2
+     */
     static validateImageFields (item1, item2) {
-        if (item1 === null) {
+        if (item1 === null || item2 === null) {
             expect(item1).to.be.equal(item2);
-            return;
+            return true;
+        }
+        expect(Array.isArray(item1)).to.be.true;
+        expect(Array.isArray(item2)).to.be.true;
+        expect(item1.length).to.be.equal(item2.length);
+
+        for (let index = 0; index < item1.length; index++) {
+            const val1 = item1[index];
+            const val2 = item2[index];
+
+            expect(val1.getImageTypeSupported()).to.be.deep.equal(val2.getImageTypeSupported());
+            expect(val1.getImageFieldName()).to.be.equal(val2.getImageFieldName());
+            Validator.validateImageResolution(val1.getImageResolution(), val2.getImageResolution());
+        }
+
+        return true;
+    }
+
+
+    /**
+     * RegisterAppInterface pcm stream capabilities validation.
+     * @param {AudioPassThruCapabilities} item1
+     * @param {AudioPassThruCapabilities} item2
+     */
+    static validatePcmStreamCapabilities (item1, item2) {
+        if (item1 === null || item2 === null) {
+            expect(item1).to.be.equal(item2);
+            return true;
+        }
+
+        expect(item1.getAudioType()).to.be.equal(item2.getAudioType());
+        expect(item1.getBitsPerSample()).to.be.equal(item2.getBitsPerSample());
+        expect(item1.getSamplingRate()).to.be.equal(item2.getSamplingRate());
+        return true;
+    }
+
+
+    /**
+     * AudioPassThruCapabilities array equals validation.
+     * @param {Array<AudioPassThruCapabilities>} item1
+     * @param {Array<AudioPassThruCapabilities>} item2
+     */
+    static validateAudioPassThruCapabilities (item1, item2) {
+        if (item1 === null || item2 === null) {
+            expect(item1).to.be.equal(item2);
+            return true;
         }
         expect(Array.isArray(item1)).to.be.true;
         expect(Array.isArray(item2)).to.be.true;
@@ -83,34 +129,23 @@ class Validator {
         for (let index = 0; index < item1.length; index++) {
             const val1 = item1[index];
             const val2 = item2[index];
-            
-            expect(val1.getImageTypeSupported()).to.be.deep.equal(val2.getImageTypeSupported());
-            expect(val1.getImageFieldName()).to.be.equal(val2.getImageFieldName());
-            this.validateImageResolution(val1.getImageResolution(), val2.getImageResolution());
+            expect(val1.getAudioType()).to.be.equal(val2.getAudioType());
+            expect(val1.getBitsPerSample()).to.be.equal(val2.getBitsPerSample());
+            expect(val1.getSamplingRate()).to.be.equal(val2.getSamplingRate());
         }
-
-
 
         return true;
     }
 
-
-    static validatePcmStreamCapabilities (item1, item2) {
-        if (item1 === null) {
-            expect(item1).to.be.equal(item2);
-            return;
-        }
-
-        expect(item1.getAudioType()).to.be.equal(item2.getAudioType());
-        expect(item1.getBitsPerSample()).to.be.equal(item2.getBitsPerSample());
-        expect(item1.getSamplingRate()).to.be.equal(item2.getSamplingRate());
-    }
-
-
+    /**
+     * ImageResolution equals validation
+     * @param {ImageResolution} item1
+     * @param {ImageResolution} item2
+     */
     static validateImageResolution (item1, item2) {
-        if (item1 === null) {
+        if (item1 === null || item2 === null) {
             expect(item1).to.be.equal(item2);
-            return;
+            return true;
         }
 
         expect(item1).to.exist;
@@ -121,33 +156,15 @@ class Validator {
     }
 
 
-    static validateAudioPassThruCapabilities (item1, item2) {
-        if (item1 === null) {
+    /**
+     * TouchEventCapabilities equals validation.
+     * @param {TouchEventCapabilities} item1
+     * @param {TouchEventCapabilities} item2
+     */
+    static validateTouchEventCapabilities (item1, item2) {
+        if (item1 === null || item2 === null) {
             expect(item1).to.be.equal(item2);
-            return;
-        }
-        expect(Array.isArray(item1)).to.be.true;
-        expect(Array.isArray(item2)).to.be.true;
-
-        expect(item1.length).to.be.equal(item2.length);
-
-        for (let index = 0; index < item1.length; index++) {
-            const val1 = item1[index];
-            const val2 = item2[index];
-            
-            expect(val1.getAudioType()).to.be.equal(val2.getAudioType());
-            expect(val1.getBitsPerSample()).to.be.equal(val2.getBitsPerSample());
-            expect(val1.getSamplingRate()).to.be.equal(val2.getSamplingRate());
-        }
-
-        return true;
-    }
-
-
-    static validateTouchEventCapabilities(item1, item2) {
-        if (item1 === null) {
-            expect(item1).to.be.equal(item2);
-            return;
+            return true;
         }
 
         expect(item1).to.exist;
@@ -160,40 +177,36 @@ class Validator {
         return true;
     }
 
+    /**
+     * ScreenParams equals validation.
+     * @param {ScreenParams} item1
+     * @param {ScreenParams} item2
+     */
     static validateScreenParams (item1, item2) {
-        if (item1 === null) {
+        if (item1 === null || item2 === null) {
             expect(item1).to.be.equal(item2);
-            return;
+            return true;
         }
 
         expect(item1).to.exist;
         expect(item2).to.exist;
 
-
-
-        this.validateImageResolution(item1.getResolution(), item2.getResolution());
-        this.validateTouchEventCapabilities(item1.getTouchEventAvailable(), item2.getTouchEventAvailable());
-
-        return true;
-
-        if(!( validateImageResolution(params1.getImageResolution(), params2.getImageResolution()) )){
-            log("validateScreenParams", "Image resolutions didn't match!");
-            return false;
-        }
-
-        if(!( validateTouchEventCapabilities(params1.getTouchEventAvailable(), params2.getTouchEventAvailable()) )){
-            log("validateScreenParams", "Touch event capabilities didn't match!");
-            return false;
-        }
+        Validator.validateImageResolution(item1.getResolution(), item2.getResolution());
+        Validator.validateTouchEventCapabilities(item1.getTouchEventAvailable(), item2.getTouchEventAvailable());
 
         return true;
     }
 
 
-    static validateDisplayCapabilities  (item1, item2) {
-        if (item1 === null) {
+    /**
+     * DisplayCapabilities equals validation.
+     * @param {DisplayCapabilities} item1
+     * @param {DisplayCapabilities} item2
+     */
+    static validateDisplayCapabilities (item1, item2) {
+        if (item1 === null || item2 === null) {
             expect(item1).to.be.equal(item2);
-            return;
+            return true;
         }
         expect(item1.getDisplayType()).to.be.equal(item2.getDisplayType());
 
@@ -206,7 +219,7 @@ class Validator {
         expect(Array.isArray(item1.getTextFields())).to.be.true;
         expect(Array.isArray(item2.getTextFields())).to.be.true;
 
-        this.validateImageFields(item1.getImageFields(), item2.getImageFields());
+        Validator.validateImageFields(item1.getImageFields(), item2.getImageFields());
 
         const mediaClockFormats = item1.getMediaClockFormats();
         for (const clockFormat of mediaClockFormats) {
@@ -220,36 +233,70 @@ class Validator {
         expect(item1.getTemplatesAvailable()).to.be.equal(item2.getTemplatesAvailable());
         expect(item1.getNumCustomPresetsAvailable()).to.be.equal(item2.getNumCustomPresetsAvailable());
 
-        this.validateScreenParams(item1.getScreenParams(), item2.getScreenParams());
+        Validator.validateScreenParams(item1.getScreenParams(), item2.getScreenParams());
         return true;
     }
 
+    /**
+     * PresetBankCapabilities equals validation.
+     * @param {PresetBankCapabilities} item1
+     * @param {PresetBankCapabilities} item2
+     */
     static validatePresetBankCapabilities (item1, item2) {
-        if (item1 === null) {
+        if (item1 === null || item2 === null) {
             expect(item1).to.be.equal(item2);
-            return;
+            return true;
         }
 
         expect(item1.getOnScreenPresetsAvailable()).to.be.equal(item2.getOnScreenPresetsAvailable());
+        return true;
     }
 
+    /**
+     * VehicleType equals validation.
+     * @param {VehicleType} item1
+     * @param {VehicleType} item2
+     */
     static validateVehicleType (item1, item2) {
-        if (item1 === null) {
+        if (item1 === null || item2 === null) {
             expect(item1).to.be.equal(item2);
-            return;
+            return true;
         }
 
         expect(item1.getMake()).to.be.equal(item2.getMake());
         expect(item1.getModel()).to.be.equal(item2.getModel());
         expect(item1.getTrim()).to.be.equal(item2.getTrim());
         expect(item1.getModelYear()).to.be.equal(item2.getModelYear());
+        return true;
     }
 
 
-    static validateButtonCapabilities (item1, item2) {
-        if (item1 === null) {
+    /**
+     * HMICapabilities equals validation.
+     * @param {HMICapabilities} item1
+     * @param {HMICapabilities} item2
+     */
+    static validateHMICapabilities (item1, item2) {
+        if (item1 === null || item2 === null) {
             expect(item1).to.be.equal(item2);
-            return;
+            return true;
+        }
+
+        expect(item1.getNavigation()).to.be.equal(item2.getNavigation());
+        expect(item1.getVideoStreaming()).to.be.equal(item2.getVideoStreaming());
+        expect(item1.getPhoneCall()).to.be.equal(item2.getPhoneCall());
+        return true;
+    }
+
+    /**
+     * ButtonCapabilities array equals validation.
+     * @param {Array<ButtonCapabilities>} item1
+     * @param {Array<ButtonCapabilities>} item2
+     */
+    static validateButtonCapabilities (item1, item2) {
+        if (item1 === null || item2 === null) {
+            expect(item1).to.be.equal(item2);
+            return true;
         }
         expect(Array.isArray(item1)).to.be.true;
         expect(Array.isArray(item2)).to.be.true;
@@ -259,20 +306,24 @@ class Validator {
         for (let index = 0; index < item1.length; index++) {
             const val1 = item1[index];
             const val2 = item2[index];
-            
+
             expect(val1.getName()).to.be.equal(val2.getName());
             expect(val1.getUpDownAvailable()).to.be.equal(val2.getUpDownAvailable());
             expect(val1.getLongPressAvailable()).to.be.equal(val2.getLongPressAvailable());
             expect(val1.getShortPressAvailable()).to.be.equal(val2.getShortPressAvailable());
         }
+        return true;
     }
 
-    // assertTrue(Test.TRUE, Validator.validateSoftButtonCapabilities(Test.GENERAL_SOFTBUTTONCAPABILITIES_LIST, testSoftButtonCapabilities));
-
+    /**
+     * SoftButtonCapabilities array equals validation.
+     * @param {Array<SoftButtonCapabilities>} item1
+     * @param {Array<SoftButtonCapabilities>} item2
+     */
     static validateSoftButtonCapabilities (item1, item2) {
-        if (item1 === null) {
+        if (item1 === null || item2 === null) {
             expect(item1).to.be.equal(item2);
-            return;
+            return true;
         }
         expect(Array.isArray(item1)).to.be.true;
         expect(Array.isArray(item2)).to.be.true;
@@ -282,197 +333,170 @@ class Validator {
         for (let index = 0; index < item1.length; index++) {
             const val1 = item1[index];
             const val2 = item2[index];
-            
+
             expect(val1.getImageSupported()).to.be.equal(val2.getImageSupported());
             expect(val1.getUpDownAvailable()).to.be.equal(val2.getImageSupported());
             expect(val1.getLongPressAvailable()).to.be.equal(val2.getLongPressAvailable());
             expect(val1.getShortPressAvailable()).to.be.equal(val2.getShortPressAvailable());
         }
+        return true;
     }
 
-    // assertTrue(Test.TRUE, Validator.validateButtonCapabilities(Test.GENERAL_BUTTONCAPABILITIES_LIST, testButtonCapabilities));
-    // assertTrue(Test.TRUE, Validator.validateVehicleType(Test.GENERAL_VEHICLETYPE, testVehicleType));
-    // assertTrue(Test.TRUE, Validator.validatePresetBankCapabilities(Test.GENERAL_PRESETBANKCAPABILITIES, testPbc));
-    // assertTrue(Test.TRUE, Validator.validateDisplayCapabilities(Test.GENERAL_DISPLAYCAPABILITIES, testDc));
-
-    static validateTtsChunks (list1, list2) {
-        if (list1 === null || list2 === null) {
-            expect(list1).to.equal(list2);
-            return;
+    /**
+     * TTSChunk array equals validation.
+     * @param {Array<TTSChunk>} item1
+     * @param {Array<TTSChunk>} item2
+     */
+    static validateTtsChunks (item1, item2) {
+        if (item1 === null || item2 === null) {
+            expect(item1).to.be.equal(item2);
+            return true;
         }
+        expect(Array.isArray(item1)).to.be.true;
+        expect(Array.isArray(item2)).to.be.true;
 
-        let text1 = list1.map((val) => {
-            return val.getText();
-        });
-        let text2 = list1.map((val) => {
-            return val.getText();
-        });
+        expect(item1.length).to.be.equal(item2.length);
 
-        expect(text1).to.deep.equal(text2);
+        for (let index = 0; index < item1.length; index++) {
+            const val1 = item1[index];
+            const val2 = item2[index];
+            expect(val1.getText()).to.be.equal(val2.getText());
+        }
+        return true;
     }
 
 
+    /**
+     * DeviceInfo equals validation.
+     * @param {DeviceInfo} item1
+     * @param {DeviceInfo} item2
+     */
     static validateDeviceInfo (item1, item2) {
-        if (item1 === null) {
-            return item2 === null;
-        }
-        if (item2 === null) {
-            return item1 === null;
+        if (item1 === null || item2 === null) {
+            expect(item1).to.equal(item2);
+            return true;
         }
 
-        if (item1.getOs()                   !== item2.getOs()          ||
-                item1.getCarrier()              !== item2.getCarrier()     ||
-                item1.getHardware()             !== item2.getHardware()    ||
-                item1.getOsVersion()            !== item2.getOsVersion()   ||
-                item1.getFirmwareRev()          !== item2.getFirmwareRev() ||
-                item1.getMaxNumberRFCOMMPorts() !== item2.getMaxNumberRFCOMMPorts()) {
-            return false;
-        }
+        expect(item1.getOs()).to.be.equal(item2.getOs());
+        expect(item1.getCarrier()).to.be.equal(item2.getCarrier());
+        expect(item1.getHardware()).to.be.equal(item2.getHardware());
+        expect(item1.getOsVersion()).to.be.equal(item2.getOsVersion());
+        expect(item1.getFirmwareRev()).to.be.equal(item2.getFirmwareRev());
+        expect(item1.getMaxNumberRFCOMMPorts()).to.be.equal(item2.getMaxNumberRFCOMMPorts());
 
         return true;
     }
 
+    /**
+     * TemplateColorScheme equals validation.
+     * @param {TemplateColorScheme} item1
+     * @param {TemplateColorScheme} item2
+     */
     static validateTemplateColorScheme (item1, item2) {
-        if (item1 === null) {
-            return item2 === null;
-        }
-        if (item2 === null) {
-            return item1 === null;
+        if (item1 === null || item2 === null) {
+            expect(item1).to.equal(item2);
+            return true;
         }
 
-        if (item1.getPrimaryColor().getRedValue() !== item2.getPrimaryColor().getRedValue()
-                || item1.getPrimaryColor().getGreenValue() !== item2.getPrimaryColor().getGreenValue()
-                || item1.getPrimaryColor().getBlueValue() !== item2.getPrimaryColor().getBlueValue()
-                || item1.getSecondaryColor().getRedValue() !== item2.getSecondaryColor().getRedValue()
-                || item1.getSecondaryColor().getGreenValue() !== item2.getSecondaryColor().getGreenValue()
-                || item1.getSecondaryColor().getBlueValue() !== item2.getSecondaryColor().getBlueValue()
-                || item1.getBackgroundColor().getRedValue() !== item2.getBackgroundColor().getRedValue()
-                || item1.getBackgroundColor().getGreenValue() !== item2.getBackgroundColor().getGreenValue()
-                || item1.getBackgroundColor().getBlueValue() !== item2.getBackgroundColor().getBlueValue()) {
-            return false;
-        }
+        expect(item1.getPrimaryColor().getRedValue()).to.be.equal(item2.getPrimaryColor().getRedValue());
+        expect(item1.getPrimaryColor().getGreenValue()).to.be.equal(item2.getPrimaryColor().getGreenValue());
+        expect(item1.getPrimaryColor().getBlueValue()).to.be.equal(item2.getPrimaryColor().getBlueValue());
+
+        expect(item1.getSecondaryColor().getRedValue()).to.be.equal(item2.getSecondaryColor().getRedValue());
+        expect(item1.getSecondaryColor().getGreenValue()).to.be.equal(item2.getSecondaryColor().getGreenValue());
+        expect(item1.getSecondaryColor().getBlueValue()).to.be.equal(item2.getSecondaryColor().getBlueValue());
+
+        expect(item1.getBackgroundColor().getRedValue()).to.be.equal(item2.getBackgroundColor().getRedValue());
+        expect(item1.getBackgroundColor().getGreenValue()).to.be.equal(item2.getBackgroundColor().getGreenValue());
+        expect(item1.getBackgroundColor().getBlueValue()).to.be.equal(item2.getBackgroundColor().getBlueValue());
 
         return true;
     }
 
-
-
-
-    static assertTrue () {
-        const args = arguments;
-        let val1, msg;
-        if (args.length === 1) {
-            val1 = args[0];
-        } else if (args.length === 2) {
-            msg = args[0];
-            val1 = args[1];
-        } else {
-            throw new Error('Bad arguments');
-        }
-        expect(val1, msg).to.be.true;
+    /**
+     * Assert val is true.
+     * @param {*} val - value to assert
+     * @param {String} msg - Message to display on failure.
+     */
+    static assertTrue (val, msg) {
+        expect(val, msg).to.be.true;
     }
 
-    static assertEquals () {
-        const args = arguments;
-        let val1, val2, msg;
-        if (args.length === 2) {
-            val1 = args[0];
-            val2 = args[1];
-        } else if (args.length === 3) {
-            msg = args[0];
-            val1 = args[1];
-            val2 = args[2];
-        } else {
-            throw new Error('Bad arguments');
-        }
+    /**
+     * Assert values are equal. Defaults to deeply equal which means
+     * objects like [1,2] or {'x': 1} will be compared based on values and not
+     * by reference.
+     * @param {*} val1 - First value to compare.
+     * @param {*} val2 - Second value to compare.
+     * @param {String} msg - Message to display on failure.
+     */
+    static assertEquals (val1, val2, msg) {
         expect(val1, msg).to.be.deep.equal(val2);
     }
 
-    static assertNull () {
-        const args = arguments;
-        let val1, msg;
-        if (args.length === 1) {
-            val1 = args[0];
-        } else if (args.length === 2) {
-            msg = args[0];
-            val1 = args[1];
-        } else {
-            throw new Error('Bad arguments');
-        }
-        expect(val1, msg).to.be.null;
+    /**
+     * Assert value is null or undefined.
+     * @param {*} val - value to assert.
+     * @param {String} msg - Message to display on failure.
+     */
+    static assertNullOrUndefined (val, msg) {
+        expect(val, msg).to.not.exist;
     }
 
-    static assertNullOrUndefined () {
-        const args = arguments;
-        let val1, msg;
-        if (args.length === 1) {
-            val1 = args[0];
-        } else if (args.length === 2) {
-            msg = args[0];
-            val1 = args[1];
-        } else {
-            throw new Error('Bad arguments');
-        }
-        expect(val1, msg).to.not.exist;
+    /**
+     * Assert value is not null.
+     * @param {*} val - value to assert.
+     * @param {String} msg - Message to display on failure.
+     */
+    static assertNotNull (val, msg) {
+        expect(val, msg).to.be.not.null;
     }
 
-    static assertNotNull () {
-        const args = arguments;
-        let val1, msg;
-        if (args.length === 1) {
-            val1 = args[0];
-        } else if (args.length === 2) {
-            msg = args[0];
-            val1 = args[1];
-        } else {
-            throw new Error('Bad arguments');
-        }
-        expect(val1, msg).to.be.not.null;
+    /**
+     * Assert value is null.
+     * @param {*} val - value to assert.
+     * @param {String} msg - Message to display on failure.
+     */
+    static assertNull (val, msg) {
+        expect(val, msg).to.be.null;
     }
 
-    static validateText (text1, text2) {
-        return text1 === text2;
-    }
-
-
-    static assertNotNullUndefined () {
-        const args = arguments;
-        let val,msg;
-        if (args.length === 2) {
-            val = args[1];
-            msg = args[0];
-        } else {
-            val = args[0];
-        }
+    /**
+     * Assert value is not null or undefined.
+     * @param {*} val - value to assert.
+     * @param {String} msg - Message to display on failure.
+     */
+    static assertNotNullUndefined (val, msg) {
         expect(val, msg).not.to.be.null.and.not.to.be.undefined;
     }
 
-
-
+    /**
+     * Test a basic RpcRequest or RpcResponse with no params set.
+     * @param {String} functionName
+     * @param {RpcType} messageType
+     * @param {RpcRequest|RpcResponse} msg
+     */
     static testNullBase (functionName, messageType, msg) {
-        this.assertNotNull('RPCMessage was null.', msg);
+        Validator.assertNotNull(msg, 'RPCMessage was null.');
         let correlationId;
         if (msg instanceof RpcRequest) {
-            correlationId = msg.getCorrelationId(); 
-            this.assertNotNull('Correlation ID of the RPC message was null.', correlationId);
+            correlationId = msg.getCorrelationId();
+            Validator.assertNotNull(correlationId, 'Correlation ID of the RPC message was null.');
         } else if (msg instanceof RpcResponse) {
             correlationId = msg.getCorrelationId();
-            this.assertNullOrUndefined('Correlation ID of the RPC message was not null.', correlationId);
+            Validator.assertNullOrUndefined(correlationId, 'Correlation ID of the RPC message was not null.');
         }
-        this.assertNotNull('Message type of the RPC message was null.', msg.getRPCType());
-
-        this.assertEquals('Message type didn\'t match expected message type.', messageType, msg.getRPCType());
-
-        this.assertNotNull('Command type of the RPC message was null.', msg.getFunctionName());
-        this.assertEquals('Command type didn\'t match expected command type.', functionName, msg.getFunctionName());
-
+        Validator.assertNotNull(msg.getRPCType(), 'Message type of the RPC message was null.');
+        Validator.assertEquals(messageType, msg.getRPCType(), 'Message type didn\'t match expected message type.');
+        Validator.assertNotNull(msg.getFunctionName(), 'Command type of the RPC message was null.');
+        Validator.assertEquals(functionName, msg.getFunctionName(), 'Command type didn\'t match expected command type.');
 
         try {
-            this.assertTrue('Parameters weren\'t initialized, but the JSON contained 2 or more objects.', (msg.serializeJSON().length() === 1));
+            Validator.assertTrue((msg.serializeJSON().length() === 1), 'Parameters weren\'t initialized, but the JSON contained 2 or more objects.');
         } catch (error) {
-            //do nothing
+            // do nothing
         }
-    }  
+    }
 }
 
 

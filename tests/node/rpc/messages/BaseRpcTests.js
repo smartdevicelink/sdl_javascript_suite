@@ -5,9 +5,6 @@ const RpcResponse = SDL.rpc.RpcResponse;
 
 const Validator = require('./../../../Validator.js');
 
-const assertEquals = Validator.assertEquals.bind(Validator);
-const assertNotNullUndefined = Validator.assertNotNullUndefined.bind(Validator);
-
 const CORR_ID = 402;
 
 exports.tests = function () {
@@ -22,7 +19,7 @@ exports.tests = function () {
     });
 
     it('testCreation', function (done) {
-        assertNotNullUndefined('Object creation failed.', this.msg);
+        Validator.assertNotNullUndefined(this.msg, 'Object creation failed.');
         done();
     });
 
@@ -30,28 +27,28 @@ exports.tests = function () {
         const msg = this.msg;
         const CORR_ID = this.CORR_ID;
         if (msg instanceof RpcRequest) {
-            const correlationId = msg.getCorrelationId(); 
-            assertNotNullUndefined('Correlation ID should be defined.', correlationId);
-            assertEquals('Correlation ID doesn\'t match expected ID.', CORR_ID, correlationId);
+            const correlationId = msg.getCorrelationId();
+            Validator.assertNotNullUndefined(correlationId, 'Correlation ID should be defined.');
+            Validator.assertEquals(CORR_ID, correlationId, 'Correlation ID doesn\'t match expected ID.');
         } else if (msg instanceof RpcResponse) {
             const correlationId = msg.getCorrelationId();
-            assertNotNullUndefined('Correlation ID should be defined.', correlationId);
-            assertEquals('Correlation ID doesn\'t match expected ID.', CORR_ID, correlationId);
+            Validator.assertNotNullUndefined(correlationId, 'Correlation ID should be defined.');
+            Validator.assertEquals(CORR_ID, correlationId, 'Correlation ID doesn\'t match expected ID.');
         }
         done();
     });
 
     it('testRPCType', function (done) {
         const messageType = this.msg.getRPCType();
-        assertNotNullUndefined(messageType);
-        assertEquals(messageType, this.getRPCType());
+        Validator.assertNotNullUndefined(messageType);
+        Validator.assertEquals(messageType, this.getRPCType());
         done();
     });
 
     it('testFunctionName', function (done) {
         const functionName = this.msg.getFunctionName();
-        assertNotNullUndefined(functionName);
-        assertEquals(functionName, this.getFunctionName());
+        Validator.assertNotNullUndefined(functionName);
+        Validator.assertEquals(functionName, this.getFunctionName());
 
         done();
     });

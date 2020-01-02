@@ -18,7 +18,7 @@ const ScreenParams = SDL.rpc.structs.ScreenParams;
 const TextField = SDL.rpc.structs.TextField;
 const TouchEventCapabilities = SDL.rpc.structs.TouchEventCapabilities;
 const SoftButtonCapabilities = SDL.rpc.structs.SoftButtonCapabilities;
-const HMICapabilities = SDL.rpc.structs.HMICapabilities;          
+const HMICapabilities = SDL.rpc.structs.HMICapabilities;
 
 // enums
 const SpeechCapabilities = SDL.rpc.enums.SpeechCapabilities;
@@ -242,7 +242,7 @@ const JSON_GENERAL_DISPLAYCAPABILITIES = Test.JSON_GENERAL_DISPLAYCAPABILITIES =
     [DisplayCapabilities.KEY_DISPLAY_TYPE]: GENERAL_DISPLAYTYPE,
     [DisplayCapabilities.KEY_DISPLAY_NAME]: GENERAL_STRING,
     [DisplayCapabilities.KEY_TEXT_FIELDS]: [
-        GENERAL_TEXTFIELD.getParameters(), 
+        GENERAL_TEXTFIELD.getParameters(),
     ],
     [DisplayCapabilities.KEY_IMAGE_FIELDS]: JSON_GENERAL_IMAGEFIELD_LIST,
     [DisplayCapabilities.KEY_MEDIA_CLOCK_FORMATS]: GENERAL_MEDIACLOCKFORMAT_LIST,

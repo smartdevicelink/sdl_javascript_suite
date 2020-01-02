@@ -1,12 +1,19 @@
 const SDL = require('./../../../lib/js/dist/SDL.js');
 const Bson = SDL.util.Bson;
-const expect = require('chai').expect;
+const Validator = require('./../../Validator.js');
+
+const testBuffer = new Uint8Array([12, 0, 0, 0, 16, 120, 0, 1, 0, 0, 0, 0]);
+const testObj = { 'x': 1 };
 
 
 describe('BsonTest', function () {
-    it('serialize deserialize test', function (done) {
-        const testObj = { 'x': 1, };
-        expect(testObj).to.be.deep.equal(Bson.deserialize(Bson.serialize(testObj)));
+    it('testSerialize', function (done) {
+        Validator.assertEquals(Bson.serialize(testObj), testBuffer);
+        done();
+    });
+
+    it('testDeserialize', function (done) {
+        Validator.assertEquals(Bson.deserialize(testBuffer), testObj);
         done();
     });
 });
