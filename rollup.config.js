@@ -35,6 +35,14 @@ export default [{ // Vanilla JS source
     },
     plugins: [
         globals(),
-        commonjs()
+        builtins(),
+        resolve({
+            preferBuiltins: false,
+        }),
+        commonjs(),
+        babel({
+            exclude: 'node_modules/**', // only transpile our source code
+        }),
     ],
+    external: ['ws', 'https']
 }];

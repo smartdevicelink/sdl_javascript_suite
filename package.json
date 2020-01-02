@@ -1,6 +1,6 @@
 {
   "name": "sdl_javascript_suite",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "The official JavaScript SDK for SmartDeviceLink.",
   "main": "/lib/js/dist/SDL.js",
   "engines": {
@@ -11,7 +11,7 @@
     "lib": "lib"
   },
   "scripts": {
-    "build": "node lib/js/generate.js && node lib/node/generate.js && node_modules/.bin/rollup -c",
+    "build": "node lib/node/teardown.js && node lib/js/generate.js && node lib/node/setup.js && node lib/node/generate.js && node_modules/.bin/rollup -c && node lib/node/teardown.js",
     "test": "mocha './tests/node/**/*.js'",
     "lint": "node_modules/.bin/eslint \"./lib/js/**\" \"./lib/node/**\"",
     "lint-js": "node_modules/.bin/eslint \"./lib/js/**\"",
@@ -43,7 +43,9 @@
     "express": "^4.17.1",
     "express-ws": "^4.0.0",
     "lodash.merge": "^4.6.2",
+    "merge-dirs": "^0.2.1",
     "openurl": "^1.1.1",
+    "rimraf": "^3.0.0",
     "rollup": "^1.27.0",
     "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-babel-minify": "^9.1.1",

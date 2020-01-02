@@ -18,16 +18,26 @@
     "rules": {
         "array-bracket-spacing": [ "error" ],
         "brace-style": [ "error" ],
-        "camelcase": [ "error" ],
+        "camelcase": [ "error", {
+            "allow": [
+                "SamplingRate_8KHZ",
+                "SamplingRate_16KHZ",
+                "SamplingRate_22KHZ",
+                "SamplingRate_44KHZ",
+                "BitsPerSample_8_BIT",
+                "BitsPerSample_16_BIT",
+            ]
+        }],
         "comma-dangle": [
             "error",
             {
-                "arrays": "always",
-                "objects": "always"
+                "arrays": "always-multiline",
+                "objects": "always-multiline"
             }
         ],
         "comma-spacing": [ "error" ],
         "comma-style": [ "error" ],
+        "curly": [ "error" ],
         "dot-notation": [ "error" ],
         "eqeqeq": [ "error" ],
         "id-length": [ "error" ],
@@ -43,15 +53,21 @@
             "error",
             "unix"
         ],
-        "new-cap": [ "error" ],
+        "new-cap": [ "error", { 
+            "newIsCapExceptions": ["tClass"]
+        }],
         "no-case-declarations": [ "error" ],
         "no-const-assign": [ "error" ],
         "no-mixed-operators": [ "error" ],
         "no-multi-str": [ "error" ],
         "no-nested-ternary": [ "error" ],
         "no-new-object": [ "error" ],
+        "no-throw-literal": [ "error" ],
+        "no-trailing-spaces": [ "error" ],
         "no-unneeded-ternary": [ "error" ],
-        "no-unused-vars": [ "warn" ],
+        "no-unused-vars": [ "warn", {
+            "args": "none"
+        }],
         "no-var": [ "error" ],
         "no-whitespace-before-property": [ "error" ],
         "nonblock-statement-body-position": [
