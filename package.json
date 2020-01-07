@@ -12,7 +12,7 @@
   },
   "scripts": {
     "build": "node lib/node/teardown.js && node lib/js/generate.js && node lib/node/setup.js && node lib/node/generate.js && node_modules/.bin/rollup -c && node lib/node/teardown.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha './tests/node/**/*.js'",
     "lint": "node_modules/.bin/eslint \"./lib/js/**\" \"./lib/node/**\"",
     "lint-js": "node_modules/.bin/eslint \"./lib/js/**\"",
     "lint-node": "node_modules/.bin/eslint \"./lib/node/**\"",
@@ -37,6 +37,7 @@
     "@babel/preset-env": "^7.7.1",
     "babel-minify-webpack-plugin": "^0.3.1",
     "bson": "^4.0.2",
+    "chai": "^4.2.0",
     "eslint": "^6.6.0",
     "esm": "^3.2.25",
     "express": "^4.17.1",
