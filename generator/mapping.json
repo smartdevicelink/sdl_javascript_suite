@@ -1,0 +1,140 @@
+{
+  "enums": {
+    "DisplayType": {
+      "params_additional": [
+        {
+          "key": "TESTING",
+          "value": "'TESTING'"
+        }
+      ]
+    }
+  },
+  "structs": {
+    "DisplayCapabilities": {
+      "graphicSupported": {
+        "methods": {
+          "method_title": "GraphicsSupported",
+          "key": "KEY_GRAPHICS_SUPPORTED"
+        },
+        "params": {
+          "key": "KEY_GRAPHICS_SUPPORTED"
+        }
+      }
+    },
+    "Grid": {
+      "col": {
+        "methods": {
+          "method_title": "Column",
+          "key": "KEY_COLUMN"
+        },
+        "params": {
+          "key": "KEY_COLUMN"
+        }
+      },
+      "colspan": {
+        "methods": {
+          "method_title": "ColumnSpan",
+          "key": "KEY_COLUMN_SPAN"
+        },
+        "params": {
+          "key": "KEY_COLUMN_SPAN"
+        }
+      },
+      "rowspan": {
+        "methods": {
+          "method_title": "RowSpan",
+          "key": "KEY_ROW_SPAN"
+        },
+        "params": {
+          "key": "KEY_ROW_SPAN"
+        }
+      },
+      "levelspan": {
+        "methods": {
+          "method_title": "LevelSpan",
+          "key": "KEY_LEVEL_SPAN"
+        },
+        "params": {
+          "key": "KEY_LEVEL_SPAN"
+        }
+      }
+    },
+    "TextField": {
+      "name": {
+        "methods": {
+          "method_title": "TextFieldName"
+        }
+      }
+    },
+    "RGBColor": {
+      "red": {
+        "methods": {
+          "method_title": "RedValue"
+        }
+      },
+      "green": {
+        "methods": {
+          "method_title": "GreenValue"
+        }
+      },
+      "blue": {
+        "methods": {
+          "method_title": "BlueValue"
+        }
+      }
+    }
+  },
+  "functions": {
+    "SetAppIconRequest": {
+      "syncFileName": {
+        "methods": {
+          "method_title": "FileName",
+          "key": "KEY_FILE_NAME"
+        },
+        "params": {
+          "key": "KEY_FILE_NAME"
+        }
+      }
+    },
+    "RegisterAppInterfaceResponse": {
+      "supportedDiagModes": {
+        "methods": {
+          "key": "KEY_SUPPORTED_DIAG_MODE"
+        },
+        "params": {
+          "key": "KEY_SUPPORTED_DIAG_MODE"
+        }
+      }
+    },
+    "RegisterAppInterfaceRequest": {
+      "appID": {
+        "-methods": {}
+      },
+      "fullAppID": {
+        "script": "templates/scripts/fullAppID.js"
+      },
+      "params_additional": [
+        {
+          "key": "APP_ID_MAX_LENGTH",
+          "value": 10
+        }
+      ]
+    },
+    "PutFileRequest": {
+      "syncFileName": {
+        "methods": {
+          "method_title": "FileName",
+          "key": "KEY_FILE_NAME"
+        },
+        "params": {
+          "key": "KEY_FILE_NAME"
+        }
+      },
+      "script": "templates/scripts/PutFileRequest.js"
+    },
+    "OnHMIStatus": {
+      "name": "OnHmiStatus",
+      "file_name": "OnHmiStatus"
+    }
+  }
+}
