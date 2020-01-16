@@ -19,8 +19,8 @@ class TestEnumsProducer(TestCase):
     def test_FunctionID(self):
         item = Enum(name='FunctionID', elements={
             'RESERVED': EnumElement(name='RESERVED', value=0),
-            'RegisterAppInterfaceID': EnumElement(name='RegisterAppInterfaceID', hexvalue=1),
-            'PerformAudioPassThruID': EnumElement(name='PerformAudioPassThruID', hexvalue=10)
+            'RegisterAppInterfaceID': EnumElement(name='RegisterAppInterfaceID', hex_value=1),
+            'PerformAudioPassThruID': EnumElement(name='PerformAudioPassThruID', hex_value=10)
         })
         expected = {
             'name': 'FunctionID',

@@ -70,11 +70,11 @@ class EnumsProducer(InterfaceProducerCommon):
         :param param: sub-element (EnumElement) of element from initial Model
         :return: self.params
         """
-        if getattr(param, 'hexvalue', None) is not None:
-            if len(str(param.hexvalue)) > 1:
-                value = '0x{}'.format(param.hexvalue)
+        if getattr(param, 'hex_value', None) is not None:
+            if len(str(param.hex_value)) > 1:
+                value = '0x{}'.format(param.hex_value)
             else:
-                value = '0x0{}'.format(param.hexvalue)
+                value = '0x0{}'.format(param.hex_value)
         elif getattr(param, 'value', None) is not None:
             value = param.value
         else:
@@ -89,6 +89,6 @@ class EnumsProducer(InterfaceProducerCommon):
         :param param: sub-element (EnumElement) of element from initial Model
         :return: string with sub-element type
         """
-        if getattr(param, 'hexvalue', None) is not None or getattr(param, 'value', None) is not None:
+        if getattr(param, 'hex_value', None) is not None or getattr(param, 'value', None) is not None:
             return 'Number'
         return 'String'

@@ -11,7 +11,7 @@ from datetime import date
 from pathlib import Path
 
 from model.array import Array
-from model.double import Double
+from model.float import Float
 from model.enum import Enum
 from model.function import Function
 from model.integer import Integer
@@ -277,7 +277,7 @@ class InterfaceProducerCommon(ABC):
         def evaluate(instance):
             if isinstance(instance, (Struct, Enum)):
                 return instance.name
-            if isinstance(instance, (Integer, Double)):
+            if isinstance(instance, (Integer, Float)):
                 return 'Number'
             return type(instance).__name__
 

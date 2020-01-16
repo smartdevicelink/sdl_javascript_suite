@@ -396,7 +396,7 @@ class Generator:
     def evaluate_instance_directory(dir_name):
         """
         :param dir_name: property from paths.ini (ENUMS|STRUCTS|FUNCTIONS)_DIR_NAME
-        :return: substring after double dot
+        :return: substring after float dot
         """
         pattern = re.search(r'^([./]*)(.+)', dir_name)
         if pattern:
