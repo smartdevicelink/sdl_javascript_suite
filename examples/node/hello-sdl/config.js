@@ -34,4 +34,5 @@ module.exports = {
     appId: 'hello-node',
     appName: 'hello-node',
     port: process.env.APP_PORT || 3005,
+    connectionLostTimeout: !isNaN(parseInt(process.env.CONNECTION_LOST_TIMEOUT)) ? parseInt(process.env.CONNECTION_LOST_TIMEOUT) : 10000,
 };
