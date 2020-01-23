@@ -1,14 +1,4 @@
 {
-  "enums": {
-    "DisplayType": {
-      "params_additional": [
-        {
-          "key": "TESTING",
-          "value": "'TESTING'"
-        }
-      ]
-    }
-  },
   "structs": {
     "DisplayCapabilities": {
       "graphicSupported": {
@@ -131,10 +121,6 @@
         }
       },
       "script": "templates/scripts/PutFileRequest.js"
-    },
-    "OnHMIStatus": {
-      "name": "OnHmiStatus",
-      "file_name": "OnHmiStatus"
     }
   }
 }

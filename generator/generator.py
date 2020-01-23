@@ -12,11 +12,9 @@ from json import JSONDecodeError, loads
 from os.path import basename
 from pprint import pformat
 from time import sleep
-from xml.etree.ElementTree import ParseError as XMLSchemaError
 
 from jinja2 import Environment, FileSystemLoader, TemplateNotFound, UndefinedError
 from pathlib2 import Path
-from xmlschema import XMLSchema
 
 ROOT = Path(__file__).absolute().parents[0]
 
@@ -48,6 +46,9 @@ class Generator:
     def __init__(self):
         self.logger = logging.getLogger(self.__class__.__name__)
         self._env = None
+        self.paths_named = namedtuple('paths_named', 'path_to_enum_class path_to_struct_class path_to_request_class '
+                                                     'path_to_response_class path_to_notification_class enums_dir_name '
+                                                     'structs_dir_name functions_dir_name')
 
     @property
     def env(self):
@@ -92,29 +93,6 @@ class Generator:
         logging.getLogger().handlers.clear()
         root_logger = logging.getLogger()
         root_logger.addHandler(handler)
-
-    def evaluate_source_xml_xsd(self, xml, xsd):
-        """
-        :param xml: path to MOBILE_API.xml file
-        :param xsd: path to .xsd file (optional)
-        :return: validated path to .xsd file
-        """
-        if not Path(xml).exists():
-            self.logger.critical('File not found: %s', xml)
-            sys.exit(1)
-
-        if xsd and Path(xsd).exists():
-            return xsd
-
-        replace = xml.replace('.xml', '.xsd')
-        if xsd and not Path(xsd).exists():
-            self.logger.critical('File not found: %s', xsd)
-            sys.exit(1)
-        elif not xsd and not Path(replace).exists():
-            self.logger.critical('File not found: %s', replace)
-            sys.exit(1)
-        else:
-            return replace
 
     def evaluate_output_directory(self, output_directory):
         """
@@ -206,13 +184,7 @@ class Generator:
                         print('\nThe user interrupted the execution of the program')
                         sys.exit(1)
 
-        self.config_logging(args.verbose)
-
-        args.source_xsd = self.evaluate_source_xml_xsd(args.source_xml, args.source_xsd)
-
         args.output_directory = self.evaluate_output_directory(args.output_directory)
-
-        self.env = args.templates_directory
 
         self.logger.info('parsed arguments:\n%s', pformat((vars(args))))
         return args
@@ -247,9 +219,7 @@ class Generator:
         :param file_name: path to file with Paths
         :return: namedtuple with Paths to key elements
         """
-        fields = ('path_to_enum_class', 'path_to_struct_class', 'path_to_request_class', 'path_to_response_class',
-                  'path_to_notification_class', 'enums_dir_name', 'structs_dir_name', 'functions_dir_name')
-        intermediate = {}
+        data = {}
         try:
             with file_name.open('r') as file:
                 for line in file:
@@ -261,21 +231,20 @@ class Generator:
                             self.logger.critical('can not evaluate value, too many separators %s', str(line))
                             sys.exit(1)
                         name, var = line.partition('=')[::2]
-                        if name.strip() in intermediate:
+                        if name.strip() in data:
                             self.logger.critical('duplicate key %s', name)
                             sys.exit(1)
-                        intermediate[name.strip().lower()] = var.strip()
+                        data[name.strip().lower()] = var.strip()
         except FileNotFoundError as message1:
             self.logger.critical(message1)
             sys.exit(1)
 
-        for line in fields:
-            if line not in intermediate:
-                self.logger.critical('in %s missed fields: %s ', file, str(line))
-                sys.exit(1)
+        missed = list(set(self.paths_named._fields) - set(data.keys()))
+        if missed:
+            self.logger.critical('in %s missed fields: %s ', file, str(missed))
+            sys.exit(1)
 
-        Paths = namedtuple('Paths', ' '.join(fields))
-        return Paths(**intermediate)
+        return self.paths_named(**data)
 
     def get_mappings(self, file_name=ROOT.joinpath('mapping.json')):
         """
@@ -318,8 +287,8 @@ class Generator:
         """
 
         directory.mkdir(parents=True, exist_ok=True)
-        template = type(items[0]).__name__.lower() + '_template.js'
-        for item in items:
+        for item in items.values():
+            template = type(item).__name__.lower() + '_template.js'
             data = transformer.transform(item)
             file = directory.joinpath(data['file_name'] + '.js')
             if file.is_file():
@@ -347,49 +316,32 @@ class Generator:
                 self.logger.info('Writing new %s', file)
                 self.write_file(file, template, data)
 
-    def parser(self, xml, xsd, pattern=None):
+    def filter_pattern(self, interface, pattern):
         """
-        Validate xml to match with xsd. Calling parsers to get Model from xml. If provided pattern, filtering Model.
-        :param xml: path to MOBILE_API.xml
-        :param xsd: path to MOBILE_API.xsd
+        :param interface: initial Model
         :param pattern: regex-pattern from command-line arguments to filter element from initial Model
         :return: initial Model
         """
-        self.logger.info('''Validating XML and generating model with following parameters:
-            Source xml      : %s
-            Source xsd      : %s''', xml, xsd)
-
-        try:
-            schema = XMLSchema(xsd)
-            if not schema.is_valid(xml):
-                raise GenerateError(schema.validate(xml))
-            interface = Parser().parse(xml)
-        except (InterfaceError, XMLSchemaError, GenerateError) as message1:
-            self.logger.critical('Invalid XML file content: %s, %s', xml, message1)
-            sys.exit(1)
-
         enum_names = tuple(interface.enums.keys())
         struct_names = tuple(interface.structs.keys())
 
         if pattern:
-            intermediate = {}
-            intermediate.update({'params': interface.params})
-            for kind, content in vars(interface).items():
-                if kind == 'params':
+            match = {i: {} for i in vars(interface).keys()}
+            match['params'] = interface.params
+            for key, value in vars(interface).items():
+                if key == 'params':
                     continue
-                for name, item in content.items():
+                for name, item in value.items():
                     if re.match(pattern, item.name):
-                        self.logger.info('%s/%s match with %s', kind, item.name, pattern)
-                        if kind in intermediate:
-                            intermediate[kind].update({name: item})
+                        if hasattr(item, 'message_type'):
+                            log = '{}/{} {} match with {}'.format(key, item.name, item.message_type.name.title(),
+                                                                  pattern)
                         else:
-                            intermediate.update({kind: {name: item}})
-            interface = Interface(**intermediate)
-
-        self.logger.debug({'enums': tuple(interface.enums.keys()),
-                           'structs': tuple(interface.structs.keys()),
-                           'functions': tuple(map(lambda i: i.function_id.name, interface.functions.values())),
-                           'params': interface.params})
+                            log = '{}/{} match with {}'.format(key, item.name, pattern)
+                        self.logger.info(log)
+                        if key in match:
+                            match[key][name] = item
+            return enum_names, struct_names, Interface(**match)
         return enum_names, struct_names, interface
 
     @staticmethod
@@ -409,26 +361,30 @@ class Generator:
         :return: None
         """
         args = self.get_parser()
+        self.config_logging(args.verbose)
+        self.env = args.templates_directory
 
         self.versions_compatibility_validating()
 
-        enum_names, struct_names, interface = self.parser(xml=args.source_xml, xsd=args.source_xsd,
-                                                          pattern=args.regex_pattern)
-
         paths = self.get_paths()
+
+        interface = Parser().parse(args.source_xml, args.source_xsd)
+
+        enum_names, struct_names, filtered = self.filter_pattern(interface, args.regex_pattern)
+
         mappings = self.get_mappings()
 
-        if args.enums and interface.enums:
+        if args.enums and filtered.enums:
             directory = args.output_directory.joinpath(self.evaluate_instance_directory(paths.enums_dir_name))
-            self.process(directory, args.skip, args.overwrite, tuple(interface.enums.values()),
+            self.process(directory, args.skip, args.overwrite, filtered.enums,
                          EnumsProducer(paths, mappings))
-        if args.structs and interface.structs:
+        if args.structs and filtered.structs:
             directory = args.output_directory.joinpath(self.evaluate_instance_directory(paths.structs_dir_name))
-            self.process(directory, args.skip, args.overwrite, tuple(interface.structs.values()),
+            self.process(directory, args.skip, args.overwrite, filtered.structs,
                          StructsProducer(paths, enum_names, struct_names, mappings))
-        if args.functions and interface.functions:
+        if args.functions and filtered.functions:
             directory = args.output_directory.joinpath(self.evaluate_instance_directory(paths.functions_dir_name))
-            self.process(directory, args.skip, args.overwrite, tuple(interface.functions.values()),
+            self.process(directory, args.skip, args.overwrite, filtered.functions,
                          FunctionsProducer(paths, enum_names, struct_names, mappings))
 
 
