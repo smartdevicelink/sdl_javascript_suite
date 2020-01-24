@@ -105,7 +105,7 @@ The script should import the base Enum class and the produced class should exten
 The class should have the next JSDoc comment:
 ```javascript
 /**
- * [decription]
+ * [description]
  * @typedef {Enum} [enum_name]
  * @property {Object} _MAP
  */
@@ -164,7 +164,7 @@ For each `<element>` the static getter method should be defined in the class. Th
 The getter should have the next JSDoc comment:
 ```javascript
 /**
- * [decription]
+ * [description]
  * @return {[enum_type]}
  */
 ```
@@ -660,7 +660,7 @@ The constructor has one parameter named `parameters` to pass the JavaScript obje
 The class should have the next JSDoc comment:
 ```javascript
 /**
- * [decription]
+ * [description]
  */
 ```
 Where `[description]` is `<description>` of the current `<struct>`, if exists.
@@ -724,7 +724,7 @@ For each `<param>` the getter and setter methods should be defined in the class:
 The setter should have the next JSDoc comment:
 ```javascript
 /**
- * @param {[param_type]} [value_name] [decription]
+ * @param {[param_type]} [value_name] [description]
  * @return {[struct_name]}
  */
 ```
@@ -930,7 +930,7 @@ There are some prerequisites for the Function class:
 The class should have the next JSDoc comment:
 ```javascript
 /**
- * [decription]
+ * [description]
  */
 ```
 Where `[description]` is `<description>` of the current `<function>`, if exists.
@@ -1033,7 +1033,7 @@ For each `<param>` the getter and setter methods should be defined in the class:
 The setter should have the next JSDoc comment:
 ```javascript
 /**
- * @param {[param_type]} [value_name] [decription]
+ * @param {[param_type]} [value_name] [description]
  * @return {[struct_name]}
  */
 ```
