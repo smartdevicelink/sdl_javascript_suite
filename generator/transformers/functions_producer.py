@@ -31,6 +31,7 @@ class FunctionsProducer(InterfaceProducerCommon):
         :param item: particular element from initial Model
         :return: dictionary to be applied to jinja2 template
         """
+        list(map(item.params.__delitem__, filter(item.params.__contains__, ['success', 'resultCode', 'info'])))
         render = super(FunctionsProducer, self).transform(item)
         render.update({'func': self.ending_cutter(item.function_id.name)})
         if item.message_type.name == 'response':
@@ -46,6 +47,6 @@ class FunctionsProducer(InterfaceProducerCommon):
         if name:
             what_where = self.extract_imports(name)
             render.update({'extend': what_where.what})
-            render['imports'].append(what_where)
-        render['imports'].append(self.imports(what='FunctionID', wherefrom='{}/FunctionID.js'.format(self.enums_dir)))
+            render['imports'].add(what_where)
+        render['imports'].add(self.imports(what='FunctionID', wherefrom='{}/FunctionID.js'.format(self.enums_dir)))
         return render

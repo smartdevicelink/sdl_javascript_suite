@@ -1,0 +1,54 @@
+{
+  "enums": {
+    "AudioType": {
+      "not_exist": {
+        "any": null
+      },
+      "PCM": {
+        "-methods": "any value",
+        "params": {
+          "key": "new_key",
+          "value": "new_value"
+        },
+        "methods": {
+          "method_title": "new_key",
+          "description": "description",
+          "type": "type"
+        }
+      }
+    }
+  },
+  "structs": {
+    "Grid": {
+      "script": "templates/scripts/PutFileRequest.js",
+      "col": {
+        "methods": {
+          "description": "new description",
+          "external": "external",
+          "param_name": "param_name",
+          "type": "type",
+          "method_title": "Column",
+          "key": "KEY_COLUMN"
+        },
+        "params": {
+          "key": "KEY_COLUMN",
+          "value": "new_value"
+        }
+      }
+    }
+  },
+  "functions": {
+    "RegisterAppInterfaceRequest": {
+      "appID": {
+        "-methods": {}
+      },
+      "params": [
+        {
+          "key": "APP_ID_MAX_LENGTH",
+          "value": 10
+        }
+      ],
+      "script": "templates/scripts/RegisterAppInterfaceRequest.js"
+    }
+  }
+}

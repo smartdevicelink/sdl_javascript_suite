@@ -4,15 +4,15 @@
  * @param {Uint8Array} fileData
  * @return {PutFile}
  */
-setFileData(fileData) {
+setFileData (fileData) {
     this.setBulkData(fileData);
     return this;
 }
 /**
  * @return {Uint8Array}
  */
-getFileData() {
+getFileData () {
     return this.getBulkData();
 }
 
-//----------------- END -----------------------
+// ----------------- END -----------------------

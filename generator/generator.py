@@ -22,7 +22,6 @@ sys.path.append(ROOT.parents[0].joinpath('lib/rpc_spec/InterfaceParser').as_posi
 
 try:
     from parsers.sdl_rpc_v2 import Parser
-    from parsers.parse_error import ParseError as InterfaceError
     from model.interface import Interface
     from transformers.generate_error import GenerateError
     from transformers.common_producer import InterfaceProducerCommon

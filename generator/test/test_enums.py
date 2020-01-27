@@ -2,9 +2,9 @@ from collections import namedtuple
 from datetime import date
 from unittest import TestCase
 
-from transformers.enums_producer import EnumsProducer
 from model.enum import Enum
 from model.enum_element import EnumElement
+from transformers.enums_producer import EnumsProducer
 
 
 class TestEnumsProducer(TestCase):
@@ -24,15 +24,12 @@ class TestEnumsProducer(TestCase):
         })
         expected = {
             'name': 'FunctionID',
-            'imports': [self.producer.imports(what='Enum', wherefrom='../../util/Enum.js')],
-            'methods': [self.producer.methods(origin='RESERVED',
-                                              method_title='RESERVED',
+            'imports': {self.producer.imports(what='Enum', wherefrom='../../util/Enum.js')},
+            'methods': [self.producer.methods(method_title='RESERVED',
                                               description=[], type='Number'),
-                        self.producer.methods(origin='RegisterAppInterfaceID',
-                                              method_title='RegisterAppInterface',
+                        self.producer.methods(method_title='RegisterAppInterface',
                                               description=[], type='Number'),
-                        self.producer.methods(origin='PerformAudioPassThruID',
-                                              method_title='PerformAudioPassThru',
+                        self.producer.methods(method_title='PerformAudioPassThru',
                                               description=[], type='Number')],
             'params': [self.producer.params(key='RESERVED', value=0),
                        self.producer.params(key='RegisterAppInterface', value='0x01'),
@@ -54,10 +51,9 @@ class TestEnumsProducer(TestCase):
             'year': date.today().year,
             'name': 'Result',
             'file_name': 'Result',
-            'imports': [self.producer.imports(what='Enum', wherefrom='../../util/Enum.js')],
-            'methods': tuple([self.producer.methods(origin='SUCCESS',
-                                              method_title='SUCCESS',
-                                              description=[], type='String')]),
+            'imports': {self.producer.imports(what='Enum', wherefrom='../../util/Enum.js')},
+            'methods': tuple([self.producer.methods(method_title='SUCCESS',
+                                                    description=[], type='String')]),
             'params': tuple([self.producer.params(key='SUCCESS', value="'SUCCESS'")]),
             'extend': 'Enum'
         }

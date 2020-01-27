@@ -100,15 +100,13 @@
       "appID": {
         "-methods": {}
       },
-      "fullAppID": {
-        "script": "templates/scripts/fullAppID.js"
-      },
-      "params_additional": [
+      "params": [
         {
           "key": "APP_ID_MAX_LENGTH",
           "value": 10
         }
-      ]
+      ],
+      "script": "templates/scripts/RegisterAppInterfaceRequest.js"
     },
     "PutFileRequest": {
       "syncFileName": {

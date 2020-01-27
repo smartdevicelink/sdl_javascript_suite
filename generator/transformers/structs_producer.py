@@ -33,5 +33,5 @@ class StructsProducer(InterfaceProducerCommon):
         tmp = super(StructsProducer, self).transform(item)
         what_where = self.extract_imports(self.struct_class)
         tmp.update({'extend': what_where.what})
-        tmp['imports'].append(what_where)
+        tmp['imports'].add(what_where)
         return tmp

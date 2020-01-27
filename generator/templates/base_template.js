@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /*
 * Copyright (c) {{year}}, SmartDeviceLink Consortium, Inc.
 * All rights reserved.

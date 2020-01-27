@@ -3,7 +3,6 @@ Enums transformation
 """
 
 import logging
-import textwrap
 from collections import namedtuple
 
 from model.enum import Enum
@@ -24,14 +23,7 @@ class EnumsProducer(InterfaceProducerCommon):
             mapping=mapping['enums'] if mapping and 'enums' in mapping else {})
         self.logger = logging.getLogger(self.__class__.__name__)
         self.enum_class = paths.path_to_enum_class
-
-    @property
-    def methods(self):
-        """
-        Override
-        :return: namedtuple methods(origin='', method_title='', description='', type='')
-        """
-        return namedtuple('Methods', 'origin method_title description type')
+        self.methods = namedtuple('Methods', 'method_title description type')
 
     def transform(self, item: Enum) -> dict:
         """
@@ -42,7 +34,7 @@ class EnumsProducer(InterfaceProducerCommon):
         tmp = super(EnumsProducer, self).transform(item)
         what_where = self.extract_imports(self.enum_class)
         tmp.update({'extend': what_where.what})
-        tmp['imports'].append(what_where)
+        tmp['imports'].add(what_where)
         return tmp
 
     def common_flow(self, param: EnumElement, item_type=None):
@@ -55,10 +47,10 @@ class EnumsProducer(InterfaceProducerCommon):
         """
         (name, description) = self.extract_name_description(param)
         type_name = self.extract_type(param)
-        description = textwrap.wrap(description, 117 - len(type_name))
+        description = self.extract_description(description, 117 - len(type_name))
         name = self.ending_cutter(name)
 
-        methods = self.methods(origin=param.name, method_title=name, description=description, type=type_name)
+        methods = self.methods(method_title=name, description=description, type=type_name)
         params = self.extract_param(param)
 
         imports = None

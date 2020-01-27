@@ -1,7 +1,6 @@
 from collections import namedtuple
 from unittest import TestCase
 
-from transformers.functions_producer import FunctionsProducer
 from model.array import Array
 from model.boolean import Boolean
 from model.enum import Enum
@@ -11,6 +10,7 @@ from model.integer import Integer
 from model.param import Param
 from model.string import String
 from model.struct import Struct
+from transformers.functions_producer import FunctionsProducer
 
 
 class TestFunctionsProducer(TestCase):
@@ -29,10 +29,12 @@ class TestFunctionsProducer(TestCase):
         mapping = {"functions": {
             "RegisterAppInterfaceRequest": {
                 "syncMsgVersion": {
-                    "imports": {
-                        "what": "SdlMsgVersion",
-                        "wherefrom": "../structs/SdlMsgVersion.js"
-                    },
+                    "imports": [
+                        {
+                            "what": "SdlMsgVersion",
+                            "wherefrom": "../structs/SdlMsgVersion.js"
+                        }
+                    ],
                     "methods": {
                         "method_title": "SdlMsgVersion",
                         "external": "SdlMsgVersion",
@@ -43,10 +45,7 @@ class TestFunctionsProducer(TestCase):
                         "key": "KEY_SDL_MSG_VERSION"
                     }
                 },
-                "fullAppID": {
-                    "script": "templates/scripts/fullAppID.js"
-                },
-                "params_additional": [
+                "params": [
                     {
                         "key": "APP_ID_MAX_LENGTH",
                         "value": 10
@@ -81,23 +80,23 @@ class TestFunctionsProducer(TestCase):
                         })
         expected = {
             'name': 'RegisterAppInterface',
-            'imports': [self.producer.imports(what='SdlMsgVersion', wherefrom='../structs/SdlMsgVersion.js'),
+            'imports': {self.producer.imports(what='SdlMsgVersion', wherefrom='../structs/SdlMsgVersion.js'),
                         self.producer.imports(what='TemplateColorScheme',
                                               wherefrom='../structs/TemplateColorScheme.js'),
                         self.producer.imports(what='TTSChunk', wherefrom='../structs/TTSChunk.js'),
                         self.producer.imports(what='RpcRequest', wherefrom='../RpcRequest.js'),
-                        self.producer.imports(what='FunctionID', wherefrom='../enums/FunctionID.js')],
-            'methods': [self.producer.methods(origin='syncMsgVersion', key='KEY_SDL_MSG_VERSION',
+                        self.producer.imports(what='FunctionID', wherefrom='../enums/FunctionID.js')},
+            'methods': [self.producer.methods(key='KEY_SDL_MSG_VERSION',
                                               method_title='SdlMsgVersion', external='SdlMsgVersion',
                                               description=['See SyncMsgVersion'], param_name='version',
                                               type='SdlMsgVersion'),
-                        self.producer.methods(origin='fullAppID', key='KEY_FULL_APP_ID', method_title='FullAppID',
+                        self.producer.methods(key='KEY_FULL_APP_ID', method_title='FullAppID',
                                               external=None, description=['ID used'], param_name='id', type='String'),
-                        self.producer.methods(origin='dayColorScheme', key='KEY_DAY_COLOR_SCHEME', param_name='scheme',
+                        self.producer.methods(key='KEY_DAY_COLOR_SCHEME', param_name='scheme',
                                               method_title='DayColorScheme', external='TemplateColorScheme',
                                               description=['A color scheme for all display layout templates.'],
                                               type='TemplateColorScheme'),
-                        self.producer.methods(origin='ttsName', key='KEY_TTS_NAME', param_name='name',
+                        self.producer.methods(key='KEY_TTS_NAME', param_name='name',
                                               method_title='TtsName', external='TTSChunk',
                                               description=['TTS string for'], type='Array<TTSChunk>')],
             'params': [self.producer.params(key='APP_ID_MAX_LENGTH', value=10),
@@ -132,14 +131,14 @@ class TestFunctionsProducer(TestCase):
                         })
         expected = {
             'name': 'RegisterAppInterfaceResponse',
-            'imports': [self.producer.imports(what='Language', wherefrom='../enums/Language.js'),
+            'imports': {self.producer.imports(what='Language', wherefrom='../enums/Language.js'),
                         self.producer.imports(what='RpcResponse', wherefrom='../RpcResponse.js'),
-                        self.producer.imports(what='FunctionID', wherefrom='../enums/FunctionID.js')],
-            'methods': [self.producer.methods(origin='language', key='KEY_LANGUAGE',
+                        self.producer.imports(what='FunctionID', wherefrom='../enums/FunctionID.js')},
+            'methods': [self.producer.methods(key='KEY_LANGUAGE',
                                               method_title='Language', external='Language',
                                               description=['The currently'], param_name='language',
                                               type='Language'),
-                        self.producer.methods(origin='supportedDiagModes', key='KEY_SUPPORTED_DIAG_MODES',
+                        self.producer.methods(key='KEY_SUPPORTED_DIAG_MODES',
                                               method_title='SupportedDiagModes', external=None,
                                               description=['Specifies the'], param_name='modes',
                                               type='Array<Number>')],
@@ -163,8 +162,8 @@ class TestFunctionsProducer(TestCase):
                         message_type=EnumElement(name='request'), params={})
         expected = {
             'name': 'UnregisterAppInterface',
-            'imports': [self.producer.imports(what='RpcRequest', wherefrom='../RpcRequest.js'),
-                        self.producer.imports(what='FunctionID', wherefrom='../enums/FunctionID.js')],
+            'imports': {self.producer.imports(what='RpcRequest', wherefrom='../RpcRequest.js'),
+                        self.producer.imports(what='FunctionID', wherefrom='../enums/FunctionID.js')},
             'func': 'UnregisterAppInterface',
             'extend': 'RpcRequest'
         }
@@ -185,10 +184,10 @@ class TestFunctionsProducer(TestCase):
                         })
         expected = {
             'name': 'PutFile',
-            'imports': [self.producer.imports(what='FileType', wherefrom='../enums/FileType.js'),
+            'imports': {self.producer.imports(what='FileType', wherefrom='../enums/FileType.js'),
                         self.producer.imports(what='RpcRequest', wherefrom='../RpcRequest.js'),
-                        self.producer.imports(what='FunctionID', wherefrom='../enums/FunctionID.js')],
-            'methods': [self.producer.methods(origin='fileType', key='KEY_FILE_TYPE',
+                        self.producer.imports(what='FunctionID', wherefrom='../enums/FunctionID.js')},
+            'methods': [self.producer.methods(key='KEY_FILE_TYPE',
                                               method_title='FileType', external='FileType',
                                               description=['Selected file type.'], param_name='type',
                                               type='FileType')],
@@ -217,9 +216,9 @@ class TestFunctionsProducer(TestCase):
                         })
         expected = {
             'name': 'OnEncodedSyncPData',
-            'imports': [self.producer.imports(what='RpcNotification', wherefrom='../RpcNotification.js'),
-                        self.producer.imports(what='FunctionID', wherefrom='../enums/FunctionID.js')],
-            'methods': [self.producer.methods(origin='URL', key='KEY_URL',
+            'imports': {self.producer.imports(what='RpcNotification', wherefrom='../RpcNotification.js'),
+                        self.producer.imports(what='FunctionID', wherefrom='../enums/FunctionID.js')},
+            'methods': [self.producer.methods(key='KEY_URL',
                                               method_title='URL', external=None,
                                               description=['If'], param_name='url',
                                               type='String')],
@@ -247,10 +246,10 @@ class TestFunctionsProducer(TestCase):
                         })
         expected = {
             'name': 'CreateInteractionChoiceSet',
-            'imports': [self.producer.imports(what='Choice', wherefrom='../structs/Choice.js'),
+            'imports': {self.producer.imports(what='Choice', wherefrom='../structs/Choice.js'),
                         self.producer.imports(what='RpcRequest', wherefrom='../RpcRequest.js'),
-                        self.producer.imports(what='FunctionID', wherefrom='../enums/FunctionID.js')],
-            'methods': [self.producer.methods(origin='choiceSet', key='KEY_CHOICE_SET',
+                        self.producer.imports(what='FunctionID', wherefrom='../enums/FunctionID.js')},
+            'methods': [self.producer.methods(key='KEY_CHOICE_SET',
                                               method_title='ChoiceSet', external='Choice',
                                               description=['A choice is an option given to'], param_name='set',
                                               type='Array<Choice>')],

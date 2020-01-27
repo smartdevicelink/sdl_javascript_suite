@@ -11,8 +11,8 @@ from datetime import date
 from pathlib import Path
 
 from model.array import Array
-from model.float import Float
 from model.enum import Enum
+from model.float import Float
 from model.function import Function
 from model.integer import Integer
 from model.struct import Struct
@@ -34,6 +34,9 @@ class InterfaceProducerCommon(ABC):
         self.enums_dir = enums_dir_name
         self.structs_dir = structs_dir_name
         self.mapping = mapping
+        self.imports = namedtuple('Imports', 'what wherefrom')
+        self.methods = namedtuple('Methods', 'key method_title external description param_name type')
+        self.params = namedtuple('Params', 'key value')
 
     @property
     def get_version(self):
@@ -41,28 +44,6 @@ class InterfaceProducerCommon(ABC):
         :return: current version of Generator
         """
         return self.version
-
-    @property
-    def imports(self):
-        """
-        :return: namedtuple imports(what='', wherefrom='')
-        """
-        return namedtuple('Imports', 'what wherefrom')
-
-    @property
-    def methods(self):
-        """
-        :return: namedtuple methods(
-                            origin='', key='', method_title='', external='', description='', param_name='', type='',)
-        """
-        return namedtuple('Methods', 'origin key method_title external description param_name type')
-
-    @property
-    def params(self):
-        """
-        :return: namedtuple params(key='', value='')
-        """
-        return namedtuple('Params', 'key value')
 
     @staticmethod
     def replace_sync(name):
@@ -84,30 +65,24 @@ class InterfaceProducerCommon(ABC):
         params = {}
 
         for param in getattr(item, self.container_name).values():
-            if isinstance(item, Function) and item.message_type.name == 'response' and \
-                            param.name in ('success', 'resultCode', 'info'):
-                self.logger.warning('%s of type %s/%s - skip parameter "%s"',
-                                    item.name, type(item).__name__, item.message_type.name, param.name)
-                continue
-
             _import, _methods, _params = self.common_flow(param, type(item))
 
             if _import:
                 imports.update(_import)
             if _methods:
-                methods.update({param.name: _methods})
+                methods[param.name] = _methods
             params.update({param.name: _params})
 
         name = self.replace_sync(item.name)
         render = {'year': date.today().year,
                   'file_name': name,
                   'name': name,
-                  'imports': [self.imports(what=k, wherefrom=v) for k, v in imports.items()],
+                  'imports': {self.imports(what=k, wherefrom=v) for k, v in imports.items()},
                   'methods': methods,
                   'params': params}
 
         if getattr(item, 'description', None):
-            render.update({'description': textwrap.wrap(self.extract_description(item.description), 116)})
+            render.update({'description': self.extract_description(item.description, 116)})
         if item.deprecated:
             render.update({'deprecated': item.deprecated})
 
@@ -117,55 +92,6 @@ class InterfaceProducerCommon(ABC):
         render.update({'methods': tuple(render['methods'].values())})
 
         return render
-
-    def custom_mapping(self, render, item):
-        """
-        :param render: dictionarry with data ready to apply to Jinja2 template
-        :param item: original item from parsed model
-        :return:
-        """
-        if isinstance(item, Function):
-            mapping_name = item.name + item.message_type.name.capitalize()
-        else:
-            mapping_name = item.name
-
-        if mapping_name not in self.mapping:
-            return
-        custom = self.mapping[mapping_name]
-
-        if 'params_additional' in custom:
-            for param in custom['params_additional']:
-                render['params'].update({param['key']: self.params(**param)})
-            del custom['params_additional']
-        if 'script' in custom:
-            script = self.get_file_content(custom['script'])
-            if script:
-                if 'script' in render:
-                    render['scripts'].append(script)
-                else:
-                    render['scripts'] = [script]
-            del custom['script']
-
-        for name, mapping in custom.copy().items():
-            for sub_name, sub_mapping in mapping.copy().items():
-                if sub_name == '-methods':
-                    del render['methods'][name]
-                    del custom[name]['-methods']
-                if sub_name == 'script':
-                    script = self.get_file_content(sub_mapping)
-                    if script:
-                        if 'script' in render:
-                            render['scripts'].append(script)
-                        else:
-                            render['scripts'] = [script]
-                    del custom[name]['script']
-                if sub_name in render and name in render[sub_name]:
-                    render[sub_name][name] = render[sub_name][name]._replace(**sub_mapping)
-                    del custom[name][sub_name]
-            if not custom[name]:
-                del custom[name]
-
-        render.update(custom)
 
     def common_flow(self, param, item_type):
         """
@@ -191,10 +117,10 @@ class InterfaceProducerCommon(ABC):
 
         short_name = re.sub(r'(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])', '=^.^=', param_name) \
             .split('=^.^=').pop().lower()
-        description = textwrap.wrap(description, 100 - len(type_name) - len(short_name))
+        description = self.extract_description(description, 100 - len(type_name) - len(short_name))
         title = param_name[:1].upper() + param_name[1:]
 
-        methods = self.methods(origin=param.name, key=key, method_title=title, external=name, description=description,
+        methods = self.methods(key=key, method_title=title, external=name, description=description,
                                param_name=short_name, type=type_name)
         params = self.params(key=key, value="'{}'".format(param.name))
         return imports, methods, params
@@ -233,13 +159,18 @@ class InterfaceProducerCommon(ABC):
         return name
 
     @staticmethod
-    def extract_description(description):
+    def extract_description(data, length: int) -> list:
         """
         Evaluate, align and delete @TODO
-        :param description: list with description
+        :param data: list with description
+        :param length:
         :return: evaluated string
         """
-        return re.sub(r'(\s{2,}|\n|\[@TODO.+)', ' ', ''.join(description)).strip() if description else ''
+        if not data:
+            return []
+        if isinstance(data, list):
+            data = ' '.join(data)
+        return textwrap.wrap(re.sub(r'(\s{2,}|\n|\[@TODO.+)', ' ', data).strip(), length)
 
     def extract_name_description(self, param):
         """
@@ -265,7 +196,7 @@ class InterfaceProducerCommon(ABC):
                 if not description and getattr(param.param_type.element_type, 'description', None):
                     description = param.param_type.element_type.description
 
-        return self.replace_sync(name), self.extract_description(description)
+        return self.replace_sync(name), self.extract_description(description, 116)
 
     def extract_type(self, param):
         """
@@ -299,3 +230,68 @@ class InterfaceProducerCommon(ABC):
         except FileNotFoundError as message:
             self.logger.error(message)
             return ''
+
+    def custom_mapping(self, render, item):
+        """
+        :param render: dictionarry with data ready to apply to Jinja2 template
+        :param item: original item from parsed model
+        :return:
+        """
+        if isinstance(item, Function):
+            mapping_name = item.name + item.message_type.name.capitalize()
+        else:
+            mapping_name = item.name
+
+        if mapping_name not in self.mapping:
+            return
+        custom = self.mapping[mapping_name]
+
+        if 'params' in custom:
+            for data in custom['params']:
+                missed = list(set(self.params._fields) - set(data.keys()))
+                if missed:
+                    self.logger.warning('not valid %s', str(data))
+                    continue
+                render['params'][data['key']] = self.params(**data)
+            del custom['params']
+        if 'script' in custom:
+            script = self.get_file_content(custom['script'])
+            if script:
+                render['scripts'] = [script]
+            del custom['script']
+
+        for name, mapping in custom.copy().items():
+            for section, data in mapping.copy().items():
+                if section == '-methods' and name in render['methods']:
+                    redundant = list(custom[name].copy().keys())
+                    redundant.remove('-methods')
+                    if redundant:
+                        self.logger.info('%s/%s, "-methods" provided, skipping: %s',
+                                         mapping_name, name, str(redundant))
+                    del render['methods'][name]
+                    del custom[name]
+                    break
+                if section in render:
+                    if section == 'imports':
+                        for field in data:
+                            missed = list(set(getattr(self, section)._fields) - set(field.keys()))
+                            if missed:
+                                self.logger.error('%s/%s/%s, redundant: %s', mapping_name, name, section, missed)
+                                continue
+                            render[section].add(self.imports(**field))
+                    elif name in render[section]:
+                        redundant = list(set(data.keys()) - set(getattr(self, section)._fields))
+                        if redundant:
+                            self.logger.error('%s/%s/%s, redundant: %s', mapping_name, name, section, redundant)
+                            continue
+                        if 'description' in data:
+                            data['description'] = self.extract_description(data['description'], 116)
+                        render[section][name] = render[section][name]._replace(**data)
+                    else:
+                        self.logger.warning('%s/%s not exist, skipping it.', mapping_name, name)
+                    del custom[name][section]
+                else:
+                    self.logger.warning('%s/%s/%s not exist, skipping it.', mapping_name, name, section)
+                    del custom[name]
+            if name in custom and not custom[name]:
+                del custom[name]
