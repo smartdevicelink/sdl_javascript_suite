@@ -1558,7 +1558,7 @@ The customization script contains the JSON object. Below is the schema:
                     "value": [custom_value]
                 },
             },
-            "params_additional": [
+            "params": [
                 {
                     "key": [custom_param_name],
                     "value": [custom_param_value]
@@ -1570,7 +1570,7 @@ The customization script contains the JSON object. Below is the schema:
 }
 ```
 
-Root keys in the structure are `"enums"`, `"structs"` and `"functions"`. The key on the next level is the corresponding name of required `<enum>`, `<struct>` or `<function>`. On the next level, the name of `<element>` or `<param>` is expected. Also, at this level, it is possible to add any custom code into class from the file via the `script` key and to add custom params to class properties via an array from `params_additional` key. See the detailed description below.
+Root keys in the structure are `"enums"`, `"structs"` and `"functions"`. The key on the next level is the corresponding name of required `<enum>`, `<struct>` or `<function>`. On the next level, the name of `<element>` or `<param>` is expected. Also, at this level, it is possible to add any custom code into class from the file via the `script` key and to add custom params to class properties via an array from `params` key. See the detailed description below.
 
 The mapping object does not provide the possibility to create brand new `<enum>`, `<struct>` or `<function>`, and their child elements in this way. The customization is allowed only for existing XML elements, unexisting names of elements and their child elements defined int the mapping object will be ignored.
 
