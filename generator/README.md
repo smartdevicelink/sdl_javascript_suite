@@ -1531,3 +1531,211 @@ OnLanguageChange.KEY_HMI_DISPLAY_LANGUAGE = 'hmiDisplayLanguage';
 
 export { OnLanguageChange };
 ```
+
+# Custom mapping
+
+## Overview
+
+There are cases named `edge cases` when it is not possible to get the required info from XML or some manual additions are required in generated classes. For that purpose the generator includes the custom mapping file `mapping.json` that allows to add required customizations.
+
+## Structure
+
+The customization script contains the JSON object. Below is the schema:
+
+```json
+{
+    ["enums"|"structs"|"functions"]: {
+        [enum_name|struct_name|function_name]: {
+            [element_name|param_name]: {
+                "-methods": {},
+                "methods": {
+                    "method_name": [custom_method_name],
+                    "key": [custom_key_name],
+                    "description": [custom_description]
+                },
+                "params": {
+                    "key": [custom_key_name]
+                    "value": [custom_value]
+                },
+            },
+            "params_additional": [
+                {
+                    "key": [custom_param_name],
+                    "value": [custom_param_value]
+                }
+            ],
+            "script": [path_to_custom_code]
+        }
+    }
+}
+```
+
+Root keys in the structure are `"enums"`, `"structs"` and `"functions"`. The key on the next level is the corresponding name of required `<enum>`, `<struct>` or `<function>`. On the next level, the name of `<element>` or `<param>` is expected. Also, at this level, it is possible to add any custom code into class from the file via the `script` key and to add custom params to class properties via an array from `params_additional` key. See the detailed description below.
+
+The mapping object does not provide the possibility to create brand new `<enum>`, `<struct>` or `<function>`, and their child elements in this way. The customization is allowed only for existing XML elements, unexisting names of elements and their child elements defined int the mapping object will be ignored.
+
+## Adding the custom code
+As described above the custom code could be added via `script` key. The value of this key should be the path to the file. The code will be included as-is directly into the class, therefore only comments and method definitions are allowed in this file.
+
+Example:
+```json
+{
+    "functions": {
+        "PutFileRequest": {
+            "script": "templates/scripts/PutFileRequest.js"
+        }
+    }
+}
+```
+
+The content of the `templates/scripts/PutFileRequest.js` file is:
+```javascript
+// ------ Not part of the RPC spec itself -----
+
+/**
+ * @param {Uint8Array} fileData
+ * @return {PutFile}
+ */
+setFileData(fileData) {
+    this.setBulkData(fileData);
+    return this;
+}
+/**
+ * @return {Uint8Array}
+ */
+getFileData() {
+    return this.getBulkData();
+}
+
+//----------------- END -----------------------
+```
+This code will be included into `PutFileRequest` class of the `messages/PutFileRequest.js` file as-is.
+
+## Adding custom parameters
+As described above the custom code could be added via `params` key. The value of this key should be the array of objects. Each that object should include `key` and `value` properties for defining the name and the value of the new parameter.
+
+Following example demonstrates the object and the code that will be generated for Enums and Structs/Functions:
+```json
+{
+    "key": "APP_ID_MAX_LENGTH",
+    "value": 10
+}
+```
+
+In Enums this will produce the new property in the static `_MAP` object
+```javascript
+_EnumClass_._MAP = Object.freeze({
+    // ...,
+    'APP_ID_MAX_LENGTH': 10,
+    // ...
+});
+```
+
+In Structs/Functions this will produce the new static property
+```javascript
+// ...
+_StructClass_.APP_ID_MAX_LENGTH = 10;
+// ...
+```
+```javascript
+// ...
+_FunctionClass_.APP_ID_MAX_LENGTH = 10;
+// ...
+```
+
+## Customization the `<element>` of `<enum>` or the `<param>` of `<struct>`/`<function>`
+In order of this customization it is possible to change the name and description of getter/setter methods and the name and value of corresponding static property. Additionally it is possible to remove getter/setter methods.
+
+### Changing the name and description of getter/setter methods
+To change the name and description of getter/setter methods it needs to define `methods.method_name` value.
+
+Example:
+```json
+{
+    "enums": {
+        "AudioType": {
+            "PCM": {
+                "methods": {
+                    "method_name": "Wave",
+                    "description": "Linear Wave!"
+                }
+            }
+        }
+    }
+}
+```
+
+This will replace the `PCM` method name to `Wave` and `Linear PCM.` description to `Linear Wave!`, please pay attention the `_MAP` still has the `PCM` key.
+```javascript
+     /*
+     * Linear Wave!
+     * @return {String}
+     */
+    static get Wave () {
+        return AudioType._MAP.PCM;
+    }
+```
+
+### Changing the name and value of corresponding static property
+To change the name of corresponding static property it needs to define `params.key` value.
+
+To change the value of corresponding static property it needs to define `params.value` value.
+
+Example:
+```json
+{
+    "enums": {
+        "AudioType": {
+            "PCM": {
+                "methods": {
+                    "key": "Wave"
+                },
+                "params": {
+                    "key": "Wave",
+                    "value": "NEW_PCM"
+                }
+            }
+        }
+    }
+}
+```
+
+The result will the following. Please pay attention that in case if the name of the static property was changed, you should also define the same `methods.key` value, otherwise the key will be unchanged in getter/setter methods.
+```javascript
+
+class AudioType extends Enum {
+// ...
+     /*
+     * Linear PCM.
+     * @return {String}
+     */
+    static get PCM () {
+        return AudioType._MAP.Wave; // will be old `AudioType._MAP.PCM` if `methods.key` is not defined
+    }
+// ...
+}
+
+AudioType._MAP = Object.freeze({
+    // ...,
+    'Wave': "NEW_PCM", // old key/value PCM: "PCM"
+    // ...
+});
+```
+
+### Removing getter/setter methods
+To remove getter/setter methods it needs to define `-methods` key, the value of this key doesn't matter.
+
+Example:
+```json
+{
+    "enums": {
+        "AudioType": {
+            "PCM": {
+                "-methods": {}
+            }
+        }
+    }
+}
+```
+
+This will remove `static get PCM` method from the class and only the `_MAP` key/value will be generated.

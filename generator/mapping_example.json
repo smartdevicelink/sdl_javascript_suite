@@ -1,11 +1,11 @@
 {
   "enums": {
     "AudioType": {
-      "not_exist": {
+      "not_exist_and_will_be_ignored": {
         "any": null
       },
       "PCM": {
-        "-methods": "any value",
+        "-methods": {},
         "params": {
           "key": "new_key",
           "value": "new_value"
@@ -13,7 +13,6 @@
         "methods": {
           "method_title": "new_key",
           "description": "description",
-          "type": "type"
         }
       }
     }
@@ -24,9 +23,6 @@
       "col": {
         "methods": {
           "description": "new description",
-          "external": "external",
-          "param_name": "param_name",
-          "type": "type",
           "method_title": "Column",
           "key": "KEY_COLUMN"
         },
