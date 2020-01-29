@@ -36,8 +36,7 @@ import { BinaryFrameHeader } from './../protocol/BinaryFrameHeader.js';
             case FunctionID.{{item.name}}:
                 if (rpcType === RpcType.{{item.type}}) {
                     message = new {{item.name}}(params);
-                } {% if item.type == 'REQUEST' -%}
-                  else if (rpcType === RpcType.RESPONSE) {
+                }{% if item.type == 'REQUEST' %} else if (rpcType === RpcType.RESPONSE) {
                     message = new {{item.name}}Response(params);
                 }
                 {%- endif %}
