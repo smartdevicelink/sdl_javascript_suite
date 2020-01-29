@@ -213,7 +213,7 @@ class InterfaceProducerCommon(ABC):
             return type(instance).__name__
 
         if isinstance(param.param_type, Array):
-            return 'Array<{}>'.format(evaluate(param.param_type.element_type))
+            return self.replace_sync(evaluate(param.param_type.element_type)) + '[]'
         return self.replace_sync(evaluate(param.param_type))
 
     def get_file_content(self, file_name: str):

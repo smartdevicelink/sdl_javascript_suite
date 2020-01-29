@@ -23,34 +23,32 @@
      */
 {%- block constructor %}
 {% endblock -%}
-    {% if scripts is defined -%}
-    {% for s in scripts %}
-{{s|indent(4,True)}}
-    {% endfor -%}
+    {%- if script is defined %}
+{{script|indent(4,True)}}
     {% endif -%}
-    {% for e in methods %}
-    {% set l = e.type|length + e.param_name|length + 13 -%}
+    {% for method in methods %}
+    {% set len = method.type|length + method.param_name|length + 13 -%}
     /**
      {% if deprecated is defined -%}
      * @deprecated
      {% endif -%}
-     {% if not e.description -%}
-     * @param {{'%s%s%s %s'|format('{', e.type, '}', e.param_name)}}
+     {% if not method.description -%}
+     * @param {{'%s%s%s %s'|format('{', method.type, '}', method.param_name)}}
      {% else -%}
-     * {% for d in e.description -%}
+     * {% for d in method.description -%}
      {% if loop.index == 1 -%}
-     @param {{'%s%s%s %s - %s'|format('{', e.type, '}', e.param_name, d)}}
+     @param {{'%s%s%s %s - %s'|format('{', method.type, '}', method.param_name, d)}}
      {% else -%}
-     * {{d|indent(l,True)}}
+     * {{d|indent(len,True)}}
      {% endif -%} {% endfor -%}
      {% endif -%}
      * @return {{'%s%s%s'|format('{', name, '}')}}
      */
-    set{{e.method_title}} ({{e.param_name}}) {
-        {%- if e.external and 'Array' not in e.type %}
-        this.validateType({{e.external}}, {{e.param_name}});
+    set{{method.method_title}} ({{method.param_name}}) {
+        {%- if method.external %}
+        this.validateType({{method.external}}, {{method.param_name}}{{ ', true' if '[]' in method.type }});
         {%- endif %}
-        this.setParameter({{name}}.{{e.key}}, {{e.param_name}});
+        this.setParameter({{name}}.{{method.key}}, {{method.param_name}});
         return this;
     }
 
@@ -58,19 +56,19 @@
      {% if deprecated is defined -%}
      * @deprecated
      {% endif -%}
-     * @return {{'%s%s%s'|format('{', e.type, '}')}}
+     * @return {{'%s%s%s'|format('{', method.type, '}')}}
      */
-    get{{e.method_title}} () {
-        {%- if e.external %}
-        return this.getObject({{e.external}}, {{name}}.{{e.key}});
+    get{{method.method_title}} () {
+        {%- if method.external %}
+        return this.getObject({{method.external}}, {{name}}.{{method.key}});
         {%- else %}
-        return this.getParameter({{name}}.{{e.key}});
+        return this.getParameter({{name}}.{{method.key}});
         {%- endif %}
     }
-{% endfor %}
+{% endfor -%}
 {%- endblock %}
-{% block properties %}
-{%- for e in params %}
-{{name}}.{{e.key}} = {{e.value}};
+{% block properties -%}
+{% for param in params %}
+{{name}}.{{param.key}} = {{param.value}};
 {%- endfor %}
 {%- endblock %}

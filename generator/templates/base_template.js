@@ -30,15 +30,16 @@
 * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 * POSSIBILITY OF SUCH DAMAGE.
 */
-{% for e in imports %}
-import {{'%s %s %s'|format('{', e.what, '}')}} from '{{e.wherefrom}}';
+{% block imports -%}
+{% for _import in imports %}
+import {{'%s %s %s'|format('{', _import.what, '}')}} from '{{_import.wherefrom}}';
 {%- endfor %}
-{% block typedef %}{% endblock %}
-class {{name}} extends {{extend}} {
+{% endblock -%}
+{% block typedef -%}{%- endblock %}
+class {{name}}{{' extends '+ extend if extend}} {
 {%- block body %}
 {% endblock -%}
 }
-{% block properties %}
-{% endblock %}
+{% block properties -%}{%- endblock %}
 
 export {{'%s %s %s'|format('{', name, '}')}};

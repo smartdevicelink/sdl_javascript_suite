@@ -22,6 +22,7 @@ sys.path.append(ROOT.parents[0].joinpath('lib/rpc_spec/InterfaceParser').as_posi
 
 try:
     from parsers.sdl_rpc_v2 import Parser
+    from parsers.rpc_base import ParseError
     from model.interface import Interface
     from transformers.generate_error import GenerateError
     from transformers.common_producer import InterfaceProducerCommon
@@ -47,7 +48,7 @@ class Generator:
         self._env = None
         self.paths_named = namedtuple('paths_named', 'path_to_enum_class path_to_struct_class path_to_request_class '
                                                      'path_to_response_class path_to_notification_class enums_dir_name '
-                                                     'structs_dir_name functions_dir_name')
+                                                     'structs_dir_name functions_dir_name rpc_creator')
 
     @property
     def env(self):
@@ -272,8 +273,8 @@ class Generator:
             render = self.env.get_template(template).render(data)
             with file_name.open('w', encoding='utf-8') as file:
                 file.write(render)
-        except (TemplateNotFound, UndefinedError) as message1:
-            self.logger.error('skipping %s, template not found %s', file_name.as_posix(), message1)
+        except (TemplateNotFound, UndefinedError, AttributeError) as message1:
+            self.logger.error('skipping %s, %s', file_name.as_posix(), message1)
 
     def process(self, directory, skip, overwrite, items, transformer):
         """
@@ -284,36 +285,79 @@ class Generator:
         :param items: elements initial Model
         :param transformer: producer/transformer instance
         """
-
         directory.mkdir(parents=True, exist_ok=True)
         for item in items.values():
-            template = type(item).__name__.lower() + '_template.js'
             data = transformer.transform(item)
-            file = directory.joinpath(data['file_name'] + '.js')
-            if file.is_file():
-                if skip:
-                    self.logger.info('Skipping %s', file)
-                    continue
-                if overwrite:
-                    self.logger.info('Overriding %s', file)
-                    self.write_file(file, template, data)
-                else:
-                    while True:
-                        try:
-                            confirm = input('File already exists {}. Overwrite? Y/Enter = yes, N = no\n'.format(file))
-                            if confirm.lower() == 'y' or not confirm:
-                                self.logger.info('Overriding %s', file)
-                                self.write_file(file, template, data)
-                                break
-                            if confirm.lower() == 'n':
-                                self.logger.info('Skipping %s', file)
-                                break
-                        except KeyboardInterrupt:
-                            print('\nThe user interrupted the execution of the program')
-                            sys.exit(1)
+            if 'template' in data:
+                template = data['template']
             else:
-                self.logger.info('Writing new %s', file)
+                template = type(item).__name__.lower() + '_template.js'
+            file = directory.joinpath(data['name'] + '.js')
+            self.process_common(skip, overwrite, file, template, data)
+
+    def process_function_name(self, file, dir_name, skip, overwrite, functions, transformer, mappings):
+        """
+        :param file:
+        :param dir_name:
+        :param skip:
+        :param overwrite:
+        :param functions:
+        :param transformer:
+        :param mappings:
+        :return:
+        """
+        creator = namedtuple('creator', 'name type')
+        data = {'name': file.stem, 'imports': [], 'cases': []}
+        for item in functions.values():
+            kind = item.message_type.name.upper()
+            if kind == 'RESPONSE':
+                name = item.name + kind.capitalize()
+            else:
+                name = item.name
+            key = item.name + kind.capitalize()
+            if key in mappings and 'name' in mappings[key]:
+                name = mappings[key]['name']
+
+            if kind != 'RESPONSE':
+                data['cases'].append(creator(name, kind))
+            data['imports'].append(transformer.imports(what=name, wherefrom='{}/{}.js'.format(dir_name, name)))
+
+        self.process_common(skip, overwrite, file, file.stem + '_template.js', data)
+
+    def process_common(self, skip, overwrite, file, template, data):
+        """
+        :param skip:
+        :param overwrite:
+        :param file:
+        :param template:
+        :param data:
+        :return:
+        """
+        if file.is_file():
+            if skip:
+                self.logger.info('Skipping %s', file.name)
+                return
+            if overwrite:
+                self.logger.info('Overriding %s', file.name)
                 self.write_file(file, template, data)
+            else:
+                while True:
+                    try:
+                        confirm = input('File already exists {}. Overwrite? Y/Enter = yes, N = no\n'
+                                        .format(file.name))
+                        if confirm.lower() == 'y' or not confirm:
+                            self.logger.info('Overriding %s', file.name)
+                            self.write_file(file, template, data)
+                            break
+                        if confirm.lower() == 'n':
+                            self.logger.info('Skipping %s', file.name)
+                            break
+                    except KeyboardInterrupt:
+                        print('\nThe user interrupted the execution of the program')
+                        sys.exit(1)
+        else:
+            self.logger.info('Writing new %s', file.name)
+            self.write_file(file, template, data)
 
     def filter_pattern(self, interface, pattern):
         """
@@ -321,27 +365,31 @@ class Generator:
         :param pattern: regex-pattern from command-line arguments to filter element from initial Model
         :return: initial Model
         """
-        enum_names = tuple(interface.enums.keys())
-        struct_names = tuple(interface.structs.keys())
+        names = tuple(interface.enums.keys()) + tuple(interface.structs.keys())
 
         if pattern:
             match = {i: {} for i in vars(interface).keys()}
             match['params'] = interface.params
+            empty = True
             for key, value in vars(interface).items():
                 if key == 'params':
                     continue
                 for name, item in value.items():
                     if re.match(pattern, item.name):
                         if hasattr(item, 'message_type'):
-                            log = '{}/{} {} match with {}'.format(key, item.name, item.message_type.name.title(),
-                                                                  pattern)
+                            log = '{}/{} {} match with {}'.format(
+                                key, item.name, item.message_type.name.title(), pattern)
                         else:
                             log = '{}/{} match with {}'.format(key, item.name, pattern)
                         self.logger.info(log)
                         if key in match:
                             match[key][name] = item
-            return enum_names, struct_names, Interface(**match)
-        return enum_names, struct_names, interface
+                            empty = False
+            if empty:
+                self.logger.warning('no one match with %s', pattern)
+                sys.exit(0)
+            return Interface(**match), names
+        return interface, names
 
     @staticmethod
     def evaluate_instance_directory(dir_name):
@@ -367,9 +415,13 @@ class Generator:
 
         paths = self.get_paths()
 
-        interface = Parser().parse(args.source_xml, args.source_xsd)
+        try:
+            interface = Parser().parse(args.source_xml, args.source_xsd)
+        except ParseError as error1:
+            self.logger.error(error1)
+            sys.exit(1)
 
-        enum_names, struct_names, filtered = self.filter_pattern(interface, args.regex_pattern)
+        filtered, names = self.filter_pattern(interface, args.regex_pattern)
 
         mappings = self.get_mappings()
 
@@ -380,11 +432,14 @@ class Generator:
         if args.structs and filtered.structs:
             directory = args.output_directory.joinpath(self.evaluate_instance_directory(paths.structs_dir_name))
             self.process(directory, args.skip, args.overwrite, filtered.structs,
-                         StructsProducer(paths, enum_names, struct_names, mappings))
+                         StructsProducer(paths, names, mappings))
         if args.functions and filtered.functions:
+            transformer = FunctionsProducer(paths, names, mappings)
             directory = args.output_directory.joinpath(self.evaluate_instance_directory(paths.functions_dir_name))
-            self.process(directory, args.skip, args.overwrite, filtered.functions,
-                         FunctionsProducer(paths, enum_names, struct_names, mappings))
+            self.process(directory, args.skip, args.overwrite, filtered.functions, transformer)
+            self.process_function_name(args.output_directory.joinpath(paths.rpc_creator), paths.functions_dir_name,
+                                       args.skip, args.overwrite, interface.functions, transformer,
+                                       mappings.get('functions', {}))
 
 
 if __name__ == '__main__':

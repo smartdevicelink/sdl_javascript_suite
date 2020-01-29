@@ -23,25 +23,23 @@
     constructor () {
         super();
     }
-    {%- for e in methods %}
+    {%- for method in methods %}
 
     /**
      {%- if deprecated is defined %}
      * @deprecated
      {%- endif %}
-     {%- for d in e.description %}
+     {%- for d in method.description %}
      * {{d}}
      {%- endfor %}
-     * @return {{'%s%s%s'|format('{', e.type, '}')}}
+     * @return {{'%s%s%s'|format('{', method.type, '}')}}
      */
-    static get {{e.method_title}} () {
-        return {{name}}._MAP.{{e.method_title}};
+    static get {{method.method_title}} () {
+        return {{name}}._MAP.{{method.method_title}};
     }
     {%- endfor %}
-{% if scripts is defined -%}
-    {%- for s in scripts %}
-{{s|indent(4,True)}}
-    {%- endfor %}
+{% if script is defined %}
+{{script|indent(4,True)}}
 {% endif %}
     /**
      * Get the value for the given enum key
@@ -63,8 +61,8 @@
 {% endblock %}
 {% block properties %}
 {{name}}._MAP = Object.freeze({
-{%- for e in params %}
-    '{{e.key}}': {{e.value}},
+{%- for param in params %}
+    '{{param.key}}': {{param.value}},
 {%- endfor %}
 });
 {%- endblock %}
