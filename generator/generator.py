@@ -7,6 +7,7 @@ import re
 import sys
 from argparse import ArgumentParser
 from collections import namedtuple
+from datetime import date
 from inspect import getfile
 from json import JSONDecodeError, loads
 from os.path import basename
@@ -307,7 +308,7 @@ class Generator:
         :return:
         """
         creator = namedtuple('creator', 'name type')
-        data = {'name': file.stem, 'imports': [], 'cases': []}
+        data = {'name': file.stem, 'imports': [], 'cases': [], 'year': date.today().year, }
         for item in functions.values():
             kind = item.message_type.name.upper()
             if kind == 'RESPONSE':

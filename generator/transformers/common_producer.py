@@ -26,11 +26,10 @@ class InterfaceProducerCommon(ABC):
     version = '1.0.0'
 
     def __init__(self, container_name, enums_dir_name, structs_dir_name,
-                 enum_names=(), struct_names=(), mapping=OrderedDict()):
+                 names=(), mapping=OrderedDict()):
         self.logger = logging.getLogger(self.__class__.__name__)
         self.container_name = container_name
-        self.enum_names = list(map(lambda e: self.replace_sync(e), enum_names))
-        self.struct_names = list(map(lambda e: self.replace_sync(e), struct_names))
+        self.names = list(map(lambda e: self.replace_sync(e), names))
         self.enums_dir = enums_dir_name
         self.structs_dir = structs_dir_name
         self.mapping = mapping
@@ -104,9 +103,9 @@ class InterfaceProducerCommon(ABC):
         type_name = self.extract_type(param)
         imports = None
         if name:
-            if name in self.enum_names:
+            if isinstance(param, Enum):
                 imports = {name: '{}/{}.js'.format(self.enums_dir, name)}
-            elif name in self.struct_names:
+            elif isinstance(param, Struct):
                 if item_type is Struct:
                     import_path = '.'
                 else:
@@ -261,6 +260,8 @@ class InterfaceProducerCommon(ABC):
             del custom['script']
 
         for name, mapping in custom.copy().items():
+            if not isinstance(mapping, dict):
+                continue
             for section, data in mapping.copy().items():
                 if section == '-methods' and name in render['methods']:
                     redundant = list(custom[name].copy().keys())
@@ -295,3 +296,5 @@ class InterfaceProducerCommon(ABC):
                     del custom[name]
             if name in custom and not custom[name]:
                 del custom[name]
+
+        render.update(custom)

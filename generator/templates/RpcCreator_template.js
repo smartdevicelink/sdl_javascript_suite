@@ -8,7 +8,6 @@ import { RpcType } from './enums/RpcType.js';
 import { FunctionID } from './enums/FunctionID.js';
 import { JsonRpcMarshaller } from './../util/JsonRpcMarshaller.js';
 import { BinaryFrameHeader } from './../protocol/BinaryFrameHeader.js';
-
 {% endblock -%}
 {%- block body %}
     /**

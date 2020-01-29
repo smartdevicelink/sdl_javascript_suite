@@ -12,13 +12,12 @@ class FunctionsProducer(InterfaceProducerCommon):
     Functions transformation
     """
 
-    def __init__(self, paths, enum_names, struct_names, mapping=None):
+    def __init__(self, paths, names, mapping=None):
         super(FunctionsProducer, self).__init__(
             container_name='params',
             enums_dir_name=paths.enums_dir_name,
             structs_dir_name=paths.structs_dir_name,
-            enum_names=enum_names,
-            struct_names=struct_names,
+            names=names,
             mapping=mapping['functions'] if mapping and 'functions' in mapping else {})
         self.logger = logging.getLogger(self.__class__.__name__)
         self.request_class = paths.path_to_request_class

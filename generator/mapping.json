@@ -1,4 +1,16 @@
 {
+  "enums": {
+    "FunctionID": {
+      "OnHMIStatusID": {
+        "methods": {
+          "method_title": "OnHmiStatus"
+        },
+        "params": {
+          "key": "OnHmiStatus"
+        }
+      }
+    }
+  },
   "structs": {
     "DisplayCapabilities": {
       "graphicSupported": {
@@ -75,6 +87,15 @@
     }
   },
   "functions": {
+    "OnHMIStatusNotification": {
+      "name": "OnHmiStatus",
+      "file_name": "OnHmiStatus",
+      "hmiLevel": {
+        "methods": {
+          "method_title": "HMILevel"
+        }
+      }
+    },
     "SetAppIconRequest": {
       "syncFileName": {
         "methods": {
