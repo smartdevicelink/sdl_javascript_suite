@@ -9,6 +9,7 @@ from argparse import ArgumentParser
 from collections import namedtuple
 from datetime import date
 from inspect import getfile
+from itertools import groupby
 from json import JSONDecodeError, loads
 from os.path import basename
 from pprint import pformat
@@ -307,21 +308,28 @@ class Generator:
         :param mappings:
         :return:
         """
-        creator = namedtuple('creator', 'name type')
-        data = {'name': file.stem, 'imports': [], 'cases': [], 'year': date.today().year, }
-        for item in functions.values():
-            kind = item.message_type.name.upper()
-            if kind == 'RESPONSE':
-                name = item.name + kind.capitalize()
-            else:
-                name = item.name
-            key = item.name + kind.capitalize()
-            if key in mappings and 'name' in mappings[key]:
-                name = mappings[key]['name']
+        if dir_name.startswith('..'):
+            dir_name = dir_name[1:]
 
-            if kind != 'RESPONSE':
-                data['cases'].append(creator(name, kind))
-            data['imports'].append(transformer.imports(what=name, wherefrom='{}/{}.js'.format(dir_name, name)))
+        creator = namedtuple('creator', 'function_name class_name type')
+        data = {'name': file.stem, 'imports': [], 'cases': [], 'year': date.today().year, }
+
+        grouped = [{'name': k, 'type': [x for x in v]} for k, v in groupby(functions.values(), key=lambda x: x.name)]
+
+        for item in grouped:
+            name = item['name']
+            for func in item['type']:
+                kind = func.message_type.name.capitalize()
+                if kind == 'Response':
+                    name += kind
+                key = name + kind
+                if key in mappings and 'name' in mappings[key]:
+                    name = mappings[key]['name']
+                data['imports'].append(transformer.imports(what=name, wherefrom='{}/{}.js'.format(dir_name, name)))
+                if kind != 'Response':
+                    data['cases'].append(creator(name, name, kind.upper()))
+                elif kind == 'Response' and len(item['type']) == 1:
+                    data['cases'].append(creator(item['name'], name, kind.upper()))
 
         self.process_common(skip, overwrite, file, file.stem + '_template.js', data)
 
@@ -426,6 +434,7 @@ class Generator:
 
         mappings = self.get_mappings()
 
+        functions_transformer = FunctionsProducer(paths, names, mappings)
         if args.enums and filtered.enums:
             directory = args.output_directory.joinpath(self.evaluate_instance_directory(paths.enums_dir_name))
             self.process(directory, args.skip, args.overwrite, filtered.enums,
@@ -435,12 +444,11 @@ class Generator:
             self.process(directory, args.skip, args.overwrite, filtered.structs,
                          StructsProducer(paths, names, mappings))
         if args.functions and filtered.functions:
-            transformer = FunctionsProducer(paths, names, mappings)
             directory = args.output_directory.joinpath(self.evaluate_instance_directory(paths.functions_dir_name))
-            self.process(directory, args.skip, args.overwrite, filtered.functions, transformer)
-            self.process_function_name(args.output_directory.joinpath(paths.rpc_creator), paths.functions_dir_name,
-                                       args.skip, args.overwrite, interface.functions, transformer,
-                                       mappings.get('functions', {}))
+            self.process(directory, args.skip, args.overwrite, filtered.functions, functions_transformer)
+        self.process_function_name(args.output_directory.joinpath(paths.rpc_creator), paths.functions_dir_name,
+                                   args.skip, args.overwrite, interface.functions, functions_transformer,
+                                   mappings.get('functions', {}))
 
 
 if __name__ == '__main__':

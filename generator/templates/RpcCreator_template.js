@@ -33,11 +33,11 @@ import { BinaryFrameHeader } from './../protocol/BinaryFrameHeader.js';
 
         switch (functionId) {
             {%- for item in cases %}
-            case FunctionID.{{item.name}}:
+            case FunctionID.{{item.function_name}}:
                 if (rpcType === RpcType.{{item.type}}) {
-                    message = new {{item.name}}(params);
+                    message = new {{item.class_name}}(params);
                 }{% if item.type == 'REQUEST' %} else if (rpcType === RpcType.RESPONSE) {
-                    message = new {{item.name}}Response(params);
+                    message = new {{item.class_name}}Response(params);
                 }
                 {%- endif %}
                 break;
