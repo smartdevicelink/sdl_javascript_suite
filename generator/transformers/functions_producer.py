@@ -44,7 +44,7 @@ class FunctionsProducer(InterfaceProducerCommon):
         elif item.message_type.name == 'notification':
             name = self.notification_class
         if name:
-            what_where = self.extract_imports(name)
+            what_where = self.prepare_imports(name)
             render.update({'extend': what_where.what})
             render['imports'].add(what_where)
         render['imports'].add(self.imports(what='FunctionID', wherefrom='{}/FunctionID.js'.format(self.enums_dir)))

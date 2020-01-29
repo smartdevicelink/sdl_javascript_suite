@@ -92,6 +92,33 @@ class InterfaceProducerCommon(ABC):
 
         return render
 
+    def extract_imports(self, param, item_type):
+        """
+        :param param:
+        :param item_type:
+        :return:
+        """
+
+        def evaluate(element):
+            if isinstance(element, (Struct, Enum)):
+                return self.replace_sync(element.name), type(element)
+            return None, None
+
+        if isinstance(param.param_type, Array):
+            type_origin, kind = evaluate(param.param_type.element_type)
+        else:
+            type_origin, kind = evaluate(param.param_type)
+
+        if type_origin in self.names:
+            if kind is Enum:
+                return {type_origin: '{}/{}.js'.format(self.enums_dir, type_origin)}
+            elif kind is Struct:
+                if item_type is Struct:
+                    import_path = '.'
+                else:
+                    import_path = self.structs_dir
+                return {type_origin: '{}/{}.js'.format(import_path, type_origin)}
+
     def common_flow(self, param, item_type):
         """
         Main transformation flow, for Struct and Function
@@ -101,16 +128,7 @@ class InterfaceProducerCommon(ABC):
         """
         name, description = self.extract_name_description(param)
         type_name = self.extract_type(param)
-        imports = None
-        if name:
-            if isinstance(param, Enum):
-                imports = {name: '{}/{}.js'.format(self.enums_dir, name)}
-            elif isinstance(param, Struct):
-                if item_type is Struct:
-                    import_path = '.'
-                else:
-                    import_path = self.structs_dir
-                imports = {name: '{}/{}.js'.format(import_path, name)}
+        imports = self.extract_imports(param, item_type)
         param_name = self.replace_sync(param.name)
         key = self.key(param_name)
 
@@ -124,7 +142,7 @@ class InterfaceProducerCommon(ABC):
         params = self.params(key=key, value="'{}'".format(param.name))
         return imports, methods, params
 
-    def extract_imports(self, extend):
+    def prepare_imports(self, extend):
         """
         Extract imports from property PATH_TO_(STRUCT|REQUEST|RESPONSE|NOTIFICATION)_CLASS
         :param extend: property to be evaluated and converted to self.imports

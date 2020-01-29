@@ -32,7 +32,7 @@ class EnumsProducer(InterfaceProducerCommon):
         :return: dictionary to be applied to jinja2 template
         """
         tmp = super(EnumsProducer, self).transform(item)
-        what_where = self.extract_imports(self.enum_class)
+        what_where = self.prepare_imports(self.enum_class)
         tmp.update({'extend': what_where.what})
         tmp['imports'].add(what_where)
         return tmp

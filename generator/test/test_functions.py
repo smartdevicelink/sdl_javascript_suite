@@ -29,12 +29,6 @@ class TestFunctionsProducer(TestCase):
         mapping = {"functions": {
             "RegisterAppInterfaceRequest": {
                 "syncMsgVersion": {
-                    "imports": [
-                        {
-                            "what": "SdlMsgVersion",
-                            "wherefrom": "../structs/SdlMsgVersion.js"
-                        }
-                    ],
                     "methods": {
                         "method_title": "SdlMsgVersion",
                         "external": "SdlMsgVersion",
@@ -59,9 +53,8 @@ class TestFunctionsProducer(TestCase):
                 "script": "templates/scripts/PutFileRequest.js"
             }}}
 
-        enum_names = ('FileType', 'Language')
-        struct_names = ('SyncMsgVersion', 'TemplateColorScheme', 'TTSChunk', 'Choice')
-        self.producer = FunctionsProducer(paths, enum_names, struct_names, mapping)
+        names = ('FileType', 'Language', 'SyncMsgVersion', 'TemplateColorScheme', 'TTSChunk', 'Choice')
+        self.producer = FunctionsProducer(paths, names, mapping)
 
     def test_RegisterAppInterfaceRequest(self):
         item = Function(name='RegisterAppInterface', function_id=Enum(name='RegisterAppInterfaceID'),
@@ -98,7 +91,7 @@ class TestFunctionsProducer(TestCase):
                                               type='TemplateColorScheme'),
                         self.producer.methods(key='KEY_TTS_NAME', param_name='name',
                                               method_title='TtsName', external='TTSChunk',
-                                              description=['TTS string for'], type='Array<TTSChunk>')],
+                                              description=['TTS string for'], type='TTSChunk[]')],
             'params': [self.producer.params(key='APP_ID_MAX_LENGTH', value=10),
                        self.producer.params(key='KEY_SDL_MSG_VERSION', value="'syncMsgVersion'"),
                        self.producer.params(key='KEY_FULL_APP_ID', value="'fullAppID'"),
@@ -141,7 +134,7 @@ class TestFunctionsProducer(TestCase):
                         self.producer.methods(key='KEY_SUPPORTED_DIAG_MODES',
                                               method_title='SupportedDiagModes', external=None,
                                               description=['Specifies the'], param_name='modes',
-                                              type='Array<Number>')],
+                                              type='Number[]')],
             'params': [self.producer.params(key='KEY_LANGUAGE', value="'language'"),
                        self.producer.params(key='KEY_SUPPORTED_DIAG_MODES', value="'supportedDiagModes'")],
             'description': ['The response'],
@@ -252,7 +245,7 @@ class TestFunctionsProducer(TestCase):
             'methods': [self.producer.methods(key='KEY_CHOICE_SET',
                                               method_title='ChoiceSet', external='Choice',
                                               description=['A choice is an option given to'], param_name='set',
-                                              type='Array<Choice>')],
+                                              type='Choice[]')],
             'params': [self.producer.params(key='KEY_CHOICE_SET', value="'choiceSet'")],
             'description': ['creates interaction'],
             'func': 'CreateInteractionChoiceSet',

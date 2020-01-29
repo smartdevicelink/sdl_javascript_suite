@@ -15,7 +15,7 @@ class TestStructsProducer(TestCase):
                      structs_dir_name='../structs',
                      path_to_struct_class='../RpcStruct.js')
 
-        self.producer = StructsProducer(paths, (), ('Image',))
+        self.producer = StructsProducer(paths, ['Image'], {})
 
     def test_SoftButton(self):
         item = Struct(name='SoftButton', members={
