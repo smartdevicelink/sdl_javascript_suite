@@ -18,7 +18,7 @@ export default [{ // Vanilla JS source
             file: 'examples/webengine/hello-sdl/sdl.js',
             format: 'umd',
             sourcemap: 'inline',
-            name: 'sdl',
+            name: 'SDL',
         },
     ],
     plugins: [

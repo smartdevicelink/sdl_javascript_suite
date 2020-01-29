@@ -1,5 +1,5 @@
 <!--
-* Copyright (c) 2019, Livio, Inc.
+* Copyright (c) 2020, SmartDeviceLink Consortium, Inc.
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -13,9 +13,9 @@
 * disclaimer in the documentation and/or other materials provided with the
 * distribution.
 *
-* Neither the name of the Livio Inc. nor the names of its contributors
-* may be used to endorse or promote products derived from this software
-* without specific prior written permission.
+* Neither the name of the SmartDeviceLink Consortium Inc. nor the names of
+* its contributors may be used to endorse or promote products derived
+* from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -39,16 +39,14 @@
     <script>
         class HelloSdl {
             constructor () {
-              const urlParams = new URLSearchParams(window.location.search);
-              const host = (urlParams.get('sdl-host') && `${urlParams.get('sdl-transport-role') === 'ws-client' ? 'ws' : 'wss'}://${urlParams.get('sdl-host')}`) || 'ws://localhost';
-              const port = urlParams.get('sdl-port') || 5050;
-              this._appConfig = new SDL.manager.AppConfig()
-                    .setAppId(sdl_manifest.sdlAppID)
-                    .setAppName(sdl_manifest.appName)
+                const urlParams = new URLSearchParams(window.location.search);
+                const host = (urlParams.get('sdl-host') && `${urlParams.get('sdl-transport-role') === 'ws-client' ? 'ws' : 'wss'}://${urlParams.get('sdl-host')}`) || 'ws://localhost';
+                const port = urlParams.get('sdl-port') || 5050;
+                this._appConfig = new SDL.manager.AppConfig()
+                    .loadManifest(sdl_manifest)
                     .setIsMediaApp(false)
                     .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
                     .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
-                    .setAppTypes([sdl_manifest.category])
                     .setTransportConfig(new SDL.transport.WebSocketClientConfig(host, port));
 
                 const listener = new SDL.manager.lifecycle.LifecycleListener();
@@ -62,8 +60,10 @@
 
                 this._manager = new SDL.manager.lifecycle.LifecycleManager(this._appConfig, listener);
 
+                const raiListener = new SDL.rpc.RpcListener().setOnRpcMessage(this._onRaiListener.bind(this));
                 const hmiFullListener = new SDL.rpc.RpcListener().setOnRpcMessage(this._onHmiStatusListener.bind(this));
 
+                this._manager.addRpcListener(SDL.rpc.enums.FunctionID.RegisterAppInterface, raiListener);
                 this._manager.addRpcListener(SDL.rpc.enums.FunctionID.OnHMIStatus, hmiFullListener);
             }
 
@@ -71,23 +71,32 @@
                 this._manager.start();
             }
 
+            async _onRaiListener (response) {
+                console.log('RAI result:', response.getResultCode());
+            }
+
             async _onConnected () {
                 console.log('Connected to SDL WebSocket Server');
-                const fileBinary = await _fetchImageUnit8Array(`./${sdl_manifest.appIcon}`);
-                const fileName = `${this._appConfig.getAppId()}_icon.gif`;
 
-                const putFile = new SDL.rpc.messages.PutFile()
-                    .setFileName(fileName)
-                    .setFileType('GRAPHIC_PNG')
-                    .setPersistentFile(true)
-                    .setFileData(fileBinary);
+                // process icon separately because this is not a part of app interface registration
+                // disabled because `fetch` is impossible with `file://` protocol
+                if (false && sdl_manifest.appIcon) {
+                    const fileBinary = await _fetchImageUnit8Array(`./${sdl_manifest.appIcon}`);
+                    const fileName = `${this._appConfig.getAppId()}_icon.gif`;
 
-                await this._asyncSendRpc(putFile);
+                    const putFile = new SDL.rpc.messages.PutFile()
+                        .setFileName(fileName)
+                        .setFileType('GRAPHIC_PNG')
+                        .setPersistentFile(true)
+                        .setFileData(fileBinary);
 
-                const setAppIcon = new SDL.rpc.messages.SetAppIcon()
-                    .setFileName(fileName);
+                    await this._asyncSendRpc(putFile);
 
-                await this._asyncSendRpc(setAppIcon);
+                    const setAppIcon = new SDL.rpc.messages.SetAppIcon()
+                        .setFileName(fileName);
+
+                    await this._asyncSendRpc(setAppIcon);
+                }
             }
 
             async _onHmiStatusListener (onHmiStatus) {
@@ -121,7 +130,7 @@
 
                     // tear down the app
                     await this._asyncSendRpc(new SDL.rpc.messages.UnregisterAppInterface());
-                    
+
                     this._manager.stop();
                 }
             }
