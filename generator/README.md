@@ -1549,7 +1549,7 @@ The customization script contains the JSON object. Below is the schema:
             [element_name|param_name]: {
                 "-methods": {},
                 "methods": {
-                    "method_name": [custom_method_name],
+                    "method_title": [custom_method_title],
                     "key": [custom_key_name],
                     "description": [custom_description]
                 },
@@ -1647,7 +1647,7 @@ _FunctionClass_.APP_ID_MAX_LENGTH = 10;
 In order of this customization it is possible to change the name and description of getter/setter methods and the name and value of corresponding static property. Additionally it is possible to remove getter/setter methods.
 
 ### Changing the name and description of getter/setter methods
-To change the name and description of getter/setter methods it needs to define `methods.method_name` value.
+To change the name and description of getter/setter methods it needs to define `methods.method_title` value.
 
 Example:
 ```json
@@ -1656,7 +1656,7 @@ Example:
         "AudioType": {
             "PCM": {
                 "methods": {
-                    "method_name": "Wave",
+                    "method_title": "Wave",
                     "description": "Linear Wave!"
                 }
             }

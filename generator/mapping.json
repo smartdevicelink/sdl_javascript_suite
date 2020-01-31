@@ -1,28 +1,5 @@
 {
-  "enums": {
-    "FunctionID": {
-      "OnHMIStatusID": {
-        "methods": {
-          "method_title": "OnHmiStatus"
-        },
-        "params": {
-          "key": "OnHmiStatus"
-        }
-      }
-    }
-  },
   "structs": {
-    "DisplayCapabilities": {
-      "graphicSupported": {
-        "methods": {
-          "method_title": "GraphicsSupported",
-          "key": "KEY_GRAPHICS_SUPPORTED"
-        },
-        "params": {
-          "key": "KEY_GRAPHICS_SUPPORTED"
-        }
-      }
-    },
     "Grid": {
       "col": {
         "methods": {
@@ -60,42 +37,9 @@
           "key": "KEY_LEVEL_SPAN"
         }
       }
-    },
-    "TextField": {
-      "name": {
-        "methods": {
-          "method_title": "TextFieldName"
-        }
-      }
-    },
-    "RGBColor": {
-      "red": {
-        "methods": {
-          "method_title": "RedValue"
-        }
-      },
-      "green": {
-        "methods": {
-          "method_title": "GreenValue"
-        }
-      },
-      "blue": {
-        "methods": {
-          "method_title": "BlueValue"
-        }
-      }
     }
   },
   "functions": {
-    "OnHMIStatusNotification": {
-      "name": "OnHmiStatus",
-      "file_name": "OnHmiStatus",
-      "hmiLevel": {
-        "methods": {
-          "method_title": "HMILevel"
-        }
-      }
-    },
     "SetAppIconRequest": {
       "syncFileName": {
         "methods": {
@@ -104,16 +48,6 @@
         },
         "params": {
           "key": "KEY_FILE_NAME"
-        }
-      }
-    },
-    "RegisterAppInterfaceResponse": {
-      "supportedDiagModes": {
-        "methods": {
-          "key": "KEY_SUPPORTED_DIAG_MODE"
-        },
-        "params": {
-          "key": "KEY_SUPPORTED_DIAG_MODE"
         }
       }
     },

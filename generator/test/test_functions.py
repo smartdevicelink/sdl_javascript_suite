@@ -97,7 +97,7 @@ class TestFunctionsProducer(TestCase):
                        self.producer.params(key='KEY_FULL_APP_ID', value="'fullAppID'"),
                        self.producer.params(key='KEY_DAY_COLOR_SCHEME', value="'dayColorScheme'"),
                        self.producer.params(key='KEY_TTS_NAME', value="'ttsName'")],
-            'scripts': [self.producer.get_file_content('templates/scripts/fullAppID.js')],
+            'script': self.producer.get_file_content('templates/scripts/fullAppID.js'),
             'func': 'RegisterAppInterface',
             'extend': 'RpcRequest'
         }
@@ -186,7 +186,7 @@ class TestFunctionsProducer(TestCase):
                                               type='FileType')],
             'params': [self.producer.params(key='KEY_FILE_TYPE', value="'fileType'")],
             'description': ['Used to'],
-            'scripts': [self.producer.get_file_content('templates/scripts/PutFileRequest.js')],
+            'script': self.producer.get_file_content('templates/scripts/PutFileRequest.js'),
             'func': 'PutFile',
             'extend': 'RpcRequest'
         }
@@ -196,7 +196,7 @@ class TestFunctionsProducer(TestCase):
         self.assertListEqual(sorted(expected['methods']), sorted(result['methods']))
         self.assertListEqual(sorted(expected['params']), sorted(result['params']))
         self.assertEqual(expected['description'], result['description'])
-        self.assertSequenceEqual(expected['scripts'], result['scripts'])
+        self.assertSequenceEqual(expected['script'], result['script'])
         self.assertEqual(expected['func'], result['func'])
         self.assertEqual(expected['extend'], result['extend'])
 

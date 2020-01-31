@@ -274,7 +274,7 @@ class InterfaceProducerCommon(ABC):
         if 'script' in custom:
             script = self.get_file_content(custom['script'])
             if script:
-                render['scripts'] = [script]
+                render['script'] = script
             del custom['script']
 
         for name, mapping in custom.copy().items():
