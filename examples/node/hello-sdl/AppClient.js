@@ -37,7 +37,7 @@ const CONFIG = require('./config.js');
 class AppClient {
     constructor (wsClient) {
         // TODO: setAppIcon(SdlArtwork)
-        const appConfig = new SDL.manager.AppConfig()
+        this._appConfig = new SDL.manager.AppConfig()
             .setAppId(CONFIG.appId)
             .setAppName(CONFIG.appName)
             .setIsMediaApp(false)
@@ -58,7 +58,7 @@ class AppClient {
             this._onConnected();
         });
 
-        this._sdlManager = new SDL.manager.SdlManager(appConfig, managerListener);
+        this._sdlManager = new SDL.manager.SdlManager(this._appConfig, managerListener);
         this._sdlManager
             .start()
             .addRpcListener(SDL.rpc.enums.FunctionID.OnHMIStatus, function (message) {
