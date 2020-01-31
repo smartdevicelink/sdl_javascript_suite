@@ -1,3 +1,9 @@
 **/node_modules/
 *.log
-.env
+.*env*
+.idea
+*__pycache__
+.DS_Store
+*htmlcov
+*.coverage
+*.pytest_cache
