@@ -25,7 +25,7 @@
 {% endblock -%}
     {%- if script is defined %}
 {{script|indent(4,True)}}
-    {% endif -%}
+{% endif -%}
     {% for method in methods %}
     {% set len = method.type|length + method.param_name|length + 13 -%}
     /**

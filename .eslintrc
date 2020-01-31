@@ -40,7 +40,7 @@
         "curly": [ "error" ],
         "dot-notation": [ "error" ],
         "eqeqeq": [ "error" ],
-        "id-length": [ "error", { "exceptions": ["x", "y"] } ],
+        "id-length": [ "error", { "exceptions": ["x", "y", "c"] } ],
         "indent": [
             "error",
             4,
