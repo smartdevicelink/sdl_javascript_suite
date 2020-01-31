@@ -22,6 +22,7 @@ export default [{ // Vanilla JS source
         commonjs(),
         babel({
             exclude: 'node_modules/**', // only transpile our source code
+            plugins: ["babel-plugin-transform-async-to-promises"] // convert async/await syntax
         }),
         uglify(),
     ],
@@ -42,6 +43,7 @@ export default [{ // Vanilla JS source
         commonjs(),
         babel({
             exclude: 'node_modules/**', // only transpile our source code
+            plugins: ["babel-plugin-transform-async-to-promises"] // convert async/await syntax
         }),
     ],
     external: ['ws', 'https']

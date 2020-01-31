@@ -1,4 +1,4 @@
 [submodule "lib/rpc_spec"]
 	path = lib/rpc_spec
-	url = git@github.com:vladmu/rpc_spec.git
+	url = https://github.com/smartdevicelink/rpc_spec.git
 	branch = master

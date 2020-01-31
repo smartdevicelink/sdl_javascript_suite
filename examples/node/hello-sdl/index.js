@@ -89,7 +89,7 @@ class HelloSdl {
     }
 
     async _onHmiStatusListener (onHmiStatus) {
-        const hmiLevel = onHmiStatus.getHMILevel();
+        const hmiLevel = onHmiStatus.getHmiLevel();
 
         // wait for the FULL state for more functionality
         if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
