@@ -19,7 +19,7 @@ describe('RegisterAppInterfaceTests', function () {
             msg.setIsMediaApplication(Test.GENERAL_BOOLEAN);
             msg.setLanguageDesired(Test.GENERAL_LANGUAGE);
             msg.setHmiDisplayLanguageDesired(Test.GENERAL_LANGUAGE);
-            msg.setAppHmiType(Test.GENERAL_APPHMITYPE_LIST);
+            msg.setAppHMIType(Test.GENERAL_APPHMITYPE_LIST);
             msg.setHashID(Test.GENERAL_STRING);
             msg.setDeviceInfo(Test.GENERAL_DEVICEINFO);
             // appID is set based on the fullAppID
@@ -70,7 +70,7 @@ describe('RegisterAppInterfaceTests', function () {
         const testMedia = rpcMessage.getIsMediaApplication();
         const testLang = rpcMessage.getLanguageDesired();
         const testHmiLang = rpcMessage.getHmiDisplayLanguageDesired();
-        const testApps = rpcMessage.getAppHmiType();
+        const testApps = rpcMessage.getAppHMIType();
         const testHashId = rpcMessage.getHashID();
         const testDeviceInfo = rpcMessage.getDeviceInfo();
         const testAppId = rpcMessage.getAppId();
@@ -113,7 +113,7 @@ describe('RegisterAppInterfaceTests', function () {
         Validator.assertNullOrUndefined(rpcMessage.getIsMediaApplication());
         Validator.assertNullOrUndefined(rpcMessage.getLanguageDesired());
         Validator.assertNullOrUndefined(rpcMessage.getHmiDisplayLanguageDesired());
-        Validator.assertNullOrUndefined(rpcMessage.getAppHmiType());
+        Validator.assertNullOrUndefined(rpcMessage.getAppHMIType());
         Validator.assertNullOrUndefined(rpcMessage.getHashID());
         Validator.assertNullOrUndefined(rpcMessage.getDeviceInfo());
         Validator.assertNullOrUndefined(rpcMessage.getAppId());
