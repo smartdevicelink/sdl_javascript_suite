@@ -54,9 +54,13 @@ class AppClient {
             );
 
         const managerListener = new SDL.manager.SdlManagerListener();
-        managerListener.setOnStart((sdlManager) => {
-            this._onConnected();
-        });
+        managerListener
+            .setOnStart((sdlManager) => {
+                this._onConnected();
+            })
+            .setOnError((sdlManager, info) => {
+                console.error('Error from SdlManagerListener: ', info);
+            });
 
         this._sdlManager = new SDL.manager.SdlManager(this._appConfig, managerListener);
         this._sdlManager
