@@ -45,5 +45,5 @@ console.log(`WebSocket Server listening on port ${CONFIG.port}`);
 // Event listener for incoming WebSocket connections
 appWebSocketServer.on('connection', (connection) => {
     console.log('connection established');
-    new AppClient(connection).start();
+    new AppClient(connection);
 });
