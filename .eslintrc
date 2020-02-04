@@ -40,7 +40,7 @@
         "curly": [ "error" ],
         "dot-notation": [ "error" ],
         "eqeqeq": [ "error" ],
-        "id-length": [ "error" ],
+        "id-length": [ "error", { "exceptions": ["x", "y", "c"] } ],
         "indent": [
             "error",
             4,
@@ -53,7 +53,7 @@
             "error",
             "unix"
         ],
-        "new-cap": [ "error", { 
+        "new-cap": [ "error", {
             "newIsCapExceptions": ["tClass"]
         }],
         "no-case-declarations": [ "error" ],
