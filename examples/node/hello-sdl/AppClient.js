@@ -36,6 +36,7 @@ const CONFIG = require('./config.js');
 
 class AppClient {
     constructor (wsClient) {
+        // TODO: setAppIcon(SdlArtwork)
         this._appConfig = new SDL.manager.AppConfig()
             .setAppId(CONFIG.appId)
             .setAppName(CONFIG.appName)
@@ -52,24 +53,21 @@ class AppClient {
                 )
             );
 
-        const listener = new SDL.manager.lifecycle.LifecycleListener();
-        listener.setOnProxyConnected((manager) => {
-            this._onConnected();
-        });
-        listener.setOnProxyClosed((lifecycleManager, info, reason) => {});
-        listener.setOnServiceStarted((serviceType, sessionId, correlationId) => {});
-        listener.setOnServiceEnded((serviceType) => {});
-        listener.setOnError((lifecycleManager, info) => {});
+        const managerListener = new SDL.manager.SdlManagerListener();
+        managerListener
+            .setOnStart((sdlManager) => {
+                this._onConnected();
+            })
+            .setOnError((sdlManager, info) => {
+                console.error('Error from SdlManagerListener: ', info);
+            });
 
-        this._manager = new SDL.manager.lifecycle.LifecycleManager(this._appConfig, listener);
-
-        const hmiFullListener = new SDL.rpc.RpcListener().setOnRpcMessage(this._onHmiStatusListener.bind(this));
-
-        this._manager.addRpcListener(SDL.rpc.enums.FunctionID.OnHMIStatus, hmiFullListener);
-    }
-
-    start () {
-        this._manager.start();
+        this._sdlManager = new SDL.manager.SdlManager(this._appConfig, managerListener);
+        this._sdlManager
+            .start()
+            .addRpcListener(SDL.rpc.enums.FunctionID.OnHMIStatus, function (message) {
+                this._onHmiStatusListener(message);
+            }.bind(this));
     }
 
     async _onConnected () {
@@ -83,12 +81,13 @@ class AppClient {
             .setPersistentFile(true)
             .setFileData(fileBinary);
 
-        await this._asyncSendRpc(putFile);
-
         const setAppIcon = new SDL.rpc.messages.SetAppIcon()
             .setFileName(fileName);
 
-        await this._asyncSendRpc(setAppIcon);
+        await this._sdlManager.sendSequentialRpcs([
+            putFile,
+            setAppIcon,
+        ]);
     }
 
     async _onHmiStatusListener (onHmiStatus) {
@@ -101,7 +100,7 @@ class AppClient {
                 .setMainField2('こんにちは')
                 .setMainField3('你好');
 
-            await this._asyncSendRpc(show);
+            await this._sdlManager.sendRpc(show);
 
             await this._sleep(2000);
 
@@ -112,50 +111,21 @@ class AppClient {
                     .setMainField2('')
                     .setMainField3('');
 
-                this._asyncSendRpc(showCountdown); // don't wait for a response
+                this._sdlManager.sendRpc(showCountdown); // don't wait for a response
 
                 await this._sleep();
             }
 
             // tear down the app
-            await this._asyncSendRpc(new SDL.rpc.messages.UnregisterAppInterface());
+            await this._sdlManager.sendRpc(new SDL.rpc.messages.UnregisterAppInterface());
 
-            this._manager.stop();
+            this._sdlManager.dispose();
         }
     }
 
     async _sleep (timeout = 1000) {
         return new Promise((resolve) => {
             setTimeout(resolve, timeout);
-        });
-    }
-
-    // TODO: this should go into some manager class
-    // abstracts out the work of sending the RPC and attaching listeners to wait for a response
-    _asyncSendRpc (request, timeout = 5000) {
-        return new Promise((resolve, reject) => {
-            const functionId = SDL.rpc.enums.FunctionID.valueForKey(request.getFunctionName()); // this is the number value
-            let correlationIdRequest;
-            let listener;
-
-            listener = new SDL.rpc.RpcListener().setOnRpcMessage(rpcMessage => {
-                const correlationIdResponse = rpcMessage.getCorrelationId();
-                // ensure the correlation ids match
-                if (correlationIdRequest === correlationIdResponse) {
-                    // remove the listener once the correct response is received
-                    this._manager.removeRpcListener(functionId, listener);
-                    resolve(rpcMessage);
-                }
-            });
-
-            this._manager.addRpcListener(functionId, listener);
-            this._manager.sendRpcMessage(request); // the request will get a correlation id after this method
-
-            correlationIdRequest = request.getCorrelationId();
-
-            setTimeout(() => {
-                reject(new Error(`Response timeout for ${request.getFunctionName()}`));
-            }, timeout); // timeout after so long of not getting a response
         });
     }
 }
