@@ -36,7 +36,13 @@ const CONFIG = require('./config.js');
 
 class AppClient {
     constructor (wsClient) {
-        // TODO: setAppIcon(SdlArtwork)
+        const fileName = `${CONFIG.appId}_icon.gif`;
+        const file = new SDL.manager.file.filetypes.SdlFile()
+            .setName(fileName)
+            .setFilePath('./test_icon_1.png')
+            .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG)
+            .setPersistent(true);
+
         this._appConfig = new SDL.manager.AppConfig()
             .setAppId(CONFIG.appId)
             .setAppName(CONFIG.appName)
@@ -51,7 +57,8 @@ class AppClient {
                     wsClient,
                     CONFIG.connectionLostTimeout
                 )
-            );
+            )
+            .setAppIcon(file);
 
         const managerListener = new SDL.manager.SdlManagerListener();
         managerListener
@@ -72,15 +79,17 @@ class AppClient {
 
     async _onConnected () {
         // app starts in the NONE state
-        const fileBinary = await _fetchImageUnit8Array('./test_icon_1.png');
+        /* this does the same thing that the app config's setAppIcon method does when passed to the file manager
+        const fileManager = this._sdlManager.getFileManager();
         const fileName = `${this._appConfig.getAppId()}_icon.gif`;
 
-        const putFile = new SDL.rpc.messages.PutFile()
-            .setFileName(fileName)
-            .setFileType('GRAPHIC_PNG')
-            .setPersistentFile(true)
-            .setFileData(fileBinary);
+        const file = new SDL.manager.file.filetypes.SdlFile()
+            .setName(fileName)
+            .setFilePath('./test_icon_1.png')
+            .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG)
+            .setPersistent(true);
 
+        const putFile = await fileManager.createPutFile(file);
         const setAppIcon = new SDL.rpc.messages.SetAppIcon()
             .setFileName(fileName);
 
@@ -88,6 +97,7 @@ class AppClient {
             putFile,
             setAppIcon,
         ]);
+        */
     }
 
     async _onHmiStatusListener (onHmiStatus) {
@@ -128,11 +138,6 @@ class AppClient {
             setTimeout(resolve, timeout);
         });
     }
-}
-
-async function _fetchImageUnit8Array (path) {
-    const aryBuffer = fs.readFileSync(path, null);
-    return new Uint8Array(aryBuffer);
 }
 
 module.exports = AppClient;
