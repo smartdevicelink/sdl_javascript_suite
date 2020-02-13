@@ -1,5 +1,5 @@
 <!--
-* Copyright (c) 2020, SmartDeviceLink Consortium, Inc.
+* Copyright (c) 2020, Ford Motor Company
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -13,7 +13,7 @@
 * disclaimer in the documentation and/or other materials provided with the
 * distribution.
 *
-* Neither the name of the SmartDeviceLink Consortium Inc. nor the names of
+* Neither the name of the Ford Motor Company nor the names of
 * its contributors may be used to endorse or promote products derived
 * from this software without specific prior written permission.
 *
@@ -39,15 +39,12 @@
     <script>
         class HelloSdl {
             constructor () {
-                const urlParams = new URLSearchParams(window.location.search);
-                const host = (urlParams.get('sdl-host') && `${urlParams.get('sdl-transport-role') === 'ws-client' ? 'ws' : 'wss'}://${urlParams.get('sdl-host')}`) || 'ws://localhost';
-                const port = urlParams.get('sdl-port') || 5050;
                 this._appConfig = new SDL.manager.AppConfig()
                     .loadManifest(sdl_manifest)
                     .setIsMediaApp(false)
                     .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
                     .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
-                    .setTransportConfig(new SDL.transport.WebSocketClientConfig(host, port));
+                    .setTransportConfig(SDL.transport.WebSocketClientConfig.webEngine());
 
                 const listener = new SDL.manager.lifecycle.LifecycleListener();
                 listener.setOnProxyConnected((manager) => {

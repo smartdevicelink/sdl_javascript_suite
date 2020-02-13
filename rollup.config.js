@@ -41,6 +41,9 @@ export default [{ // Vanilla JS source
         format: 'umd',
         sourcemap: 'inline',
         name: 'SDL',
+        globals: {
+            ws: 'ws',
+        },
     },
     plugins: [
         globals(),
