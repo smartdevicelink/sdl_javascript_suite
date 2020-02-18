@@ -72,6 +72,12 @@
             }
 
             async _onConnected () {
+                // add a voice command to test the manager out
+                const screenManager = this._sdlManager.getScreenManager();
+                screenManager.setVoiceCommands([new SDL.manager.screen.utils.VoiceCommand(['Testing'], () => {
+                    console.log("The testing voice command has been clicked!");
+                })]);
+
                 // app starts in the NONE state
                 /* this does the same thing that the app config's setAppIcon method does when passed to the file manager
                 const fileManager = this._sdlManager.getFileManager();
