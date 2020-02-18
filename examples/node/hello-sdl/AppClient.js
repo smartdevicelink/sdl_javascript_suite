@@ -76,6 +76,7 @@ class AppClient {
                         console.log('SubscribeVehicleData permissions changed!');
                         console.log('Allowed Permissions: ', allowedPermissions);
                         console.log('Permission Group Status: ', permissionGroupStatus);
+                        this._logPermissions();
                     }
                 );
                 this._onConnected();
@@ -155,6 +156,7 @@ class AppClient {
             console.log(`Show RPC allowed: ${this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.Show)}`);
             console.log(`PutFile RPC allowed: ${this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.PutFile)}`);
             console.log(`GetVehicleData RPC allowed: ${this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.GetVehicleData)}`);
+            console.log(`SubscribeVehicleData RPC allowed: ${this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.SubscribeVehicleData)}`);
         }
     }
 }
