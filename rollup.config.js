@@ -7,12 +7,14 @@ import globals from 'rollup-plugin-node-globals';
 
 export default [{ // Vanilla JS source
     input: 'lib/js/app.js',
-    output: {
-        file: 'lib/js/dist/SDL.js',
-        format: 'umd',
-        sourcemap: 'inline',
-        name: 'SDL',
-    },
+    output: [
+        {
+            file: 'lib/js/dist/SDL.js',
+            format: 'umd',
+            sourcemap: 'inline',
+            name: 'SDL',
+        },
+    ],
     plugins: [
         globals(),
         builtins(),
@@ -22,7 +24,7 @@ export default [{ // Vanilla JS source
         commonjs(),
         babel({
             exclude: 'node_modules/**', // only transpile our source code
-            plugins: ["babel-plugin-transform-async-to-promises"] // convert async/await syntax
+            plugins: ['babel-plugin-transform-async-to-promises'], // convert async/await syntax
         }),
         uglify(),
     ],
@@ -33,6 +35,9 @@ export default [{ // Vanilla JS source
         format: 'umd',
         sourcemap: 'inline',
         name: 'SDL',
+        globals: {
+            ws: 'ws',
+        },
     },
     plugins: [
         globals(),
@@ -43,8 +48,8 @@ export default [{ // Vanilla JS source
         commonjs(),
         babel({
             exclude: 'node_modules/**', // only transpile our source code
-            plugins: ["babel-plugin-transform-async-to-promises"] // convert async/await syntax
+            plugins: ['babel-plugin-transform-async-to-promises'], // convert async/await syntax
         }),
     ],
-    external: ['ws', 'https']
+    external: ['ws', 'https'],
 }];
