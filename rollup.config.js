@@ -7,12 +7,14 @@ import globals from 'rollup-plugin-node-globals';
 
 export default [{ // Vanilla JS source
     input: 'lib/js/app.js',
-    output: {
-        file: 'lib/js/dist/SDL.js',
-        format: 'umd',
-        sourcemap: 'inline',
-        name: 'SDL',
-    },
+    output: [
+        {
+            file: 'lib/js/dist/SDL.js',
+            format: 'umd',
+            sourcemap: 'inline',
+            name: 'SDL',
+        },
+    ],
     plugins: [
         globals(),
         builtins(),
@@ -33,6 +35,9 @@ export default [{ // Vanilla JS source
         format: 'umd',
         sourcemap: 'inline',
         name: 'SDL',
+        globals: {
+            ws: 'ws',
+        },
     },
     plugins: [
         globals(),

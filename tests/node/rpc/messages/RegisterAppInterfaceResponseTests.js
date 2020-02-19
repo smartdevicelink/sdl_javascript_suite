@@ -28,7 +28,7 @@ describe('RegisterAppInterfaceResponseTests', function () {
             msg.setPcmStreamCapabilities(Test.GENERAL_AUDIOPASSTHRUCAPABILITIES);
             msg.setVehicleType(Test.GENERAL_VEHICLETYPE);
             msg.setSupportedDiagModes(Test.GENERAL_INTEGER_LIST);
-            msg.setHMICapabilities(Test.GENERAL_HMICAPABILITIES);
+            msg.setHmiCapabilities(Test.GENERAL_HMICAPABILITIES);
             // TODO sdlVersion https://github.com/smartdevicelink/rpc_spec/blob/version/6_0_0/MOBILE_API.xml#L4663 unused?
             msg.setSystemSoftwareVersion(Test.GENERAL_STRING);
             msg.setIconResumed(Test.GENERAL_BOOLEAN);
@@ -53,7 +53,7 @@ describe('RegisterAppInterfaceResponseTests', function () {
             expectedParameters[RegisterAppInterfaceResponse.KEY_AUDIO_PASS_THRU_CAPABILITIES] = Test.JSON_AUDIOPASSTHRUCAPABILITIES_LIST;
             expectedParameters[RegisterAppInterfaceResponse.KEY_PCM_STREAM_CAPABILITIES] = Test.JSON_AUDIOPASSTHRUCAPABILITIES;
             expectedParameters[RegisterAppInterfaceResponse.KEY_VEHICLE_TYPE] = Test.JSON_GENERAL_VEHICLETYPE;
-            expectedParameters[RegisterAppInterfaceResponse.KEY_SUPPORTED_DIAG_MODE] = Test.GENERAL_INTEGER_LIST;
+            expectedParameters[RegisterAppInterfaceResponse.KEY_SUPPORTED_DIAG_MODES] = Test.GENERAL_INTEGER_LIST;
             expectedParameters[RegisterAppInterfaceResponse.KEY_HMI_CAPABILITIES] = Test.GENERAL_HMICAPABILITIES.getParameters();
             expectedParameters[RegisterAppInterfaceResponse.KEY_SYSTEM_SOFTWARE_VERSION] = Test.GENERAL_STRING;
             expectedParameters[RegisterAppInterfaceResponse.KEY_ICON_RESUMED] = Test.GENERAL_BOOLEAN;
@@ -91,7 +91,7 @@ describe('RegisterAppInterfaceResponseTests', function () {
         const testPcmStream =  msg.getPcmStreamCapabilities();
         const testVehicleType =  msg.getVehicleType();
         const testSupportedDiagModes =  msg.getSupportedDiagModes();
-        const testHmiCapabilities =  msg.getHMICapabilities();
+        const testHmiCapabilities =  msg.getHmiCapabilities();
         const testSystemSoftwareVersion =  msg.getSystemSoftwareVersion();
         const testIconResumed =  msg.getIconResumed();
 
@@ -138,7 +138,7 @@ describe('RegisterAppInterfaceResponseTests', function () {
         Validator.assertNullOrUndefined(msg.getPcmStreamCapabilities());
         Validator.assertNullOrUndefined(msg.getVehicleType());
         Validator.assertNullOrUndefined(msg.getSupportedDiagModes());
-        Validator.assertNullOrUndefined(msg.getHMICapabilities());
+        Validator.assertNullOrUndefined(msg.getHmiCapabilities());
         Validator.assertNullOrUndefined(msg.getSystemSoftwareVersion());
         Validator.assertNullOrUndefined(msg.getIconResumed());
 
