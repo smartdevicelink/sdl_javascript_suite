@@ -44,7 +44,7 @@
                     .setIsMediaApp(false)
                     .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
                     .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
-                    .setTransportConfig(SDL.transport.WebSocketClientConfig.webEngine());
+                    .setTransportConfig(new SDL.transport.WebSocketClientConfig());
 
                 const listener = new SDL.manager.lifecycle.LifecycleListener();
                 listener.setOnProxyConnected((manager) => {

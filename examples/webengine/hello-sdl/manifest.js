@@ -2,7 +2,7 @@
 const sdl_manifest = {
     'entrypoint': 'index.html',
     'appIcon': 'test_icon_1.png',
-    'sdlAppID': 'hello-webengine',
+    'appID': 'hello-webengine',
     'appName': 'Hello WebEngine',
     'category': 'DEFAULT',
     'additionalCategories': [],
@@ -13,6 +13,6 @@ const sdl_manifest = {
         },
     },
     'appVersion': '1.0.0',
-    'sdlMinRPCVersion': '6.0',
-    'sdlMinProtocolVersion': '5.0',
+    'minRPCVersion': '6.0',
+    'minProtocolVersion': '5.0',
 };
