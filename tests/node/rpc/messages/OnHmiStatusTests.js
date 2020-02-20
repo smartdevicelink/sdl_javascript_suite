@@ -1,5 +1,5 @@
 const SDL = require('./../../../../lib/js/dist/SDL.js');
-const OnHmiStatus = SDL.rpc.messages.OnHmiStatus;
+const OnHMIStatus = SDL.rpc.messages.OnHMIStatus;
 const FunctionID = SDL.rpc.enums.FunctionID;
 const RpcType = SDL.rpc.enums.RpcType;
 
@@ -7,11 +7,11 @@ const BaseRpcTests = require('./BaseRpcTests');
 const Test = require('./../../../Test.js');
 const Validator = require('./../../../Validator.js');
 
-describe('OnHmiStatusTests', function () {
+describe('OnHMIStatusTests', function () {
     before(function () {
         this.createMessage = function () {
-            const msg = new OnHmiStatus();
-            msg.setHMILevel(Test.GENERAL_HMILEVEL);
+            const msg = new OnHMIStatus();
+            msg.setHmiLevel(Test.GENERAL_HMILEVEL);
             msg.setAudioStreamingState(Test.GENERAL_AUDIOSTREAMINGSTATE);
             msg.setSystemContext(Test.GENERAL_SYSTEMCONTEXT);
             msg.setVideoStreamingState(Test.GENERAL_VIDEOSTREAMINGSTATE);
@@ -21,11 +21,11 @@ describe('OnHmiStatusTests', function () {
 
         this.getExpectedParameters = function (sdlVersion) {
             const expectedParameters = {};
-            expectedParameters[OnHmiStatus.KEY_HMI_LEVEL] = Test.GENERAL_HMILEVEL;
-            expectedParameters[OnHmiStatus.KEY_AUDIO_STREAMING_STATE] = Test.GENERAL_AUDIOSTREAMINGSTATE;
-            expectedParameters[OnHmiStatus.KEY_SYSTEM_CONTEXT] = Test.GENERAL_SYSTEMCONTEXT;
-            expectedParameters[OnHmiStatus.KEY_VIDEO_STREAMING_STATE] = Test.GENERAL_VIDEOSTREAMINGSTATE;
-            expectedParameters[OnHmiStatus.KEY_WINDOW_ID] = Test.GENERAL_INT;
+            expectedParameters[OnHMIStatus.KEY_HMI_LEVEL] = Test.GENERAL_HMILEVEL;
+            expectedParameters[OnHMIStatus.KEY_AUDIO_STREAMING_STATE] = Test.GENERAL_AUDIOSTREAMINGSTATE;
+            expectedParameters[OnHMIStatus.KEY_SYSTEM_CONTEXT] = Test.GENERAL_SYSTEMCONTEXT;
+            expectedParameters[OnHMIStatus.KEY_VIDEO_STREAMING_STATE] = Test.GENERAL_VIDEOSTREAMINGSTATE;
+            expectedParameters[OnHMIStatus.KEY_WINDOW_ID] = Test.GENERAL_INT;
             return expectedParameters;
         };
 
@@ -43,7 +43,7 @@ describe('OnHmiStatusTests', function () {
     it ('testRpcValues', function (done) {
         // Test Values
         let rpcMessage = this.msg;
-        const hmiLevel = rpcMessage.getHMILevel();
+        const hmiLevel = rpcMessage.getHmiLevel();
         const audioStreamingState = rpcMessage.getAudioStreamingState();
         const context = rpcMessage.getSystemContext();
         const videoStreamingState = rpcMessage.getVideoStreamingState();
@@ -57,14 +57,14 @@ describe('OnHmiStatusTests', function () {
         Validator.assertEquals(Test.GENERAL_INT, testWindowID);
 
         // Invalid/Null Tests
-        rpcMessage = new OnHmiStatus();
+        rpcMessage = new OnHMIStatus();
         Validator.assertNotNull(rpcMessage);
         Validator.testNullBase(
             FunctionID.keyForValue(FunctionID.OnHMIStatus),
             RpcType.NOTIFICATION,
             rpcMessage);
 
-        Validator.assertNullOrUndefined(rpcMessage.getHMILevel());
+        Validator.assertNullOrUndefined(rpcMessage.getHmiLevel());
         Validator.assertNullOrUndefined(rpcMessage.getAudioStreamingState());
         Validator.assertNullOrUndefined(rpcMessage.getSystemContext());
         Validator.assertNullOrUndefined(rpcMessage.getVideoStreamingState());

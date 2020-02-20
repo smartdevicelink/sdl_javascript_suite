@@ -85,7 +85,7 @@ class Validator {
             const val2 = item2[index];
 
             expect(val1.getImageTypeSupported()).to.be.deep.equal(val2.getImageTypeSupported());
-            expect(val1.getImageFieldName()).to.be.equal(val2.getImageFieldName());
+            expect(val1.getName()).to.be.equal(val2.getName());
             Validator.validateImageResolution(val1.getImageResolution(), val2.getImageResolution());
         }
 
@@ -229,7 +229,7 @@ class Validator {
 
         expect(item1.getDisplayType()).to.be.equal(item2.getDisplayType());
         expect(item1.getDisplayName()).to.be.equal(item2.getDisplayName());
-        expect(item1.getGraphicsSupported()).to.be.equal(item2.getGraphicsSupported());
+        expect(item1.getGraphicSupported()).to.be.equal(item2.getGraphicSupported());
         expect(item1.getTemplatesAvailable()).to.be.equal(item2.getTemplatesAvailable());
         expect(item1.getNumCustomPresetsAvailable()).to.be.equal(item2.getNumCustomPresetsAvailable());
 
@@ -398,17 +398,17 @@ class Validator {
             return true;
         }
 
-        expect(item1.getPrimaryColor().getRedValue()).to.be.equal(item2.getPrimaryColor().getRedValue());
-        expect(item1.getPrimaryColor().getGreenValue()).to.be.equal(item2.getPrimaryColor().getGreenValue());
-        expect(item1.getPrimaryColor().getBlueValue()).to.be.equal(item2.getPrimaryColor().getBlueValue());
+        expect(item1.getPrimaryColor().getRed()).to.be.equal(item2.getPrimaryColor().getRed());
+        expect(item1.getPrimaryColor().getGreen()).to.be.equal(item2.getPrimaryColor().getGreen());
+        expect(item1.getPrimaryColor().getBlue()).to.be.equal(item2.getPrimaryColor().getBlue());
 
-        expect(item1.getSecondaryColor().getRedValue()).to.be.equal(item2.getSecondaryColor().getRedValue());
-        expect(item1.getSecondaryColor().getGreenValue()).to.be.equal(item2.getSecondaryColor().getGreenValue());
-        expect(item1.getSecondaryColor().getBlueValue()).to.be.equal(item2.getSecondaryColor().getBlueValue());
+        expect(item1.getSecondaryColor().getRed()).to.be.equal(item2.getSecondaryColor().getRed());
+        expect(item1.getSecondaryColor().getGreen()).to.be.equal(item2.getSecondaryColor().getGreen());
+        expect(item1.getSecondaryColor().getBlue()).to.be.equal(item2.getSecondaryColor().getBlue());
 
-        expect(item1.getBackgroundColor().getRedValue()).to.be.equal(item2.getBackgroundColor().getRedValue());
-        expect(item1.getBackgroundColor().getGreenValue()).to.be.equal(item2.getBackgroundColor().getGreenValue());
-        expect(item1.getBackgroundColor().getBlueValue()).to.be.equal(item2.getBackgroundColor().getBlueValue());
+        expect(item1.getBackgroundColor().getRed()).to.be.equal(item2.getBackgroundColor().getRed());
+        expect(item1.getBackgroundColor().getGreen()).to.be.equal(item2.getBackgroundColor().getGreen());
+        expect(item1.getBackgroundColor().getBlue()).to.be.equal(item2.getBackgroundColor().getBlue());
 
         return true;
     }

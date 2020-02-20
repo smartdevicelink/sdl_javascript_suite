@@ -31,7 +31,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 */
 {% block imports -%}
-{% for _import in imports %}
+{% for _import in imports|sort %}
 import {{'%s %s %s'|format('{', _import.what, '}')}} from '{{_import.wherefrom}}';
 {%- endfor %}
 {% endblock -%}
