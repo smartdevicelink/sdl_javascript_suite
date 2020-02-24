@@ -36,7 +36,13 @@ const CONFIG = require('./config.js');
 
 class AppClient {
     constructor (wsClient) {
-        // TODO: setAppIcon(SdlArtwork)
+        const fileName = `${CONFIG.appId}_icon.gif`;
+        const file = new SDL.manager.file.filetypes.SdlFile()
+            .setName(fileName)
+            .setFilePath('./test_icon_1.png')
+            .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG)
+            .setPersistent(true);
+
         this._appConfig = new SDL.manager.AppConfig()
             .setAppId(CONFIG.appId)
             .setAppName(CONFIG.appName)
@@ -51,11 +57,35 @@ class AppClient {
                     wsClient,
                     CONFIG.connectionLostTimeout
                 )
-            );
+            )
+            .setAppIcon(file);
 
         const managerListener = new SDL.manager.SdlManagerListener();
         managerListener
             .setOnStart((sdlManager) => {
+                this._permissionManager = this._sdlManager.getPermissionManager();
+                this._logPermissions();
+                this._permissionManager.addListener(
+                    [
+                        new SDL.manager.permission.PermissionElement(
+                            SDL.rpc.enums.FunctionID.SubscribeVehicleData,
+                            [
+                                'accPedalPosition',
+                                'gps',
+                                'fuelLevel',
+                                'odometer',
+                                'prndl',
+                            ]
+                        ),
+                    ],
+                    SDL.manager.permission.enums.PermissionGroupType.ANY,
+                    (allowedPermissions, permissionGroupStatus) => {
+                        console.log('SubscribeVehicleData permissions changed!');
+                        console.log('Allowed Permissions: ', allowedPermissions);
+                        console.log('Permission Group Status: ', permissionGroupStatus);
+                        this._logPermissions();
+                    }
+                );
                 this._onConnected();
             })
             .setOnError((sdlManager, info) => {
@@ -65,22 +95,22 @@ class AppClient {
         this._sdlManager = new SDL.manager.SdlManager(this._appConfig, managerListener);
         this._sdlManager
             .start()
-            .addRpcListener(SDL.rpc.enums.FunctionID.OnHMIStatus, function (message) {
-                this._onHmiStatusListener(message);
-            }.bind(this));
+            .addRpcListener(SDL.rpc.enums.FunctionID.OnHMIStatus, this._onHmiStatusListener.bind(this));
     }
 
     async _onConnected () {
         // app starts in the NONE state
-        const fileBinary = await _fetchImageUnit8Array('./test_icon_1.png');
+        /* this does the same thing that the app config's setAppIcon method does when passed to the file manager
+        const fileManager = this._sdlManager.getFileManager();
         const fileName = `${this._appConfig.getAppId()}_icon.gif`;
 
-        const putFile = new SDL.rpc.messages.PutFile()
-            .setFileName(fileName)
-            .setFileType('GRAPHIC_PNG')
-            .setPersistentFile(true)
-            .setFileData(fileBinary);
+        const file = new SDL.manager.file.filetypes.SdlFile()
+            .setName(fileName)
+            .setFilePath('./test_icon_1.png')
+            .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG)
+            .setPersistent(true);
 
+        const putFile = await fileManager.createPutFile(file);
         const setAppIcon = new SDL.rpc.messages.SetAppIcon()
             .setFileName(fileName);
 
@@ -88,10 +118,12 @@ class AppClient {
             putFile,
             setAppIcon,
         ]);
+        */
     }
 
     async _onHmiStatusListener (onHmiStatus) {
         const hmiLevel = onHmiStatus.getHmiLevel();
+        this._logPermissions();
 
         // wait for the FULL state for more functionality
         if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
@@ -128,11 +160,15 @@ class AppClient {
             setTimeout(resolve, timeout);
         });
     }
-}
 
-async function _fetchImageUnit8Array (path) {
-    const aryBuffer = fs.readFileSync(path, null);
-    return new Uint8Array(aryBuffer);
+    _logPermissions () {
+        if (this._permissionManager) {
+            console.log(`Show RPC allowed: ${this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.Show)}`);
+            console.log(`PutFile RPC allowed: ${this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.PutFile)}`);
+            console.log(`GetVehicleData RPC allowed: ${this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.GetVehicleData)}`);
+            console.log(`SubscribeVehicleData RPC allowed: ${this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.SubscribeVehicleData)}`);
+        }
+    }
 }
 
 module.exports = AppClient;
