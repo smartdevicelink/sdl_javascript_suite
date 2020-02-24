@@ -63,6 +63,29 @@ class AppClient {
         const managerListener = new SDL.manager.SdlManagerListener();
         managerListener
             .setOnStart((sdlManager) => {
+                this._permissionManager = this._sdlManager.getPermissionManager();
+                this._logPermissions();
+                this._permissionManager.addListener(
+                    [
+                        new SDL.manager.permission.PermissionElement(
+                            SDL.rpc.enums.FunctionID.SubscribeVehicleData,
+                            [
+                                'accPedalPosition',
+                                'gps',
+                                'fuelLevel',
+                                'odometer',
+                                'prndl',
+                            ]
+                        ),
+                    ],
+                    SDL.manager.permission.enums.PermissionGroupType.ANY,
+                    (allowedPermissions, permissionGroupStatus) => {
+                        console.log('SubscribeVehicleData permissions changed!');
+                        console.log('Allowed Permissions: ', allowedPermissions);
+                        console.log('Permission Group Status: ', permissionGroupStatus);
+                        this._logPermissions();
+                    }
+                );
                 this._onConnected();
             })
             .setOnError((sdlManager, info) => {
@@ -72,9 +95,7 @@ class AppClient {
         this._sdlManager = new SDL.manager.SdlManager(this._appConfig, managerListener);
         this._sdlManager
             .start()
-            .addRpcListener(SDL.rpc.enums.FunctionID.OnHMIStatus, function (message) {
-                this._onHmiStatusListener(message);
-            }.bind(this));
+            .addRpcListener(SDL.rpc.enums.FunctionID.OnHMIStatus, this._onHmiStatusListener.bind(this));
     }
 
     async _onConnected () {
@@ -102,6 +123,7 @@ class AppClient {
 
     async _onHmiStatusListener (onHmiStatus) {
         const hmiLevel = onHmiStatus.getHmiLevel();
+        this._logPermissions();
 
         // wait for the FULL state for more functionality
         if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
@@ -137,6 +159,15 @@ class AppClient {
         return new Promise((resolve) => {
             setTimeout(resolve, timeout);
         });
+    }
+
+    _logPermissions () {
+        if (this._permissionManager) {
+            console.log(`Show RPC allowed: ${this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.Show)}`);
+            console.log(`PutFile RPC allowed: ${this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.PutFile)}`);
+            console.log(`GetVehicleData RPC allowed: ${this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.GetVehicleData)}`);
+            console.log(`SubscribeVehicleData RPC allowed: ${this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.SubscribeVehicleData)}`);
+        }
     }
 }
 
