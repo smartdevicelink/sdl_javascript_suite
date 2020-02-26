@@ -7,3 +7,5 @@
 *htmlcov
 *.coverage
 *.pytest_cache
+hello-sdl*.zip
+app-directory.json

@@ -34,9 +34,10 @@
 
 <head>
     <script src='./SDL.js'></script>
-    <script src='./manifest.js'></script>
 
-    <script>
+    <script type='module'>
+        import sdl_manifest from './manifest.js';
+
         class HelloSdl {
             constructor () {
                 this._appConfig = new SDL.manager.AppConfig()
@@ -180,9 +181,7 @@
             const aryBuffer = await new Response(blob).arrayBuffer();
             return new Uint8Array(aryBuffer);
         }
-    </script>
 
-    <script>
         console.log('start app');
         const app = new HelloSdl();
         app.start();

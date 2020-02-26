@@ -14,6 +14,12 @@ export default [{ // Vanilla JS source
             sourcemap: 'inline',
             name: 'SDL',
         },
+        {
+            file: 'examples/webengine/hello-sdl/SDL.js',
+            format: 'umd',
+            sourcemap: 'inline',
+            name: 'SDL',
+        },
     ],
     plugins: [
         globals(),
