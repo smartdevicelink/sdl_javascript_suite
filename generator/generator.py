@@ -172,6 +172,11 @@ class Generator:
             if not getattr(args, intermediate.name) and intermediate.path.exists():
                 while True:
                     try:
+                        if args.overwrite:
+                            self.logger.warning('%s set to %s', intermediate.name, intermediate.path)
+                            setattr(args, intermediate.name, intermediate.path.as_posix())
+                            break
+                            
                         confirm = input('Confirm default path {} for {} Y/Enter = yes, N = no'
                                         .format(intermediate.path, intermediate.name))
                         if confirm.lower() == 'y' or not confirm:

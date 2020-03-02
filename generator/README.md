@@ -41,7 +41,8 @@ optional arguments:
   -s, --structs         only specified elements will be generated, if present
   -m, -f, --functions   only specified elements will be generated, if present
   -y, --overwrite       force overwriting of existing files in output
-                        directory, ignore confirmation message
+                        directory and do not verify RPC spec source directory
+                        and output directories, ignore confirmation message
   -n, --skip            skip overwriting of existing files in output
                         directory, ignore confirmation message
 ```
@@ -49,7 +50,7 @@ optional arguments:
 # JavaScript ES6 Transformation rules
 
 ## Overview
-These are the general transformation rules for RPC classes of SDL JavaScript Suite Library. The description of base classes, already included in the library, is not provided here, for details please view the source code. 
+These are the general transformation rules for RPC classes of SDL JavaScript Suite Library. The description of base classes, already included in the library, is not provided here, for details please view the source code.
 
 The JSDoc is used for inline documentation of generated code. All non-XML values should follow Architecture & Contribution Guidelines (GUIDELINES.md)
 
@@ -138,7 +139,7 @@ class ImageType extends Enum {
     }
 }
 ```
-The set of `<element>` should be mapped to the frozen object and put into the private static property `_MAP`. 
+The set of `<element>` should be mapped to the frozen object and put into the private static property `_MAP`.
 
 The following list are general rules for keys and values of this object:
 
@@ -651,9 +652,9 @@ Example:
 structs/VehicleDataResult.js
 ```
 
-The script should import the base `RpcStruct` class and the produced class should extend it. The name of the class is the value from the `"name"` attribute of `<struct>`. 
+The script should import the base `RpcStruct` class and the produced class should extend it. The name of the class is the value from the `"name"` attribute of `<struct>`.
 
-The script should also import any Enum and Struct classes, that are used in the represented structure. 
+The script should also import any Enum and Struct classes, that are used in the represented structure.
 
 The constructor has one parameter named `parameters` to pass the JavaScript object with initial values of the represented structure and should call `super(parameters)` to pass this object into the base class.
 
@@ -712,11 +713,11 @@ For each `<param>` the getter and setter methods should be defined in the class:
 1. The name of the getter is the `PascalCase` formatted value of the `"name"` attribute with the `get` prefix, for the setter the prefix should be `set`.
 2. Uses of the "sync" prefix shall be replaced with "sdl" (where it would not break functionality). E.g. `SyncMsgVersion -> SdlMsgVersion`. This applies to member variables and their accessors. The key used when creating the RPC message JSON should match that of the RPC Spec.
 3. If the `<param>` has the `"type"` attribute value as one of `Boolean`, `Float`, `Integer`, `String`:
-    * The getter should call and return the result of the `this.getParameter` method, where the single parameter is the value of the corresponding static property described above; 
+    * The getter should call and return the result of the `this.getParameter` method, where the single parameter is the value of the corresponding static property described above;
     * The setter should call the `this.setParameter` method, where the first parameter is the value of the corresponding static property described above, the second is the value passed into setter;
     * The setter should return `this` instance to support the chaining.
 4. If the `<param>` has the `"type"` attribute value as the one of `<enum>` or `<struct>` name:
-    * The getter should call and return the result of the `this.getObject` method, where the first parameter is the corresponding Struct or Enum class, the second is the value of the corresponding static property described above; 
+    * The getter should call and return the result of the `this.getObject` method, where the first parameter is the corresponding Struct or Enum class, the second is the value of the corresponding static property described above;
     * The setter should validate the received value by calling the `this.validateType` method, where the fist parameter is the Struct or Enum class corresponding to the `"type"` attribute value of `<param>`, the second is the value itself;
     * The setter should call the `this.setParameter` method, where the first parameter is the value of the corresponding static property described above, the second is the value passed into setter;
     * The setter should return `this` instance to support the chaining.
@@ -750,7 +751,7 @@ setDataType(type) {
     this.setParameter(VehicleDataResult.KEY_DATA_TYPE, type);
     return this;
 }
- 
+
 /**
  * @return {VehicleDataType}
  */
@@ -766,7 +767,7 @@ setOemCustomDataType(type) {
     this.setParameter(VehicleDataResult.KEY_OEM_CUSTOM_DATA_TYPE, type);
     return this;
 }
- 
+
 /**
  * @return {String}
  */
@@ -922,8 +923,8 @@ There are some prerequisites for the Function class:
 
 1. Based on the value of the `"messagetype"` attribute of `<function>`, the script should import the base class `RpcRequest`, `RpcResponse` or `RpcNotification` class and the produced class should extend the imported base class.
 2. The script should import `enums/FunctionID.js` to get the `functionID` hex value of the current RPC function. The key of the required `<element>` of `FunctionID` enum is the value of the `"functionID"` attribute of `<function>`.
-3. The script should import all Enum and Struct classes, that are used by the representing function. 
-4. The name of the class is the value from the `"name"` attribute of `<function>` (followed by additional suffix `Response` if the `"messagetype"` attribute is set to `response`), e.g. `AddCommand`, `AddCommandResponse`, `OnLanguageChange`. 
+3. The script should import all Enum and Struct classes, that are used by the representing function.
+4. The name of the class is the value from the `"name"` attribute of `<function>` (followed by additional suffix `Response` if the `"messagetype"` attribute is set to `response`), e.g. `AddCommand`, `AddCommandResponse`, `OnLanguageChange`.
 5. The constructor has one parameter named `store` to pass the JavaScript object with initial values of the function params and should call `super(store)` to pass this object into the parent class.
 6. The constructor should call `this.setFunctionName` method with the correspond `FunctionID` value described in the point 2, e.g. `FunctionID.AddCommandID`.
 
@@ -948,7 +949,7 @@ import { RpcRequest } from '_path_to_base_classes_/RpcRequest.js';
 import { FunctionID } from '../enums/FunctionID.js';
 import { Image } from '../enums/Image.js';
 import { MenuParams } from '../enums/MenuParams.js';
- 
+
 /**
  * Adds a command to the in application menu. Either menuParams or vrCommands must be provided.
  */
@@ -970,7 +971,7 @@ import { RpcResponse } from '_path_to_base_classes_/RpcResponse.js';
 import { FunctionID } from '../enums/FunctionID.js';
 
 class AddCommandResponse extends RpcResponse {
- 
+
     /**
      * @constructor
      */
@@ -987,7 +988,7 @@ import { RpcNotification } from '_path_to_base_classes_/RpcNotification.js';
 import { FunctionID } from '../enums/FunctionID.js';
 import { Language } from '../enums/Language.js';
 import { MenuParams } from '../enums/MenuParams.js';
- 
+
 class OnLanguageChange extends RpcNotification {
 
     /**
@@ -1020,11 +1021,11 @@ For each `<param>` the getter and setter methods should be defined in the class:
 
 1. The name of the getter is the `PascalCase` formatted value of the `"name"` attribute with the `get` prefix, for the setter the prefix should be `set`.
 2. If the `<param>` has the `"type"` attribute value as one of `Boolean`, `Float`, `Integer`, `String`:
-    * The getter should call and return the result of the `this.getParameter` method, where the single parameter is the value of the corresponding static property described above; 
+    * The getter should call and return the result of the `this.getParameter` method, where the single parameter is the value of the corresponding static property described above;
     * The setter should call the `this.setParameter` method, where the first parameter is the value of the corresponding static property described above, the second is the value passed into setter;
     * The setter should return `this` instance to support the chaining.
 3. If the `<param>` has the `"type"` attribute value as the one of `<enum>` or `<struct>` name:
-    * The getter should call and return the result of the `this.getObject` method, where the first parameter is the corresponding Struct or Enum class, the second is the value of the corresponding static property described above; 
+    * The getter should call and return the result of the `this.getObject` method, where the first parameter is the corresponding Struct or Enum class, the second is the value of the corresponding static property described above;
     * The setter should validate the received value by calling the `this.validateType` method, where the fist parameter is the Struct or Enum class corresponding to the `"type"` attribute value of `<param>`, the second is the value itself;
     * The setter should call the `this.setParameter` method, where the first parameter is the value of the corresponding static property described above, the second is the value passed into setter;
     * The setter should return `this` instance to support the chaining.
@@ -1057,14 +1058,14 @@ setCmdID(id) {
     this.setParameter(AddCommand.KEY_CMD_ID, id);
     return this;
 }
- 
+
 /**
  * @return {Number}
  */
 getCmdID() {
     return this.getParameter(AddCommand.KEY_CMD_ID);
 }
- 
+
 /**
  * @param {MenuParams} params  Optional sub value containing menu parameters
  * @return {AddCommand}
@@ -1074,14 +1075,14 @@ setMenuParams(menuParams) {
     this.setParameter(AddCommand.KEY_MENU_PARAMS, menuParams);
     return this;
 }
- 
+
 /**
  * @return {MenuParams}
  */
 getMenuParams() {
     return this.getObject(MenuParams, AddCommand.KEY_MENU_PARAMS);
 }
- 
+
 /**
  * @param {Language} language  Current display language
  * @return {OnLanguageChange}
@@ -1091,7 +1092,7 @@ setHmiDisplayLanguage(language) {
     this.setParameter(OnLanguageChange.KEY_HMI_DISPLAY_LANGUAGE, language);
     return this;
 }
-   
+
 /**
  * @return {Language}
  */
@@ -1117,29 +1118,29 @@ XML:
         Adds a command to the in application menu.
         Either menuParams or vrCommands must be provided.
     </description>
-     
+
     <param name="cmdID" type="Integer" minvalue="0" maxvalue="2000000000" mandatory="true">
         <description>unique ID of the command to add.</description>
     </param>
-     
+
     <param name="menuParams" type="MenuParams" mandatory="false">
         <description>Optional sub value containing menu parameters</description>
     </param>
-     
+
     <param name="vrCommands" type="String" minsize="1" maxsize="100" maxlength="99" array="true" mandatory="false">
         <description>
             An array of strings to be used as VR synonyms for this command.
             If this array is provided, it may not be empty.
         </description>
     </param>
-     
+
     <param name="cmdIcon" type="Image" mandatory="false" since="2.0">
         <description>
             Image struct determining whether static or dynamic icon.
             If omitted on supported displays, no (or the default if applicable) icon shall be displayed.
         </description>
     </param>
-     
+
 </function>
 ```
 
@@ -1281,7 +1282,7 @@ XML:
     <param name="success" type="Boolean" platform="documentation" mandatory="true">
         <description> true if successful; false, if failed </description>
     </param>
-    
+
     <param name="resultCode" type="Result" platform="documentation" mandatory="true">
         <description>See Result</description>
         <element name="SUCCESS"/>
@@ -1298,32 +1299,32 @@ XML:
         <element name="UNSUPPORTED_RESOURCE"/>
         <element name="WARNINGS"/>
     </param>
-    
+
     <param name="info" type="String" maxlength="1000" mandatory="false" platform="documentation">
         <description>Provides additional human readable info regarding the result.</description>
     </param>
-    
+
     <param name="choiceID" type="Integer" minvalue="0" maxvalue="2000000000" mandatory="false">
         <description>
             ID of the choice that was selected in response to PerformInteraction.
             Only is valid if general result is "success:true".
         </description>
     </param>
-    
+
     <param name="manualTextEntry" type="String" maxlength="500" mandatory="false" since="3.0">
         <description>
             Manually entered text selection, e.g. through keyboard
             Can be returned in lieu of choiceID, depending on trigger source
         </description>
     </param>
-    
+
     <param name="triggerSource" type="TriggerSource" mandatory="false">
         <description>
             See TriggerSource
             Only is valid if resultCode is SUCCESS.
         </description>
     </param>
-    
+
 </function>
 ```
 
