@@ -473,10 +473,10 @@ class Validator {
     /**
      * Test a basic RpcRequest or RpcResponse with no params set.
      * @param {String} functionName
-     * @param {RpcType} messageType
+     * @param {RpcType} MessageType
      * @param {RpcRequest|RpcResponse} msg
      */
-    static testNullBase (functionName, messageType, msg) {
+    static testNullBase (functionName, MessageType, msg) {
         Validator.assertNotNull(msg, 'RPCMessage was null.');
         let correlationId;
         if (msg instanceof RpcRequest) {
@@ -487,7 +487,7 @@ class Validator {
             Validator.assertNullOrUndefined(correlationId, 'Correlation ID of the RPC message was not null.');
         }
         Validator.assertNotNull(msg.getRPCType(), 'Message type of the RPC message was null.');
-        Validator.assertEquals(messageType, msg.getRPCType(), 'Message type didn\'t match expected message type.');
+        Validator.assertEquals(MessageType, msg.getRPCType(), 'Message type didn\'t match expected message type.');
         Validator.assertNotNull(msg.getFunctionName(), 'Command type of the RPC message was null.');
         Validator.assertEquals(functionName, msg.getFunctionName(), 'Command type didn\'t match expected command type.');
 
