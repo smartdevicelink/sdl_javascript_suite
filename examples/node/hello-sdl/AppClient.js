@@ -99,26 +99,28 @@ class AppClient {
     }
 
     async _onConnected () {
-        // app starts in the NONE state
-        /* this does the same thing that the app config's setAppIcon method does when passed to the file manager
-        const fileManager = this._sdlManager.getFileManager();
-        const fileName = `${this._appConfig.getAppId()}_icon.gif`;
-
-        const file = new SDL.manager.file.filetypes.SdlFile()
-            .setName(fileName)
-            .setFilePath('./test_icon_1.png')
-            .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG)
-            .setPersistent(true);
-
-        const putFile = await fileManager.createPutFile(file);
-        const setAppIcon = new SDL.rpc.messages.SetAppIcon()
-            .setFileName(fileName);
-
-        await this._sdlManager.sendSequentialRpcs([
-            putFile,
-            setAppIcon,
+        // add voice commands for when the managers are ready
+        const screenManager = this._sdlManager.getScreenManager();
+        screenManager.setVoiceCommands([
+            new SDL.manager.screen.utils.VoiceCommand(['Option 1'], () => {
+                console.log('Option one has been clicked!');
+            }),
+            new SDL.manager.screen.utils.VoiceCommand(['Option 2'], () => {
+                console.log('Option two has been clicked!');
+            }),
+            new SDL.manager.screen.utils.VoiceCommand(['Option 3'], () => {
+                console.log('Option three has been clicked!');
+            }),
         ]);
-        */
+
+        // set up the presentation for the manager when its ready
+        screenManager.setTextField1('Hello SDL!');
+        screenManager.setTextField2('こんにちは');
+        screenManager.setTextField3('你好');
+        screenManager.setTitle('JavaScript Library');
+        screenManager.setTextAlignment(SDL.rpc.enums.TextAlignment.RIGHT_ALIGNED);
+        screenManager.setPrimaryGraphic(new SDL.manager.file.filetypes.SdlArtwork('sdl-logo', SDL.rpc.enums.FileType.GRAPHIC_PNG)
+            .setFilePath('./test_icon_1.png'));
     }
 
     async _onHmiStatusListener (onHmiStatus) {
@@ -127,13 +129,35 @@ class AppClient {
 
         // wait for the FULL state for more functionality
         if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
-            const show = new SDL.rpc.messages.Show();
-            show.setMainField1('Hello')
-                .setMainField2('こんにちは')
-                .setMainField3('你好');
+            const art1 = new SDL.manager.file.filetypes.SdlArtwork('fef2', SDL.rpc.enums.FileType.GRAPHIC_PNG)
+                .setFilePath('./test_icon_1.png');
 
-            await this._sdlManager.sendRpc(show);
+            let state1 = new SDL.manager.screen.utils.SoftButtonState('ROCK', 'rock', art1);
+            let state2 = new SDL.manager.screen.utils.SoftButtonState('PAPER', 'paper', art1);
+            let state3 = new SDL.manager.screen.utils.SoftButtonState('SCISSORS', 'scissors', art1);
+            let state4 = new SDL.manager.screen.utils.SoftButtonState('BUTTON', 'button');
 
+            let softButtonObjects = [
+                new SDL.manager.screen.utils.SoftButtonObject('game', [state1, state2, state3], 'ROCK', (id, rpc) => {
+                    if (rpc instanceof SDL.rpc.messages.OnButtonPress) {
+                        console.log('First button pressed!');
+                    }
+                }),
+                new SDL.manager.screen.utils.SoftButtonObject('button', [state4], 'BUTTON', (id, rpc) => {
+                    if (rpc instanceof SDL.rpc.messages.OnButtonPress) {
+                        console.log('Second button pressed!');
+                    }
+                }),
+            ];
+
+            // set the softbuttons now and rotate through the states of the first softbutton
+            const screenManager = this._sdlManager.getScreenManager();
+            await screenManager.setSoftButtonObjects(softButtonObjects);
+
+            await this._sleep(2000);
+            softButtonObjects[0].transitionToNextState();
+            await this._sleep(2000);
+            softButtonObjects[0].transitionToNextState();
             await this._sleep(2000);
 
             const count = 3;
