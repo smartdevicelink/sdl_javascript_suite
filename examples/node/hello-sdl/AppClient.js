@@ -31,7 +31,7 @@
 */
 
 const fs = require('fs');
-const SDL = require('../../../lib/node/dist/index.js');
+const SDL = require('../../../lib/node/dist/SDL.min.js');
 const CONFIG = require('./config.js');
 
 class AppClient {
@@ -132,12 +132,12 @@ class AppClient {
             const art1 = new SDL.manager.file.filetypes.SdlArtwork('fef2', SDL.rpc.enums.FileType.GRAPHIC_PNG)
                 .setFilePath('./test_icon_1.png');
 
-            let state1 = new SDL.manager.screen.utils.SoftButtonState('ROCK', 'rock', art1);
-            let state2 = new SDL.manager.screen.utils.SoftButtonState('PAPER', 'paper', art1);
-            let state3 = new SDL.manager.screen.utils.SoftButtonState('SCISSORS', 'scissors', art1);
-            let state4 = new SDL.manager.screen.utils.SoftButtonState('BUTTON', 'button');
+            const state1 = new SDL.manager.screen.utils.SoftButtonState('ROCK', 'rock', art1);
+            const state2 = new SDL.manager.screen.utils.SoftButtonState('PAPER', 'paper', art1);
+            const state3 = new SDL.manager.screen.utils.SoftButtonState('SCISSORS', 'scissors', art1);
+            const state4 = new SDL.manager.screen.utils.SoftButtonState('BUTTON', 'button');
 
-            let softButtonObjects = [
+            const softButtonObjects = [
                 new SDL.manager.screen.utils.SoftButtonObject('game', [state1, state2, state3], 'ROCK', (id, rpc) => {
                     if (rpc instanceof SDL.rpc.messages.OnButtonPress) {
                         console.log('First button pressed!');
