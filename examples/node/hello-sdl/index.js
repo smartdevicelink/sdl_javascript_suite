@@ -31,7 +31,7 @@
 */
 
 const fs = require('fs');
-const SDL = require('../../../lib/node/dist/SDL.min.js');
+const SDL = require('./SDL.min.js');
 const CONFIG = require('./config.js');
 const WS = require('ws');
 const AppClient = require('./AppClient.js');

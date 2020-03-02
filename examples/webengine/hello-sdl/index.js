@@ -34,7 +34,6 @@ const express = require('express');
 const app = express();
 
 app.use(express.static(__dirname));
-app.use(express.static(`${__dirname}./../../../lib/js/dist/`));
 
 
 const PORT = process.env.PORT || 9090;
