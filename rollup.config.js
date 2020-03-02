@@ -20,6 +20,18 @@ export default [{ // Vanilla JS source
             sourcemap: 'inline',
             name: 'SDL',
         },
+        {
+            file: 'examples/node/hello-sdl/SDL.min.js',
+            format: 'umd',
+            sourcemap: 'inline',
+            name: 'SDL',
+        },
+        {
+            file: 'examples/js/hello-sdl/SDL.min.js',
+            format: 'umd',
+            sourcemap: 'inline',
+            name: 'SDL',
+        },
     ],
     plugins: [
         globals(),
