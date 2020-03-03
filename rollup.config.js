@@ -9,13 +9,19 @@ export default [{ // Vanilla JS source
     input: 'lib/js/app.js',
     output: [
         {
-            file: 'lib/js/dist/SDL.js',
+            file: 'lib/js/dist/SDL.min.js',
             format: 'umd',
             sourcemap: 'inline',
             name: 'SDL',
         },
         {
-            file: 'examples/webengine/hello-sdl/SDL.js',
+            file: 'examples/webengine/hello-sdl/SDL.min.js',
+            format: 'umd',
+            sourcemap: 'inline',
+            name: 'SDL',
+        },
+        {
+            file: 'examples/js/hello-sdl/SDL.min.js',
             format: 'umd',
             sourcemap: 'inline',
             name: 'SDL',
@@ -36,15 +42,26 @@ export default [{ // Vanilla JS source
     ],
 }, { // NodeJS source
     input: 'lib/node/index.js',
-    output: {
-        dir: 'lib/node/dist',
-        format: 'umd',
-        sourcemap: 'inline',
-        name: 'SDL',
-        globals: {
-            ws: 'ws',
+    output: [
+        {
+            file: 'lib/node/dist/SDL.min.js',
+            format: 'umd',
+            sourcemap: 'inline',
+            name: 'SDL',
+            globals: {
+                ws: 'ws',
+            },
         },
-    },
+        {
+            file: 'examples/node/hello-sdl/SDL.min.js',
+            format: 'umd',
+            sourcemap: 'inline',
+            name: 'SDL',
+            globals: {
+                ws: 'ws',
+            },
+        },
+    ],
     plugins: [
         globals(),
         builtins(),
