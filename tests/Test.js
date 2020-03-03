@@ -1,4 +1,4 @@
-const SDL = require('./../lib/js/dist/SDL.js');
+const SDL = require('./../lib/js/dist/SDL.min.js');
 
 const SdlMsgVersion = SDL.rpc.structs.SdlMsgVersion;
 const TTSChunk = SDL.rpc.structs.TTSChunk;

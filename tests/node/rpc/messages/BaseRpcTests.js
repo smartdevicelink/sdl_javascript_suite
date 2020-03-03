@@ -1,4 +1,4 @@
-const SDL = require('./../../../../lib/js/dist/SDL.js');
+const SDL = require('./../../../../lib/js/dist/SDL.min.js');
 
 const RpcRequest = SDL.rpc.RpcRequest;
 const RpcResponse = SDL.rpc.RpcResponse;
@@ -55,6 +55,25 @@ exports.tests = function () {
 
     it('testJson', function (done) {
         Validator.validateJson(this.msg, this.getExpectedParameters());
+        done();
+    });
+
+    it('testNullBase', function (done) {
+        const msg = this.msg;
+        Validator.assertNotNullUndefined(msg, 'RPCMessage was null.');
+
+        const CORR_ID = msg.getCorrelationId();
+        if(msg instanceof RpcRequest){
+            Validator.assertNotNullUndefined(CORR_ID, 'Correlation ID of the RPC message was null.');
+        } else if(msg instanceof RpcResponse){
+            //Validator.assertNull(CORR_ID, 'Correlation ID of the RPC message was not null.');
+        }
+
+        Validator.assertNotNullUndefined(msg.getRPCType(), 'RPC Type of the RPC message was null.');
+        Validator.assertEquals(msg.getRPCType(), this.getRPCType(), 'RPC Type didn\'t match expected type.');
+        Validator.assertNotNullUndefined(msg.getFunctionName(), 'Function name of the RPC message was null.');
+        Validator.assertEquals(this.getFunctionName(), msg.getFunctionName(), 'Function name didn\'t match expected function name.');
+
         done();
     });
 };
