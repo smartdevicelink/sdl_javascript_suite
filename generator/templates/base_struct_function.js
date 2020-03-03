@@ -16,10 +16,11 @@
 {%- endblock %}
 {% block body %}
     /**
+     * Initalizes an instance of {{name}}.
+     * @constructor
      {% if deprecated is defined -%}
      * @deprecated
      {% endif -%}
-     * @constructor
      */
 {%- block constructor %}
 {% endblock -%}

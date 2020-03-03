@@ -33,13 +33,21 @@
 <html>
 
 <head>
-    <script src='./SDL.js'></script>
+    <script src='./SDL.min.js'></script>
 
     <script>
         class HelloSdl {
             constructor () {
+                const appId = 'hello-js';
+                const fileName = `${appId}_icon.gif`;
+                const file = new SDL.manager.file.filetypes.SdlFile()
+                    .setName(fileName)
+                    .setFilePath('./test_icon_1.png')
+                    .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG)
+                    .setPersistent(true);
+
                 this._appConfig = new SDL.manager.AppConfig()
-                    .setAppId('hello-js')
+                    .setAppId(appId)
                     .setAppName('Hello JS')
                     .setIsMediaApp(false)
                     .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
@@ -47,59 +55,107 @@
                     .setAppTypes([
                         SDL.rpc.enums.AppHMIType.DEFAULT,
                     ])
-                    .setTransportConfig(new SDL.transport.WebSocketClientConfig('ws://localhost', 5050));
+                    .setTransportConfig(new SDL.transport.WebSocketClientConfig('ws://localhost', 5050))
+                    .setAppIcon(file);
 
-                const listener = new SDL.manager.lifecycle.LifecycleListener();
-                listener.setOnProxyConnected((manager) => {
-                    this._onConnected();
-                });
-                listener.setOnProxyClosed((lifecycleManager, info, reason) => {});
-                listener.setOnServiceStarted((serviceType, sessionId, correlationId) => {});
-                listener.setOnServiceEnded((serviceType) => {});
-                listener.setOnError((lifecycleManager, info) => {});
+                const managerListener = new SDL.manager.SdlManagerListener();
+                managerListener
+                    .setOnStart((sdlManager) => {
+                        this._permissionManager = this._sdlManager.getPermissionManager();
+                        this._logPermissions();
+                        this._permissionManager.addListener(
+                            [
+                                new SDL.manager.permission.PermissionElement(
+                                    SDL.rpc.enums.FunctionID.SubscribeVehicleData,
+                                    [
+                                        'accPedalPosition',
+                                        'gps',
+                                        'fuelLevel',
+                                        'odometer',
+                                        'prndl',
+                                    ]
+                                ),
+                            ],
+                            SDL.manager.permission.enums.PermissionGroupType.ANY,
+                            (allowedPermissions, permissionGroupStatus) => {
+                                console.log('SubscribeVehicleData permissions changed!');
+                                console.log('Allowed Permissions: ', allowedPermissions);
+                                console.log('Permission Group Status: ', permissionGroupStatus);
+                                this._logPermissions();
+                            }
+                        );
+                        this._onConnected();
+                    })
+                    .setOnError((sdlManager, info) => {
+                        console.error('Error from SdlManagerListener: ', info);
+                    });
 
-                this._manager = new SDL.manager.lifecycle.LifecycleManager(this._appConfig, listener);
-
-                const hmiFullListener = new SDL.rpc.RpcListener().setOnRpcMessage(this._onHmiStatusListener.bind(this));
-
-                this._manager.addRpcListener(SDL.rpc.enums.FunctionID.OnHMIStatus, hmiFullListener);
-            }
-
-            start () {
-                this._manager.start();
+                this._sdlManager = new SDL.manager.SdlManager(this._appConfig, managerListener);
+                this._sdlManager
+                    .start()
+                    .addRpcListener(SDL.rpc.enums.FunctionID.OnHMIStatus, this._onHmiStatusListener.bind(this));
             }
 
             async _onConnected () {
-                // app starts in the NONE state
-                const fileBinary = await _fetchImageUnit8Array('./test_icon_1.png');
-                const fileName = `${this._appConfig.getAppId()}_icon.gif`;
+                // add voice commands for when the managers are ready
+                const screenManager = this._sdlManager.getScreenManager();
+                screenManager.setVoiceCommands([
+                    new SDL.manager.screen.utils.VoiceCommand(['Option 1'], () => {
+                        console.log('Option one selected!');
+                    }),
+                    new SDL.manager.screen.utils.VoiceCommand(['Option 2'], () => {
+                        console.log('Option two selected!');
+                    }),
+                    new SDL.manager.screen.utils.VoiceCommand(['Option 3'], () => {
+                        console.log('Option three selected!');
+                    }),
+                ]);
 
-                const putFile = new SDL.rpc.messages.PutFile()
-                    .setFileName(fileName)
-                    .setFileType('GRAPHIC_PNG')
-                    .setPersistentFile(true)
-                    .setFileData(fileBinary);
-
-                await this._asyncSendRpc(putFile);
-
-                const setAppIcon = new SDL.rpc.messages.SetAppIcon()
-                    .setFileName(fileName);
-
-                await this._asyncSendRpc(setAppIcon);
+                // set up the presentation for the manager when its ready
+                screenManager.setTextField1('Hello SDL!');
+                screenManager.setTextField2('こんにちは');
+                screenManager.setTextField3('你好');
+                screenManager.setTitle('JavaScript Library');
+                screenManager.setTextAlignment(SDL.rpc.enums.TextAlignment.RIGHT_ALIGNED);
+                screenManager.setPrimaryGraphic(new SDL.manager.file.filetypes.SdlArtwork('sdl-logo', SDL.rpc.enums.FileType.GRAPHIC_PNG)
+                    .setFilePath('./test_icon_1.png'));
             }
 
             async _onHmiStatusListener (onHmiStatus) {
                 const hmiLevel = onHmiStatus.getHmiLevel();
+                this._logPermissions();
 
                 // wait for the FULL state for more functionality
                 if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
-                    const show = new SDL.rpc.messages.Show();
-                    show.setMainField1('Hello')
-                        .setMainField2('こんにちは')
-                        .setMainField3('你好');
+                    const art1 = new SDL.manager.file.filetypes.SdlArtwork('logo', SDL.rpc.enums.FileType.GRAPHIC_PNG)
+                        .setFilePath('./test_icon_1.png');
 
-                    await this._asyncSendRpc(show);
+                    let state1 = new SDL.manager.screen.utils.SoftButtonState('ROCK', 'rock', art1);
+                    let state2 = new SDL.manager.screen.utils.SoftButtonState('PAPER', 'paper', art1);
+                    let state3 = new SDL.manager.screen.utils.SoftButtonState('SCISSORS', 'scissors', art1);
+                    let state4 = new SDL.manager.screen.utils.SoftButtonState('BUTTON', 'button');
 
+                    let softButtonObjects = [
+                        new SDL.manager.screen.utils.SoftButtonObject('game', [state1, state2, state3], 'ROCK', (id, rpc) => {
+                            if (rpc instanceof SDL.rpc.messages.OnButtonPress) {
+                                console.log('First button pressed!');
+                            }
+                        }),
+                        new SDL.manager.screen.utils.SoftButtonObject('button', [state4], 'BUTTON', (id, rpc) => {
+                            if (rpc instanceof SDL.rpc.messages.OnButtonPress) {
+                                console.log('Second button pressed!');
+                            }
+                        }),
+                    ];
+
+                    // set the softbuttons now and rotate through the states of the first softbutton
+                    const screenManager = this._sdlManager.getScreenManager();
+                    await screenManager.setSoftButtonObjects(softButtonObjects);
+
+                    await this._sleep(2000);
+                    softButtonObjects[0].transitionToNextState();
+                    await this._sleep(2000);
+                    softButtonObjects[0].transitionToNextState();
                     await this._sleep(2000);
 
                     const count = 3;
@@ -109,15 +165,15 @@
                             .setMainField2('')
                             .setMainField3('');
 
-                        this._asyncSendRpc(showCountdown); // don't wait for a response
+                        this._sdlManager.sendRpc(showCountdown); // don't wait for a response
 
                         await this._sleep();
                     }
 
                     // tear down the app
-                    await this._asyncSendRpc(new SDL.rpc.messages.UnregisterAppInterface());
-                    
-                    this._manager.stop();
+                    await this._sdlManager.sendRpc(new SDL.rpc.messages.UnregisterAppInterface());
+
+                    this._sdlManager.dispose();
                 }
             }
 
@@ -127,48 +183,20 @@
                 });
             }
 
-            // TODO: this should go into some manager class
-            // abstracts out the work of sending the RPC and attaching listeners to wait for a response
-            _asyncSendRpc (request, timeout = 5000) {
-                return new Promise((resolve, reject) => {
-                    const functionId = SDL.rpc.enums.FunctionID.valueForKey(request.getFunctionName()); // this is the number value
-                    let correlationIdRequest;
-                    let listener;
-
-                    listener = new SDL.rpc.RpcListener().setOnRpcMessage(rpcMessage => {
-                        const correlationIdResponse = rpcMessage.getCorrelationId();
-                        // ensure the correlation ids match
-                        if (correlationIdRequest === correlationIdResponse) {
-                            // remove the listener once the correct response is received
-                            this._manager.removeRpcListener(functionId, listener);
-                            resolve(rpcMessage);
-                        }
-                    });
-
-                    this._manager.addRpcListener(functionId, listener);
-                    this._manager.sendRpcMessage(request); // the request will get a correlation id after this method
-
-                    correlationIdRequest = request.getCorrelationId();
-
-                    setTimeout(() => {
-                        reject(new Error(`Response timeout for ${request.getFunctionName()}`));
-                    }, timeout); // timeout after so long of not getting a response
-                });
+            _logPermissions () {
+                if (this._permissionManager) {
+                    console.log(`Show RPC allowed: ${this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.Show)}`);
+                    console.log(`PutFile RPC allowed: ${this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.PutFile)}`);
+                    console.log(`GetVehicleData RPC allowed: ${this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.GetVehicleData)}`);
+                    console.log(`SubscribeVehicleData RPC allowed: ${this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.SubscribeVehicleData)}`);
+                }
             }
-        }
-
-        async function _fetchImageUnit8Array (path) {
-            const img = await fetch(path);
-            const blob = await img.blob();
-            const aryBuffer = await new Response(blob).arrayBuffer();
-            return new Uint8Array(aryBuffer);
         }
     </script>
 
     <script>
         console.log('start app');
         const app = new HelloSdl();
-        app.start();
     </script>
 </head>
 
