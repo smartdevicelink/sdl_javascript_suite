@@ -103,13 +103,13 @@ class AppClient {
         const screenManager = this._sdlManager.getScreenManager();
         screenManager.setVoiceCommands([
             new SDL.manager.screen.utils.VoiceCommand(['Option 1'], () => {
-                console.log('Option one has been clicked!');
+                console.log('Option one selected!');
             }),
             new SDL.manager.screen.utils.VoiceCommand(['Option 2'], () => {
-                console.log('Option two has been clicked!');
+                console.log('Option two selected!');
             }),
             new SDL.manager.screen.utils.VoiceCommand(['Option 3'], () => {
-                console.log('Option three has been clicked!');
+                console.log('Option three selected!');
             }),
         ]);
 
@@ -129,7 +129,7 @@ class AppClient {
 
         // wait for the FULL state for more functionality
         if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
-            const art1 = new SDL.manager.file.filetypes.SdlArtwork('fef2', SDL.rpc.enums.FileType.GRAPHIC_PNG)
+            const art1 = new SDL.manager.file.filetypes.SdlArtwork('logo', SDL.rpc.enums.FileType.GRAPHIC_PNG)
                 .setFilePath('./test_icon_1.png');
 
             const state1 = new SDL.manager.screen.utils.SoftButtonState('ROCK', 'rock', art1);
