@@ -39,9 +39,9 @@ exports.tests = function () {
     });
 
     it('testRPCType', function (done) {
-        const MessageType = this.msg.getRPCType();
-        Validator.assertNotNullUndefined(MessageType);
-        Validator.assertEquals(MessageType, this.getRPCType());
+        const messageType = this.msg.getRPCType();
+        Validator.assertNotNullUndefined(messageType);
+        Validator.assertEquals(messageType, this.getRPCType());
         done();
     });
 
