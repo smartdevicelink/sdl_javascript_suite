@@ -11,8 +11,8 @@ describe('BinaryFrameHeaderTests', function () {
     before(function () {
         this.createDummyBfh = function () {
             const bfh = new BinaryFrameHeader(RPC_TYPE_NOTIFICATION, FunctionID.OnHMIStatus, 123, MAX_SAFE_INT);
-            bfh.setBulkData(new Uint8Array(2));
-            bfh.setJsonData(new Uint8Array(2));
+            bfh.setBulkData(null);
+            bfh.setJsonData(null);
             return bfh;
         };
     });
