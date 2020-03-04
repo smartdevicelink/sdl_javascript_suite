@@ -13,24 +13,6 @@ const params = new VideoStreamingParameters();
 const capability = new VideoStreamingCapability();
 
 describe('VideoStreamingParametersTest', function () {
-    it('testUpdateNullScale', function (done) {
-        const preferredResolution = new ImageResolution();
-        preferredResolution.setResolutionWidth(800);
-        preferredResolution.setResolutionHeight(354);
-
-        capability.setScale(null);
-        capability.setPreferredResolution(preferredResolution);
-        // TODO: setting the VideoStreamingCapability scale to null should treat it as a scale of 1, according to Java Suite. Recommend confirming expected behavior, as this would imply the need for an override rule in the RPC generator.
-        // Validator.assertNull(capability.getScale());
-        params.update(capability);
-
-        const width = params.getResolution().getResolutionWidth();
-        const height = params.getResolution().getResolutionHeight();
-
-        Validator.assertEquals(width, 800);
-        Validator.assertEquals(height, 354);
-        done();
-    });
 
     it('testUpdateScale_1_Resolution_800_354', function (done) {
         const preferredResolution = new ImageResolution();
