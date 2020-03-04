@@ -28,13 +28,10 @@ describe('BinaryFrameHeaderTests', function () {
 
         Validator.assertTrue(bfh.getFunctionId() === parsedBfh.getFunctionId(), 'Function ID not parsed properly.');
 
-        // RPCType is parsed to 0x00, should be 0x02
         Validator.assertEquals(parsedBfh.getRpcType(), bfh.getRpcType(), 'RPC type not parsed properly.');
 
-        // BulkData is parsed to null, should be Uint8Array
         Validator.assertEquals(parsedBfh.getBulkData(), bfh.getBulkData(), 'Bulk data not parsed properly.');
 
-        // JSONData is parsed to [], should be Uint8Array
         Validator.assertEquals(parsedBfh.getJsonData(), bfh.getJsonData(), 'JSON data not parsed properly.');
 
         Validator.assertEquals(parsedBfh.getJsonSize(), bfh.getJsonSize(), 'JSON size not parsed properly.');
