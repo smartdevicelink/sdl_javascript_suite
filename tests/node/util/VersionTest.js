@@ -8,7 +8,7 @@ const TEST_VERSION_STRING = '1.2.3';
 const TEST_VERSION = new Version(1, 2, 3);
 
 describe('VersionTest', function () {
-    it('testToString', function (done) {
+    it('testFromString', function (done) {
         const version = new Version();
         version.fromString(TEST_VERSION_STRING);
         Validator.assertEquals(1, version.getMajor());
@@ -17,11 +17,20 @@ describe('VersionTest', function () {
         done();
     });
 
-    it('testToStringIncorrect', function (done) {
+    it('testFromStringPartial', function (done) {
+        const version = new Version();
+        version.fromString('1.2');
+        Validator.assertEquals(1, version.getMajor());
+        Validator.assertEquals(2, version.getMinor());
+        Validator.assertEquals(0, version.getPatch());
+        done();
+    });
+
+    it('testFromStringIncorrect', function (done) {
         let err;
         try {
             const version = new Version();
-            version.fromString('1.2');
+            version.fromString('127.0.0.1');
         } catch (error) {
             err = error;
         }
