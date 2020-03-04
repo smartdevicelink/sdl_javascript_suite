@@ -5,14 +5,13 @@ const BinaryFrameHeader = SDL.protocol.BinaryFrameHeader;
 const Validator = require('./../../Validator');
 
 const RPC_TYPE_NOTIFICATION = 0x02;
-const MAX_SAFE_INT = Math.pow(2, 31) - 1;
+const JSON_SIZE = 0;
 
 describe('BinaryFrameHeaderTests', function () {
     before(function () {
         this.createDummyBfh = function () {
-            const bfh = new BinaryFrameHeader(RPC_TYPE_NOTIFICATION, FunctionID.OnHMIStatus, 123, MAX_SAFE_INT);
+            const bfh = new BinaryFrameHeader(RPC_TYPE_NOTIFICATION, FunctionID.OnHMIStatus, 123, JSON_SIZE);
             bfh.setBulkData(null);
-            bfh.setJsonData(null);
             return bfh;
         };
     });
