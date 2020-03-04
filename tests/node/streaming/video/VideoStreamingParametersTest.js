@@ -13,7 +13,6 @@ const params = new VideoStreamingParameters();
 const capability = new VideoStreamingCapability();
 
 describe('VideoStreamingParametersTest', function () {
-
     it('testUpdateScale_1_Resolution_800_354', function (done) {
         const preferredResolution = new ImageResolution();
         preferredResolution.setResolutionWidth(800);
