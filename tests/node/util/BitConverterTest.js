@@ -1,5 +1,5 @@
 
-const SDL = require('./../../../lib/js/dist/SDL');
+const SDL = require('./../../../lib/js/dist/SDL.min.js');
 const BitConverter = SDL.util.BitConverter;
 const Validator = require('./../../Validator.js');
 
