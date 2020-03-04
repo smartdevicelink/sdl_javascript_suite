@@ -63,10 +63,10 @@ exports.tests = function () {
         Validator.assertNotNullUndefined(msg, 'RPCMessage was null.');
 
         const CORR_ID = msg.getCorrelationId();
-        if(msg instanceof RpcRequest){
-            Validator.assertNotNullUndefined(CORR_ID, 'Correlation ID of the RPC message was null.');
-        } else if(msg instanceof RpcResponse){
-            //Validator.assertNull(CORR_ID, 'Correlation ID of the RPC message was not null.');
+        if (msg instanceof RpcRequest) {
+            Validator.assertNotNullUndefined(CORR_ID, 'Correlation ID of the RpcRequest was null.');
+        } else if (msg instanceof RpcResponse) {
+            Validator.assertNotNullUndefined(CORR_ID, 'Correlation ID of the RpcResponse was null.');
         }
 
         Validator.assertNotNullUndefined(msg.getRPCType(), 'RPC Type of the RPC message was null.');
