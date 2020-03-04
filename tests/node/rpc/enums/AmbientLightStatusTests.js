@@ -3,8 +3,8 @@ const SDL = require('./../../../../lib/js/dist/SDL.min.js');
 const AmbientLightStatus = SDL.rpc.enums.AmbientLightStatus;
 const Validator = require('./../../../Validator.js');
 
-describe('AmbientLightStatusTests', function(){
-    it('testValidEnums', function (done){
+describe('AmbientLightStatusTests', function () {
+    it('testValidEnums', function (done) {
         let example = 'DAY';
         const enumDay = AmbientLightStatus.valueForKey(example);
         example = 'NIGHT';
@@ -33,15 +33,15 @@ describe('AmbientLightStatusTests', function(){
         done();
     });
 
-    it('testInvalidEnum', function(done){
-        let example = 'nIGHT';
+    it('testInvalidEnum', function (done) {
+        const example = 'nIGHT';
         const temp = AmbientLightStatus.valueForKey(example);
         Validator.assertNull(temp, 'Result of valueForKey should be null.');
         done();
     });
 
-    it('testNullEnum', function(done){
-        let example = null;
+    it('testNullEnum', function (done) {
+        const example = null;
         const temp = AmbientLightStatus.valueForKey(example);
         Validator.assertNull(temp, 'Result of valueForKey should be null.');
         done();

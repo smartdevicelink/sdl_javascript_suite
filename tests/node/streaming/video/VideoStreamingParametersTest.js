@@ -12,56 +12,56 @@ const VideoStreamingParameters = SDL.streaming.video.VideoStreamingParameters;
 const params = new VideoStreamingParameters();
 const capability = new VideoStreamingCapability();
 
-describe('VideoStreamingParametersTest', function(){
-    it('testUpdateNullScale', function(done){
-        let preferredResolution = new ImageResolution();
+describe('VideoStreamingParametersTest', function () {
+    it('testUpdateNullScale', function (done) {
+        const preferredResolution = new ImageResolution();
         preferredResolution.setResolutionWidth(800);
         preferredResolution.setResolutionHeight(354);
 
         capability.setScale(null);
         capability.setPreferredResolution(preferredResolution);
-        //TODO: setting the VideoStreamingCapability scale to null should treat it as a scale of 1
-        //Validator.assertNull(capability.getScale());
+        // TODO: setting the VideoStreamingCapability scale to null should treat it as a scale of 1, according to Java Suite. Recommend confirming expected behavior, as this would imply the need for an override rule in the RPC generator.
+        // Validator.assertNull(capability.getScale());
         params.update(capability);
 
-        let width = params.getResolution().getResolutionWidth();
-        let height = params.getResolution().getResolutionHeight();
-
-        //Validator.assertEquals(width, 800);
-        //Validator.assertEquals(height, 354);
-        done();
-    });
-
-    it('testUpdateScale_1_Resolution_800_354', function (done){
-        let preferredResolution = new ImageResolution();
-        preferredResolution.setResolutionWidth(800);
-        preferredResolution.setResolutionHeight(354);
-        
-        capability.setScale(1);
-        capability.setPreferredResolution(preferredResolution);
-
-        params.update(capability);
-
-        let width = params.getResolution().getResolutionWidth();
-        let height = params.getResolution().getResolutionHeight();
+        const width = params.getResolution().getResolutionWidth();
+        const height = params.getResolution().getResolutionHeight();
 
         Validator.assertEquals(width, 800);
         Validator.assertEquals(height, 354);
         done();
     });
 
-    it('testUpdateScale_1_25_Resolution_1280_569', function(done){
-        let preferredResolution = new ImageResolution();
+    it('testUpdateScale_1_Resolution_800_354', function (done) {
+        const preferredResolution = new ImageResolution();
+        preferredResolution.setResolutionWidth(800);
+        preferredResolution.setResolutionHeight(354);
+
+        capability.setScale(1);
+        capability.setPreferredResolution(preferredResolution);
+
+        params.update(capability);
+
+        const width = params.getResolution().getResolutionWidth();
+        const height = params.getResolution().getResolutionHeight();
+
+        Validator.assertEquals(width, 800);
+        Validator.assertEquals(height, 354);
+        done();
+    });
+
+    it('testUpdateScale_1_25_Resolution_1280_569', function (done) {
+        const preferredResolution = new ImageResolution();
         preferredResolution.setResolutionWidth(1280);
         preferredResolution.setResolutionHeight(569);
-        
+
         capability.setScale(1.25);
         capability.setPreferredResolution(preferredResolution);
 
         params.update(capability);
 
-        let width = params.getResolution().getResolutionWidth();
-        let height = params.getResolution().getResolutionHeight();
+        const width = params.getResolution().getResolutionWidth();
+        const height = params.getResolution().getResolutionHeight();
 
         Validator.assertEquals(width, 1024);
         Validator.assertEquals(height, 455);
@@ -69,18 +69,18 @@ describe('VideoStreamingParametersTest', function(){
         done();
     });
 
-    it('testUpdateScale_1_5_Resolution_1280_569', function(done){
-        let preferredResolution = new ImageResolution();
+    it('testUpdateScale_1_5_Resolution_1280_569', function (done) {
+        const preferredResolution = new ImageResolution();
         preferredResolution.setResolutionWidth(1280);
         preferredResolution.setResolutionHeight(569);
-        
+
         capability.setScale(1.5);
         capability.setPreferredResolution(preferredResolution);
 
         params.update(capability);
 
-        let width = params.getResolution().getResolutionWidth();
-        let height = params.getResolution().getResolutionHeight();
+        const width = params.getResolution().getResolutionWidth();
+        const height = params.getResolution().getResolutionHeight();
 
         Validator.assertEquals(width, 853);
         Validator.assertEquals(height, 379);
@@ -88,10 +88,10 @@ describe('VideoStreamingParametersTest', function(){
         done();
     });
 
-    it('testUpdateCapabilityFormat', function(done){
+    it('testUpdateCapabilityFormat', function (done) {
         capability.setMaxBitrate(10000);
 
-        let preferredResolution = new ImageResolution();
+        const preferredResolution = new ImageResolution();
         preferredResolution.setResolutionWidth(800);
         preferredResolution.setResolutionHeight(600);
         capability.setPreferredResolution(preferredResolution);
@@ -114,5 +114,5 @@ describe('VideoStreamingParametersTest', function(){
         Validator.assertEquals(params.getFormat(), format);
 
         done();
-    })
+    });
 });

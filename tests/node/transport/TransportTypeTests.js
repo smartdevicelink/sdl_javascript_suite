@@ -5,8 +5,8 @@ const TransportType = SDL.transport.enums.TransportType;
 const Validator = require('./../../Validator');
 const Test = require('./../../Test');
 
-describe('TransportTypeTests', function(){
-    it('testTransportTypeEnum', function(done){
+describe('TransportTypeTests', function () {
+    it('testTransportTypeEnum', function (done) {
         const testWebSocketClient = 'WEBSOCKET_CLIENT';
         const testWebSocketServer = 'WEBSOCKET_SERVER';
         const testCustom = 'CUSTOM';
@@ -16,7 +16,7 @@ describe('TransportTypeTests', function(){
         const expectedWebSocketServerEnum = TransportType.WEBSOCKET_SERVER;
         const expectedCustomEnum = TransportType.CUSTOM;
 
-        let expectedEnumList = [];
+        const expectedEnumList = [];
         expectedEnumList.push(TransportType.WEBSOCKET_CLIENT);
         expectedEnumList.push(TransportType.WEBSOCKET_SERVER);
         expectedEnumList.push(TransportType.CUSTOM);
@@ -30,9 +30,9 @@ describe('TransportTypeTests', function(){
         // Valid Tests
         Validator.assertEquals(expectedWebSocketClientEnum, actualWebSocketClientEnum, Test.MATCH);
         Validator.assertEquals(expectedWebSocketServerEnum, actualWebSocketServerEnum, Test.MATCH);
-        Validator.assertEquals(expectedCustomEnum, actualCustomEnum, Test.MATCH)
+        Validator.assertEquals(expectedCustomEnum, actualCustomEnum, Test.MATCH);
 
-        //Invalid/Null Tests
+        // Invalid/Null Tests
         Validator.assertNull(actualInvalidEnum, Test.NULL);
         Validator.assertNull(actualNullEnum, Test.NULL);
         done();
