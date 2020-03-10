@@ -61,6 +61,15 @@ export default [{ // Vanilla JS source
                 ws: 'ws',
             },
         },
+        {
+            file: 'examples/node/hello-sdl-tcp/SDL.min.js',
+            format: 'umd',
+            sourcemap: 'inline',
+            name: 'SDL',
+            globals: {
+                ws: 'ws',
+            },
+        },
     ],
     plugins: [
         globals(),
