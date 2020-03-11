@@ -14,9 +14,10 @@
     "build": "node lib/node/teardown.js && npm run build-rpcs && node lib/js/generate.js && node lib/node/setup.js && node lib/node/generate.js && node_modules/.bin/rollup -c && node lib/node/teardown.js",
     "build-rpcs": "python3 generator/generator.py -y",
     "test": "mocha './tests/node/**/*.js'",
-    "lint": "node_modules/.bin/eslint \"./lib/js/**\" \"./lib/node/**\"",
+    "lint": "node_modules/.bin/eslint \"./lib/js/**\" \"./lib/node/**\" \"./tests/**/*.js\"",
     "lint-js": "node_modules/.bin/eslint \"./lib/js/**\"",
     "lint-node": "node_modules/.bin/eslint \"./lib/node/**\"",
+    "lint-tests": "node_modules/.bin/eslint \"./tests/**/*.js\"",
     "build-third-party": "webpack"
   },
   "repository": {

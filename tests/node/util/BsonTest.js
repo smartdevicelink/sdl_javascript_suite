@@ -1,4 +1,4 @@
-const SDL = require('./../../../lib/js/dist/SDL.js');
+const SDL = require('./../../../lib/js/dist/SDL.min.js');
 const Bson = SDL.util.Bson;
 const Validator = require('./../../Validator.js');
 
