@@ -52,18 +52,15 @@ module.exports = function (appClient) {
 
         it('testSetPrimaryGraphic', function (done) {
             // FIXME: UnhandledPromiseRejectionWarning: Error: undefined must be of type Image
-            // screenManager.setPrimaryGraphic(testArtwork);
+            screenManager.setPrimaryGraphic(testArtwork);
             Validator.assertEquals(screenManager.getPrimaryGraphic(), testArtwork);
             done();
         });
 
         it('testSetPrimaryGraphicWithBlankImage', function (done) {
-            // FIXME: Uncaught TypeError: this._textAndGraphicManager.getBlankArtwork is not a function
-            // Should be calling this._textAndGraphicManager._getBlankArtwork()
-
-            // screenManager.setPrimaryGraphic(null);
-            // Validator.assertNotNull(screenManager.getPrimaryGraphic());
-            // Validator.assertEquals(screenManager.getPrimaryGraphic().getName(), 'blankArtwork');
+            screenManager.setPrimaryGraphic(null);
+            Validator.assertNotNull(screenManager.getPrimaryGraphic());
+            Validator.assertEquals(screenManager.getPrimaryGraphic().getName(), 'blankArtwork');
             done();
         });
 
@@ -75,12 +72,9 @@ module.exports = function (appClient) {
         });
 
         it('testSetSecondaryGraphicWithBlankImage', function (done) {
-            // FIXME: Uncaught TypeError: this._textAndGraphicManager.getBlankArtwork is not a function
-            // Should be calling this._textAndGraphicManager._getBlankArtwork()
-
-            // screenManager.setSecondaryGraphic(null);
-            // Validator.assertNotNull(screenManager.getSecondaryGraphic());
-            // Validator.assertEquals(screenManager.getSecondaryGraphic().getName(), 'blankArtwork');
+            screenManager.setSecondaryGraphic(null);
+            Validator.assertNotNull(screenManager.getSecondaryGraphic());
+            Validator.assertEquals(screenManager.getSecondaryGraphic().getName(), 'blankArtwork');
             done();
         });
 
