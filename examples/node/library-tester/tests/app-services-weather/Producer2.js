@@ -34,7 +34,7 @@ const SDL = require('../../SDL.min.js');
 const AppHelper = require('../../AppHelper.js');
 
 // this acts as the producer app
-module.exports = class Producer {
+module.exports = class Producer2 {
     constructor (catalogRpc) {
         this._catalogRpc = catalogRpc;
         this._app = null;
@@ -43,12 +43,12 @@ module.exports = class Producer {
     }
 
     async start () {
-        const appId = 'node-testing';
+        const appId = 'node-producer-2';
 
         const fileName = 'test_icon_1';
         const file = new SDL.manager.file.filetypes.SdlFile()
             .setName(fileName)
-            .setFilePath('./tests/app-services-navigation/test_icon_1.png')
+            .setFilePath('./tests/app-services-weather/test_icon_1.png')
             .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG)
             .setPersistent(true);
 
@@ -70,29 +70,6 @@ module.exports = class Producer {
 
         await this._app.start(); // after this point, we are in HMI FULL and managers are ready
         this.sdlManager = this._app.getManager();
-    }
-
-    async setupAppService () {
-        const pasr = new SDL.rpc.messages.PublishAppService()
-            .setAppServiceManifest(new SDL.rpc.structs.AppServiceManifest({
-                serviceName: 'node-tester-navigation',
-                serviceType: SDL.rpc.enums.AppServiceType.NAVIGATION,
-                serviceIcon: {
-                    value: 'test_icon_1',
-                    imageType: SDL.rpc.enums.ImageType.DYNAMIC,
-                    isTemplate: false,
-                },
-                allowAppConsumers: true,
-                navigationServiceManifest: {},
-                handledRPCs: [
-                    SDL.rpc.enums.FunctionID.SendLocation, // this app can intercept SendLocation
-                ]
-            }));
-
-        const pasrResponse = await this.sdlManager.sendRpc(pasr);
-        this._serviceId = pasrResponse.getAppServiceRecord()
-            .getServiceID();
-        // app published!
 
         // inform the user that a new app should be activated now
         const show = new SDL.rpc.messages.Show()
@@ -100,6 +77,50 @@ module.exports = class Producer {
             .setMainField2('Check the app list and activate the consumer app');
 
         await this.sdlManager.sendRpc(show);
+
+        this.respondToPerformAppServiceInteractions();
+    }
+
+    async unpublishAppService () {
+        return this.sdlManager.sendRpc(new SDL.rpc.messages.UnpublishAppService().setServiceID(this._serviceId));
+    }
+
+    async setupAppService (allowAppConsumers) {
+        const pasr = new SDL.rpc.messages.PublishAppService()
+            .setAppServiceManifest(new SDL.rpc.structs.AppServiceManifest({
+                serviceName: 'weather-service-2',
+                serviceType: SDL.rpc.enums.AppServiceType.WEATHER,
+                serviceIcon: {
+                    value: 'test_icon_1',
+                    imageType: SDL.rpc.enums.ImageType.DYNAMIC,
+                    isTemplate: false,
+                },
+                allowAppConsumers: allowAppConsumers,
+                weatherServiceManifest: {
+                    currentForecastSupported: true,
+                    maxMultidayForecastAmount: 7,
+                    maxHourlyForecastAmount: 24,
+                    maxMinutelyForecastAmount: 60,
+                },
+            }));
+
+        const pasrResponse = await this.sdlManager.sendRpc(pasr);
+        this._serviceId = pasrResponse.getAppServiceRecord()
+            .getServiceID();
+        // app published!
+    }
+
+    respondToPerformAppServiceInteractions () {
+        this.sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.PerformAppServiceInteraction, (message) => {
+            if (message.getRPCType() === SDL.rpc.enums.RpcType.REQUEST) {
+                const pasiResponse = new SDL.rpc.messages.PerformAppServiceInteractionResponse()
+                    .setSuccess(true)
+                    .setResultCode(SDL.rpc.enums.Result.SUCCESS)
+                    .setCorrelationId(request.getCorrelationId());
+            
+                this.sdlManager.sendRpc(pasiResponse); // nothing to wait for
+            }
+        });
     }
 
     sendLocationResponse (request) {

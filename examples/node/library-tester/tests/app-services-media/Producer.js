@@ -48,7 +48,7 @@ module.exports = class Producer {
         const fileName = 'test_icon_1';
         const file = new SDL.manager.file.filetypes.SdlFile()
             .setName(fileName)
-            .setFilePath('./tests/example-2/test_icon_1.png')
+            .setFilePath('./tests/app-services-media/test_icon_1.png')
             .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG)
             .setPersistent(true);
 

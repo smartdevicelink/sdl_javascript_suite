@@ -34,27 +34,19 @@ const SDL = require('../../SDL.min.js');
 const AppHelper = require('../../AppHelper.js');
 
 // this acts as the producer app
-module.exports = class Producer {
+module.exports = class Consumer {
     constructor (catalogRpc) {
         this._catalogRpc = catalogRpc;
         this._app = null;
         this.sdlManager = null;
-        this._serviceId = null;
+        this.serviceId = null;
+        this.appId = 'node-consumer';
     }
 
     async start () {
-        const appId = 'node-testing';
-
-        const fileName = 'test_icon_1';
-        const file = new SDL.manager.file.filetypes.SdlFile()
-            .setName(fileName)
-            .setFilePath('./tests/app-services-navigation/test_icon_1.png')
-            .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG)
-            .setPersistent(true);
-
         const appConfig = new SDL.manager.AppConfig()
-            .setAppId(appId)
-            .setAppName(appId)
+            .setAppId(this.appId)
+            .setAppName(this.appId)
             .setIsMediaApp(false)
             .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
             .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
@@ -62,8 +54,7 @@ module.exports = class Producer {
                 SDL.rpc.enums.AppHMIType.MEDIA,
                 SDL.rpc.enums.AppHMIType.REMOTE_CONTROL,
             ])
-            .setTransportConfig(new SDL.transport.TcpClientConfig(process.env.HOST, process.env.PORT))
-            .setAppIcon(file);
+            .setTransportConfig(new SDL.transport.TcpClientConfig(process.env.HOST, process.env.PORT));
 
         this._app = new AppHelper(this._catalogRpc)
             .setAppConfig(appConfig);
@@ -72,43 +63,52 @@ module.exports = class Producer {
         this.sdlManager = this._app.getManager();
     }
 
-    async setupAppService () {
-        const pasr = new SDL.rpc.messages.PublishAppService()
-            .setAppServiceManifest(new SDL.rpc.structs.AppServiceManifest({
-                serviceName: 'node-tester-navigation',
-                serviceType: SDL.rpc.enums.AppServiceType.NAVIGATION,
-                serviceIcon: {
-                    value: 'test_icon_1',
-                    imageType: SDL.rpc.enums.ImageType.DYNAMIC,
-                    isTemplate: false,
-                },
-                allowAppConsumers: true,
-                navigationServiceManifest: {},
-                handledRPCs: [
-                    SDL.rpc.enums.FunctionID.SendLocation, // this app can intercept SendLocation
-                ]
-            }));
+    async getAppServiceDataPromise () {
+        const gap = new SDL.rpc.messages.GetAppServiceData()
+            .setServiceType(SDL.rpc.enums.AppServiceType.WEATHER)
+            .setSubscribe(true); // future updates to app services will now be sent
 
-        const pasrResponse = await this.sdlManager.sendRpc(pasr);
-        this._serviceId = pasrResponse.getAppServiceRecord()
-            .getServiceID();
-        // app published!
-
-        // inform the user that a new app should be activated now
-        const show = new SDL.rpc.messages.Show()
-            .setMainField1('An additional consumer app has been started')
-            .setMainField2('Check the app list and activate the consumer app');
-
-        await this.sdlManager.sendRpc(show);
+        return this.sdlManager.sendRpc(gap); // don't wait for the response!
     }
 
-    sendLocationResponse (request) {
-        const slResponse = new SDL.rpc.messages.SendLocationResponse()
-            .setSuccess(true)
-            .setResultCode(SDL.rpc.enums.Result.SUCCESS)
-            .setCorrelationId(request.getCorrelationId());
+    async sendPerformInteractionPromise (serviceId) {
+        const pasi = new SDL.rpc.messages.PerformAppServiceInteraction()
+            .setServiceID(serviceId)
+            .setServiceUri('hello')
+            .setOriginApp(this.appId)
+            .setRequestServiceActive(true);
 
-        this.sdlManager.sendRpc(slResponse); // nothing to wait for
+        return this.sdlManager.sendRpc(pasi);
+    }
+
+    async getAndShowImage (image, serviceId) {
+        const getFile = new SDL.rpc.messages.GetFile()
+            .setFileName(image.getValue())
+            .setAppServiceId(serviceId);
+
+        await this.sdlManager.sendRpc(getFile);
+
+        // just show that getting an image that was uploaded from a producer app is possible
+        // don't utilize the blob returned from the GetFile and have the consumer upload its own instead
+
+        const fileManager = this.sdlManager.getFileManager();
+
+        const weatherFile = new SDL.manager.file.filetypes.SdlFile()
+            .setName(image.getValue())
+            .setFilePath('./tests/app-services-weather/weather-icon.png')
+            .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG);
+
+        const putFile = await fileManager.createPutFile(weatherFile);
+        await this.sdlManager.sendRpc(putFile);
+
+        const show = new SDL.rpc.messages.Show()
+            .setMainField1('An image of the sun from the weather app service should be shown!')
+            .setGraphic(new SDL.rpc.structs.Image({
+                value: image.getValue(),
+                imageType: SDL.rpc.enums.ImageType.DYNAMIC,
+            }));
+
+        await this.sdlManager.sendRpc(show);
     }
 
     async stop () {
