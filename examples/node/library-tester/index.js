@@ -78,8 +78,8 @@ async function start () {
     console.log('\nFinal grade is measured by:');
     console.log('\tTop level coverage of enums');
     console.log('\tTop level coverage of structs');
-    console.log('\tProperty coverage of requests');
-    console.log('\tProperty coverage of notifications');
+    console.log('\tTop level and property coverage of requests');
+    console.log('\tTop level and property coverage of notifications');
 
     let covered = 0;
     let total = 0;
@@ -87,10 +87,10 @@ async function start () {
     total += overviewStats.enums.topLevelTotal;
     covered += overviewStats.structs.topLevelCovered;
     total += overviewStats.structs.topLevelTotal;
-    covered += overviewStats.functions.request.allPropsCovered;
-    total += overviewStats.functions.request.allPropsTotal;
-    covered += overviewStats.functions.notification.allPropsCovered;
-    total += overviewStats.functions.notification.allPropsTotal;
+    covered += overviewStats.functions.request.allPropsCovered + overviewStats.functions.request.topLevelCovered;
+    total += overviewStats.functions.request.allPropsTotal + overviewStats.functions.request.topLevelTotal;
+    covered += overviewStats.functions.notification.allPropsCovered + overviewStats.functions.notification.topLevelCovered;
+    total += overviewStats.functions.notification.allPropsTotal + overviewStats.functions.notification.topLevelTotal;
 
     const grade = Math.floor(covered * 100 / total);
     console.log(`\nFinal grade: ${covered}/${total}, or ${grade}%`);
@@ -114,16 +114,17 @@ function analyzeCoverage (coverage, section, functionType = null) {
 
     // search for true values in all nested properties
     for (const name in baseSearchObj) {
-        let atLeastOnePropCovered = false;
         for (const prop in baseSearchObj[name]) {
+            if (prop === '_isUsed') {
+                continue; // ignore the custom property
+            }
             allPropsTotal++;
             if (baseSearchObj[name][prop]) {
-                atLeastOnePropCovered = true;
                 allPropsCovered++;
             }
         }
         topLevelTotal++;
-        if (atLeastOnePropCovered) {
+        if (baseSearchObj[name]._isUsed) {
             topLevelCovered++;
         } else {
             missingCoverage.push(name);
@@ -164,22 +165,26 @@ function createCoverageState () {
     newFunctions.notification = {};
 
     for (const name in specCopy.functions) {
+        if (specCopy.functions[name].request !== undefined) {
+            newFunctions.request[name] = {};
+            newFunctions.request[name]._isUsed = false;
+        }
+        if (specCopy.functions[name].response !== undefined) {
+            newFunctions.response[name] = {};
+            newFunctions.response[name]._isUsed = false;
+        }
+        if (specCopy.functions[name].notification !== undefined) {
+            newFunctions.notification[name] = {};
+            newFunctions.notification[name]._isUsed = false;
+        }
+
         for (const prop in specCopy.functions[name].request) {
-            if (!newFunctions.request[name]) {
-                newFunctions.request[name] = {};
-            }
             newFunctions.request[name][prop] = false;
         }
         for (const prop in specCopy.functions[name].response) {
-            if (!newFunctions.response[name]) {
-                newFunctions.response[name] = {};
-            }
             newFunctions.response[name][prop] = false;
         }
         for (const prop in specCopy.functions[name].notification) {
-            if (!newFunctions.notification[name]) {
-                newFunctions.notification[name] = {};
-            }
             newFunctions.notification[name][prop] = false;
         }
     }
@@ -208,6 +213,8 @@ function catalogRpc (coverage) {
 
         const rpcInSpec = spec.functions[rpc.getFunctionName()][rpcTypeName];
         const rpcInCoverage = coverage.functions[rpcTypeName][rpc.getFunctionName()];
+
+        rpcInCoverage._isUsed = true;
 
         // add coverage to the RPC message
         for (let prop in parameters) {
