@@ -1,0 +1,27 @@
+{
+  "name": "hello-sdl-node",
+  "version": "0.1.0",
+  "description": "A barebones example of an SDL-enabled Node.js app",
+  "main": "index.js",
+  "dependencies": {
+    "esm": "^3.2.25",
+    "ws": "^7.2.0"
+  },
+  "devDependencies": {
+    "dotenv": "^7.0.0",
+    "mkdirp": "^0.5.1",
+    "needle": "^2.3.1",
+    "websocket": "^1.0.28",
+    "ws": "^6.2.1",
+    "xml2js": "^0.4.19"
+  },
+  "scripts": {
+    "start": "node xml-spec-generator.js && node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Livio",
+  "contributors": [
+    "Nick Schwab <nick.schwab@livio.io>"
+  ],
+  "license": "BSD-3-Clause"
+}

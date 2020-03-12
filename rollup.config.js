@@ -70,6 +70,15 @@ export default [{ // Vanilla JS source
                 ws: 'ws',
             },
         },
+        {
+            file: 'examples/node/library-tester/SDL.min.js',
+            format: 'umd',
+            sourcemap: 'inline',
+            name: 'SDL',
+            globals: {
+                ws: 'ws',
+            },
+        },
     ],
     plugins: [
         globals(),
