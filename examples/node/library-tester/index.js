@@ -79,7 +79,6 @@ async function start () {
     console.log('\tTop level coverage of enums');
     console.log('\tTop level coverage of structs');
     console.log('\tTop level and property coverage of requests');
-    console.log('\tTop level and property coverage of notifications');
 
     let covered = 0;
     let total = 0;
@@ -89,8 +88,6 @@ async function start () {
     total += overviewStats.structs.topLevelTotal;
     covered += overviewStats.functions.request.allPropsCovered + overviewStats.functions.request.topLevelCovered;
     total += overviewStats.functions.request.allPropsTotal + overviewStats.functions.request.topLevelTotal;
-    covered += overviewStats.functions.notification.allPropsCovered + overviewStats.functions.notification.topLevelCovered;
-    total += overviewStats.functions.notification.allPropsTotal + overviewStats.functions.notification.topLevelTotal;
 
     const grade = Math.floor(covered * 100 / total);
     console.log(`\nFinal grade: ${covered}/${total}, or ${grade}%`);
@@ -280,7 +277,8 @@ async function runTests (coverage) {
         }
 
         const testModule = require(`${__dirname}/tests/${folder.name}`);
-        const result = await testModule(catalogRpc(coverage));
+        const result = await testModule(catalogRpc(coverage))
+            .catch(err => console.error(err));
     }
 }
 
