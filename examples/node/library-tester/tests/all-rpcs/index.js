@@ -47,18 +47,18 @@ module.exports = async function (catalogRpc) {
             SDL.rpc.enums.AppHMIType.REMOTE_CONTROL,
         ])
         .setTransportConfig(new SDL.transport.TcpClientConfig(process.env.HOST, process.env.PORT));
-        
+
     const app = new AppHelper(catalogRpc)
         .setAppConfig(appConfig);
 
     await app.start(); // after this point, we are in HMI FULL and managers are ready
     const sdlManager = app.getManager();
 
-    console.log("Sending a bunch of requests just to see if a response is returned. Ignore any errors related to invalid RPCs that follow.")
+    console.log('Sending a bunch of requests just to see if a response is returned. Ignore any errors related to invalid RPCs that follow.');
 
     // REQUEST TESTS
-    
-    for (let rpc in SDL.rpc.messages) {
+
+    for (const rpc in SDL.rpc.messages) {
         const rpcInstance = new SDL.rpc.messages[rpc]();
         // skip notification and response RPCs
         if (rpcInstance.getRPCType() === SDL.rpc.enums.RpcType.RESPONSE
@@ -67,8 +67,8 @@ module.exports = async function (catalogRpc) {
         }
 
         const FunctionID = SDL.rpc.enums.FunctionID;
-       
-        if (rpcInstance.getFunctionName() === FunctionID.keyForValue(FunctionID.RegisterAppInterface) || 
+
+        if (rpcInstance.getFunctionName() === FunctionID.keyForValue(FunctionID.RegisterAppInterface) ||
             rpcInstance.getFunctionName() === FunctionID.keyForValue(FunctionID.UnregisterAppInterface) ||
             rpcInstance.getFunctionName() === FunctionID.keyForValue(FunctionID.CloseApplication)) {
             continue;
@@ -77,7 +77,7 @@ module.exports = async function (catalogRpc) {
         const response = await sdlManager.sendRpc(rpcInstance)
             .catch(err => err);
 
-        if ( !(response instanceof SDL.rpc.RpcResponse)) {
+        if (!(response instanceof SDL.rpc.RpcResponse)) {
             console.error(response);
             throw new Error(`${rpc} response not correct!`);
         }
@@ -85,7 +85,7 @@ module.exports = async function (catalogRpc) {
 
     // invoke the onPacketReceived method in the transport layer to simulate receiving notifications and request packets
     // NOTIFICATION AND REQUEST TESTS
-    for (let rpc in SDL.rpc.messages) {
+    for (const rpc in SDL.rpc.messages) {
         const rpcInstance = new SDL.rpc.messages[rpc]();
         // skip response RPCs
         if (rpcInstance.getRPCType() === SDL.rpc.enums.RpcType.RESPONSE) {
@@ -106,16 +106,18 @@ module.exports = async function (catalogRpc) {
 
         // listen for the notification or request
         const listenPromise = rpcListenPromise(sdlManager, SDL.rpc.enums.FunctionID[rpc]);
-        // "send" the packet 
+        // "send" the packet
         sdlManager._lifecycleManager._sdlSession._sdlProtocol._transportManager.onPacketReceived(sdlPacket);
         const rpcReceived = await listenPromise;
 
-        if ( !(rpcReceived instanceof SDL.rpc.RpcNotification) && !(rpcReceived instanceof SDL.rpc.RpcRequest)) {
+        if (!(rpcReceived instanceof SDL.rpc.RpcNotification) && !(rpcReceived instanceof SDL.rpc.RpcRequest)) {
             console.error(rpcReceived);
             throw new Error(`${rpc} rpc received not correct!`);
         }
     }
-    
+
+    console.log('Finished sending the rpcs');
+
     // send CloseApplication last
     await sdlManager.sendRpc(new SDL.rpc.messages.CloseApplication());
 
@@ -129,7 +131,7 @@ function rpcListenPromise (sdlManager, functionId) {
         const listener = (message) => {
             sdlManager.removeRpcListener(functionId, listener);
             resolve(message);
-        }
+        };
         sdlManager.addRpcListener(functionId, listener);
     });
 }
