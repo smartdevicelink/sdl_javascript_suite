@@ -38,7 +38,7 @@ module.exports = async function (catalogRpc) {
 
     const appConfig = new SDL.manager.AppConfig()
         .setAppId(appId)
-        .setAppName(appId)
+        .setAppName("close app (click on me)")
         .setIsMediaApp(false)
         .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
         .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
@@ -55,23 +55,26 @@ module.exports = async function (catalogRpc) {
     const sdlManager = app.getManager();
 
     // app logic start
-    const hmiStatus = listenForHmiNone(sdlManager);
+    const hmiStatus = listenForHmiStatus(sdlManager, SDL.rpc.enums.HMILevel.HMI_NONE);
 
-    // send CloseApplication last
+    // send CloseApplication
     await sdlManager.sendRpc(new SDL.rpc.messages.CloseApplication());
 
     // the application should now be in HMI NONE state
     await hmiStatus;
+
+    // wait for receiving HMI full status
+    await listenForHmiStatus(sdlManager, SDL.rpc.enums.HMILevel.HMI_FULL);
 
     // tear down the app
     await sdlManager.sendRpc(new SDL.rpc.messages.UnregisterAppInterface());
     sdlManager.dispose();
 };
 
-function listenForHmiNone (sdlManager) {
+function listenForHmiStatus (sdlManager, status) {
     return new Promise((resolve, reject) => {
         const listener = (message) => {
-            if (message.getHmiLevel() === SDL.rpc.enums.HMILevel.HMI_NONE) {
+            if (message.getHmiLevel() === status) {
                 sdlManager.removeRpcListener(SDL.rpc.enums.FunctionID.OnHMIStatus, listener);
                 resolve(message);
             }
