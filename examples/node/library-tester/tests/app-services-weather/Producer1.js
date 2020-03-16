@@ -43,7 +43,7 @@ module.exports = class Producer1 {
     }
 
     async start () {
-        const appId = 'node-testing';
+        const appId = 'weather-service-prod-1';
 
         const fileName = 'test_icon_1';
         const file = new SDL.manager.file.filetypes.SdlFile()

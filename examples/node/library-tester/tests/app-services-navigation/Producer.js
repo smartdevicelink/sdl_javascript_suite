@@ -43,7 +43,7 @@ module.exports = class Producer {
     }
 
     async start () {
-        const appId = 'node-testing';
+        const appId = 'nav-service-prod';
 
         const fileName = 'test_icon_1';
         const file = new SDL.manager.file.filetypes.SdlFile()

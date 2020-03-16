@@ -33,52 +33,52 @@
 const SDL = require('../../SDL.min.js');
 const AppHelper = require('../../AppHelper.js');
 
-// this acts as the producer app
-module.exports = class Consumer {
-    constructor (catalogRpc) {
-        this._catalogRpc = catalogRpc;
-        this._app = null;
-        this.sdlManager = null;
-        this.serviceId = null;
-        this.appId = 'nav-service-cons';
-    }
+module.exports = async function (catalogRpc) {
+    const appId = 'close-app';
 
-    async start () {
-        const appConfig = new SDL.manager.AppConfig()
-            .setAppId(this.appId)
-            .setAppName(this.appId)
-            .setIsMediaApp(false)
-            .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
-            .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
-            .setAppTypes([
-                SDL.rpc.enums.AppHMIType.MEDIA,
-                SDL.rpc.enums.AppHMIType.REMOTE_CONTROL,
-            ])
-            .setTransportConfig(new SDL.transport.TcpClientConfig(process.env.HOST, process.env.PORT));
+    const appConfig = new SDL.manager.AppConfig()
+        .setAppId(appId)
+        .setAppName(appId)
+        .setIsMediaApp(false)
+        .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
+        .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
+        .setAppTypes([
+            SDL.rpc.enums.AppHMIType.MEDIA,
+            SDL.rpc.enums.AppHMIType.REMOTE_CONTROL,
+        ])
+        .setTransportConfig(new SDL.transport.TcpClientConfig(process.env.HOST, process.env.PORT));
+        
+    const app = new AppHelper(catalogRpc)
+        .setAppConfig(appConfig);
 
-        this._app = new AppHelper(this._catalogRpc)
-            .setAppConfig(appConfig);
+    await app.start(); // after this point, we are in HMI FULL and managers are ready
+    const sdlManager = app.getManager();
 
-        await this._app.start(); // after this point, we are in HMI FULL and managers are ready
-        this.sdlManager = this._app.getManager();
-    }
+    // app logic start
+    const hmiStatus = listenForHmiNone(sdlManager);
 
-    async sendLocationPromise () {
-        const location = new SDL.rpc.messages.SendLocation()
-            .setLongitudeDegrees(80)
-            .setLatitudeDegrees(80)
-            .setLocationName('Livio')
+    // send CloseApplication last
+    await sdlManager.sendRpc(new SDL.rpc.messages.CloseApplication());
 
-        return this.sdlManager.sendRpc(location);
-    }
+    // the application should now be in HMI NONE state
+    await hmiStatus;
 
-    async stop () {
-        // tear down the app
-        await this.sdlManager.sendRpc(new SDL.rpc.messages.UnregisterAppInterface());
-        this.sdlManager.dispose();
-    }
-
+    // tear down the app
+    await sdlManager.sendRpc(new SDL.rpc.messages.UnregisterAppInterface());
+    sdlManager.dispose();
 };
+
+function listenForHmiNone (sdlManager) {
+    return new Promise((resolve, reject) => {
+        const listener = (message) => {
+            if (message.getHmiLevel() === SDL.rpc.enums.HMILevel.HMI_NONE) {
+                sdlManager.removeRpcListener(SDL.rpc.enums.FunctionID.OnHMIStatus, listener);
+                resolve(message);
+            }
+        }
+        sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.OnHMIStatus, listener);
+    });
+}
 
 function sleep (timeout = 1000) {
     return new Promise((resolve) => {

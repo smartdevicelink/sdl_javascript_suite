@@ -34,7 +34,7 @@ const SDL = require('../../SDL.min.js');
 const AppHelper = require('../../AppHelper.js');
 
 module.exports = async function (catalogRpc) {
-    const appId = 'node-testing';
+    const appId = 'example-app-2';
 
     const fileName = `${appId}_icon.gif`;
     const file = new SDL.manager.file.filetypes.SdlFile()

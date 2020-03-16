@@ -34,7 +34,7 @@ const SDL = require('../../SDL.min.js');
 const AppHelper = require('../../AppHelper.js');
 
 module.exports = async function (catalogRpc) {
-    const appId = 'node-testing';
+    const appId = 'all-rpcs';
 
     const appConfig = new SDL.manager.AppConfig()
         .setAppId(appId)
@@ -48,7 +48,7 @@ module.exports = async function (catalogRpc) {
         ])
         .setTransportConfig(new SDL.transport.TcpClientConfig(process.env.HOST, process.env.PORT));
 
-    const app = new AppHelper(catalogRpc)
+    const app = new AppHelper() // since these are going to be invalid rpcs, do not count any of the messages sent towards coverage
         .setAppConfig(appConfig);
 
     await app.start(); // after this point, we are in HMI FULL and managers are ready

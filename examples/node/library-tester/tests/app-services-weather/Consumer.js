@@ -40,7 +40,7 @@ module.exports = class Consumer {
         this._app = null;
         this.sdlManager = null;
         this.serviceId = null;
-        this.appId = 'node-consumer';
+        this.appId = 'weather-service-cons';
     }
 
     async start () {

@@ -111,17 +111,21 @@ function analyzeCoverage (coverage, section, functionType = null) {
 
     // search for true values in all nested properties
     for (const name in baseSearchObj) {
+        let atLeastOnePropCovered = false;
         for (const prop in baseSearchObj[name]) {
             if (prop === '_isUsed') {
                 continue; // ignore the custom property
             }
             allPropsTotal++;
             if (baseSearchObj[name][prop]) {
+                atLeastOnePropCovered = true;
                 allPropsCovered++;
             }
         }
         topLevelTotal++;
-        if (baseSearchObj[name]._isUsed) {
+        if (baseSearchObj[name]._isUsed) { // for functions
+            topLevelCovered++;
+        } else if (atLeastOnePropCovered) { // for enums and structs
             topLevelCovered++;
         } else {
             missingCoverage.push(name);
@@ -214,7 +218,7 @@ function catalogRpc (coverage) {
         rpcInCoverage._isUsed = true;
 
         // add coverage to the RPC message
-        for (let prop in parameters) {
+        for (const prop in parameters) {
             rpcInCoverage[prop] = true;
         }
 
@@ -226,16 +230,16 @@ function catalogRpc (coverage) {
 function analyzeStruct (coverage, parameters, specScope, structName = null) {
     // add coverage to the struct
     if (structName !== null) {
-        for (let prop in parameters) {
+        for (const prop in parameters) {
             coverage.structs[structName][prop] = true;
         }
     }
 
     // for every property found, find its type using spec.json and add it to the coverage JSON
-    for (let prop in parameters) {
-        let value = parameters[prop]; 
+    for (const prop in parameters) {
+        let value = parameters[prop];
         const propType = specScope[prop].type;
-        const isArray = specScope[prop].array === "true";
+        const isArray = specScope[prop].array === 'true';
 
         if (propType !== 'String' && propType !== 'Number' && propType !== 'Boolean') {
             // make value into an array to simplify the logic, if it isn't one already
@@ -243,7 +247,7 @@ function analyzeStruct (coverage, parameters, specScope, structName = null) {
                 value = [value];
             }
             // loop through the elements and mark their properties or values as covered
-            for (let element of value) {
+            for (const element of value) {
                 // check enums and structs
                 if (coverage.enums[propType]) {
                     coverage.enums[propType][element] = true;

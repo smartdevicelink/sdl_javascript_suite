@@ -34,7 +34,7 @@ const SDL = require('../../SDL.min.js');
 const AppHelper = require('../../AppHelper.js');
 
 module.exports = async function (catalogRpc) {
-    const appId = 'node-testing';
+    const appId = 'remote-control';
 
     const appConfig = new SDL.manager.AppConfig()
         .setAppId(appId)
