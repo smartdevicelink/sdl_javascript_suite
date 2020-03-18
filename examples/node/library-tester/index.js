@@ -280,6 +280,10 @@ async function runTests (coverage) {
             continue; // ignore regular files
         }
 
+        if (process.env.TEST !== undefined && process.env.TEST !== folder.name) {
+            continue; // if TEST is defined, make it so that only that test runs
+        }
+
         const testModule = require(`${__dirname}/tests/${folder.name}`);
         const result = await testModule(catalogRpc(coverage))
             .catch(err => console.error(err));

@@ -34,11 +34,11 @@ const SDL = require('../../SDL.min.js');
 const AppHelper = require('../../AppHelper.js');
 
 module.exports = async function (catalogRpc) {
-    const appId = 'close-app';
+    const appId = 'widgets';
 
     const appConfig = new SDL.manager.AppConfig()
         .setAppId(appId)
-        .setAppName("close app (click twice)")
+        .setAppName(appId)
         .setIsMediaApp(false)
         .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
         .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
@@ -47,7 +47,7 @@ module.exports = async function (catalogRpc) {
             SDL.rpc.enums.AppHMIType.REMOTE_CONTROL,
         ])
         .setTransportConfig(new SDL.transport.TcpClientConfig(process.env.HOST, process.env.PORT));
-        
+
     const app = new AppHelper(catalogRpc)
         .setAppConfig(appConfig);
 
@@ -55,30 +55,76 @@ module.exports = async function (catalogRpc) {
     const sdlManager = app.getManager();
 
     // app logic start
-    const hmiStatus = listenForHmiStatus(sdlManager, SDL.rpc.enums.HMILevel.HMI_NONE);
 
-    // send CloseApplication
-    await sdlManager.sendRpc(new SDL.rpc.messages.CloseApplication());
+    // send a CreateWindow as a way to see if the HMI supports widgets
+    const createWindowResponse = await sdlManager.sendRpc(new SDL.rpc.messages.CreateWindow()
+        .setWindowID(1)
+        .setWindowName('Widget 1')
+        .setType(SDL.rpc.enums.WindowType.WIDGET))
+        .catch(err => err); // catch disallowed errors
 
-    // the application should now be in HMI NONE state
-    await hmiStatus;
+    if (createWindowResponse.getResultCode() === SDL.rpc.enums.Result.DISALLOWED) {
+        console.warn('The HMI does not support widgets. Skipping this test.');
+        // tear down the app
+        await sdlManager.sendRpc(new SDL.rpc.messages.UnregisterAppInterface());
+        return sdlManager.dispose();
+    }
 
-    // wait for receiving HMI full status
-    await listenForHmiStatus(sdlManager, SDL.rpc.enums.HMILevel.HMI_FULL);
+    // success! send a show to the main and widget window
+
+    sdlManager.sendRpc(new SDL.rpc.messages.Show()
+        .setMainField1('Make Widget 1 visible!'));
+
+    await listenForHmiStatus(sdlManager, SDL.rpc.enums.HMILevel.HMI_FULL, 1);
+
+    await sdlManager.sendRpc(new SDL.rpc.messages.Show()
+        .setMainField1('This text should be copied')
+        .setMainField2('to the second widget!')
+        .setWindowID(1));
+
+    // make another widget duplicating the first widget
+    await sdlManager.sendRpc(new SDL.rpc.messages.CreateWindow()
+        .setWindowID(2)
+        .setWindowName('Widget 2')
+        .setType(SDL.rpc.enums.WindowType.WIDGET)
+        .setDuplicateUpdatesFromWindowID(1));
+
+    sdlManager.sendRpc(new SDL.rpc.messages.Show()
+        .setMainField1('Now make Widget 2 visible!'));
+
+    await listenForHmiStatus(sdlManager, SDL.rpc.enums.HMILevel.HMI_FULL, 2);
+
+    await sleep(2000);
+
+    // delete the duplicated window
+    await sdlManager.sendRpc(new SDL.rpc.messages.DeleteWindow()
+        .setWindowID(2));
+
+    await sdlManager.sendRpc(new SDL.rpc.messages.Show()
+        .setMainField1('Now only one widget')
+        .setMainField2('should be visible!'));
+
+    await sdlManager.sendRpc(new SDL.rpc.messages.Show()
+        .setMainField1('Remove me to complete')
+        .setMainField2('the test!')
+        .setWindowID(1));
+
+    // listen for a change in the widget to HMI_NONE, which is done by removing the widget from view
+    const widgetStatusPromise = await listenForHmiStatus(sdlManager, SDL.rpc.enums.HMILevel.HMI_NONE, 1);
 
     // tear down the app
     await sdlManager.sendRpc(new SDL.rpc.messages.UnregisterAppInterface());
     sdlManager.dispose();
 };
 
-function listenForHmiStatus (sdlManager, status) {
+function listenForHmiStatus (sdlManager, status, windowId) {
     return new Promise((resolve, reject) => {
         const listener = (message) => {
-            if (message.getHmiLevel() === status) {
+            if (message.getHmiLevel() === status && message.getWindowID() === windowId) {
                 sdlManager.removeRpcListener(SDL.rpc.enums.FunctionID.OnHMIStatus, listener);
                 resolve(message);
             }
-        }
+        };
         sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.OnHMIStatus, listener);
     });
 }

@@ -50,7 +50,8 @@ module.exports = async function (catalogRpc) {
     await producer1.setupAppService(true);
     await producer2.setupAppService(true);
 
-    let appServiceCapabilities = await capabilityListenPromise(consumer.sdlManager, SDL.rpc.enums.SystemCapabilityType.APP_SERVICES);
+    let appServiceCapabilities = await consumer.sdlManager.getSystemCapabilityManager().queryCapability(SDL.rpc.enums.SystemCapabilityType.APP_SERVICES);
+
     // locate the weather app services from the capability response and use the service ids to activate one of them
     const foundCapability = appServiceCapabilities.getAppServices().find((capability) => {
         return 'weather-service-1' === capability.getUpdatedAppServiceRecord()
@@ -85,28 +86,6 @@ module.exports = async function (catalogRpc) {
     await producer2.stop();
     await consumer.stop();
 };
-
-function capabilityListenPromise (sdlManager, systemCapabilityType) {
-    return new Promise((resolve, reject) => {
-        const listener = (message) => {
-            sdlManager.getSystemCapabilityManager().removeOnSystemCapabilityListener(systemCapabilityType, listener);
-            resolve(message);
-        }
-        sdlManager.getSystemCapabilityManager().addOnSystemCapabilityListener(systemCapabilityType, listener);
-    });
-}
-
-function rpcListenPromise (sdlManager, functionId, type) {
-    return new Promise((resolve, reject) => {
-        const listener = (message) => {
-            if (message.getRPCType() === type) {
-                sdlManager.removeRpcListener(functionId, listener);
-                resolve(message);
-            }
-        }
-        sdlManager.addRpcListener(functionId, listener);
-    });
-}
 
 function sleep (timeout = 1000) {
     return new Promise((resolve) => {
