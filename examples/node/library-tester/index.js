@@ -64,21 +64,24 @@ async function start () {
         },
     };
 
-    console.log('\nEnum coverage:');
-    console.log(overviewStats.enums);
-    console.log('\nStruct coverage:');
-    console.log(overviewStats.structs);
-    console.log('\nFunction request coverage:');
-    console.log(overviewStats.functions.request);
-    console.log('\nFunction response coverage:');
-    console.log(overviewStats.functions.response);
-    console.log('\nFunction notification coverage:');
-    console.log(overviewStats.functions.notification);
+    if (process.env.HIDE_COVERAGE !== 'true') {
+        console.log('\nEnum coverage:');
+        console.log(overviewStats.enums);
+        console.log('\nStruct coverage:');
+        console.log(overviewStats.structs);
+        console.log('\nFunction request coverage:');
+        console.log(overviewStats.functions.request);
+        console.log('\nFunction response coverage:');
+        console.log(overviewStats.functions.response);
+        console.log('\nFunction notification coverage:');
+        console.log(overviewStats.functions.notification);
 
-    console.log('\nFinal grade is measured by:');
-    console.log('\tTop level coverage of enums');
-    console.log('\tTop level coverage of structs');
-    console.log('\tTop level and property coverage of requests');
+        console.log('\nFinal grade is measured by:');
+        console.log('\tTop level coverage of enums');
+        console.log('\tTop level coverage of structs');
+        console.log('\tTop level and property coverage of requests');
+    }
+    
 
     let covered = 0;
     let total = 0;
