@@ -31,7 +31,6 @@
 */
 
 const SDL = require('../../SDL.min.js');
-const ServerHelper = require('../../ServerHelper.js');
 const Producer1 = require('./Producer1.js');
 const Producer2 = require('./Producer2.js');
 const Consumer = require('./Consumer.js');
