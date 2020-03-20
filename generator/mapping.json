@@ -1,79 +1,97 @@
 {
-  "structs": {
-    "Grid": {
-      "col": {
-        "methods": {
-          "method_title": "Column",
-          "key": "KEY_COLUMN"
-        },
-        "params": {
-          "key": "KEY_COLUMN"
+    "structs": {
+        "Grid": {
+            "col": {
+                "methods": {
+                    "method_title": "Column",
+                    "key": "KEY_COLUMN"
+                },
+                "params": {
+                    "key": "KEY_COLUMN"
+                }
+            },
+            "colspan": {
+                "methods": {
+                    "method_title": "ColumnSpan",
+                    "key": "KEY_COLUMN_SPAN"
+                },
+                "params": {
+                    "key": "KEY_COLUMN_SPAN"
+                }
+            },
+            "rowspan": {
+                "methods": {
+                    "method_title": "RowSpan",
+                    "key": "KEY_ROW_SPAN"
+                },
+                "params": {
+                    "key": "KEY_ROW_SPAN"
+                }
+            },
+            "levelspan": {
+                "methods": {
+                    "method_title": "LevelSpan",
+                    "key": "KEY_LEVEL_SPAN"
+                },
+                "params": {
+                    "key": "KEY_LEVEL_SPAN"
+                }
+            }
         }
-      },
-      "colspan": {
-        "methods": {
-          "method_title": "ColumnSpan",
-          "key": "KEY_COLUMN_SPAN"
-        },
-        "params": {
-          "key": "KEY_COLUMN_SPAN"
-        }
-      },
-      "rowspan": {
-        "methods": {
-          "method_title": "RowSpan",
-          "key": "KEY_ROW_SPAN"
-        },
-        "params": {
-          "key": "KEY_ROW_SPAN"
-        }
-      },
-      "levelspan": {
-        "methods": {
-          "method_title": "LevelSpan",
-          "key": "KEY_LEVEL_SPAN"
-        },
-        "params": {
-          "key": "KEY_LEVEL_SPAN"
-        }
-      }
-    }
-  },
-  "functions": {
-    "SetAppIconRequest": {
-      "syncFileName": {
-        "methods": {
-          "method_title": "FileName",
-          "key": "KEY_FILE_NAME"
-        },
-        "params": {
-          "key": "KEY_FILE_NAME"
-        }
-      }
     },
-    "RegisterAppInterfaceRequest": {
-      "appID": {
-        "-methods": {}
-      },
-      "params": [
-        {
-          "key": "APP_ID_MAX_LENGTH",
-          "value": 10
-        }
-      ],
-      "script": "templates/scripts/RegisterAppInterfaceRequest.js"
-    },
-    "PutFileRequest": {
-      "syncFileName": {
-        "methods": {
-          "method_title": "FileName",
-          "key": "KEY_FILE_NAME"
+    "functions": {
+        "SetAppIconRequest": {
+            "syncFileName": {
+                "methods": {
+                    "method_title": "FileName",
+                    "key": "KEY_FILE_NAME"
+                },
+                "params": {
+                    "key": "KEY_FILE_NAME"
+                }
+            }
         },
-        "params": {
-          "key": "KEY_FILE_NAME"
+        "RegisterAppInterfaceRequest": {
+            "appID": {
+                "-methods": {}
+            },
+            "params": [
+                {
+                    "key": "APP_ID_MAX_LENGTH",
+                    "value": 10
+                }
+            ],
+            "script": "templates/scripts/RegisterAppInterfaceRequest.js"
+        },
+        "PutFileRequest": {
+            "syncFileName": {
+                "methods": {
+                    "method_title": "FileName",
+                    "key": "KEY_FILE_NAME"
+                },
+                "params": {
+                    "key": "KEY_FILE_NAME"
+                }
+            },
+            "script": "templates/scripts/PutFileRequest.js"
+        },
+        "GetVehicleDataRequest": {
+            "script": "templates/scripts/GetVehicleDataRequest.js"
+        },
+        "GetVehicleDataResponse": {
+            "script": "templates/scripts/GetVehicleDataResponse.js"
+        },
+        "SubscribeVehicleDataRequest": {
+            "script": "templates/scripts/SubscribeVehicleDataRequest.js"
+        },
+        "SubscribeVehicleDataResponse": {           
+            "script": "templates/scripts/SubscribeVehicleDataResponse.js"
+        },
+        "UnsubscribeVehicleDataRequest": {
+            "script": "templates/scripts/UnsubscribeVehicleDataRequest.js"
+        },
+        "UnsubscribeVehicleDataResponse": {
+            "script": "templates/scripts/UnsubscribeVehicleDataResponse.js"
         }
-      },
-      "script": "templates/scripts/PutFileRequest.js"
     }
-  }
 }
