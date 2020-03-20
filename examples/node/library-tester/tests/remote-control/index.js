@@ -257,6 +257,124 @@ module.exports = async function (catalogRpc) {
     responseParams = getDataResponse.getModuleData().getHmiSettingsControlData().getParameters();
     rcPropCoverageTest(responseParams, 'HmiSettingsControlData');
 
+    // multiple modules test. find RCs with multiple modules and test them
+
+    // climate
+    if (remoteControlCapabilities.getClimateControlCapabilities().length > 1) {
+        for (const capability of remoteControlCapabilities.getClimateControlCapabilities()) {
+            if (!capability.getAcEnableAvailable()) { // not available, so skip this module
+                console.warn(`AC Enable not available in the ${capability.getModuleInfo().getModuleId()} module. Skipping test`);
+            }
+            const moduleData = new SDL.rpc.structs.ModuleData({
+                moduleType: SDL.rpc.enums.ModuleType.CLIMATE,
+                climateControlData: {
+                    acEnable: false
+                },
+                moduleId: capability.getModuleInfo().getModuleId(),
+            });
+
+            const climateData = new SDL.rpc.messages.SetInteriorVehicleData()
+                .setModuleData(moduleData);
+            await sdlManager.sendRpc(climateData);
+            await sleep(500); // show a brief moment of the HMI's changing module statuses
+            // now release the module from this app's control
+            await sdlManager.sendRpc(new SDL.rpc.messages.ReleaseInteriorVehicleDataModule()
+                .setModuleType(SDL.rpc.enums.ModuleType.CLIMATE)
+                .setModuleId(capability.getModuleInfo().getModuleId()));
+        }
+    } else {
+        console.warn('No multiple climate modules found');
+    }
+
+    // radio
+    if (remoteControlCapabilities.getRadioControlCapabilities().length > 1) {
+        for (const capability of remoteControlCapabilities.getRadioControlCapabilities()) {
+            if (!capability.getRadioBandAvailable()) { // not available, so skip this module
+                console.warn(`Band not available in the ${capability.getModuleInfo().getModuleId()} module. Skipping test`);
+            }
+            const moduleData = new SDL.rpc.structs.ModuleData({
+                moduleType: SDL.rpc.enums.ModuleType.RADIO,
+                radioControlData: {
+                    band: SDL.rpc.enums.RadioBand.AM
+                },
+                moduleId: capability.getModuleInfo().getModuleId(),
+            });
+
+            const radioData = new SDL.rpc.messages.SetInteriorVehicleData()
+                .setModuleData(moduleData);
+            await sdlManager.sendRpc(radioData);
+            await sleep(500); // show a brief moment of the HMI's changing module statuses
+            // now release the module from this app's control
+            await sdlManager.sendRpc(new SDL.rpc.messages.ReleaseInteriorVehicleDataModule()
+                .setModuleType(SDL.rpc.enums.ModuleType.RADIO)
+                .setModuleId(capability.getModuleInfo().getModuleId()));
+        }
+    } else {
+        console.warn('No multiple radio modules found');
+    }
+
+    // audio
+    if (remoteControlCapabilities.getAudioControlCapabilities().length > 1) {
+        for (const capability of remoteControlCapabilities.getAudioControlCapabilities()) {
+            if (!capability.getVolumeAvailable()) { // not available, so skip this module
+                console.warn(`Volume not available in the ${capability.getModuleInfo().getModuleId()} module. Skipping test`);
+            }
+            const moduleData = new SDL.rpc.structs.ModuleData({
+                moduleType: SDL.rpc.enums.ModuleType.AUDIO,
+                audioControlData: {
+                    volume: 98,
+                },
+                moduleId: capability.getModuleInfo().getModuleId(),
+            });
+
+            const audioData = new SDL.rpc.messages.SetInteriorVehicleData()
+                .setModuleData(moduleData);
+            await sdlManager.sendRpc(audioData);
+            await sleep(500); // show a brief moment of the HMI's changing module statuses
+            // now release the module from this app's control
+            await sdlManager.sendRpc(new SDL.rpc.messages.ReleaseInteriorVehicleDataModule()
+                .setModuleType(SDL.rpc.enums.ModuleType.AUDIO)
+                .setModuleId(capability.getModuleInfo().getModuleId()));
+        }
+    } else {
+        console.warn('No multiple audio modules found');
+    }
+
+    // seat
+    if (remoteControlCapabilities.getSeatControlCapabilities().length > 1) {
+        for (const capability of remoteControlCapabilities.getSeatControlCapabilities()) {
+            // set the user's location in the seat
+            const globalProperties = new SDL.rpc.messages.SetGlobalProperties()
+                .setUserLocation(new SDL.rpc.structs.SeatLocation({
+                    grid: capability.getModuleInfo().getLocation()
+                }));
+            await sdlManager.sendRpc(globalProperties);
+
+            if (!capability.getCoolingEnabledAvailable()) { // not available, so skip this module
+                console.warn(`Cooling not available in the ${capability.getModuleInfo().getModuleId()} module. Skipping test`);
+            }
+            const moduleData = new SDL.rpc.structs.ModuleData({
+                moduleType: SDL.rpc.enums.ModuleType.SEAT,
+                seatControlData: {
+                    id: SDL.rpc.enums.SupportedSeat.DRIVER,
+                    coolingEnabled: false,
+                },
+                moduleId: capability.getModuleInfo().getModuleId(),
+            });
+
+            const seatData = new SDL.rpc.messages.SetInteriorVehicleData()
+                .setModuleData(moduleData);
+            await sdlManager.sendRpc(seatData);
+            await sleep(500); // show a brief moment of the HMI's changing module statuses
+            // now release the module from this app's control
+            await sdlManager.sendRpc(new SDL.rpc.messages.ReleaseInteriorVehicleDataModule()
+                .setModuleType(SDL.rpc.enums.ModuleType.SEAT)
+                .setModuleId(capability.getModuleInfo().getModuleId()));
+        }
+    } else {
+        console.warn('No multiple seat modules found');
+    }
+
     // tear down the app
     await sdlManager.sendRpc(new SDL.rpc.messages.UnregisterAppInterface());
     sdlManager.dispose();
