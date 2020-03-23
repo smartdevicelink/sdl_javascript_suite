@@ -4,7 +4,7 @@
  * Sets a value for OEM Custom VehicleData.
  * @param {String} vehicleDataName
  * @param {VehicleDataResult} vehicleDataState
- * @return {SubscribeVehicleDataResponse}
+ * @return {UnsubscribeVehicleDataResponse}
  */
 setOemCustomVehicleData (vehicleDataName, vehicleDataState) {
     this.setParameter(vehicleDataName, vehicleDataState);
