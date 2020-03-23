@@ -46,10 +46,9 @@ module.exports = async function (catalogRpc) {
     console.log('This should fail immediately and not hang!')
     await app3.start()
 
-    // TODO: this test will fail. fix the problem and then uncomment this to confirm the bug is fixed
-    // const app4 = new SampleApp(catalogRpc, 'you-shouldnt-see-me', true);
-    // console.log('This should fail immediately and not hang!')
-    // await app4.start();
+    const app4 = new SampleApp(catalogRpc, 'you-shouldnt-see-me', true);
+    console.log('This should fail immediately and not hang!')
+    await app4.start();
 };
 
 function rpcListenPromise (sdlManager, functionId, type) {
