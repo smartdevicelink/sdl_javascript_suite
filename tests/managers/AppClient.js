@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019, Livio, Inc.
+* Copyright (c) 2020, Livio, Inc.
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -63,29 +63,6 @@ class AppClient {
         const managerListener = new SDL.manager.SdlManagerListener();
         managerListener
             .setOnStart((sdlManager) => {
-                this._permissionManager = this._sdlManager.getPermissionManager();
-                this._logPermissions();
-                this._permissionManager.addListener(
-                    [
-                        new SDL.manager.permission.PermissionElement(
-                            SDL.rpc.enums.FunctionID.SubscribeVehicleData,
-                            [
-                                'accPedalPosition',
-                                'gps',
-                                'fuelLevel',
-                                'odometer',
-                                'prndl',
-                            ]
-                        ),
-                    ],
-                    SDL.manager.permission.enums.PermissionGroupType.ANY,
-                    (allowedPermissions, permissionGroupStatus) => {
-                        console.log('SubscribeVehicleData permissions changed!');
-                        console.log('Allowed Permissions: ', allowedPermissions);
-                        console.log('Permission Group Status: ', permissionGroupStatus);
-                        this._logPermissions();
-                    }
-                );
                 this._onConnected();
             })
             .setOnError((sdlManager, info) => {
@@ -126,7 +103,6 @@ class AppClient {
 
     async _onHmiStatusListener (onHmiStatus) {
         const hmiLevel = onHmiStatus.getHmiLevel();
-        this._logPermissions();
 
         // wait for the FULL state for more functionality
         if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
@@ -162,9 +138,9 @@ class AppClient {
             await this._sleep(2000);
 
             const count = 3;
-            for (let i = 0; i < count; i++) {
+            for (let secondsLeft = 0; secondsLeft < count; secondsLeft++) {
                 const showCountdown = new SDL.rpc.messages.Show();
-                showCountdown.setMainField1(`Exiting in ${(count - i).toString()}`)
+                showCountdown.setMainField1(`Exiting in ${(count - secondsLeft).toString()}`)
                     .setMainField2('')
                     .setMainField3('');
 
@@ -184,15 +160,6 @@ class AppClient {
         return new Promise((resolve) => {
             setTimeout(resolve, timeout);
         });
-    }
-
-    _logPermissions () {
-        if (this._permissionManager) {
-            console.log(`Show RPC allowed: ${this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.Show)}`);
-            console.log(`PutFile RPC allowed: ${this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.PutFile)}`);
-            console.log(`GetVehicleData RPC allowed: ${this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.GetVehicleData)}`);
-            console.log(`SubscribeVehicleData RPC allowed: ${this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.SubscribeVehicleData)}`);
-        }
     }
 }
 

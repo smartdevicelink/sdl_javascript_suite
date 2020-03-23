@@ -1,4 +1,4 @@
-const SDL = require('./../../../lib/js/dist/SDL.min.js');
+const SDL = require('./../../../lib/node/dist/SDL.min.js');
 
 const Validator = require('../../Validator');
 
@@ -51,7 +51,6 @@ module.exports = function (appClient) {
         });
 
         it('testSetPrimaryGraphic', function (done) {
-            // FIXME: UnhandledPromiseRejectionWarning: Error: undefined must be of type Image
             screenManager.setPrimaryGraphic(testArtwork);
             Validator.assertEquals(screenManager.getPrimaryGraphic(), testArtwork);
             done();
@@ -65,7 +64,6 @@ module.exports = function (appClient) {
         });
 
         it('testSetSecondaryGraphic', function (done) {
-            // FIXME: UnhandledPromiseRejectionWarning: Error: undefined must be of type Image
             screenManager.setSecondaryGraphic(testArtwork);
             Validator.assertEquals(screenManager.getSecondaryGraphic(), testArtwork);
             done();
@@ -85,7 +83,6 @@ module.exports = function (appClient) {
         });
 
         it('testSetTextFieldTypes', function (done) {
-            // FIXME: UnhandledPromiseRejectionWarning: TypeError: Cannot read property 'name' of undefined
             screenManager.setTextField1Type(SDL.rpc.enums.MetadataType.mediaTitle);
             screenManager.setTextField2Type(SDL.rpc.enums.MetadataType.mediaAlbum);
             screenManager.setTextField3Type(SDL.rpc.enums.MetadataType.mediaArtist);
