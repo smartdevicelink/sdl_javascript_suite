@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020, Livio, Inc.
+* Copyright (c) 2019, Livio, Inc.
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -30,36 +30,9 @@
 * POSSIBILITY OF SUCH DAMAGE.
 */
 
-import { TextAndGraphicManagerBase } from './TextAndGraphicManagerBase.js';
-import { SdlArtwork } from '../file/filetypes/SdlArtwork.js';
-import { FileType } from '../../rpc/enums/FileType.js';
-
-class TextAndGraphicManager extends TextAndGraphicManagerBase {
-    /**
-     * Initializes an instance of TextAndGraphicManager.
-     * @constructor
-     * @param {LifecycleManager} lifecycleManager
-     * @param {FileManager} fileManager
-     * @param {SoftButtonManager} softButtonManager
-    */
-    constructor (lifecycleManager, fileManager, softButtonManager) {
-        super(lifecycleManager, fileManager, softButtonManager);
-    }
-
-    /**
-     * Creates or returns a blank artwork. Implements the abstract method
-     * @private
-     * @return {SdlArtwork}
-    */
-    _getBlankArtwork () {
-        if (this._blankArtwork === null) {
-            this._blankArtwork = new SdlArtwork();
-            this._blankArtwork.setType(FileType.GRAPHIC_PNG);
-            this._blankArtwork.setName('blankArtwork');
-            this._blankArtwork.setFileData(new Array(50));
-        }
-        return this._blankArtwork;
-    }
-}
-
-export { TextAndGraphicManager };
+module.exports = {
+    appId: 'hello-node',
+    appName: 'hello-node',
+    port: process.env.APP_PORT || 3005,
+    connectionLostTimeout: !isNaN(parseInt(process.env.CONNECTION_LOST_TIMEOUT)) ? parseInt(process.env.CONNECTION_LOST_TIMEOUT) : 10000,
+};

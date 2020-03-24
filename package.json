@@ -14,6 +14,7 @@
     "build": "node lib/node/teardown.js && npm run build-rpcs && node lib/js/generate.js && node lib/node/setup.js && node lib/node/generate.js && node_modules/.bin/rollup -c && node lib/node/teardown.js",
     "build-rpcs": "python3 generator/generator.py -y",
     "test": "mocha './tests/node/**/*.js'",
+    "test-managers": "mocha './tests/managers/**/*.js'",
     "lint": "node_modules/.bin/eslint \"./lib/js/**\" \"./lib/node/**\" \"./tests/**/*.js\"",
     "lint-js": "node_modules/.bin/eslint \"./lib/js/**\"",
     "lint-node": "node_modules/.bin/eslint \"./lib/node/**\"",
@@ -47,6 +48,7 @@
     "express-ws": "^4.0.0",
     "lodash.merge": "^4.6.2",
     "merge-dirs": "^0.2.1",
+    "mocha": "^7.1.1",
     "openurl": "^1.1.1",
     "rimraf": "^3.0.0",
     "rollup": "^1.27.0",
@@ -57,6 +59,7 @@
     "rollup-plugin-node-globals": "^1.4.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-uglify": "^6.0.3",
+    "sinon": "^9.0.1",
     "webpack": "3.8.1",
     "websocket": "^1.0.30"
   },
