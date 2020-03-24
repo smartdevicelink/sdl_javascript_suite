@@ -4,6 +4,7 @@ const permissionManagerTests = require('./permission/PermissionManagerTests');
 const softButtonManagerTests = require('./screen/SoftButtonManagerTests');
 const screenManagerTests = require('./screen/ScreenManagerTests');
 const lifecycleManagerTests = require('./lifecycle/LifecycleManagerTests');
+const fileManagerTests = require('./file/FileManagerTests');
 
 // connect to core and select the app on the HMI to run the tests
 describe('ManagerTests', function () {
@@ -16,6 +17,7 @@ describe('ManagerTests', function () {
             softButtonManagerTests(appClient);
             screenManagerTests(appClient);
             lifecycleManagerTests(appClient);
+            fileManagerTests(appClient);
             done();
         });
     });
