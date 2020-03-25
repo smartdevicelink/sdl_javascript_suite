@@ -52,7 +52,7 @@ module.exports = async function (catalogRpc) {
     let appServiceCapabilities = await consumer.sdlManager.getSystemCapabilityManager().queryCapability(SDL.rpc.enums.SystemCapabilityType.APP_SERVICES);
 
     // locate the weather app services from the capability response and use the service ids to activate one of them
-    const foundCapability = appServiceCapabilities.getAppServices().find((capability) => {
+    const foundCapability = appServiceCapabilities.find((capability) => {
         return 'weather-service-1' === capability.getUpdatedAppServiceRecord()
             .getServiceManifest()
             .getServiceName()
