@@ -159,23 +159,6 @@ class AppClient {
             await this._sleep(2000);
             softButtonObjects[0].transitionToNextState();
             await this._sleep(2000);
-
-            const count = 3;
-            for (let i = 0; i < count; i++) {
-                const showCountdown = new SDL.rpc.messages.Show();
-                showCountdown.setMainField1(`Exiting in ${(count - i).toString()}`)
-                    .setMainField2('')
-                    .setMainField3('');
-
-                this._sdlManager.sendRpc(showCountdown); // don't wait for a response
-
-                await this._sleep();
-            }
-
-            // tear down the app
-            await this._sdlManager.sendRpc(new SDL.rpc.messages.UnregisterAppInterface());
-
-            this._sdlManager.dispose();
         }
     }
 
