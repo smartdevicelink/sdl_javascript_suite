@@ -57,12 +57,12 @@ module.exports = async function (catalogRpc) {
 
     const permissionPromise = new Promise((resolve, reject) => {
         permissionListener = (allowedPermissions, permissionGroupStatus) => {
-            // should be disallowed now
-            const disallowedEnum = SDL.manager.permission.enums.PermissionGroupStatus.DISALLOWED;
-            if (permissionGroupStatus === disallowedEnum) {
+            // should be allowed now
+            const allowedEnum = SDL.manager.permission.enums.PermissionGroupStatus.ALLOWED;
+            if (permissionGroupStatus === allowedEnum) {
                 resolve();
             } else {
-                reject(new Error(`Expected permission change for Show to ${disallowedEnum}. Got ${permissionGroupStatus}`));
+                reject(new Error(`Expected permission change for Show to ${allowedEnum}. Got ${permissionGroupStatus}`));
             }
         }
     });
