@@ -99,6 +99,8 @@ module.exports = async function (catalogRpc) {
 
     // set up the presentation for the manager
     const screenManager = sdlManager.getScreenManager();
+    // put all the screen manager updates below into one transaction
+    screenManager.beginTransaction();
 
     screenManager.setTextField1('You should see a softbutton changing states');
     screenManager.setTextField2('A softbutton with a static icon, a primary graphic, and a template title');
@@ -132,6 +134,12 @@ module.exports = async function (catalogRpc) {
 
     // set the softbuttons now and rotate through the states of the first softbutton
     await screenManager.setSoftButtonObjects(softButtonObjects);
+    // commit the transaction!
+    const success = await screenManager.commit();
+    if (!success) {
+        console.error('The commit for text and button updates failed!');
+    }
+
     // let it run forever
     const timer = setInterval(() => {
         softButtonObjects[0].transitionToNextState();
