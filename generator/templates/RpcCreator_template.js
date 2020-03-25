@@ -27,9 +27,11 @@ import { BinaryFrameHeader } from './../protocol/BinaryFrameHeader.js';
         const functionName = FunctionID.keyForValue(functionId);
         const bulkData = binaryFrameHeader.getBulkData();
         const jsonData = binaryFrameHeader.getJsonData();
-        const params = {
-            parameters: JsonRpcMarshaller.unmarshall(jsonData),
-        };
+        const params = {};
+        // not-empty object check
+        if (Object.keys(jsonData).length !== 0) {
+            params.parameters = JsonRpcMarshaller.unmarshall(jsonData);
+        }
 
         switch (functionId) {
             {%- for item in cases %}
