@@ -129,7 +129,9 @@ function makeSoftButton (text, id, softButtonType) {
         .setSoftButtonID(id);
 
     if (softButtonType === SDL.rpc.enums.SoftButtonType.SBT_BOTH || softButtonType === SDL.rpc.enums.SoftButtonType.SBT_IMAGE) {
-        softButton.setImage(new SDL.rpc.structs.Image().setImageType(SDL.rpc.enums.ImageType.STATIC).setValue(`0x0${id}`));
+        // use the below line for static images
+        // softButton.setImage(new SDL.rpc.structs.Image().setImageType(SDL.rpc.enums.ImageType.STATIC).setValue(`0x0${id}`));
+        softButton.setImage(new SDL.rpc.structs.Image().setImageType(SDL.rpc.enums.ImageType.DYNAMIC).setValue('sdl-logo'));
     }
     if (softButtonType === SDL.rpc.enums.SoftButtonType.SBT_BOTH || softButtonType === SDL.rpc.enums.SoftButtonType.SBT_TEXT) {
         softButton.setText(text);
