@@ -32,14 +32,14 @@
 
 const SDL = require('../../../lib/node/dist/SDL.min.js');
 const CONFIG = require('./config.js');
-const filePath = './test_icon_1.png';
 
 class AppClient {
     constructor () {
         const fileName = `${CONFIG.appId}_icon`;
+        this._filePath = './test_icon_1.png';
         const file = new SDL.manager.file.filetypes.SdlFile()
             .setName(fileName)
-            .setFilePath(filePath)
+            .setFilePath(this._filePath)
             .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG)
             .setPersistent(true);
 
@@ -115,7 +115,7 @@ class AppClient {
         screenManager.setTitle('JavaScript Library');
         screenManager.setTextAlignment(SDL.rpc.enums.TextAlignment.RIGHT_ALIGNED);
         screenManager.setPrimaryGraphic(new SDL.manager.file.filetypes.SdlArtwork('sdl-logo', SDL.rpc.enums.FileType.GRAPHIC_PNG)
-            .setFilePath(filePath));
+            .setFilePath(this._filePath));
     }
 
     async _onHmiStatusListener (onHmiStatus) {
@@ -125,7 +125,7 @@ class AppClient {
         // wait for the FULL state for more functionality
         if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
             const art1 = new SDL.manager.file.filetypes.SdlArtwork('logo', SDL.rpc.enums.FileType.GRAPHIC_PNG)
-                .setFilePath(filePath);
+                .setFilePath(this._filePath);
 
             const state1 = new SDL.manager.screen.utils.SoftButtonState('ROCK', 'rock', art1);
             const state2 = new SDL.manager.screen.utils.SoftButtonState('PAPER', 'paper', art1);
