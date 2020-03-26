@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019, Livio, Inc.
+* Copyright (c) 2020, Livio, Inc.
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -30,16 +30,16 @@
 * POSSIBILITY OF SUCH DAMAGE.
 */
 
-const fs = require('fs');
 const SDL = require('../../../lib/node/dist/SDL.min.js');
 const CONFIG = require('./config.js');
 
 class AppClient {
     constructor (wsClient) {
-        const fileName = `${CONFIG.appId}_icon.gif`;
+        const fileName = `${CONFIG.appId}_icon`;
+        this._filePath = './test_icon_1.png';
         const file = new SDL.manager.file.filetypes.SdlFile()
             .setName(fileName)
-            .setFilePath('./test_icon_1.png')
+            .setFilePath(this._filePath)
             .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG)
             .setPersistent(true);
 
@@ -96,41 +96,55 @@ class AppClient {
         this._sdlManager
             .start()
             .addRpcListener(SDL.rpc.enums.FunctionID.OnHMIStatus, this._onHmiStatusListener.bind(this));
+
+        // for a cloud server app the hmi full will be received before the managers report that they're ready!
+        this._managersReady = false;
+        this._hmiFull = false;
     }
 
-    async _onConnected () {
-        // add voice commands for when the managers are ready
-        const screenManager = this._sdlManager.getScreenManager();
-        screenManager.setVoiceCommands([
-            new SDL.manager.screen.utils.VoiceCommand(['Option 1'], () => {
-                console.log('Option one selected!');
-            }),
-            new SDL.manager.screen.utils.VoiceCommand(['Option 2'], () => {
-                console.log('Option two selected!');
-            }),
-            new SDL.manager.screen.utils.VoiceCommand(['Option 3'], () => {
-                console.log('Option three selected!');
-            }),
-        ]);
-
-        // set up the presentation for the manager when its ready
-        screenManager.setTextField1('Hello SDL!');
-        screenManager.setTextField2('こんにちは');
-        screenManager.setTextField3('你好');
-        screenManager.setTitle('JavaScript Library');
-        screenManager.setTextAlignment(SDL.rpc.enums.TextAlignment.RIGHT_ALIGNED);
-        screenManager.setPrimaryGraphic(new SDL.manager.file.filetypes.SdlArtwork('sdl-logo', SDL.rpc.enums.FileType.GRAPHIC_PNG)
-            .setFilePath('./test_icon_1.png'));
+    _onConnected () {
+        this._managersReady = true;
+        this._checkReadyState();
     }
 
-    async _onHmiStatusListener (onHmiStatus) {
+    _onHmiStatusListener (onHmiStatus) {
         const hmiLevel = onHmiStatus.getHmiLevel();
         this._logPermissions();
 
         // wait for the FULL state for more functionality
         if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
+            this._hmiFull = true;
+            this._checkReadyState();
+        }
+    }
+
+    async _checkReadyState () {
+        if (this._managersReady && this._hmiFull) {
+            // add voice commands
+            const screenManager = this._sdlManager.getScreenManager();
+            screenManager.setVoiceCommands([
+                new SDL.manager.screen.utils.VoiceCommand(['Option 1'], () => {
+                    console.log('Option one selected!');
+                }),
+                new SDL.manager.screen.utils.VoiceCommand(['Option 2'], () => {
+                    console.log('Option two selected!');
+                }),
+                new SDL.manager.screen.utils.VoiceCommand(['Option 3'], () => {
+                    console.log('Option three selected!');
+                }),
+            ]);
+
+            // set up the presentation for the manager when its ready
+            screenManager.setTextField1('Hello SDL!');
+            screenManager.setTextField2('こんにちは');
+            screenManager.setTextField3('你好');
+            screenManager.setTitle('JavaScript Library');
+            screenManager.setTextAlignment(SDL.rpc.enums.TextAlignment.RIGHT_ALIGNED);
+            screenManager.setPrimaryGraphic(new SDL.manager.file.filetypes.SdlArtwork('sdl-logo', SDL.rpc.enums.FileType.GRAPHIC_PNG)
+                .setFilePath(this._filePath));
+
             const art1 = new SDL.manager.file.filetypes.SdlArtwork('logo', SDL.rpc.enums.FileType.GRAPHIC_PNG)
-                .setFilePath('./test_icon_1.png');
+                .setFilePath(this._filePath);
 
             const state1 = new SDL.manager.screen.utils.SoftButtonState('ROCK', 'rock', art1);
             const state2 = new SDL.manager.screen.utils.SoftButtonState('PAPER', 'paper', art1);
@@ -151,7 +165,6 @@ class AppClient {
             ];
 
             // set the softbuttons now and rotate through the states of the first softbutton
-            const screenManager = this._sdlManager.getScreenManager();
             await screenManager.setSoftButtonObjects(softButtonObjects);
 
             await this._sleep(2000);
@@ -159,23 +172,6 @@ class AppClient {
             await this._sleep(2000);
             softButtonObjects[0].transitionToNextState();
             await this._sleep(2000);
-
-            const count = 3;
-            for (let i = 0; i < count; i++) {
-                const showCountdown = new SDL.rpc.messages.Show();
-                showCountdown.setMainField1(`Exiting in ${(count - i).toString()}`)
-                    .setMainField2('')
-                    .setMainField3('');
-
-                this._sdlManager.sendRpc(showCountdown); // don't wait for a response
-
-                await this._sleep();
-            }
-
-            // tear down the app
-            await this._sdlManager.sendRpc(new SDL.rpc.messages.UnregisterAppInterface());
-
-            this._sdlManager.dispose();
         }
     }
 
