@@ -84,7 +84,6 @@ module.exports = async function (catalogRpc) {
 
     // assume the HMI's default module id supports all the button capabilities
     for (const index in remoteControlCapabilities.getButtonCapabilities()) {
-        break;
         const buttonCapability = remoteControlCapabilities.getButtonCapabilities()[index];
         let pressMode;
         if (buttonCapability.getShortPressAvailable()) {
