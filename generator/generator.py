@@ -6,7 +6,7 @@ import logging
 import re
 import sys
 from argparse import ArgumentParser
-from collections import namedtuple
+from collections import namedtuple, OrderedDict
 from datetime import date
 from inspect import getfile
 from itertools import groupby
@@ -31,7 +31,7 @@ try:
     from transformers.enums_producer import EnumsProducer
     from transformers.functions_producer import FunctionsProducer
     from transformers.structs_producer import StructsProducer
-except ModuleNotFoundError as message:
+except ImportError as message:
     print('%s.\nprobably you did not initialize submodule', message)
     sys.exit(1)
 
@@ -52,6 +52,16 @@ class Generator:
                                                      'path_to_response_class path_to_notification_class enums_dir_name '
                                                      'structs_dir_name functions_dir_name rpc_creator')
 
+    _version = '1.0.0'
+
+    @property
+    def get_version(self) -> str:
+        """
+        version of the entire generator
+        :return: current entire generator version
+        """
+        return self._version
+
     @property
     def env(self):
         """
@@ -70,30 +80,28 @@ class Generator:
             sys.exit(1)
         else:
             self._env = Environment(loader=FileSystemLoader(value))
-
-    @property
-    def get_version(self):
-        """
-        :return: current version of Generator
-        """
-        return InterfaceProducerCommon.version
+            self._env.globals['year'] = date.today().year
 
     def config_logging(self, verbose):
         """
-        Configure logging
-        :param verbose: boolean
+        Configuring logging for all application
+        :param verbose: if True setting logging.DEBUG else logging.ERROR
+        :return: None
         """
         handler = logging.StreamHandler()
-        handler.setFormatter(logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                                               datefmt='%m-%d %H:%M'))
+        handler.setFormatter(logging.Formatter(fmt='%(asctime)s.%(msecs)03d - %(levelname)s - %(message)s',
+                                               datefmt='%H:%M:%S'))
+        root_logger = logging.getLogger()
+
         if verbose:
             handler.setLevel(logging.DEBUG)
             self.logger.setLevel(logging.DEBUG)
+            root_logger.setLevel(logging.DEBUG)
         else:
             handler.setLevel(logging.ERROR)
             self.logger.setLevel(logging.ERROR)
+            root_logger.setLevel(logging.ERROR)
         logging.getLogger().handlers.clear()
-        root_logger = logging.getLogger()
         root_logger.addHandler(handler)
 
     def evaluate_output_directory(self, output_directory):
@@ -176,7 +184,7 @@ class Generator:
                             self.logger.warning('%s set to %s', intermediate.name, intermediate.path)
                             setattr(args, intermediate.name, intermediate.path.as_posix())
                             break
-                            
+
                         confirm = input('Confirm default path {} for {} Y/Enter = yes, N = no'
                                         .format(intermediate.path, intermediate.name))
                         if confirm.lower() == 'y' or not confirm:
@@ -193,7 +201,6 @@ class Generator:
 
         args.output_directory = self.evaluate_output_directory(args.output_directory)
 
-        self.logger.info('parsed arguments:\n%s', pformat((vars(args))))
         return args
 
     def versions_compatibility_validating(self):
@@ -221,37 +228,40 @@ class Generator:
         self.logger.info('Parser type: %s, version %s,\tGenerator version %s',
                          basename(getfile(Parser().__class__)), parser_origin, self.get_version)
 
-    def get_paths(self, file_name=ROOT.joinpath('paths.ini')):
+    def get_file_content(self, file_name: Path) -> list:
         """
-        :param file_name: path to file with Paths
-        :return: namedtuple with Paths to key elements
+
+        :param file_name:
+        :return:
         """
-        data = {}
         try:
             with file_name.open('r') as file:
-                for line in file:
-                    if line.startswith('#'):
-                        self.logger.warning('commented property %s, which will be skipped', line.strip())
-                        continue
-                    if re.match(r'^(\w+)\s?=\s?(.+)', line):
-                        if len(line.split('=')) > 2:
-                            self.logger.critical('can not evaluate value, too many separators %s', str(line))
-                            sys.exit(1)
-                        name, var = line.partition('=')[::2]
-                        if name.strip() in data:
-                            self.logger.critical('duplicate key %s', name)
-                            sys.exit(1)
-                        data[name.strip().lower()] = var.strip()
+                content = file.readlines()
+            return content
         except FileNotFoundError as message1:
-            self.logger.critical(message1)
-            sys.exit(1)
+            self.logger.error(message1)
+            return []
 
-        missed = list(set(self.paths_named._fields) - set(data.keys()))
-        if missed:
-            self.logger.critical('in %s missed fields: %s ', file, str(missed))
-            sys.exit(1)
-
-        return self.paths_named(**data)
+    def get_key_words(self, file_name=ROOT.parents[0].joinpath('lib/rpc_spec/RpcParser/RESERVED_KEYWORDS')):
+        """
+        :param file_name:
+        :return:
+        """
+        content = self.get_file_content(file_name)
+        content = tuple(map(lambda e: re.sub(r'\n', r'', e).strip().casefold(), content))
+        try:
+            start_index = content.index('# sdl reserved')
+            sdl_reserved = content[start_index + 1:len(content)]
+            start_index = content.index('# javascript suite library')
+            end_index = next(i for i, item in enumerate(content) if i > start_index and not item)
+            content = content[start_index + 1:end_index]
+            content += sdl_reserved
+            content = tuple(filter(lambda e: not re.search(r'^#+\s+.+|^$', e), content))
+            self.logger.debug('key_words: %s', ', '.join(content))
+            return content
+        except (IndexError, ValueError, StopIteration) as error:
+            self.logger.error('Error while getting key_words, %s %s', type(error).__name__, error)
+            return []
 
     def get_mappings(self, file_name=ROOT.joinpath('mapping.json')):
         """
@@ -260,13 +270,43 @@ class Generator:
         :return: dictionary with custom manual mappings
         """
 
+        content = self.get_file_content(file_name)
         try:
-            with file_name.open('r') as file:
-                intermediate = file.readlines()
-            return loads(''.join(intermediate))
-        except (FileNotFoundError, JSONDecodeError) as message1:
+            return loads(''.join(content))
+        except JSONDecodeError as message1:
             self.logger.error(message1)
             return {}
+
+    def get_paths(self, file_name=ROOT.joinpath('paths.ini')):
+        """
+        :param file_name: path to file with Paths
+        :return: namedtuple with Paths to key elements
+        """
+        content = self.get_file_content(file_name)
+        if not content:
+            self.logger.critical('%s not found', file_name)
+            sys.exit(1)
+        data = OrderedDict()
+        for line in content:
+            if line.startswith('#'):
+                self.logger.warning('commented property %s, which will be skipped', line.strip())
+                continue
+            if re.match(r'^(\w+)\s?=\s?(.+)', line):
+                if len(line.split('=')) > 2:
+                    self.logger.critical('can not evaluate value, too many separators %s', str(line))
+                    sys.exit(1)
+                name, var = line.partition('=')[::2]
+                if name.strip() in data:
+                    self.logger.critical('duplicate key %s', name)
+                    sys.exit(1)
+                data[name.strip().lower()] = var.strip()
+
+        missed = list(set(self.paths_named._fields) - set(data.keys()))
+        if missed:
+            self.logger.critical('in %s missed fields: %s ', content, str(missed))
+            sys.exit(1)
+
+        return self.paths_named(**data)
 
     def write_file(self, file_name, template, data):
         """
@@ -317,7 +357,7 @@ class Generator:
             dir_name = dir_name[1:]
 
         creator = namedtuple('creator', 'function_name class_name type')
-        data = {'name': file.stem, 'imports': [], 'cases': [], 'year': date.today().year, }
+        data = {'name': file.stem, 'imports': [], 'cases': []}
 
         grouped = [{'name': k, 'type': [x for x in v]} for k, v in groupby(functions.values(), key=lambda x: x.name)]
 
@@ -353,6 +393,7 @@ class Generator:
                 return
             if overwrite:
                 self.logger.info('Overriding %s', file.name)
+                file.unlink()
                 self.write_file(file, template, data)
             else:
                 while True:
@@ -382,7 +423,7 @@ class Generator:
         names = tuple(interface.enums.keys()) + tuple(interface.structs.keys())
 
         if pattern:
-            match = {i: {} for i in vars(interface).keys()}
+            match = {i: OrderedDict() for i in vars(interface).keys()}
             match['params'] = interface.params
             empty = True
             for key, value in vars(interface).items():
@@ -423,6 +464,7 @@ class Generator:
         """
         args = self.get_parser()
         self.config_logging(args.verbose)
+        self.logger.debug('parsed arguments:\n%s', pformat((vars(args))))
         self.env = args.templates_directory
 
         self.versions_compatibility_validating()
@@ -437,23 +479,24 @@ class Generator:
 
         filtered, names = self.filter_pattern(interface, args.regex_pattern)
 
+        key_words = self.get_key_words()
         mappings = self.get_mappings()
 
-        functions_transformer = FunctionsProducer(paths, names, mappings)
+        functions_transformer = FunctionsProducer(paths, names, mappings, key_words)
         if args.enums and filtered.enums:
             directory = args.output_directory.joinpath(self.evaluate_instance_directory(paths.enums_dir_name))
             self.process(directory, args.skip, args.overwrite, filtered.enums,
-                         EnumsProducer(paths, mappings))
+                         EnumsProducer(paths, mappings, key_words))
         if args.structs and filtered.structs:
             directory = args.output_directory.joinpath(self.evaluate_instance_directory(paths.structs_dir_name))
             self.process(directory, args.skip, args.overwrite, filtered.structs,
-                         StructsProducer(paths, names, mappings))
+                         StructsProducer(paths, names, mappings, key_words))
         if args.functions and filtered.functions:
             directory = args.output_directory.joinpath(self.evaluate_instance_directory(paths.functions_dir_name))
             self.process(directory, args.skip, args.overwrite, filtered.functions, functions_transformer)
         self.process_function_name(args.output_directory.joinpath(paths.rpc_creator), paths.functions_dir_name,
                                    args.skip, args.overwrite, interface.functions, functions_transformer,
-                                   mappings.get('functions', {}))
+                                   mappings.get('functions', OrderedDict()))
 
 
 if __name__ == '__main__':

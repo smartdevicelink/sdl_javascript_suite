@@ -5,9 +5,8 @@ Common transformation
 import logging
 import re
 import textwrap
-from abc import ABC
+from abc import ABC, abstractmethod
 from collections import namedtuple, OrderedDict
-from datetime import date
 from pathlib import Path
 
 from model.array import Array
@@ -23,26 +22,37 @@ class InterfaceProducerCommon(ABC):
     """
     Common transformation
     """
-    version = '1.0.0'
 
-    def __init__(self, container_name, enums_dir_name, structs_dir_name,
-                 names=(), mapping=OrderedDict()):
+    def __init__(self, enums_dir_name, structs_dir_name,
+                 names=(), mapping=OrderedDict(), key_words=()):
         self.logger = logging.getLogger(self.__class__.__name__)
-        self.container_name = container_name
         self.names = list(map(lambda e: self.replace_sync(e), names))
         self.enums_dir = enums_dir_name
         self.structs_dir = structs_dir_name
         self.mapping = mapping
+        self.key_words = key_words
         self.imports = namedtuple('Imports', 'what wherefrom')
         self.methods = namedtuple('Methods', 'key method_title external description param_name type')
         self.params = namedtuple('Params', 'key value')
 
     @property
-    def get_version(self):
+    @abstractmethod
+    def container_name(self):
+        pass
+
+    def replace_keywords(self, name):
         """
-        :return: current version of Generator
+        if :param name in self.key_words, :return: name += 'Param'
+        :param name: string with item name
         """
-        return self.version
+        if any(map(lambda k: re.search(r'^(get|set|key_)?{}$'.format(name.casefold()), k), self.key_words)):
+            origin = name
+            if name.isupper():
+                name += '_PARAM'
+            else:
+                name += 'Param'
+            self.logger.debug('Replacing %s with %s', origin, name)
+        return self.replace_sync(name)
 
     @staticmethod
     def replace_sync(name):
@@ -51,7 +61,8 @@ class InterfaceProducerCommon(ABC):
         :return: string with replaced 'sync' to 'Sdl'
         """
         if name:
-            return re.sub(r'^(s|S)ync(.+)$', r'\1dl\2', name)
+            name = name[:1].upper() + name[1:]
+            name = re.sub(r'^([sS])ync(.+)$', r'\1dl\2', name)
         return name
 
     def transform(self, item) -> dict:
@@ -59,36 +70,35 @@ class InterfaceProducerCommon(ABC):
         :param item: particular element from initial Model
         :return: dictionary to be applied to jinja2 template
         """
-        imports = {}
-        methods = {}
-        params = {}
+        imports = OrderedDict()
+        methods = OrderedDict()
+        params = OrderedDict()
 
         for param in getattr(item, self.container_name).values():
             _import, _methods, _params = self.common_flow(param, type(item))
-
             if _import:
                 imports.update(_import)
             if _methods:
                 methods[param.name] = _methods
-            params.update({param.name: _params})
+            params[param.name] = _params
 
         name = self.replace_sync(item.name)
-        render = {'year': date.today().year,
-                  'file_name': name,
-                  'name': name,
-                  'imports': {self.imports(what=k, wherefrom=v) for k, v in imports.items()},
-                  'methods': methods,
-                  'params': params}
+        render = OrderedDict()
+        render['file_name'] = name
+        render['name'] = name
+        render['imports'] = {self.imports(what=k, wherefrom=v) for k, v in imports.items()}
+        render['methods'] = methods
+        render['params'] = params
 
         if getattr(item, 'description', None):
-            render.update({'description': self.extract_description(item.description, 116)})
+            render['description'] = self.extract_description(item.description)
         if item.deprecated:
-            render.update({'deprecated': item.deprecated})
+            render['deprecated'] = item.deprecated
 
         self.custom_mapping(render, item)
 
-        render.update({'params': tuple(render['params'].values())})
-        render.update({'methods': tuple(render['methods'].values())})
+        render['params'] = tuple(render['params'].values())
+        render['methods'] = tuple(render['methods'].values())
 
         return render
 
@@ -130,12 +140,15 @@ class InterfaceProducerCommon(ABC):
         type_name = self.extract_type(param)
         imports = self.extract_imports(param, item_type)
         param_name = self.replace_sync(param.name)
-        key = self.key(param_name)
 
         short_name = re.sub(r'(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])', '=^.^=', param_name) \
             .split('=^.^=').pop().lower()
         description = self.extract_description(description, 100 - len(type_name) - len(short_name))
-        title = param_name[:1].upper() + param_name[1:]
+
+        key = self.key(param_name)
+        key = self.replace_keywords(key)
+
+        title = self.replace_keywords(param_name)
 
         methods = self.methods(key=key, method_title=title, external=name, description=description,
                                param_name=short_name, type=type_name)
@@ -176,7 +189,7 @@ class InterfaceProducerCommon(ABC):
         return name
 
     @staticmethod
-    def extract_description(data, length: int) -> list:
+    def extract_description(data, length: int = 116) -> list:
         """
         Evaluate, align and delete @TODO
         :param data: list with description
@@ -213,7 +226,7 @@ class InterfaceProducerCommon(ABC):
                 if not description and getattr(param.param_type.element_type, 'description', None):
                     description = param.param_type.element_type.description
 
-        return self.replace_sync(name), self.extract_description(description, 116)
+        return self.replace_sync(name), self.extract_description(description)
 
     def extract_type(self, param):
         """
@@ -304,7 +317,7 @@ class InterfaceProducerCommon(ABC):
                             self.logger.error('%s/%s/%s, redundant: %s', mapping_name, name, section, redundant)
                             continue
                         if 'description' in data:
-                            data['description'] = self.extract_description(data['description'], 116)
+                            data['description'] = self.extract_description(data['description'])
                         render[section][name] = render[section][name]._replace(**data)
                     else:
                         self.logger.warning('%s/%s not exist, skipping it.', mapping_name, name)
