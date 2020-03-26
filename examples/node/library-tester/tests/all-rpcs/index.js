@@ -56,7 +56,7 @@ module.exports = async function (catalogRpc) {
 
     console.log('Sending a bunch of requests just to see if a response is returned. Ignore any errors related to invalid RPCs that follow.');
 
-    // REQUEST TESTS
+    // RECEIVE RESPONSE TESTS
 
     for (const rpc in SDL.rpc.messages) {
         const rpcInstance = new SDL.rpc.messages[rpc]();
@@ -84,7 +84,7 @@ module.exports = async function (catalogRpc) {
     }
 
     // invoke the onPacketReceived method in the transport layer to simulate receiving notifications and request packets
-    // NOTIFICATION AND REQUEST TESTS
+    // RECEIVE NOTIFICATION AND REQUEST TESTS
     for (const rpc in SDL.rpc.messages) {
         const rpcInstance = new SDL.rpc.messages[rpc]();
         // skip response RPCs
