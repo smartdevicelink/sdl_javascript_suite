@@ -63,8 +63,8 @@ module.exports = async function (catalogRpc) {
         .setType(SDL.rpc.enums.WindowType.WIDGET))
         .catch(err => err); // catch disallowed errors
 
-    if (createWindowResponse.getResultCode() === SDL.rpc.enums.Result.DISALLOWED) {
-        console.warn('The HMI does not support widgets. Skipping this test.');
+    if (!createWindowResponse.getSuccess()) {
+        console.warn('The HMI does not support adding widgets. Skipping this test.');
         // tear down the app
         await sdlManager.sendRpc(new SDL.rpc.messages.UnregisterAppInterface());
         return sdlManager.dispose();
