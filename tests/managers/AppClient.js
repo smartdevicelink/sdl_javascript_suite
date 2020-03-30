@@ -30,7 +30,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 */
 
-const fs = require('fs');
 const SDL = require('../../lib/node/dist/SDL.min.js');
 const CONFIG = require('./config.js');
 
