@@ -12,8 +12,8 @@ import { BinaryFrameHeader } from './../protocol/BinaryFrameHeader.js';
 {%- block body %}
     /**
      * Converts an SdlPacket to an RpcMessage
-     * @param {SdlPacket} sdlPacket
-     * @return {RpcMessage}
+     * @param {SdlPacket} sdlPacket - An SdlPacket to convert.
+     * @returns {RpcMessage} - The constructed RpcMessage.
      */
     static construct (sdlPacket) {
         const payload = sdlPacket.getPayload();
