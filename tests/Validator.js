@@ -10,6 +10,7 @@ class Validator {
     /**
      * Takes an RpcStruct and converts it to a json object.
      * @param {Object} obj - Either a primative value, an array, or an object with getParameters defined.
+     * @returns {Object} - A JSON Object.
      */
     static getParametersJson (obj) {
         let result;
@@ -41,6 +42,7 @@ class Validator {
      * Validate an rpcMessage matches the given expectedParameters
      * @param {RpcMessage} rpcMessage - message to validate against.
      * @param {Object} expectedParameters - json object of expected parameters
+     * @returns {Boolean} - Whether or not the JSON is valid.
      */
     static validateJson (rpcMessage, expectedParameters) {
         const parameters = Validator.getParametersJson(rpcMessage.getParameters());
@@ -50,9 +52,9 @@ class Validator {
 
     /**
      * Checks major and minor versions match. patch versions can be different.
-     * @param {SdlMsgVersion} item1
-     * @param {SdlMsgVersion} item2
-     * @returns {Boolean}
+     * @param {SdlMsgVersion} item1 - An SdlMsgVersion.
+     * @param {SdlMsgVersion} item2 - An SdlMsgVersion.
+     * @returns {Boolean} - Whether or not the major and minor versions match.
      */
     static validateSdlMsgVersion (item1, item2) {
         if (item1 === null || item2 === null) {
@@ -68,8 +70,9 @@ class Validator {
 
     /**
      * ImageField equals validation.
-     * @param {ImageField} item1
-     * @param {ImageField} item2
+     * @param {ImageField} item1 - An ImageField.
+     * @param {ImageField} item2 - An ImageField.
+     * @returns {Boolean} - Whether or not they match.
      */
     static validateImageFields (item1, item2) {
         if (item1 === null || item2 === null) {
@@ -95,8 +98,9 @@ class Validator {
 
     /**
      * RegisterAppInterface pcm stream capabilities validation.
-     * @param {AudioPassThruCapabilities} item1
-     * @param {AudioPassThruCapabilities} item2
+     * @param {AudioPassThruCapabilities} item1 - An AudioPassThruCapabilities.
+     * @param {AudioPassThruCapabilities} item2 - An AudioPassThruCapabilities.
+     * @returns {Boolean} - Whether or not it is valid.
      */
     static validatePcmStreamCapabilities (item1, item2) {
         if (item1 === null || item2 === null) {
@@ -113,8 +117,9 @@ class Validator {
 
     /**
      * AudioPassThruCapabilities array equals validation.
-     * @param {Array<AudioPassThruCapabilities>} item1
-     * @param {Array<AudioPassThruCapabilities>} item2
+     * @param {Array<AudioPassThruCapabilities>} item1 - An array of AudioPassThruCapabilities.
+     * @param {Array<AudioPassThruCapabilities>} item2 - An array of AudioPassThruCapabilities.
+     * @returns {Boolean} - Whether or not they're the same.
      */
     static validateAudioPassThruCapabilities (item1, item2) {
         if (item1 === null || item2 === null) {
@@ -139,8 +144,9 @@ class Validator {
 
     /**
      * ImageResolution equals validation
-     * @param {ImageResolution} item1
-     * @param {ImageResolution} item2
+     * @param {ImageResolution} item1 - An ImageResolution.
+     * @param {ImageResolution} item2 - An ImageResolution.
+     * @returns {Boolean} - Whether or not they're equal.
      */
     static validateImageResolution (item1, item2) {
         if (item1 === null || item2 === null) {
@@ -153,13 +159,16 @@ class Validator {
 
         expect(item1.getResolutionHeight()).to.be.equal(item2.getResolutionHeight());
         expect(item1.getResolutionWidth()).to.be.equal(item2.getResolutionWidth());
+
+        return true;
     }
 
 
     /**
      * TouchEventCapabilities equals validation.
-     * @param {TouchEventCapabilities} item1
-     * @param {TouchEventCapabilities} item2
+     * @param {TouchEventCapabilities} item1 - A TouchEventCapabilities.
+     * @param {TouchEventCapabilities} item2 - A TouchEventCapabilities.
+     * @returns {Boolean} - Whether or not they're equal.
      */
     static validateTouchEventCapabilities (item1, item2) {
         if (item1 === null || item2 === null) {
@@ -179,8 +188,9 @@ class Validator {
 
     /**
      * ScreenParams equals validation.
-     * @param {ScreenParams} item1
-     * @param {ScreenParams} item2
+     * @param {ScreenParams} item1 - A ScreenParams.
+     * @param {ScreenParams} item2 - A ScreenParams.
+     * @returns {Boolean} - Whether or not they're equal.
      */
     static validateScreenParams (item1, item2) {
         if (item1 === null || item2 === null) {
@@ -200,8 +210,9 @@ class Validator {
 
     /**
      * DisplayCapabilities equals validation.
-     * @param {DisplayCapabilities} item1
-     * @param {DisplayCapabilities} item2
+     * @param {DisplayCapabilities} item1 - A DisplayCapabilities.
+     * @param {DisplayCapabilities} item2 - A DisplayCapabilities.
+     * @returns {Boolean} - Whether or not they're equal.
      */
     static validateDisplayCapabilities (item1, item2) {
         if (item1 === null || item2 === null) {
@@ -239,8 +250,9 @@ class Validator {
 
     /**
      * PresetBankCapabilities equals validation.
-     * @param {PresetBankCapabilities} item1
-     * @param {PresetBankCapabilities} item2
+     * @param {PresetBankCapabilities} item1 - A PresetBankCapabilities.
+     * @param {PresetBankCapabilities} item2 - A PresetBankCapabilities.
+     * @returns {Boolean} - Whether or not they're equal.
      */
     static validatePresetBankCapabilities (item1, item2) {
         if (item1 === null || item2 === null) {
@@ -254,8 +266,9 @@ class Validator {
 
     /**
      * VehicleType equals validation.
-     * @param {VehicleType} item1
-     * @param {VehicleType} item2
+     * @param {VehicleType} item1 - A VehicleType.
+     * @param {VehicleType} item2 - A VehicleType.
+     * @returns {Boolean} - Whether or not they're equal.
      */
     static validateVehicleType (item1, item2) {
         if (item1 === null || item2 === null) {
@@ -273,8 +286,9 @@ class Validator {
 
     /**
      * HMICapabilities equals validation.
-     * @param {HMICapabilities} item1
-     * @param {HMICapabilities} item2
+     * @param {HMICapabilities} item1 - An HMICapabilities.
+     * @param {HMICapabilities} item2 - An HMICapabilities.
+     * @returns {Boolean} - Whether or not they're equal.
      */
     static validateHMICapabilities (item1, item2) {
         if (item1 === null || item2 === null) {
@@ -290,8 +304,9 @@ class Validator {
 
     /**
      * ButtonCapabilities array equals validation.
-     * @param {Array<ButtonCapabilities>} item1
-     * @param {Array<ButtonCapabilities>} item2
+     * @param {Array<ButtonCapabilities>} item1 - An array of ButtonCapabilities.
+     * @param {Array<ButtonCapabilities>} item2 - An array of ButtonCapabilities.
+     * @returns {Boolean} - Whether or not they're equal.
      */
     static validateButtonCapabilities (item1, item2) {
         if (item1 === null || item2 === null) {
@@ -317,8 +332,9 @@ class Validator {
 
     /**
      * SoftButton equals validation
-     * @param {SoftButtonObject} button1
-     * @param {SoftButtonObject} button2
+     * @param {SoftButtonObject} button1 - A SoftButtonObject.
+     * @param {SoftButtonObject} button2 - A SoftButtonObject.
+     * @returns {Boolean} - Whether or not they're equal.
      */
     static validateSoftButton (button1, button2) {
         return button1.getCurrentState().getSoftButton().getImage() === button2.getCurrentState().getSoftButton().getImage()
@@ -330,8 +346,9 @@ class Validator {
 
     /**
      * SoftButtonCapabilities array equals validation.
-     * @param {Array<SoftButtonCapabilities>} item1
-     * @param {Array<SoftButtonCapabilities>} item2
+     * @param {Array<SoftButtonCapabilities>} item1 - An array of SoftButtonCapabilities.
+     * @param {Array<SoftButtonCapabilities>} item2 - An array of SoftButtonCapabilities.
+     * @returns {Boolean} - Whether or not they're equal.
      */
     static validateSoftButtonCapabilities (item1, item2) {
         if (item1 === null || item2 === null) {
@@ -357,8 +374,9 @@ class Validator {
 
     /**
      * TTSChunk array equals validation.
-     * @param {Array<TTSChunk>} item1
-     * @param {Array<TTSChunk>} item2
+     * @param {Array<TTSChunk>} item1 - An array of TTSChunk.
+     * @param {Array<TTSChunk>} item2 - An array of TTSChunk.
+     * @returns {Boolean} - Whether or not they're equal.
      */
     static validateTtsChunks (item1, item2) {
         if (item1 === null || item2 === null) {
@@ -381,8 +399,9 @@ class Validator {
 
     /**
      * DeviceInfo equals validation.
-     * @param {DeviceInfo} item1
-     * @param {DeviceInfo} item2
+     * @param {DeviceInfo} item1 - A DeviceInfo.
+     * @param {DeviceInfo} item2 - A DeviceInfo.
+     * @returns {Boolean} - Whether or not they're equal.
      */
     static validateDeviceInfo (item1, item2) {
         if (item1 === null || item2 === null) {
@@ -402,8 +421,9 @@ class Validator {
 
     /**
      * TemplateColorScheme equals validation.
-     * @param {TemplateColorScheme} item1
-     * @param {TemplateColorScheme} item2
+     * @param {TemplateColorScheme} item1 - A TemplateColorScheme.
+     * @param {TemplateColorScheme} item2 - A TemplateColorScheme.
+     * @returns {Boolean} - Whether or not they're equal.
      */
     static validateTemplateColorScheme (item1, item2) {
         if (item1 === null || item2 === null) {
@@ -485,9 +505,9 @@ class Validator {
 
     /**
      * Test a basic RpcRequest or RpcResponse with no params set.
-     * @param {String} functionName
-     * @param {RpcType} messageType
-     * @param {RpcRequest|RpcResponse} msg
+     * @param {String} functionName - A function name.
+     * @param {RpcType} messageType - An RpcType enum value.
+     * @param {RpcRequest|RpcResponse} msg - An RPC request or message.
      */
     static testNullBase (functionName, messageType, msg) {
         Validator.assertNotNull(msg, 'RPCMessage was null.');

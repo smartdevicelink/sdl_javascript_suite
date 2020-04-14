@@ -4,6 +4,11 @@ const Validator = require('./../../Validator');
 module.exports = function (appClient) {
     describe('PermissionManagerTests', function () {
         const permissionManager = appClient._sdlManager.getPermissionManager();
+
+        /**
+         * Safely attempt to send an RPC.
+         * @param {RpcMessage} rpcMessage - The RPC message to send.
+         */
         function sendRpc (rpcMessage) {
             if (rpcMessage !== null) {
                 appClient._sdlManager.sendRpc(rpcMessage);

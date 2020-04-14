@@ -173,6 +173,12 @@ GENERAL_BUTTONCAPABILITIES.setShortPressAvailable(true);
 GENERAL_BUTTONCAPABILITIES.setUpDownAvailable(true);
 GENERAL_BUTTONCAPABILITIES.setName(ButtonName.SEEKRIGHT);
 
+/**
+ * Create a new TTSChunk instance.
+ * @param {String} type - The type of TTSChunk.
+ * @param {String} text - The text of the TTSChunk.
+ * @returns {TTSChunk} - A new TTSChunk instance.
+ */
 function createTtsChunk (type, text) {
     const ttsChunk = new TTSChunk();
     ttsChunk.setType(type);
