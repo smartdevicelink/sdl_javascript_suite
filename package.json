@@ -42,6 +42,7 @@
     "babel-plugin-transform-async-to-promises": "^0.8.15",
     "bson": "^4.0.2",
     "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
     "eslint": "^6.6.0",
     "esm": "^3.2.25",
     "express": "^4.17.1",
