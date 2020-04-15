@@ -249,19 +249,8 @@ class Generator:
         """
         content = self.get_file_content(file_name)
         content = tuple(map(lambda e: re.sub(r'\n', r'', e).strip().casefold(), content))
-        try:
-            start_index = content.index('# sdl reserved')
-            sdl_reserved = content[start_index + 1:len(content)]
-            start_index = content.index('# javascript suite library')
-            end_index = next(i for i, item in enumerate(content) if i > start_index and not item)
-            content = content[start_index + 1:end_index]
-            content += sdl_reserved
-            content = tuple(filter(lambda e: not re.search(r'^#+\s+.+|^$', e), content))
-            self.logger.debug('key_words: %s', ', '.join(content))
-            return content
-        except (IndexError, ValueError, StopIteration) as error:
-            self.logger.error('Error while getting key_words, %s %s', type(error).__name__, error)
-            return []
+        content = tuple(filter(lambda e: not re.search(r'^#+\s+.+|^$', e), content))
+        return content
 
     def get_mappings(self, file_name=ROOT.joinpath('mapping.json')):
         """
