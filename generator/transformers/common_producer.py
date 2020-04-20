@@ -26,7 +26,7 @@ class InterfaceProducerCommon(ABC):
     def __init__(self, enums_dir_name, structs_dir_name,
                  names=(), mapping=OrderedDict(), key_words=()):
         self.logger = logging.getLogger(self.__class__.__name__)
-        self.names = list(map(lambda e: self.replace_sync(e), names))
+        self.names = [self.replace_sync(e) for e in names]
         self.enums_dir = enums_dir_name
         self.structs_dir = structs_dir_name
         self.mapping = mapping
@@ -38,6 +38,10 @@ class InterfaceProducerCommon(ABC):
     @property
     @abstractmethod
     def container_name(self):
+        """
+        Forced to be implemented in child classes
+        :return: container name for particular issue type
+        """
         pass
 
     def replace_keywords(self, name):
@@ -55,13 +59,20 @@ class InterfaceProducerCommon(ABC):
         return self.replace_sync(name)
 
     @staticmethod
+    def capitalize(name):
+        """
+        :param name: string with item name
+        :return:
+        """
+        return name[:1].upper() + name[1:]
+
+    @staticmethod
     def replace_sync(name):
         """
         :param name: string with item name
         :return: string with replaced 'sync' to 'Sdl'
         """
         if name:
-            name = name[:1].upper() + name[1:]
             name = re.sub(r'^([sS])ync(.+)$', r'\1dl\2', name)
         return name
 
@@ -83,6 +94,7 @@ class InterfaceProducerCommon(ABC):
             params[param.name] = _params
 
         name = self.replace_sync(item.name)
+        name = self.capitalize(name)
         render = OrderedDict()
         render['file_name'] = name
         render['name'] = name
@@ -149,6 +161,7 @@ class InterfaceProducerCommon(ABC):
         key = self.replace_keywords(key)
 
         title = self.replace_keywords(param_name)
+        title = self.capitalize(title)
 
         methods = self.methods(key=key, method_title=title, external=name, description=description,
                                param_name=short_name, type=type_name)

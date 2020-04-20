@@ -27,7 +27,6 @@ try:
     from parsers.rpc_base import ParseError
     from model.interface import Interface
     from transformers.generate_error import GenerateError
-    from transformers.common_producer import InterfaceProducerCommon
     from transformers.enums_producer import EnumsProducer
     from transformers.functions_producer import FunctionsProducer
     from transformers.structs_producer import StructsProducer
