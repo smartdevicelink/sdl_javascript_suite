@@ -718,7 +718,7 @@ For each `<param>` the getter and setter methods should be defined in the class:
     * The setter should return `this` instance to support the chaining.
 4. If the `<param>` has the `"type"` attribute value as the one of `<enum>` or `<struct>` name:
     * The getter should call and return the result of the `this.getObject` method, where the first parameter is the corresponding Struct or Enum class, the second is the value of the corresponding static property described above;
-    * The setter should validate the received value by calling the `this.validateType` method, where the fist parameter is the Struct or Enum class corresponding to the `"type"` attribute value of `<param>`, the second is the value itself;
+    * The setter should validate the received value by calling the `this._validateType` method, where the fist parameter is the Struct or Enum class corresponding to the `"type"` attribute value of `<param>`, the second is the value itself;
     * The setter should call the `this.setParameter` method, where the first parameter is the value of the corresponding static property described above, the second is the value passed into setter;
     * The setter should return `this` instance to support the chaining.
 
@@ -747,7 +747,7 @@ Examples:
  * @return {VehicleDataResult}
  */
 setDataType(type) {
-    this.validateType(VehicleDataType, type);
+    this._validateType(VehicleDataType, type);
     this.setParameter(VehicleDataResult.KEY_DATA_TYPE, type);
     return this;
 }
@@ -855,7 +855,7 @@ class VehicleDataResult extends RpcStruct {
      * @return {VehicleDataResult}
      */
     setDataType (type) {
-        this.validateType(VehicleDataType, type);
+        this._validateType(VehicleDataType, type);
         this.setParameter(VehicleDataResult.KEY_DATA_TYPE, type);
         return this;
     }
@@ -872,7 +872,7 @@ class VehicleDataResult extends RpcStruct {
      * @return {VehicleDataResult}
      */
     setResultCode (code) {
-        this.validateType(VehicleDataResultCode, code);
+        this._validateType(VehicleDataResultCode, code);
         this.setParameter(VehicleDataResult.KEY_RESULT_CODE, code);
         return this;
     }
@@ -1026,7 +1026,7 @@ For each `<param>` the getter and setter methods should be defined in the class:
     * The setter should return `this` instance to support the chaining.
 3. If the `<param>` has the `"type"` attribute value as the one of `<enum>` or `<struct>` name:
     * The getter should call and return the result of the `this.getObject` method, where the first parameter is the corresponding Struct or Enum class, the second is the value of the corresponding static property described above;
-    * The setter should validate the received value by calling the `this.validateType` method, where the fist parameter is the Struct or Enum class corresponding to the `"type"` attribute value of `<param>`, the second is the value itself;
+    * The setter should validate the received value by calling the `this._validateType` method, where the fist parameter is the Struct or Enum class corresponding to the `"type"` attribute value of `<param>`, the second is the value itself;
     * The setter should call the `this.setParameter` method, where the first parameter is the value of the corresponding static property described above, the second is the value passed into setter;
     * The setter should return `this` instance to support the chaining.
 4. The exclusion are `<param>` with name `success`, `resultCode` and `info` of `<function>` with the attribute `messagetype="response"`, in this case they should be omitted.
@@ -1071,7 +1071,7 @@ getCmdID() {
  * @return {AddCommand}
  */
 setMenuParams(menuParams) {
-    this.validateType(MenuParams, menuParams);
+    this._validateType(MenuParams, menuParams);
     this.setParameter(AddCommand.KEY_MENU_PARAMS, menuParams);
     return this;
 }
@@ -1088,7 +1088,7 @@ getMenuParams() {
  * @return {OnLanguageChange}
  */
 setHmiDisplayLanguage(language) {
-    this.validateType(Language, language);
+    this._validateType(Language, language);
     this.setParameter(OnLanguageChange.KEY_HMI_DISPLAY_LANGUAGE, language);
     return this;
 }
@@ -1216,7 +1216,7 @@ class AddCommand extends RpcRequest {
      * @return {AddCommand}
      */
     setMenuParams (params) {
-        this.validateType(MenuParams, params);
+        this._validateType(MenuParams, params);
         this.setParameter(AddCommand.KEY_MENU_PARAMS, params);
         return this;
     }
@@ -1251,7 +1251,7 @@ class AddCommand extends RpcRequest {
      * @return {AddCommand}
      */
     setCmdIcon (icon) {
-        this.validateType(Image, icon);
+        this._validateType(Image, icon);
         this.setParameter(AddCommand.KEY_CMD_ICON, icon);
         return this;
     }
@@ -1414,7 +1414,7 @@ class PerformInteractionResponse extends RpcResponse {
      * @return {PerformInteractionResponse}
      */
     setTriggerSource (source) {
-        this.validateType(TriggerSource, source);
+        this._validateType(TriggerSource, source);
         this.setParameter(PerformInteractionResponse.KEY_TRIGGER_SOURCE, source);
         return this;
     }
@@ -1497,7 +1497,7 @@ class OnLanguageChange extends RpcNotification {
      * @return {OnLanguageChange}
      */
     setLanguage (language) {
-        this.validateType(Language, language);
+        this._validateType(Language, language);
         this.setParameter(OnLanguageChange.KEY_LANGUAGE, language);
         return this;
     }
@@ -1514,7 +1514,7 @@ class OnLanguageChange extends RpcNotification {
      * @return {OnLanguageChange}
      */
     setHmiDisplayLanguage (language) {
-        this.validateType(Language, language);
+        this._validateType(Language, language);
         this.setParameter(OnLanguageChange.KEY_HMI_DISPLAY_LANGUAGE, language);
         return this;
     }
