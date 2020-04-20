@@ -70,14 +70,26 @@ __All methods__ must be documented immediately prior to their declaration using 
 
 ```
 /**
-    * [Description of what the method does.]
-    * @param [param_name] - [param_description]
-    * @return [What the method returns.]
+    * [Description of what the method does].
+    * @param {data_type} [param_name] - [Description of the parameter].
+    * @returns {data_type} - [Description of the returned data].
+*/
+```
+
+
+Class constructors must be documented immediately prior to their declaration using the following format:
+
+```
+/**
+    * [Description of what the constructor does].
+    * @class
+    * @param {data_type} [param_name] - [Description of the parameter].
 */
 ```
 
 
 # Code Style Guidelines
+All contributions must pass lint validation to be accepted. Lint validation can be performed on the entire project via `npm run lint`.
 
 ### References
 

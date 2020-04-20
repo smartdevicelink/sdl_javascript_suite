@@ -1,15 +1,17 @@
 // ------ Not part of the RPC spec itself -----
 
 /**
- * @param {Uint8Array} fileData
- * @return {PutFile}
+ * Set the file data.
+ * @param {Uint8Array} fileData - A byte array of the file contents.
+ * @returns {PutFile} - The class instance to support method chaining.
  */
 setFileData (fileData) {
     this.setBulkData(fileData);
     return this;
 }
 /**
- * @return {Uint8Array}
+ * Get the file data.
+ * @returns {Uint8Array} - A byte array of the file contents.
  */
 getFileData () {
     return this.getBulkData();
