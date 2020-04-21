@@ -11,6 +11,23 @@
                     "value": 1
                 }
             }
+        },
+        "messageType": {
+            "request": {
+                "params": {
+                    "value": 0
+                }
+            },
+            "response": {
+                "params": {
+                    "value": 1
+                }
+            },
+            "notification": {
+                "params": {
+                    "value": 2
+                }
+            }
         }
     },
     "structs": {
