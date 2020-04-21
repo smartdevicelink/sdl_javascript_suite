@@ -1,4 +1,18 @@
 {
+    "enums": {
+        "PredefinedWindows": {
+            "DEFAULT_WINDOW": {
+                "params": {
+                    "value": 0
+                }
+            },
+            "PRIMARY_WIDGET": {
+                "params": {
+                    "value": 1
+                }
+            }
+        }
+    },
     "structs": {
         "Grid": {
             "col": {
