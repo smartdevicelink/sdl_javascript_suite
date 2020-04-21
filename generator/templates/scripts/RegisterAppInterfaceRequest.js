@@ -4,7 +4,7 @@
  * @returns {RegisterAppInterface} - The class instance to support method chaining.
  */
 setFullAppId (fullAppId) {
-    this.validateType(String, fullAppId);
+    this._validateType(String, fullAppId);
 
     if (fullAppId !== null) {
         fullAppId = fullAppId.toLowerCase();
@@ -37,7 +37,7 @@ getFullAppId () {
  * @returns {RegisterAppInterface} - The class instance to support method chaining.
  */
 _setAppId (appId) {
-    this.validateType(String, appId);
+    this._validateType(String, appId);
 
     this.setParameter(RegisterAppInterface.KEY_APP_ID, appId);
     return this;
