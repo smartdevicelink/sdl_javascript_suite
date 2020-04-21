@@ -3,7 +3,7 @@ Enums transformation
 """
 
 import logging
-from collections import namedtuple
+from collections import namedtuple, OrderedDict
 
 from model.enum import Enum
 from model.enum_element import EnumElement
@@ -15,15 +15,20 @@ class EnumsProducer(InterfaceProducerCommon):
     Enums transformation
     """
 
-    def __init__(self, paths, mapping=None):
+    def __init__(self, paths, mapping=OrderedDict(), key_words=()):
         super(EnumsProducer, self).__init__(
-            container_name='elements',
             enums_dir_name=paths.enums_dir_name,
             structs_dir_name=paths.structs_dir_name,
-            mapping=mapping['enums'] if mapping and 'enums' in mapping else {})
+            mapping=mapping.get('enums', OrderedDict()),
+            key_words=key_words)
+        self._container_name = 'elements'
         self.logger = logging.getLogger(self.__class__.__name__)
         self.enum_class = paths.path_to_enum_class
         self.methods = namedtuple('Methods', 'method_title description type')
+
+    @property
+    def container_name(self):
+        return self._container_name
 
     def transform(self, item: Enum) -> dict:
         """
@@ -33,7 +38,7 @@ class EnumsProducer(InterfaceProducerCommon):
         """
         tmp = super(EnumsProducer, self).transform(item)
         what_where = self.prepare_imports(self.enum_class)
-        tmp.update({'extend': what_where.what})
+        tmp['extend'] = what_where.what
         tmp['imports'].add(what_where)
         return tmp
 
@@ -67,11 +72,10 @@ class EnumsProducer(InterfaceProducerCommon):
                 value = '0x{}'.format(param.hex_value)
             else:
                 value = '0x0{}'.format(param.hex_value)
-        elif getattr(param, 'value', None) is not None:
-            value = param.value
         else:
             value = "'{}'".format(param.name)
-        return self.params(key=self.ending_cutter(param.primary_name), value=value)
+        key = self.ending_cutter(param.primary_name)
+        return self.params(key=key, value=value)
 
     @staticmethod
     def extract_type(param: EnumElement) -> str:
