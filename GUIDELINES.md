@@ -44,7 +44,7 @@ The following special rules shall apply to the RPC generation script for the Jav
 * RPC enums shall extend the `Enum` class and be stored in `/lib/js/src/rpc/enums`
 * Uses of the "sync" prefix shall be replaced with "sdl" (where it would not break functionality). E.g. `SyncMsgVersion -> SdlMsgVersion`. This applies to member variables and their accessors. The key used when creating the RPC message JSON should match that of the RPC Spec.
 * The `_MAP` keys and static getters of the `FunctionID` enum shall not include the `ID` suffix. e.g. `RegisterAppInterfaceID -> RegisterAppInterface`. All references to the `FunctionID` enum shall adopt this as well to ensure valid references.
-* `set` methods of RPC messages and RPC structs shall validate the type of the passed parameter by immediately calling `this.validateType([targetClass], [parameter]);`, followed by storing the passed parameter or object. Target classes used for validation must be imported into each respective message/struct file immediately following any copyright notice block comments.
+* `set` methods of RPC messages and RPC structs shall validate the type of the passed parameter by immediately calling `this._validateType([targetClass], [parameter]);`, followed by storing the passed parameter or object. Target classes used for validation must be imported into each respective message/struct file immediately following any copyright notice block comments.
 * Each extended RPC enumeration class must be named to match the enum name in the RPC Spec
 
 
