@@ -7,17 +7,17 @@
 import { RpcType } from './enums/RpcType.js';
 import { FunctionID } from './enums/FunctionID.js';
 import { JsonRpcMarshaller } from './../util/JsonRpcMarshaller.js';
-import { BinaryFrameHeader } from './../protocol/BinaryFrameHeader.js';
+import { _BinaryFrameHeader } from './../protocol/_BinaryFrameHeader.js';
 {% endblock -%}
 {%- block body %}
     /**
-     * Converts an SdlPacket to an RpcMessage
-     * @param {SdlPacket} sdlPacket - An SdlPacket to convert.
+     * Converts an _SdlPacket to an RpcMessage
+     * @param {_SdlPacket} sdlPacket - An _SdlPacket to convert.
      * @returns {RpcMessage} - The constructed RpcMessage.
      */
     static construct (sdlPacket) {
         const payload = sdlPacket.getPayload();
-        const binaryFrameHeader = BinaryFrameHeader.fromBinaryHeader(payload);
+        const binaryFrameHeader = _BinaryFrameHeader.fromBinaryHeader(payload);
 
         let message;
         const rpcType = binaryFrameHeader.getRpcType();
