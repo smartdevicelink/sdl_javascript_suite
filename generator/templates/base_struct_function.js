@@ -51,7 +51,7 @@
      */
     set{{method.method_title}} ({{method.param_name}}) {
         {%- if method.external %}
-        this.validateType({{method.external}}, {{method.param_name}}{{ ', true' if '[]' in method.type }});
+        this._validateType({{method.external}}, {{method.param_name}}{{ ', true' if '[]' in method.type }});
         {%- endif %}
         this.setParameter({{name}}.{{method.key}}, {{method.param_name}});
         return this;
