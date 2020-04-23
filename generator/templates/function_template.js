@@ -2,6 +2,6 @@
 {% block constructor %}
     constructor (parameters) {
         super(parameters);
-        this.setFunctionName(FunctionID.{{ func }});
+        this.setFunctionId(FunctionID.{{ func }});
     }
 {% endblock %}
