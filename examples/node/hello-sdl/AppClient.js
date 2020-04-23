@@ -43,7 +43,7 @@ class AppClient {
             .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG)
             .setPersistent(true);
 
-        this._appConfig = new SDL.manager.AppConfig()
+        this._lifecycleConfig = new SDL.manager.LifecycleConfig()
             .setAppId(CONFIG.appId)
             .setAppName(CONFIG.appName)
             .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
@@ -58,6 +58,9 @@ class AppClient {
                 )
             )
             .setAppIcon(file);
+
+        this._appConfig = new SDL.manager.AppConfig()
+            .setLifecycleConfig(this._lifecycleConfig);
 
         const managerListener = new SDL.manager.SdlManagerListener();
         managerListener
