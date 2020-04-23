@@ -50,7 +50,6 @@
                 this._appConfig = new SDL.manager.AppConfig()
                     .loadManifest(sdl_manifest)
                     .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
-                    .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
                     .setTransportConfig(new SDL.transport.WebSocketClientConfig());
 
                 const managerListener = new SDL.manager.SdlManagerListener();
