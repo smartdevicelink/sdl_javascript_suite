@@ -46,7 +46,6 @@ class AppClient {
         this._appConfig = new SDL.manager.AppConfig()
             .setAppId(CONFIG.appId)
             .setAppName(CONFIG.appName)
-            .setIsMediaApp(false)
             .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
             .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
             .setAppTypes([
