@@ -49,7 +49,6 @@
 
                 this._appConfig = new SDL.manager.AppConfig()
                     .loadManifest(sdl_manifest)
-                    .setIsMediaApp(false)
                     .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
                     .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
                     .setTransportConfig(new SDL.transport.WebSocketClientConfig());
