@@ -6,7 +6,7 @@
 // other
 import { MessageType } from './enums/MessageType.js';
 import { FunctionID } from './enums/FunctionID.js';
-import { JsonRpcMarshaller } from './../util/JsonRpcMarshaller.js';
+import { _JsonRpcMarshaller } from './../util/_JsonRpcMarshaller.js';
 import { _BinaryFrameHeader } from './../protocol/_BinaryFrameHeader.js';
 {% endblock -%}
 {%- block body %}
@@ -30,7 +30,7 @@ import { _BinaryFrameHeader } from './../protocol/_BinaryFrameHeader.js';
         const params = {};
         // not-empty object check
         if (Object.keys(jsonData).length !== 0) {
-            params.parameters = JsonRpcMarshaller.unmarshall(jsonData);
+            params.parameters = _JsonRpcMarshaller.unmarshall(jsonData);
         }
 
         switch (functionId) {
