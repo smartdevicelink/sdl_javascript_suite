@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 */
 
-const SDL = require('../../../lib/node/dist/SDL.min.js');
+const SDL = require('./SDL.min.js');
 const CONFIG = require('./config.js');
 
 class AppClient {
