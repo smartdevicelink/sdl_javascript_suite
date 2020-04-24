@@ -47,7 +47,6 @@ class AppClient {
             .setAppId(CONFIG.appId)
             .setAppName(CONFIG.appName)
             .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
-            .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
             .setAppTypes([
                 SDL.rpc.enums.AppHMIType.DEFAULT,
             ])
