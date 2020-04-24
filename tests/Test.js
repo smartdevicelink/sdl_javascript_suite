@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+
 const SDL = require('./../lib/js/dist/SDL.min.js');
 
 const SdlMsgVersion = SDL.rpc.structs.SdlMsgVersion;
