@@ -28,7 +28,7 @@ describe('_BinaryFrameHeaderTests', function () {
 
         Validator.assertTrue(bfh.getFunctionId() === parsedBfh.getFunctionId(), 'Function ID not parsed properly.');
 
-        Validator.assertEquals(parsedBfh.getRpcType(), bfh.getRpcType(), 'RPC type not parsed properly.');
+        Validator.assertEquals(parsedBfh.getMessageType(), bfh.getMessageType(), 'RPC type not parsed properly.');
 
         Validator.assertEquals(parsedBfh.getBulkData(), bfh.getBulkData(), 'Bulk data not parsed properly.');
 

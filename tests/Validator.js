@@ -88,7 +88,7 @@ class Validator {
             const val2 = item2[index];
 
             expect(val1.getImageTypeSupported()).to.be.deep.equal(val2.getImageTypeSupported());
-            expect(val1.getName()).to.be.equal(val2.getName());
+            expect(val1.getNameParam()).to.be.equal(val2.getNameParam());
             Validator.validateImageResolution(val1.getImageResolution(), val2.getImageResolution());
         }
 
@@ -322,7 +322,7 @@ class Validator {
             const val1 = item1[index];
             const val2 = item2[index];
 
-            expect(val1.getName()).to.be.equal(val2.getName());
+            expect(val1.getNameParam()).to.be.equal(val2.getNameParam());
             expect(val1.getUpDownAvailable()).to.be.equal(val2.getUpDownAvailable());
             expect(val1.getLongPressAvailable()).to.be.equal(val2.getLongPressAvailable());
             expect(val1.getShortPressAvailable()).to.be.equal(val2.getShortPressAvailable());
@@ -519,10 +519,10 @@ class Validator {
             correlationId = msg.getCorrelationId();
             Validator.assertNullOrUndefined(correlationId, 'Correlation ID of the RPC message was not null.');
         }
-        Validator.assertNotNull(msg.getRPCType(), 'Message type of the RPC message was null.');
-        Validator.assertEquals(messageType, msg.getRPCType(), 'Message type didn\'t match expected message type.');
-        Validator.assertNotNull(msg.getFunctionName(), 'Command type of the RPC message was null.');
-        Validator.assertEquals(functionName, msg.getFunctionName(), 'Command type didn\'t match expected command type.');
+        Validator.assertNotNull(msg.getMessageType(), 'Message type of the RPC message was null.');
+        Validator.assertEquals(messageType, msg.getMessageType(), 'Message type didn\'t match expected message type.');
+        Validator.assertNotNull(msg.getFunctionId(), 'Command type of the RPC message was null.');
+        Validator.assertEquals(functionName, msg.getFunctionId(), 'Command type didn\'t match expected command type.');
 
         try {
             Validator.assertTrue((msg.serializeJSON().length() === 1), 'Parameters weren\'t initialized, but the JSON contained 2 or more objects.');
