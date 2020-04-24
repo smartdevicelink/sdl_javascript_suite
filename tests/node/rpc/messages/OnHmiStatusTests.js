@@ -1,7 +1,7 @@
 const SDL = require('./../../../../lib/js/dist/SDL.min.js');
 const OnHMIStatus = SDL.rpc.messages.OnHMIStatus;
 const FunctionID = SDL.rpc.enums.FunctionID;
-const RpcType = SDL.rpc.enums.RpcType;
+const MessageType = SDL.rpc.enums.MessageType;
 
 const BaseRpcTests = require('./BaseRpcTests');
 const Test = require('./../../../Test.js');
@@ -29,11 +29,11 @@ describe('OnHMIStatusTests', function () {
             return expectedParameters;
         };
 
-        this.getRPCType = function () {
-            return RpcType.NOTIFICATION;
+        this.getMessageType = function () {
+            return MessageType.notification;
         };
 
-        this.getFunctionName = function () {
+        this.getFunctionId = function () {
             return FunctionID.keyForValue(FunctionID.OnHMIStatus);
         };
     });
@@ -61,7 +61,7 @@ describe('OnHMIStatusTests', function () {
         Validator.assertNotNull(rpcMessage);
         Validator.testNullBase(
             FunctionID.keyForValue(FunctionID.OnHMIStatus),
-            RpcType.NOTIFICATION,
+            MessageType.notification,
             rpcMessage);
 
         Validator.assertNullOrUndefined(rpcMessage.getHmiLevel());
