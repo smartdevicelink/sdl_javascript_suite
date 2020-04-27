@@ -24,7 +24,7 @@ module.exports = function (appClient) {
             Validator.assertTrue(screenManager.getVoiceCommands().length === 0);
             Validator.assertNotNullUndefined(screenManager.getSoftButtonObjects());
             Validator.assertNull(screenManager.getSoftButtonObjectByName('test'));
-            Validator.assertNull(screenManager.getSoftButtonObjectById(1));
+            Validator.assertNull(screenManager._getSoftButtonObjectById(1));
             done();
         });
 
