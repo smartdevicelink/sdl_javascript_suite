@@ -44,12 +44,10 @@ module.exports = class Consumer {
     }
 
     async start () {
-        const appConfig = new SDL.manager.AppConfig()
+        const lifecycleConfig = new SDL.manager.LifecycleConfig()
             .setAppId(this.appId)
             .setAppName(this.appId)
-            .setIsMediaApp(false)
             .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
-            .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
             .setAppTypes([
                 SDL.rpc.enums.AppHMIType.MEDIA,
                 SDL.rpc.enums.AppHMIType.REMOTE_CONTROL,
@@ -57,7 +55,7 @@ module.exports = class Consumer {
             .setTransportConfig(new SDL.transport.TcpClientConfig(process.env.HOST, process.env.PORT));
 
         this._app = new AppHelper(this._catalogRpc)
-            .setAppConfig(appConfig);
+            .setLifecycleConfig(lifecycleConfig);
 
         await this._app.start(); // after this point, we are in HMI FULL and managers are ready
         this.sdlManager = this._app.getManager();
@@ -83,7 +81,7 @@ module.exports = class Consumer {
 
     async getAndShowImage (image, serviceId) {
         const getFile = new SDL.rpc.messages.GetFile()
-            .setFileName(image.getValue())
+            .setFileName(image.getValueParam())
             .setAppServiceId(serviceId);
 
         await this.sdlManager.sendRpc(getFile);
@@ -94,17 +92,17 @@ module.exports = class Consumer {
         const fileManager = this.sdlManager.getFileManager();
 
         const weatherFile = new SDL.manager.file.filetypes.SdlFile()
-            .setName(image.getValue())
+            .setName(image.getValueParam())
             .setFilePath('./tests/app-services-weather/weather-icon.png')
             .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG);
 
-        const putFile = await fileManager.createPutFile(weatherFile);
+        const putFile = await fileManager._createPutFile(weatherFile);
         await this.sdlManager.sendRpc(putFile);
 
         const show = new SDL.rpc.messages.Show()
             .setMainField1('An image of the sun from the weather app service should be shown!')
             .setGraphic(new SDL.rpc.structs.Image({
-                value: image.getValue(),
+                value: image.getValueParam(),
                 imageType: SDL.rpc.enums.ImageType.DYNAMIC,
             }));
 

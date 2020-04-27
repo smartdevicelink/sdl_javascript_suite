@@ -34,7 +34,7 @@ const SDL = require('../../SDL.min.js');
 
 class AppHelper {
     constructor (catalogRpc) {
-        this._appConfig = {};
+        this._lifecycleConfig = {};
         this._sdlManager;
         this._hmiReady = false;
         this._managerReady = false;
@@ -46,13 +46,13 @@ class AppHelper {
         return this._sdlManager;
     }
 
-    setAppConfig (appConfig) {
-        this._appConfig = appConfig;
+    setLifecycleConfig (lifecycleConfig) {
+        this._lifecycleConfig = lifecycleConfig;
         return this;
     }
 
     async start (permissionListener) {
-        console.log(`Waiting for app activation for ${this._appConfig.getAppId()}`);
+        console.log(`Waiting for app activation for ${this._lifecycleConfig.getAppId()}`);
         return new Promise((resolve, reject) => {
             const managerListener = new SDL.manager.SdlManagerListener();
             managerListener
@@ -71,6 +71,9 @@ class AppHelper {
                 .setOnError((sdlManager, info) => {
                     console.error('Error from SdlManagerListener: ', info);
                 });
+
+            this._appConfig = new SDL.manager.AppConfig()
+                .setLifecycleConfig(this._lifecycleConfig);
 
             this._sdlManager = new SDL.manager.SdlManager(this._appConfig, managerListener);
             this._sdlManager
@@ -100,7 +103,7 @@ class AppHelper {
 
     _checkState (resolve) {
         if (this._hmiReady && this._managerReady && !this._connected) {
-            console.log(`Activated ${this._appConfig.getAppId()}`);
+            console.log(`Activated ${this._lifecycleConfig.getAppId()}`);
             this._connected = true;
             resolve();
         }

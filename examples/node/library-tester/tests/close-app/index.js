@@ -36,12 +36,10 @@ const AppHelper = require('../../AppHelper.js');
 module.exports = async function (catalogRpc) {
     const appId = 'close-app';
 
-    const appConfig = new SDL.manager.AppConfig()
+    const lifecycleConfig = new SDL.manager.LifecycleConfig()
         .setAppId(appId)
-        .setAppName("close app (click twice)")
-        .setIsMediaApp(false)
+        .setAppName(appId)
         .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
-        .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
         .setAppTypes([
             SDL.rpc.enums.AppHMIType.MEDIA,
             SDL.rpc.enums.AppHMIType.REMOTE_CONTROL,
@@ -49,7 +47,7 @@ module.exports = async function (catalogRpc) {
         .setTransportConfig(new SDL.transport.TcpClientConfig(process.env.HOST, process.env.PORT));
         
     const app = new AppHelper(catalogRpc)
-        .setAppConfig(appConfig);
+        .setLifecycleConfig(lifecycleConfig);
 
     await app.start(); // after this point, we are in HMI FULL and managers are ready
     const sdlManager = app.getManager();

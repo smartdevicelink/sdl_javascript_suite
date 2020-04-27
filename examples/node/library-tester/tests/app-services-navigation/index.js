@@ -45,7 +45,7 @@ module.exports = async function (catalogRpc) {
     // have the consumer send a SendLocation
     const sendLocationPromise = consumer.sendLocationPromise();
     // have the producer listen for SendLocation
-    const sendLocationRequest = await rpcListenPromise(producer.sdlManager, SDL.rpc.enums.FunctionID.SendLocation, SDL.rpc.enums.RpcType.REQUEST);
+    const sendLocationRequest = await rpcListenPromise(producer.sdlManager, SDL.rpc.enums.FunctionID.SendLocation, SDL.rpc.enums.MessageType.request);
     producer.sendLocationResponse(sendLocationRequest);
 
     // wait for the SendLocation
@@ -58,7 +58,7 @@ module.exports = async function (catalogRpc) {
 function rpcListenPromise (sdlManager, functionId, type) {
     return new Promise((resolve, reject) => {
         const listener = (message) => {
-            if (message.getRPCType() === type) {
+            if (message.getMessageType() === type) {
                 sdlManager.removeRpcListener(functionId, listener);
                 resolve(message);
             }

@@ -36,12 +36,10 @@ const AppHelper = require('../../AppHelper.js');
 module.exports = async function (catalogRpc) {
     const appId = 'others';
 
-    const appConfig = new SDL.manager.AppConfig()
+    const lifecycleConfig = new SDL.manager.LifecycleConfig()
         .setAppId(appId)
         .setAppName(appId)
-        .setIsMediaApp(false)
         .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
-        .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
         .setAppTypes([
             SDL.rpc.enums.AppHMIType.MEDIA,
             SDL.rpc.enums.AppHMIType.REMOTE_CONTROL,
@@ -49,7 +47,7 @@ module.exports = async function (catalogRpc) {
         .setTransportConfig(new SDL.transport.TcpClientConfig(process.env.HOST, process.env.PORT));
 
     const app = new AppHelper(catalogRpc)
-        .setAppConfig(appConfig);
+        .setLifecycleConfig(lifecycleConfig);
 
     await app.start(); // after this point, we are in HMI FULL and managers are ready
     const sdlManager = app.getManager();
@@ -85,7 +83,7 @@ module.exports = async function (catalogRpc) {
         .setFilePath('./tests/others/sound-file.mp3')
         .setType(SDL.rpc.enums.FileType.AUDIO_MP3);
 
-    const putFile = await fileManager.createPutFile(audioFile);
+    const putFile = await fileManager._createPutFile(audioFile);
     await sdlManager.sendRpc(putFile);
 
     const speak = new SDL.rpc.messages.Speak()
@@ -104,7 +102,7 @@ module.exports = async function (catalogRpc) {
         .setFilePath('./tests/others/test_icon_1.png')
         .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG);
 
-    const putFile2 = await fileManager.createPutFile(logo);
+    const putFile2 = await fileManager._createPutFile(logo);
     await sdlManager.sendRpc(putFile2);
 
     const alert = new SDL.rpc.messages.Alert()
@@ -141,7 +139,7 @@ module.exports = async function (catalogRpc) {
 
     // cancel the alert that was sent
     sdlManager.sendRpc(new SDL.rpc.messages.CancelInteraction()
-        .setFunctionID(SDL.rpc.enums.FunctionID.Alert));
+        .setFunctionIDParam(SDL.rpc.enums.FunctionID.Alert));
 
     const alert2Response = await alert2Promise;
     if (alert2Response.getResultCode() !== SDL.rpc.enums.Result.ABORTED) {

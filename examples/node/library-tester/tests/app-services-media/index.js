@@ -39,7 +39,7 @@ module.exports = async function (catalogRpc) {
     await producer.start();
     await producer.setupAppService();
     // wait for just one request from the consumer app
-    const appGetServiceDataPromise = rpcListenPromise(producer.sdlManager, SDL.rpc.enums.FunctionID.GetAppServiceData, SDL.rpc.enums.RpcType.REQUEST);
+    const appGetServiceDataPromise = rpcListenPromise(producer.sdlManager, SDL.rpc.enums.FunctionID.GetAppServiceData, SDL.rpc.enums.MessageType.request);
     // setup a consumer app and have it send a GetAppServiceData request
     const consumer = new Consumer(catalogRpc);
     await consumer.start();
@@ -57,7 +57,7 @@ module.exports = async function (catalogRpc) {
     consumer.serviceId = getAppServiceResponse.getServiceData().getServiceID();
 
     // listen to a future update from the producer
-    const appOnServiceDataPromise = rpcListenPromise(consumer.sdlManager, SDL.rpc.enums.FunctionID.OnAppServiceData, SDL.rpc.enums.RpcType.NOTIFICATION);
+    const appOnServiceDataPromise = rpcListenPromise(consumer.sdlManager, SDL.rpc.enums.FunctionID.OnAppServiceData, SDL.rpc.enums.MessageType.notification);
 
     // have the producer send an update
     producer.sendMediaServiceUpdate();
@@ -66,14 +66,14 @@ module.exports = async function (catalogRpc) {
 
     const performInteractionPromise = consumer.sendPerformInteractionPromise(); // send a PerformAppServiceInteraction to the producer
     // listen for a PerformAppServiceInteraction request on the producer app
-    const pasiRequest = await rpcListenPromise(producer.sdlManager, SDL.rpc.enums.FunctionID.PerformAppServiceInteraction, SDL.rpc.enums.RpcType.REQUEST);
+    const pasiRequest = await rpcListenPromise(producer.sdlManager, SDL.rpc.enums.FunctionID.PerformAppServiceInteraction, SDL.rpc.enums.MessageType.request);
 
     producer.sendPasiResponse(pasiRequest);
     await performInteractionPromise; // wait for the response for the consumer app
 
     // send a button press from consumer to producer
     const buttonPressPromise = consumer.sendButtonPressPromise();
-    const buttonRequest = await rpcListenPromise(producer.sdlManager, SDL.rpc.enums.FunctionID.ButtonPress, SDL.rpc.enums.RpcType.REQUEST);
+    const buttonRequest = await rpcListenPromise(producer.sdlManager, SDL.rpc.enums.FunctionID.ButtonPress, SDL.rpc.enums.MessageType.request);
     // respond to the button press
     producer.sendButtonResponse(buttonRequest);
     await buttonPressPromise; // wait for the response for the consumer app
@@ -85,7 +85,7 @@ module.exports = async function (catalogRpc) {
 function rpcListenPromise (sdlManager, functionId, type) {
     return new Promise((resolve, reject) => {
         const listener = (message) => {
-            if (message.getRPCType() === type) {
+            if (message.getMessageType() === type) {
                 sdlManager.removeRpcListener(functionId, listener);
                 resolve(message);
             }

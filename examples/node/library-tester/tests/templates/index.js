@@ -36,12 +36,10 @@ const AppHelper = require('../../AppHelper.js');
 module.exports = async function (catalogRpc) {
     const appId = 'templates';
 
-    const appConfig = new SDL.manager.AppConfig()
+    const lifecycleConfig = new SDL.manager.LifecycleConfig()
         .setAppId(appId)
         .setAppName(appId)
-        .setIsMediaApp(false)
         .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
-        .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
         .setAppTypes([
             SDL.rpc.enums.AppHMIType.MEDIA,
             SDL.rpc.enums.AppHMIType.REMOTE_CONTROL,
@@ -49,7 +47,7 @@ module.exports = async function (catalogRpc) {
         .setTransportConfig(new SDL.transport.TcpClientConfig(process.env.HOST, process.env.PORT));
 
     const app = new AppHelper(catalogRpc)
-        .setAppConfig(appConfig);
+        .setLifecycleConfig(lifecycleConfig);
 
     await app.start(); // after this point, we are in HMI FULL and managers are ready
     const sdlManager = app.getManager();
@@ -63,8 +61,8 @@ module.exports = async function (catalogRpc) {
     const weatherIcon = new SDL.manager.file.filetypes.SdlArtwork('weather-icon', SDL.rpc.enums.FileType.GRAPHIC_PNG)
         .setFilePath('./tests/templates/weather-icon.png');
 
-    await sdlManager.sendRpc(await fileManager.createPutFile(sdlLogo));
-    await sdlManager.sendRpc(await fileManager.createPutFile(weatherIcon));
+    await sdlManager.sendRpc(await fileManager._createPutFile(sdlLogo));
+    await sdlManager.sendRpc(await fileManager._createPutFile(weatherIcon));
 
     const templatesSupported = sdlManager
         .getSystemCapabilityManager()
@@ -93,8 +91,8 @@ module.exports = async function (catalogRpc) {
             .setMainField2('Text 2')
             .setMainField3('Text 3')
             .setMainField4('Text 4')
-            .setGraphic(new SDL.rpc.structs.Image().setValue('sdl-logo').setImageType(SDL.rpc.enums.ImageType.DYNAMIC))
-            .setSecondaryGraphic(new SDL.rpc.structs.Image().setValue('weather-icon').setImageType(SDL.rpc.enums.ImageType.DYNAMIC))
+            .setGraphic(new SDL.rpc.structs.Image().setValueParam('sdl-logo').setImageType(SDL.rpc.enums.ImageType.DYNAMIC))
+            .setSecondaryGraphic(new SDL.rpc.structs.Image().setValueParam('weather-icon').setImageType(SDL.rpc.enums.ImageType.DYNAMIC))
             .setSoftButtons([ // 2 hybrid buttons, 2 text buttons, 2 image buttons
                 makeSoftButton('Button 1', 2, SDL.rpc.enums.SoftButtonType.SBT_BOTH),
                 makeSoftButton('Button 2', 3, SDL.rpc.enums.SoftButtonType.SBT_BOTH),
@@ -130,8 +128,8 @@ function makeSoftButton (text, id, softButtonType) {
 
     if (softButtonType === SDL.rpc.enums.SoftButtonType.SBT_BOTH || softButtonType === SDL.rpc.enums.SoftButtonType.SBT_IMAGE) {
         // use the below line for static images
-        // softButton.setImage(new SDL.rpc.structs.Image().setImageType(SDL.rpc.enums.ImageType.STATIC).setValue(`0x0${id}`));
-        softButton.setImage(new SDL.rpc.structs.Image().setImageType(SDL.rpc.enums.ImageType.DYNAMIC).setValue('sdl-logo'));
+        // softButton.setImage(new SDL.rpc.structs.Image().setImageType(SDL.rpc.enums.ImageType.STATIC).setValueParam(`0x0${id}`));
+        softButton.setImage(new SDL.rpc.structs.Image().setImageType(SDL.rpc.enums.ImageType.DYNAMIC).setValueParam('sdl-logo'));
     }
     if (softButtonType === SDL.rpc.enums.SoftButtonType.SBT_BOTH || softButtonType === SDL.rpc.enums.SoftButtonType.SBT_TEXT) {
         softButton.setText(text);

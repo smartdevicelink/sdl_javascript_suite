@@ -200,7 +200,7 @@ function createCoverageState () {
 
 function catalogRpc (coverage) {
     return function log (rpc) {
-        const rpcTypeValue = rpc.getRPCType();
+        const rpcTypeValue = rpc.getMessageType();
         let rpcTypeName;
         if (rpcTypeValue === 0) {
             rpcTypeName = 'request';
@@ -215,8 +215,8 @@ function catalogRpc (coverage) {
         }
         const parameters = rpc.getParameters();
 
-        const rpcInSpec = spec.functions[rpc.getFunctionName()][rpcTypeName];
-        const rpcInCoverage = coverage.functions[rpcTypeName][rpc.getFunctionName()];
+        const rpcInSpec = spec.functions[rpc.getFunctionId()][rpcTypeName];
+        const rpcInCoverage = coverage.functions[rpcTypeName][rpc.getFunctionId()];
 
         rpcInCoverage._isUsed = true;
 

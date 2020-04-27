@@ -51,18 +51,6 @@ module.exports = async function (catalogRpc) {
     await app4.start();
 };
 
-function rpcListenPromise (sdlManager, functionId, type) {
-    return new Promise((resolve, reject) => {
-        const listener = (message) => {
-            if (message.getRPCType() === type) {
-                sdlManager.removeRpcListener(functionId, listener);
-                resolve(message);
-            }
-        }
-        sdlManager.addRpcListener(functionId, listener);
-    });
-}
-
 function sleep (timeout = 1000) {
     return new Promise((resolve) => {
         setTimeout(resolve, timeout);

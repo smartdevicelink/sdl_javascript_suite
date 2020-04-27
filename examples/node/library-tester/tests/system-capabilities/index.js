@@ -36,12 +36,10 @@ const AppHelper = require('../../AppHelper.js');
 module.exports = async function (catalogRpc) {
     const appId = 'system-capabilities';
 
-    const appConfig = new SDL.manager.AppConfig()
+    const lifecycleConfig = new SDL.manager.LifecycleConfig()
         .setAppId(appId)
         .setAppName(appId)
-        .setIsMediaApp(false)
         .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
-        .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
         .setAppTypes([
             SDL.rpc.enums.AppHMIType.MEDIA,
             SDL.rpc.enums.AppHMIType.REMOTE_CONTROL,
@@ -49,7 +47,7 @@ module.exports = async function (catalogRpc) {
         .setTransportConfig(new SDL.transport.TcpClientConfig(process.env.HOST, process.env.PORT));
 
     const app = new AppHelper(catalogRpc)
-        .setAppConfig(appConfig);
+        .setLifecycleConfig(lifecycleConfig);
 
     await app.start(); // after this point, we are in HMI FULL and managers are ready
     const sdlManager = app.getManager();
@@ -61,11 +59,11 @@ module.exports = async function (catalogRpc) {
     // retrieve the capabilities
     const scm = sdlManager.getSystemCapabilityManager();
     for (const sct in SDL.rpc.enums.SystemCapabilityType._MAP) {
-        await scm.queryCapability(sct);
+        await scm.updateCapability(sct);
     }
 
     // read the display capabilities object returned
-    // const displayCapabilities = await scm.queryCapability(SDL.rpc.enums.SystemCapabilityType.DISPLAYS);
+    // const displayCapabilities = await scm.updateCapability(SDL.rpc.enums.SystemCapabilityType.DISPLAYS);
 
     // tear down the app
     await sdlManager.sendRpc(new SDL.rpc.messages.UnregisterAppInterface());

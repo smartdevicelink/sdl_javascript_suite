@@ -36,12 +36,10 @@ const AppHelper = require('../../AppHelper.js');
 module.exports = async function (catalogRpc) {
     const appId = 'all-rpcs';
 
-    const appConfig = new SDL.manager.AppConfig()
+    const lifecycleConfig = new SDL.manager.LifecycleConfig()
         .setAppId(appId)
         .setAppName(appId)
-        .setIsMediaApp(false)
         .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
-        .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
         .setAppTypes([
             SDL.rpc.enums.AppHMIType.MEDIA,
             SDL.rpc.enums.AppHMIType.REMOTE_CONTROL,
@@ -49,7 +47,7 @@ module.exports = async function (catalogRpc) {
         .setTransportConfig(new SDL.transport.TcpClientConfig(process.env.HOST, process.env.PORT));
 
     const app = new AppHelper() // since these are going to be invalid rpcs, do not count any of the messages sent towards coverage
-        .setAppConfig(appConfig);
+        .setLifecycleConfig(lifecycleConfig);
 
     await app.start(); // after this point, we are in HMI FULL and managers are ready
     const sdlManager = app.getManager();
@@ -61,16 +59,16 @@ module.exports = async function (catalogRpc) {
     for (const rpc in SDL.rpc.messages) {
         const rpcInstance = new SDL.rpc.messages[rpc]();
         // skip notification and response RPCs
-        if (rpcInstance.getRPCType() === SDL.rpc.enums.RpcType.RESPONSE
-            || rpcInstance.getRPCType() === SDL.rpc.enums.RpcType.NOTIFICATION) {
+        if (rpcInstance.getMessageType() === SDL.rpc.enums.MessageType.response
+            || rpcInstance.getMessageType() === SDL.rpc.enums.MessageType.notification) {
             continue;
         }
 
         const FunctionID = SDL.rpc.enums.FunctionID;
 
-        if (rpcInstance.getFunctionName() === FunctionID.keyForValue(FunctionID.RegisterAppInterface) ||
-            rpcInstance.getFunctionName() === FunctionID.keyForValue(FunctionID.UnregisterAppInterface) ||
-            rpcInstance.getFunctionName() === FunctionID.keyForValue(FunctionID.CloseApplication)) {
+        if (rpcInstance.getFunctionId() === FunctionID.keyForValue(FunctionID.RegisterAppInterface) ||
+            rpcInstance.getFunctionId() === FunctionID.keyForValue(FunctionID.UnregisterAppInterface) ||
+            rpcInstance.getFunctionId() === FunctionID.keyForValue(FunctionID.CloseApplication)) {
             continue;
         }
 
@@ -88,7 +86,7 @@ module.exports = async function (catalogRpc) {
     for (const rpc in SDL.rpc.messages) {
         const rpcInstance = new SDL.rpc.messages[rpc]();
         // skip response RPCs
-        if (rpcInstance.getRPCType() === SDL.rpc.enums.RpcType.RESPONSE) {
+        if (rpcInstance.getMessageType() === SDL.rpc.enums.MessageType.response) {
             continue;
         }
 
@@ -96,12 +94,12 @@ module.exports = async function (catalogRpc) {
         const protocolLayer = sdlManager._lifecycleManager._sdlSession._sdlProtocol;
         const sessionId = protocolLayer._getSessionId();
         const messageId = protocolLayer._getNextMessageID();
-        const mtu = protocolLayer._mtus[SDL.protocol.enums.ServiceType.RPC];
+        const mtu = protocolLayer._mtus[SDL.protocol.enums._ServiceType.RPC];
         const version = protocolLayer._protocolVersion.getMajor();
-        const isEncrypted = rpcInstance.getIsEncrypted();
+        const isEncrypted = rpcInstance.isPayloadProtected();
 
         const sdlPacket = await new Promise((resolve, reject) => {
-            SDL.protocol.MessageFrameDisassembler.buildRPC(rpcInstance, sessionId, messageId, mtu, version, isEncrypted, resolve);
+            SDL.protocol._MessageFrameDisassembler.buildRPC(rpcInstance, sessionId, messageId, mtu, version, isEncrypted, resolve);
         });
 
         // listen for the notification or request

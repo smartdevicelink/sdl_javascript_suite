@@ -46,7 +46,7 @@ module.exports = async function (catalogRpc) {
     await consumer.start();
 
     // get the initial number of app services connected before continuing
-    const prePublishAppServices = await consumer.sdlManager.getSystemCapabilityManager().queryCapability(SDL.rpc.enums.SystemCapabilityType.APP_SERVICES);
+    const prePublishAppServices = await consumer.sdlManager.getSystemCapabilityManager().updateCapability(SDL.rpc.enums.SystemCapabilityType.APP_SERVICES);
     const BASE_SERVICES_CONNECTED = prePublishAppServices.length;
 
     // publish the app services and have the consumer listen for when it happens
@@ -55,7 +55,7 @@ module.exports = async function (catalogRpc) {
     await producer2.setupAppService(true);
     await expectAppServiceCount(consumer.sdlManager, BASE_SERVICES_CONNECTED + 2);
 
-    const appServiceCapabilities = await consumer.sdlManager.getSystemCapabilityManager().queryCapability(SDL.rpc.enums.SystemCapabilityType.APP_SERVICES);
+    const appServiceCapabilities = await consumer.sdlManager.getSystemCapabilityManager().updateCapability(SDL.rpc.enums.SystemCapabilityType.APP_SERVICES);
 
     // locate the weather app services from the capability response and use the service ids to activate one of them
     const foundCapability = appServiceCapabilities.find((capability) => {

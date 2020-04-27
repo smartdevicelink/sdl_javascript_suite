@@ -52,12 +52,10 @@ module.exports = class Producer {
             .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG)
             .setPersistent(true);
 
-        const appConfig = new SDL.manager.AppConfig()
+        const lifecycleConfig = new SDL.manager.LifecycleConfig()
             .setAppId(appId)
             .setAppName(appId)
-            .setIsMediaApp(false)
             .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
-            .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
             .setAppTypes([
                 SDL.rpc.enums.AppHMIType.MEDIA,
                 SDL.rpc.enums.AppHMIType.REMOTE_CONTROL,
@@ -66,7 +64,7 @@ module.exports = class Producer {
             .setAppIcon(file);
 
         this._app = new AppHelper(this._catalogRpc)
-            .setAppConfig(appConfig);
+            .setLifecycleConfig(lifecycleConfig);
 
         await this._app.start(); // after this point, we are in HMI FULL and managers are ready
         this.sdlManager = this._app.getManager();

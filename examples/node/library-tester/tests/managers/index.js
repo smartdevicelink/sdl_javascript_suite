@@ -37,12 +37,10 @@ const AppHelper = require('./AppHelper.js');
 module.exports = async function (catalogRpc) {
     const appId = 'managers';
 
-    const appConfig = new SDL.manager.AppConfig()
+    const lifecycleConfig = new SDL.manager.LifecycleConfig()
         .setAppId(appId)
         .setAppName(appId)
-        .setIsMediaApp(false)
         .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
-        .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
         .setAppTypes([
             SDL.rpc.enums.AppHMIType.MEDIA,
             SDL.rpc.enums.AppHMIType.REMOTE_CONTROL,
@@ -50,7 +48,7 @@ module.exports = async function (catalogRpc) {
         .setTransportConfig(new SDL.transport.TcpClientConfig(process.env.HOST, process.env.PORT));
         
     const app = new AppHelper(catalogRpc)
-        .setAppConfig(appConfig);
+        .setLifecycleConfig(lifecycleConfig);
 
     // this will get invoked once the app loses Show permissions at the end!
     let permissionListener;
@@ -84,7 +82,7 @@ module.exports = async function (catalogRpc) {
     // send a show and show off the large graphic
     const show = new SDL.rpc.messages.Show()
         .setMainField1('You should see a large graphic!')
-        .setGraphic(new SDL.rpc.structs.Image().setValue(fileName).setImageType(SDL.rpc.enums.ImageType.DYNAMIC))
+        .setGraphic(new SDL.rpc.structs.Image().setValueParam(fileName).setImageType(SDL.rpc.enums.ImageType.DYNAMIC))
         .setTemplateConfiguration(new SDL.rpc.structs.TemplateConfiguration()
             .setTemplate('TEXT_WITH_GRAPHIC'));  
     await sdlManager.sendRpc(show);

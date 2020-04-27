@@ -46,12 +46,10 @@ module.exports = class SampleApp {
     }
 
     async start () {
-        const appConfig = new SDL.manager.AppConfig()
+        const lifecycleConfig = new SDL.manager.LifecycleConfig()
             .setAppId(this.appId)
             .setAppName(this.appId)
-            .setIsMediaApp(false)
             .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
-            .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
             .setAppTypes([
                 SDL.rpc.enums.AppHMIType.MEDIA,
                 SDL.rpc.enums.AppHMIType.REMOTE_CONTROL,
@@ -59,14 +57,14 @@ module.exports = class SampleApp {
             .setTransportConfig(new SDL.transport.TcpClientConfig(process.env.HOST, process.env.PORT));
 
         if (this._setInvalidProtocolVersion) {
-            appConfig.setMinimumProtocolVersion(new SDL.util.Version().fromString("99.99.99"));
+            lifecycleConfig.setMinimumProtocolVersion(new SDL.util.Version().fromString("99.99.99"));
         }
         if (this._setInvalidRpcVersion) {
-            appConfig.setMinimumRpcVersion(new SDL.util.Version().fromString("99.99.99"));
+            lifecycleConfig.setMinimumRpcVersion(new SDL.util.Version().fromString("99.99.99"));
         }
 
         this._app = new AppHelper(this._catalogRpc)
-            .setAppConfig(appConfig);
+            .setLifecycleConfig(lifecycleConfig);
 
         const startPromise = this._app.start();
         // override one of sdl manager's methods to determine if it's going to fail
@@ -95,18 +93,6 @@ module.exports = class SampleApp {
     }
 
 };
-
-function rpcListenPromise (sdlManager, functionId, type) {
-    return new Promise((resolve, reject) => {
-        const listener = (message) => {
-            if (message.getRPCType() === type) {
-                sdlManager.removeRpcListener(functionId, listener);
-                resolve(message);
-            }
-        }
-        sdlManager.addRpcListener(functionId, listener);
-    });
-}
 
 function sleep (timeout = 1000) {
     return new Promise((resolve) => {
