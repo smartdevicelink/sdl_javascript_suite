@@ -47,10 +47,9 @@
                     .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG)
                     .setPersistent(true);
 
-                this._appConfig = new SDL.manager.AppConfig()
+                this._lifecycleConfig = new SDL.manager.LifecycleConfig()
                     .setAppId(appId)
                     .setAppName('Hello JS')
-                    .setIsMediaApp(false)
                     .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
                     .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
                     .setAppTypes([
@@ -58,6 +57,9 @@
                     ])
                     .setTransportConfig(new SDL.transport.WebSocketClientConfig('ws://localhost', 5050))
                     .setAppIcon(file);
+
+                this._appConfig = new SDL.manager.AppConfig()
+                    .setLifecycleConfig(this._lifecycleConfig);
 
                 const managerListener = new SDL.manager.SdlManagerListener();
                 managerListener

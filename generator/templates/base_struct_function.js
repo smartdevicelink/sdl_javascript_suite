@@ -7,6 +7,8 @@
  {% for d in description -%}
  * {{d}}
  {% endfor -%}
+ {% else -%}
+ * Struct description not available.
  {% endif -%}
  {% if deprecated is defined -%}
  * @deprecated
@@ -17,7 +19,8 @@
 {% block body %}
     /**
      * Initalizes an instance of {{name}}.
-     * @constructor
+     * @class
+     * @param {object} parameters - An object map of parameters.
      {% if deprecated is defined -%}
      * @deprecated
      {% endif -%}
@@ -30,34 +33,36 @@
     {% for method in methods %}
     {% set len = method.type|length + method.param_name|length + 13 -%}
     /**
+     * Set the {{method.method_title}}
      {% if deprecated is defined -%}
      * @deprecated
      {% endif -%}
      {% if not method.description -%}
-     * @param {{'%s%s%s %s'|format('{', method.type, '}', method.param_name)}}
+     * @param {{'%s%s%s %s'|format('{', method.type, '}', method.param_name)}} - The desired {{method.method_title}}.
      {% else -%}
      * {% for d in method.description -%}
      {% if loop.index == 1 -%}
-     @param {{'%s%s%s %s - %s'|format('{', method.type, '}', method.param_name, d)}}
+     @param {{'%s%s%s %s - %s'|format('{', method.type, '}', method.param_name, d)}} - The desired {{method.method_title}}.
      {% else -%}
-     * {{d|indent(len,True)}}
+     * {{d}}
      {% endif -%} {% endfor -%}
      {% endif -%}
-     * @return {{'%s%s%s'|format('{', name, '}')}}
+     * @returns {{'%s%s%s'|format('{', name, '}')}} - The class instance for method chaining.
      */
     set{{method.method_title}} ({{method.param_name}}) {
         {%- if method.external %}
-        this.validateType({{method.external}}, {{method.param_name}}{{ ', true' if '[]' in method.type }});
+        this._validateType({{method.external}}, {{method.param_name}}{{ ', true' if '[]' in method.type }});
         {%- endif %}
         this.setParameter({{name}}.{{method.key}}, {{method.param_name}});
         return this;
     }
 
     /**
+     * Get the {{method.method_title}}
      {% if deprecated is defined -%}
      * @deprecated
      {% endif -%}
-     * @return {{'%s%s%s'|format('{', method.type, '}')}}
+     * @returns {{'%s%s%s'|format('{', method.type, '}')}} - the {{method.key}} value
      */
     get{{method.method_title}} () {
         {%- if method.external %}

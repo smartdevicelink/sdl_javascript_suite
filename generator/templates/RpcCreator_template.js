@@ -4,24 +4,24 @@
 // messages
 {{-super()}}
 // other
-import { RpcType } from './enums/RpcType.js';
+import { MessageType } from './enums/MessageType.js';
 import { FunctionID } from './enums/FunctionID.js';
-import { JsonRpcMarshaller } from './../util/JsonRpcMarshaller.js';
-import { BinaryFrameHeader } from './../protocol/BinaryFrameHeader.js';
+import { _JsonRpcMarshaller } from './../util/_JsonRpcMarshaller.js';
+import { _BinaryFrameHeader } from './../protocol/_BinaryFrameHeader.js';
 {% endblock -%}
 {%- block body %}
     /**
-     * Converts an SdlPacket to an RpcMessage
-     * @param {SdlPacket} sdlPacket
-     * @return {RpcMessage}
+     * Converts an _SdlPacket to an RpcMessage
+     * @param {_SdlPacket} sdlPacket - An _SdlPacket to convert.
+     * @returns {RpcMessage} - The constructed RpcMessage.
      */
     static construct (sdlPacket) {
         const payload = sdlPacket.getPayload();
-        const binaryFrameHeader = BinaryFrameHeader.fromBinaryHeader(payload);
+        const binaryFrameHeader = _BinaryFrameHeader.fromBinaryHeader(payload);
 
         let message;
-        const rpcType = binaryFrameHeader.getRpcType();
-        const rpcName = RpcType.keyForValue(rpcType);
+        const messageType = binaryFrameHeader.getMessageType();
+        const rpcName = MessageType.keyForValue(messageType);
         const correlationId = binaryFrameHeader.getCorrelationId();
         const functionId = binaryFrameHeader.getFunctionId();
         const functionName = FunctionID.keyForValue(functionId);
@@ -30,15 +30,15 @@ import { BinaryFrameHeader } from './../protocol/BinaryFrameHeader.js';
         const params = {};
         // not-empty object check
         if (Object.keys(jsonData).length !== 0) {
-            params.parameters = JsonRpcMarshaller.unmarshall(jsonData);
+            params.parameters = _JsonRpcMarshaller.unmarshall(jsonData);
         }
 
         switch (functionId) {
             {%- for item in cases %}
             case FunctionID.{{item.function_name}}:
-                if (rpcType === RpcType.{{item.type}}) {
+                if (messageType === MessageType.{{item.type|lower}}) {
                     message = new {{item.class_name}}(params);
-                }{% if item.type == 'REQUEST' %} else if (rpcType === RpcType.RESPONSE) {
+                }{% if item.type == 'REQUEST' %} else if (messageType === MessageType.response) {
                     message = new {{item.class_name}}Response(params);
                 }
                 {%- endif %}
@@ -53,7 +53,7 @@ import { BinaryFrameHeader } from './../protocol/BinaryFrameHeader.js';
             return null;
         }
 
-        if (rpcType === RpcType.REQUEST || rpcType === RpcType.RESPONSE) {
+        if (messageType === MessageType.request || messageType === MessageType.response) {
             message.setCorrelationId(correlationId);
         }
         if (bulkData) {

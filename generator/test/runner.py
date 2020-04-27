@@ -16,7 +16,7 @@ try:
     from test_functions import TestFunctionsProducer
     from test_structs import TestStructsProducer
     from test_code_format_and_quality import CodeFormatAndQuality
-except ModuleNotFoundError as message:
+except ImportError as message:
     print('{}.\nProbably you did not initialize submodule'.format(message))
     sys.exit(1)
 
@@ -33,8 +33,7 @@ def main():
     suite.addTests(TestLoader().loadTestsFromTestCase(CodeFormatAndQuality))
 
     runner = TextTestRunner(verbosity=2)
-    test_result = runner.run(suite)
-    print(test_result)
+    runner.run(suite)
 
 
 if __name__ == '__main__':

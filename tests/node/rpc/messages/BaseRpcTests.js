@@ -38,17 +38,17 @@ exports.tests = function () {
         done();
     });
 
-    it('testRPCType', function (done) {
-        const messageType = this.msg.getRPCType();
+    it('testMessageType', function (done) {
+        const messageType = this.msg.getMessageType();
         Validator.assertNotNullUndefined(messageType);
-        Validator.assertEquals(messageType, this.getRPCType());
+        Validator.assertEquals(messageType, this.getMessageType());
         done();
     });
 
     it('testFunctionName', function (done) {
-        const functionName = this.msg.getFunctionName();
-        Validator.assertNotNullUndefined(functionName);
-        Validator.assertEquals(functionName, this.getFunctionName());
+        const functionId = this.msg.getFunctionId();
+        Validator.assertNotNullUndefined(functionId);
+        Validator.assertEquals(functionId, this.getFunctionId());
 
         done();
     });
@@ -69,10 +69,10 @@ exports.tests = function () {
             Validator.assertNotNullUndefined(CORR_ID, 'Correlation ID of the RpcResponse was null.');
         }
 
-        Validator.assertNotNullUndefined(msg.getRPCType(), 'RPC Type of the RPC message was null.');
-        Validator.assertEquals(msg.getRPCType(), this.getRPCType(), 'RPC Type didn\'t match expected type.');
-        Validator.assertNotNullUndefined(msg.getFunctionName(), 'Function name of the RPC message was null.');
-        Validator.assertEquals(this.getFunctionName(), msg.getFunctionName(), 'Function name didn\'t match expected function name.');
+        Validator.assertNotNullUndefined(msg.getMessageType(), 'Message Type of the RPC message was null.');
+        Validator.assertEquals(msg.getMessageType(), this.getMessageType(), 'Message Type didn\'t match expected type.');
+        Validator.assertNotNullUndefined(msg.getFunctionId(), 'Function id of the RPC message was null.');
+        Validator.assertEquals(this.getFunctionId(), msg.getFunctionId(), 'Function id didn\'t match expected function name.');
 
         done();
     });

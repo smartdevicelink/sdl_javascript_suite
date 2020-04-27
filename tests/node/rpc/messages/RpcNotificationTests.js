@@ -1,16 +1,16 @@
 const SDL = require('./../../../../lib/js/dist/SDL.min.js');
-const RpcType = SDL.rpc.enums.RpcType;
+const MessageType = SDL.rpc.enums.MessageType;
 const RpcNotification = SDL.rpc.RpcNotification;
 
 const BaseRpcTests = require('./BaseRpcTests');
 const Test = require('./../../../Test.js');
 
 
-describe('RpcResponseTests', function () {
+describe('RpcNotificationTests', function () {
     before(function () {
         this.createMessage = function () {
             const msg = new RpcNotification();
-            msg.setFunctionName(Test.GENERAL_STRING);
+            msg.setFunctionId(Test.GENERAL_STRING);
             msg.setParameter(Test.GENERAL_STRING, Test.GENERAL_STRING);
 
             return msg;
@@ -22,11 +22,11 @@ describe('RpcResponseTests', function () {
             return expectedParameters;
         };
 
-        this.getRPCType = function () {
-            return RpcType.NOTIFICATION;
+        this.getMessageType = function () {
+            return MessageType.notification;
         };
 
-        this.getFunctionName = function () {
+        this.getFunctionId = function () {
             return Test.GENERAL_STRING;
         };
     });

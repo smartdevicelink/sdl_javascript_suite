@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 */
 
-const SDL = require('../../../lib/node/dist/SDL.min.js');
+const SDL = require('./SDL.min.js');
 const CONFIG = require('./config.js');
 
 class AppClient {
@@ -43,17 +43,18 @@ class AppClient {
             .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG)
             .setPersistent(true);
 
-        this._appConfig = new SDL.manager.AppConfig()
+        this._lifecycleConfig = new SDL.manager.LifecycleConfig()
             .setAppId(CONFIG.appId)
             .setAppName(CONFIG.appName)
-            .setIsMediaApp(false)
             .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
-            .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
             .setAppTypes([
                 SDL.rpc.enums.AppHMIType.DEFAULT,
             ])
             .setTransportConfig(new SDL.transport.TcpClientConfig(CONFIG.host, CONFIG.port))
             .setAppIcon(file);
+
+        this._appConfig = new SDL.manager.AppConfig()
+            .setLifecycleConfig(this._lifecycleConfig);
 
         const managerListener = new SDL.manager.SdlManagerListener();
         managerListener
