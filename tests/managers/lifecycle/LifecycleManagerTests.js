@@ -34,7 +34,7 @@ module.exports = function (appClient) {
          */
         function validateRpcResponse (response) {
             Validator.assertTrue(response.getSuccess());
-            Validator.assertEquals(response.getFunctionName(), 'ListFiles');
+            Validator.assertEquals(response.getFunctionId(), 'ListFiles');
         }
         it('testRpcListener', function (done) {
             sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.ListFiles, validateRpcResponse);
