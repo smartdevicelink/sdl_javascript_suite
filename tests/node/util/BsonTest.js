@@ -1,5 +1,5 @@
 const SDL = require('./../../../lib/js/dist/SDL.min.js');
-const Bson = SDL.util.Bson;
+const Bson = SDL.util._Bson;
 const Validator = require('./../../Validator.js');
 
 const testBuffer = new Uint8Array([12, 0, 0, 0, 16, 120, 0, 1, 0, 0, 0, 0]);

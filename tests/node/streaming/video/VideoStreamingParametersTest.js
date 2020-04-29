@@ -7,7 +7,7 @@ const VideoStreamingCapability = SDL.rpc.structs.VideoStreamingCapability;
 const VideoStreamingFormat = SDL.rpc.structs.VideoStreamingFormat;
 const VideoStreamingCodec = SDL.rpc.enums.VideoStreamingCodec;
 const VideoStreamingProtocol = SDL.rpc.enums.VideoStreamingProtocol;
-const VideoStreamingParameters = SDL.streaming.video.VideoStreamingParameters;
+const VideoStreamingParameters = SDL.streaming.video._VideoStreamingParameters;
 
 const params = new VideoStreamingParameters();
 const capability = new VideoStreamingCapability();

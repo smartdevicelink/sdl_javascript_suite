@@ -40,19 +40,20 @@
 
         class HelloSdl {
             constructor () {
-                const fileName = `${sdl_manifest.appId}_icon.gif`;
+                const fileName = `${sdl_manifest.appId}_icon`;
                 const file = new SDL.manager.file.filetypes.SdlFile()
                     .setName(fileName)
                     .setFilePath(sdl_manifest.appIcon)
                     .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG)
                     .setPersistent(true);
 
-                this._appConfig = new SDL.manager.AppConfig()
+                this._lifecycleConfig = new SDL.manager.LifecycleConfig()
                     .loadManifest(sdl_manifest)
-                    .setIsMediaApp(false)
                     .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
-                    .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
                     .setTransportConfig(new SDL.transport.WebSocketClientConfig());
+
+                this._appConfig = new SDL.manager.AppConfig()
+                    .setLifecycleConfig(this._lifecycleConfig);
 
                 const managerListener = new SDL.manager.SdlManagerListener();
                 managerListener

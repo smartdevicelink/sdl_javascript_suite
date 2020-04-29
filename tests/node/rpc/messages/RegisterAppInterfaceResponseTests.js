@@ -1,7 +1,7 @@
 const SDL = require('./../../../../lib/js/dist/SDL.min.js');
 const RegisterAppInterfaceResponse = SDL.rpc.messages.RegisterAppInterfaceResponse;
 const FunctionID = SDL.rpc.enums.FunctionID;
-const RpcType = SDL.rpc.enums.RpcType;
+const MessageType = SDL.rpc.enums.MessageType;
 
 const BaseRpcTests = require('./BaseRpcTests');
 const Test = require('./../../../Test.js');
@@ -61,11 +61,11 @@ describe('RegisterAppInterfaceResponseTests', function () {
             return expectedParameters;
         };
 
-        this.getRPCType = function () {
-            return RpcType.RESPONSE;
+        this.getMessageType = function () {
+            return MessageType.response;
         };
 
-        this.getFunctionName = function () {
+        this.getFunctionId = function () {
             return FunctionID.keyForValue(FunctionID.RegisterAppInterface);
         };
     });
@@ -120,7 +120,7 @@ describe('RegisterAppInterfaceResponseTests', function () {
         Validator.assertNotNull(msg);
         Validator.testNullBase(
             FunctionID.keyForValue(FunctionID.RegisterAppInterface),
-            RpcType.RESPONSE,
+            MessageType.response,
             msg);
 
         Validator.assertNullOrUndefined(msg.getSdlMsgVersion());
