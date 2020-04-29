@@ -1,0 +1,23 @@
+<html>
+
+<head>
+    <script src='./../../lib/js/dist/SDL.min.js'></script>
+
+    <script>
+        function test(Bson) {
+            console.log(`Bson`, Bson);
+            let serial = Bson.serialize({ x: 1 })
+            console.log(serial);
+            let deserial = Bson.deserialize(serial)
+            console.log(deserial);
+        }
+        test(SDL.util.Bson);
+    </script>
+</head>
+
+
+<body>
+
+</body>
+
+</html>

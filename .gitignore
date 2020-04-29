@@ -1,0 +1,11 @@
+**/node_modules/
+*.log
+.*env*
+.idea
+*__pycache__
+.DS_Store
+*htmlcov
+*.coverage
+*.pytest_cache
+hello-sdl*.zip
+app-directory.json
