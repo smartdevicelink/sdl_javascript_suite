@@ -53,14 +53,25 @@ module.exports = async function (catalogRpc) {
     // this will get invoked once the app loses Show permissions at the end!
     let permissionListener;
 
+    let permissionChanges = 0;
     const permissionPromise = new Promise((resolve, reject) => {
         permissionListener = (allowedPermissions, permissionGroupStatus) => {
-            // should be allowed now
-            const allowedEnum = SDL.manager.permission.enums.PermissionGroupStatus.ALLOWED;
-            if (permissionGroupStatus === allowedEnum) {
-                resolve();
-            } else {
-                reject(new Error(`Expected permission change for Show to ${allowedEnum}. Got ${permissionGroupStatus}`));
+            // should be unknown first, then allowed later
+            if (permissionChanges === 0) {
+                const unknownEnum = SDL.manager.permission.enums.PermissionGroupStatus.UNKNOWN;
+                if (permissionGroupStatus === unknownEnum) {
+                    permissionChanges = 1;
+                } else {
+                    reject(new Error(`Expected permission change for Show to ${unknownEnum}. Got ${permissionGroupStatus}`));
+                }
+            }
+            else if (permissionChanges === 1) {
+                const allowedEnum = SDL.manager.permission.enums.PermissionGroupStatus.ALLOWED;
+                if (permissionGroupStatus === allowedEnum) {
+                    resolve(); // done
+                } else {
+                    reject(new Error(`Expected permission change for Show to ${allowedEnum}. Got ${permissionGroupStatus}`));
+                }
             }
         }
     });
