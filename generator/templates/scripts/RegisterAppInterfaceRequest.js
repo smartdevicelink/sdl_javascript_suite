@@ -1,9 +1,10 @@
 /**
- * @param {String} fullAppId
- * @return {RegisterAppInterface}
+ * Set the full app ID. Also sets the shortened app ID automatically.
+ * @param {String} fullAppId - A full App ID.
+ * @returns {RegisterAppInterface} - The class instance to support method chaining.
  */
 setFullAppId (fullAppId) {
-    this.validateType(String, fullAppId);
+    this._validateType(String, fullAppId);
 
     if (fullAppId !== null) {
         fullAppId = fullAppId.toLowerCase();
@@ -23,26 +24,28 @@ setFullAppId (fullAppId) {
 }
 
 /**
- * @return {String} the app id
+ * Get the full App ID.
+ * @returns {String} - The full app ID.
  */
 getFullAppId () {
     return this.getParameter(RegisterAppInterface.KEY_FULL_APP_ID);
 }
 
 /**
- * @param {String} appId - This method should not be accessed directly by developers. Only set the full ID and this
- *                         param will be set.
- * @return {RegisterAppInterface}
+ * Sets the shortened app ID.
+ * @param {String} appId - A shortened app ID.
+ * @returns {RegisterAppInterface} - The class instance to support method chaining.
  */
 _setAppId (appId) {
-    this.validateType(String, appId);
+    this._validateType(String, appId);
 
     this.setParameter(RegisterAppInterface.KEY_APP_ID, appId);
     return this;
 }
 
 /**
- * @return {String} the app id
+ * Get the shortened app ID.
+ * @returns {String} - The shortened app ID.
  */
 getAppId () {
     return this.getParameter(RegisterAppInterface.KEY_APP_ID);

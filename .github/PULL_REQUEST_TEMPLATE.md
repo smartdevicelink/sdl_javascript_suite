@@ -1,4 +1,4 @@
-[Things to note: Pull Requests **must** fix an issue. Discussion about the feature / bug takes place in the issue, discussion of the implementation takes place in the PR. Please also see the [Contributing Guide](./CONTRIBUTING.md) for information on branch naming and the CLA, and the [SmartDeviceLink GitHub Best Practices](https://d83tozu1c8tt6.cloudfront.net/media/resources/SDL_GitHub_BestPractices.pdf) document for more information on how to enter a pull request.  Once this PR is ready for review, please request one from @nickschwab.
+[Things to note: Pull Requests **must** fix an issue. Discussion about the feature / bug takes place in the issue, discussion of the implementation takes place in the PR. Please also see the [Contributing Guide](./CONTRIBUTING.md) for information on branch naming and the CLA, and the [SmartDeviceLink GitHub Best Practices](https://d83tozu1c8tt6.cloudfront.net/media/resources/SDL_GitHub_BestPractices.pdf) document for more information on how to enter a pull request.  Once this PR is ready for review, please request one from @crokita.
 
 Delete the above section when you've read it.]
 

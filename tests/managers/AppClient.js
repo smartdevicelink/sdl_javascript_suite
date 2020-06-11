@@ -34,13 +34,18 @@ const SDL = require('../../lib/node/dist/SDL.min.js');
 const CONFIG = require('./config.js');
 
 class AppClient {
-    constructor (wsClient) {
-        this._appConfig = new SDL.manager.AppConfig()
+    constructor (wsClient, ready) {
+        const fileName = `${CONFIG.appId}_icon.gif`;
+        const file = new SDL.manager.file.filetypes.SdlFile()
+            .setName(fileName)
+            .setFilePath('./test_icon_1.png')
+            .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG)
+            .setPersistent(true);
+
+        this._lifecycleConfig = new SDL.manager.LifecycleConfig()
             .setAppId(CONFIG.appId)
             .setAppName(CONFIG.appName)
-            .setIsMediaApp(false)
             .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
-            .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
             .setAppTypes([
                 SDL.rpc.enums.AppHMIType.DEFAULT,
             ])
@@ -50,6 +55,9 @@ class AppClient {
                     CONFIG.connectionLostTimeout
                 )
             );
+
+        this._appConfig = new SDL.manager.AppConfig()
+            .setLifecycleConfig(this._lifecycleConfig);
 
         const managerListener = new SDL.manager.SdlManagerListener();
         managerListener

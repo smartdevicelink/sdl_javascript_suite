@@ -12,13 +12,18 @@ describe('ManagerTests', function () {
     it('StartManagerTests', function (done) {
         const appWebSocketServer = new WS.Server({ port: 3005 });
         appWebSocketServer.on('connection', function (connection) {
-            const appClient = new AppClient(connection);
-            permissionManagerTests(appClient);
-            softButtonManagerTests(appClient);
-            screenManagerTests(appClient);
-            lifecycleManagerTests(appClient);
-            fileManagerTests(appClient);
-            done();
+            const appClient = new AppClient(connection, async (teardown) => {
+                permissionManagerTests(appClient);
+                softButtonManagerTests(appClient);
+                screenManagerTests(appClient);
+                lifecycleManagerTests(appClient);
+                setTimeout(function () {
+                    teardown();
+                    done();
+                }, 2000);
+            });
+
+
         });
     });
 });

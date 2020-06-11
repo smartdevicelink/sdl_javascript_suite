@@ -9,6 +9,10 @@ const Test = require('../../Test');
 module.exports = function (appClient) {
     const sdlManager = appClient._sdlManager;
     describe('LifecycleManagerTests', function () {
+        /**
+         * Handle Rpc Stub.
+         * @returns {Promise} - A promise.
+         */
         function handleRpcStub () {
             const responseSuccess = new SDL.rpc.messages.ListFilesResponse({
                 functionName: SDL.rpc.enums.FunctionID.ListFiles,
@@ -23,9 +27,14 @@ module.exports = function (appClient) {
                 resolve(responseSuccess);
             });
         }
+
+        /**
+         * Validate Rpc response.
+         * @param {RpcResponse} response - An Rpc Response.
+         */
         function validateRpcResponse (response) {
             Validator.assertTrue(response.getSuccess());
-            Validator.assertEquals(response.getFunctionName(), 'ListFiles');
+            Validator.assertEquals(response.getFunctionId(), 'ListFiles');
         }
         it('testRpcListener', function (done) {
             sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.ListFiles, validateRpcResponse);
