@@ -35,7 +35,7 @@ const CONFIG = require('./config.js');
 
 class AppClient {
     constructor (wsClient, ready) {
-        const fileName = `${CONFIG.appId}_icon.png`;
+        const fileName = `${CONFIG.appId}_icon`;
         const file = new SDL.manager.file.filetypes.SdlFile()
             .setName(fileName)
             .setFilePath('./test_icon_1.png')
