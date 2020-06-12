@@ -59,7 +59,7 @@ module.exports = function (appClient) {
             permissionManager.addListener(permissionElements, SDL.manager.permission.enums.PermissionGroupType.ANY,
                 function (allowedPermissions, permissionGroupStatus) {
                     if (listenerCalledCounter === 0) {
-                        Validator.assertEquals(permissionGroupStatus, SDL.manager.permission.PermissionGroupStatus.MIXED);
+                        Validator.assertEquals(permissionGroupStatus, SDL.manager.permission.enums.PermissionGroupStatus.ALLOWED);
                         Validator.assertTrue(allowedPermissions[SDL.rpc.enums.FunctionID.Show].getIsRpcAllowed());
                         Validator.assertTrue(allowedPermissions[SDL.rpc.enums.FunctionID.GetVehicleData].getIsRpcAllowed());
                         Validator.assertTrue(allowedPermissions[SDL.rpc.enums.FunctionID.GetVehicleData].getAllowedParameters().rpm);

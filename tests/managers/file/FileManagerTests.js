@@ -20,8 +20,10 @@ module.exports = function (appClient) {
     validFile.setPersistent(false);
 
     describe('FileManagerTests', function () {
-
-        // Various RpcResponse creators
+        /**
+         * Handle ListFiles successes.
+         * @returns {Promise} - A promise.
+         */
         function onListFilesSuccess () {
             const responseSuccess = new SDL.rpc.messages.ListFilesResponse({
                 functionName: SDL.rpc.enums.FunctionID.ListFiles,
@@ -37,6 +39,10 @@ module.exports = function (appClient) {
             });
         }
 
+        /**
+         * Handle ListFiles failure.
+         * @returns {Promise} - A promise.
+         */
         function onListFilesFailure () {
             const responseFailure = new SDL.rpc.messages.ListFilesResponse({
                 functionName: SDL.rpc.enums.FunctionID.ListFiles,
@@ -49,6 +55,10 @@ module.exports = function (appClient) {
             });
         }
 
+        /**
+         * Handle PutFile success.
+         * @returns {Promise} - A promise.
+         */
         function onPutFileSuccess () {
             const responseSuccess = new SDL.rpc.messages.PutFileResponse({
                 functionName: SDL.rpc.enums.FunctionID.PutFiles,
@@ -62,6 +72,10 @@ module.exports = function (appClient) {
             });
         }
 
+        /**
+         * Handle PutFile failure.
+         * @returns {Promise} - A promise.
+         */
         function onPutFileFailure () {
             const responseFailure = new SDL.rpc.messages.PutFileResponse({
                 functionName: SDL.rpc.enums.FunctionID.PutFiles,
@@ -74,10 +88,19 @@ module.exports = function (appClient) {
             });
         }
 
+        /**
+         * Check for a failure in a file upload.
+         * @param {FileManager} fileManager - the current fileManager
+         * @param {SdlFile} sdlFile - the file to be uploaded.
+         */
         async function checkForUploadFailure (fileManager, sdlFile) {
             await expect(fileManager.uploadFile(sdlFile)).to.be.rejected;
         }
 
+        /**
+         * Handle ListFiles with multiple files returned.
+         * @returns {Promise} - A promise.
+         */
         function onMultipleListFilesSuccess () {
             const fileNames = Test.GENERAL_STRING_LIST;
             fileNames.push('art1');
@@ -96,14 +119,18 @@ module.exports = function (appClient) {
             });
         }
 
-        let failEveryOtherRequest = 0;
+        let failEveryOtherRequest = true;
+        /**
+         * Handle multiple PutFile RPCs, succeeding in one and failing in the next.
+         * @returns {Promise} - A promise.
+         */
         function onMultiplePutFileSuccess () {
             const response = new SDL.rpc.messages.PutFileResponse({
                 functionName: SDL.rpc.enums.FunctionID.PutFiles,
             })
                 .setSpaceAvailable(Test.GENERAL_INT);
-            if (failEveryOtherRequest % 2 === 0) {
-                failEveryOtherRequest++;
+            if (failEveryOtherRequest) {
+                failEveryOtherRequest = !failEveryOtherRequest;
                 response.setSuccess(true);
                 // _handleRpc triggers the listener
                 sdlManager._lifecycleManager._handleRpc(response);
@@ -112,7 +139,7 @@ module.exports = function (appClient) {
                     resolve(response);
                 });
             } else {
-                failEveryOtherRequest++;
+                failEveryOtherRequest = !failEveryOtherRequest;
                 response.setSuccess(false);
                 // _handleRpc triggers the listener
                 sdlManager._lifecycleManager._handleRpc(response);
@@ -123,6 +150,10 @@ module.exports = function (appClient) {
             }
         }
 
+        /**
+         * Handle DeleteFile success.
+         * @returns {Promise} - A promise.
+         */
         function onDeleteFileSuccess () {
             const responseSuccess = new SDL.rpc.messages.DeleteFileResponse({
                 functionName: SDL.rpc.enums.FunctionID.DeleteFile,
@@ -325,7 +356,6 @@ module.exports = function (appClient) {
             sdlManager.removeRpcListener(SDL.rpc.enums.FunctionID.DeleteFile, expectSuccess);
             sdlManager.removeRpcListener(SDL.rpc.enums.FunctionID.PutFile, expectSuccess);
             sdlManager.removeRpcListener(SDL.rpc.enums.FunctionID.ListFiles, expectSuccess);
-
         });
 
         it('testMultipleFileUploadPartialFailure', async function () {

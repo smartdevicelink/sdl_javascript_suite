@@ -35,7 +35,7 @@ const CONFIG = require('./config.js');
 
 class AppClient {
     constructor (wsClient, ready) {
-        const fileName = `${CONFIG.appId}_icon.gif`;
+        const fileName = `${CONFIG.appId}_icon.png`;
         const file = new SDL.manager.file.filetypes.SdlFile()
             .setName(fileName)
             .setFilePath('./test_icon_1.png')
@@ -67,8 +67,29 @@ class AppClient {
 
         this._sdlManager = new SDL.manager.SdlManager(this._appConfig, managerListener);
         this._sdlManager
-            .start();
-        this._sdlManager.initialize();
+            .start()
+            .addRpcListener(SDL.rpc.enums.FunctionID.OnHMIStatus, this._onHmiStatusListener.bind(this));
+
+        this._ready = ready;
+    }
+
+    async _onConnected () {
+
+    }
+
+    async _onHmiStatusListener (onHmiStatus) {
+        const hmiLevel = onHmiStatus.getHmiLevel();
+
+        // wait for the FULL state for more functionality
+        if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
+            if (typeof this._ready === 'function') {
+                this._ready(async () => {
+                    // tests complete. tear down the app
+                    await this._sdlManager.sendRpc(new SDL.rpc.messages.UnregisterAppInterface());
+                    this._sdlManager.dispose();
+                });
+            }
+        }
     }
 
     async _sleep (timeout = 1000) {
