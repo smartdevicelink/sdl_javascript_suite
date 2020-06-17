@@ -5,7 +5,7 @@ module.exports = function (appClient) {
     describe('PermissionManagerTests', function () {
         const permissionManager = appClient._sdlManager.getPermissionManager();
 
-        it('testListenersAllAllowed', async function (done) {
+        it('testListenersAllAllowed', function (done) {
             Validator.assertNotNullUndefined(permissionManager);
             Validator.assertTrue(!permissionManager.getRequiresEncryption());
             const permissionElements = [new SDL.manager.permission.PermissionElement(SDL.rpc.enums.FunctionID.Show),
@@ -50,7 +50,7 @@ module.exports = function (appClient) {
             done();
         });
 
-        it('testListenersAnyAllowed', async function (done) {
+        it('testListenersAnyAllowed', function (done) {
             let listenerCalledCounter = 0;
             const permissionElements = [];
             permissionElements.push(new SDL.manager.permission.PermissionElement(SDL.rpc.enums.FunctionID.Show));
