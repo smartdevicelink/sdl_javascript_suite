@@ -60,7 +60,7 @@
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-uglify": "^6.0.4",
     "sinon": "^9.0.1",
-    "webpack": "3.8.1",
+    "webpack": "4.43.0",
     "websocket": "^1.0.30"
   },
   "dependencies": {}
