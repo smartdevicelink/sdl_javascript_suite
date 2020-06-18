@@ -35,13 +35,6 @@ const CONFIG = require('./config.js');
 
 class AppClient {
     constructor (wsClient, ready) {
-        const fileName = `${CONFIG.appId}_icon.gif`;
-        const file = new SDL.manager.file.filetypes.SdlFile()
-            .setName(fileName)
-            .setFilePath('./test_icon_1.png')
-            .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG)
-            .setPersistent(true);
-
         this._lifecycleConfig = new SDL.manager.LifecycleConfig()
             .setAppId(CONFIG.appId)
             .setAppName(CONFIG.appName)
@@ -54,8 +47,7 @@ class AppClient {
                     wsClient,
                     CONFIG.connectionLostTimeout
                 )
-            )
-            .setAppIcon(file);
+            );
 
         this._appConfig = new SDL.manager.AppConfig()
             .setLifecycleConfig(this._lifecycleConfig);
@@ -75,10 +67,14 @@ class AppClient {
             .addRpcListener(SDL.rpc.enums.FunctionID.OnHMIStatus, this._onHmiStatusListener.bind(this));
 
         this._ready = ready;
+        // for a cloud server app the hmi full will be received before the managers report that they're ready!
+        this._managersReady = false;
+        this._hmiFull = false;
     }
 
     async _onConnected () {
-        
+        this._managersReady = true;
+        this._checkReadyState();
     }
 
     async _onHmiStatusListener (onHmiStatus) {
@@ -86,8 +82,15 @@ class AppClient {
 
         // wait for the FULL state for more functionality
         if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
+            this._hmiFull = true;
+            this._checkReadyState();
+        }
+    }
+
+    async _checkReadyState () {
+        if (this._managersReady && this._hmiFull) {
             if (typeof this._ready === 'function') {
-                this._ready(async () => {
+                await this._ready(async () => {
                     // tests complete. tear down the app
                     await this._sdlManager.sendRpc(new SDL.rpc.messages.UnregisterAppInterface());
                     this._sdlManager.dispose();
