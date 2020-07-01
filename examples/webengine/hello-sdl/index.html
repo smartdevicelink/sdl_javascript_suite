@@ -40,16 +40,10 @@
 
         class HelloSdl {
             constructor () {
-                const fileName = `${sdl_manifest.appId}_icon`;
-                const file = new SDL.manager.file.filetypes.SdlFile()
-                    .setName(fileName)
-                    .setFilePath(sdl_manifest.appIcon)
-                    .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG)
-                    .setPersistent(true);
-
                 this._lifecycleConfig = new SDL.manager.LifecycleConfig()
                     .loadManifest(sdl_manifest)
                     .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
+                    .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
                     .setTransportConfig(new SDL.transport.WebSocketClientConfig());
 
                 this._appConfig = new SDL.manager.AppConfig()
@@ -120,10 +114,30 @@
 
             async _onHmiStatusListener (onHmiStatus) {
                 const hmiLevel = onHmiStatus.getHmiLevel();
+                console.log('HMI status:', hmiLevel);
+                if (this._hmiLevel === hmiLevel) {
+                    return;
+                }
+
+                this._hmiLevel = hmiLevel;
                 this._logPermissions();
 
                 // wait for the FULL state for more functionality
                 if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
+                    await this._sleep(2000);
+
+                    const count = 3;
+                    for (let i = 0; i < count; i++) {
+                        const showCountdown = new SDL.rpc.messages.Show();
+                        showCountdown.setMainField1(`Starting in ${(count - i).toString()}`)
+                            .setMainField2('')
+                            .setMainField3('');
+
+                        this._sdlManager.sendRpcResolve(showCountdown); // don't wait for a response
+
+                        await this._sleep();
+                    }
+
                     const art1 = new SDL.manager.file.filetypes.SdlArtwork('logo', SDL.rpc.enums.FileType.GRAPHIC_PNG)
                         .setFilePath(sdl_manifest.appIcon);
 
@@ -153,24 +167,15 @@
                     softButtonObjects[0].transitionToNextState();
                     await this._sleep(2000);
                     softButtonObjects[0].transitionToNextState();
-                    await this._sleep(2000);
 
-                    const count = 3;
-                    for (let i = 0; i < count; i++) {
-                        const showCountdown = new SDL.rpc.messages.Show();
-                        showCountdown.setMainField1(`Exiting in ${(count - i).toString()}`)
-                            .setMainField2('')
-                            .setMainField3('');
+                    const show_template = new SDL.rpc.messages.Show();
+                    show_template.setTemplateTitle("DEFAULT");
 
-                        this._sdlManager.sendRpc(showCountdown); // don't wait for a response
+                    const configuration = new SDL.rpc.structs.TemplateConfiguration();
+                    configuration.setTemplate("DEFAULT");
+                    show_template.setTemplateConfiguration(configuration);
 
-                        await this._sleep();
-                    }
-
-                    // tear down the app
-                    await this._sdlManager.sendRpc(new SDL.rpc.messages.UnregisterAppInterface());
-
-                    this._sdlManager.dispose();
+                    await this._sdlManager.sendRpcResolve(show_template);
                 }
             }
 
@@ -193,11 +198,199 @@
 
         console.log('start app');
         const app = new HelloSdl();
+
+        let cmd_counter = 0;
+        document.getElementById("addButton").addEventListener("click", function(){
+            cmd_counter++;
+
+            const menu_params = new SDL.rpc.structs.MenuParams();
+            menu_params.setMenuName("Test item " + cmd_counter)
+                .setPosition(cmd_counter)
+                .setParentID(0);
+
+            const add_command = new SDL.rpc.messages.AddCommand();
+            add_command.setCmdID(cmd_counter)
+                .setMenuParams(menu_params);
+
+            app._sdlManager.sendRpcResolve(add_command);
+        });
+
+        document.getElementById("delButton").addEventListener("click", function(){
+            if (cmd_counter === 0) {
+                return;
+            }
+            const del_command = new SDL.rpc.messages.DeleteCommand();
+            del_command.setCmdID(cmd_counter);
+
+            app._sdlManager.sendRpcResolve(del_command);
+            cmd_counter--;
+        });
+
+        document.getElementById("alertButton").addEventListener("click", function(){
+            const alert = new SDL.rpc.messages.Alert();
+            alert.setAlertText1("Test Alert")
+                 .setDuration(5000);
+
+            const btn1 = new SDL.rpc.structs.SoftButton();
+            btn1.setSystemAction(SDL.rpc.enums.SystemAction.DEFAULT_ACTION)
+                .setType(SDL.rpc.enums.SoftButtonType.SBT_TEXT)
+                .setText("ReRoute")
+                .setSoftButtonID(5502);
+
+            const btn2 = new SDL.rpc.structs.SoftButton();
+            btn2.setSystemAction(SDL.rpc.enums.SystemAction.DEFAULT_ACTION)
+                .setType(SDL.rpc.enums.SoftButtonType.SBT_TEXT)
+                .setText("Close")
+                .setSoftButtonID(5503);
+
+            alert.setSoftButtons([btn1, btn2])
+
+            app._sdlManager.sendRpcResolve(alert);
+        });
+
+        document.getElementById("unregButton").addEventListener("click", async function(){
+            // tear down the app
+            await app._sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
+
+            app._sdlManager.dispose();
+        });
+
+        let widget_counter = 1;
+        document.getElementById("addWidget").addEventListener("click", function(){
+            const create_window = new SDL.rpc.messages.CreateWindow();
+            create_window.setWindowID(widget_counter)
+                         .setWindowName("Test widget " + widget_counter)
+                         .setType(SDL.rpc.enums.WindowType.WIDGET);
+
+            if (widget_counter % 2 !== 0) {
+                create_window.setDuplicateUpdatesFromWindowID(0);
+            }
+
+            widget_counter++;
+
+            app._sdlManager.sendRpcResolve(create_window);
+        });
+
+        document.getElementById("delWidget").addEventListener("click", function(){
+            if (widget_counter === 1) {
+                return;
+            }
+
+            widget_counter--;
+
+            const delete_window = new SDL.rpc.messages.DeleteWindow();
+            delete_window.setWindowID(widget_counter);
+
+            app._sdlManager.sendRpcResolve(delete_window);
+        });
+
+        let template_name = 'MEDIA';
+        document.getElementById("setLayout").addEventListener("click", function(){
+            switch (template_name) {
+                case 'MEDIA': {
+                    template_name = 'NON-MEDIA';
+                    break;
+                }
+                case 'NON-MEDIA': {
+                    template_name = 'NAV_FULLSCREEN_MAP';
+                    break;
+                }
+                case 'NAV_FULLSCREEN_MAP': {
+                    template_name = 'WEB_ENGINE';
+                    break;
+                }
+                case 'WEB_ENGINE': {
+                    template_name = 'MEDIA';
+                    break;
+                }
+            }
+
+            const show_template = new SDL.rpc.messages.Show();
+            show_template.setTemplateTitle(template_name);
+
+            const configuration = new SDL.rpc.structs.TemplateConfiguration();
+            configuration.setTemplate(template_name);
+            show_template.setTemplateConfiguration(configuration);
+
+            app._sdlManager.sendRpcResolve(show_template);
+        });
+
+        document.getElementById("showAppMenu").addEventListener("click", function(){
+            const show_app_menu = new SDL.rpc.messages.ShowAppMenu();
+
+            app._sdlManager.sendRpcResolve(show_app_menu);
+        });
+
+        document.getElementById("closeApplication").addEventListener("click", function(){
+            const close_app = new SDL.rpc.messages.CloseApplication();
+
+            app._sdlManager.sendRpcResolve(close_app);
+        });
+
     </script>
 </head>
 
 
 <body>
+    <marquee direction="down" width="100%" height="100%" behavior="alternate" style="color: lime;">
+        <marquee behavior="alternate">
+            WebEngine App Testing
+        </marquee>
+    </marquee>
+    <button id="addButton" style="
+        cursor: pointer;
+        position: absolute;
+        top: 5px;
+        left: 5px;">Add command
+    </button>
+    <button id="delButton" style="
+        cursor: pointer;
+        position: absolute;
+        top: 30px;
+        left: 5px;">Delete command
+    </button>
+    <button id="alertButton" style="
+        cursor: pointer;
+        position: absolute;
+        top: 55px;
+        left: 5px;">Alert command
+    </button>
+    <button id="setLayout" style="
+        cursor: pointer;
+        position: absolute;
+        top: 80px;
+        left: 5px;">Set Layout
+    </button>
+    <button id="addWidget" style="
+        cursor: pointer;
+        position: absolute;
+        top: 105px;
+        left: 5px;">Add Widget
+    </button>
+    <button id="delWidget" style="
+        cursor: pointer;
+        position: absolute;
+        top: 130px;
+        left: 5px;">Del Widget
+    </button>
+    <button id="showAppMenu" style="
+        cursor: pointer;
+        position: absolute;
+        top: 155px;
+        left: 5px;">Show menu
+    </button>
+    <button id="closeApplication" style="
+        cursor: pointer;
+        position: absolute;
+        top: 180px;
+        left: 5px;">Close app
+    </button>
+    <button id="unregButton" style="
+        cursor: pointer;
+        position: absolute;
+        top: 80px;
+        left: 5px;">Unregister
+    </button>
 </body>
 
 </html>
