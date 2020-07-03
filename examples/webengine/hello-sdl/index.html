@@ -42,7 +42,6 @@
             constructor () {
                 this._lifecycleConfig = new SDL.manager.LifecycleConfig()
                     .loadManifest(sdl_manifest)
-                    .setAppTypes([SDL.rpc.enums.AppHMIType.WEB_VIEW])
                     .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
                     .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
                     .setTransportConfig(new SDL.transport.WebSocketClientConfig());
