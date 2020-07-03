@@ -2,13 +2,13 @@
 export default {
     "entrypoint": "./index.html",
     "appIcon": "./test_icon_1.png",
-    "appId": "hello-webengine2",
-    "appName": "Hello WebEngine2",
+    "appId": "hello-webengine3",
+    "appName": "Hello WebEngine3",
     "category": "WEB_VIEW",
     "additionalCategories": [],
     "locales": {
         "de_DE": {
-            "appName": "Hallo JS",
+            "appName": "Hallo WebEngine3",
             "appIcon": "./test_icon_1.png"
         }
     },
