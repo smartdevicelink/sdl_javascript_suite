@@ -380,12 +380,44 @@
         });
 
         document.getElementById("setLayout").addEventListener("click", function(){
-            const template_name = document.getElementById("LayoutCombo").value;
-            const window_id = document.getElementById("LayoutWindowId").value;
-
             const show_template = new SDL.rpc.messages.Show();
+
+            const window_id = document.getElementById("LayoutWindowId").value;
+            if (window_id != "MAIN") {
+                show_template.setWindowID(parseInt(window_id));
+            }
+
+            const template_name = document.getElementById("LayoutCombo").value;
             show_template.setTemplateTitle(template_name);
 
+            const configuration = new SDL.rpc.structs.TemplateConfiguration();
+            configuration.setTemplate(template_name);
+            show_template.setTemplateConfiguration(configuration);
+
+            app.setCurrentTemplateName(template_name);
+            app.sendRpcRequest(show_template);
+        });
+
+        document.getElementById("LayoutWindowId").addEventListener('change', (event) => {
+            const items = event.target.value == "MAIN" ?
+                ["DEFAULT", "MEDIA", "NON-MEDIA", "NAV_FULLSCREEN_MAP", "WEB_VIEW"] :
+                ["TEXT_WITH_GRAPHIC", "BUTTONS_WITH_GRAPHIC", "GRAPHIC_WITH_TEXT"];
+
+            var content = "";
+            for (let item of items) {
+                content += "<option>" + item + "</option>";
+            }
+
+            document.getElementById("LayoutCombo").innerHTML = content;
+        });
+
+        // refresh items in layouts combobox
+        document.getElementById("LayoutWindowId").dispatchEvent(new Event('change'));
+
+        document.getElementById("sendShow").addEventListener("click", function(){
+            const show_template = new SDL.rpc.messages.Show();
+
+            const window_id = document.getElementById("LayoutWindowId").value;
             if (window_id != "MAIN") {
                 show_template.setWindowID(parseInt(window_id));
             }
@@ -415,29 +447,8 @@
 
             show_template.setSoftButtons(soft_buttons);
 
-            const configuration = new SDL.rpc.structs.TemplateConfiguration();
-            configuration.setTemplate(template_name);
-            show_template.setTemplateConfiguration(configuration);
-
-            app.setCurrentTemplateName(template_name);
             app.sendRpcRequest(show_template);
         });
-
-        document.getElementById("LayoutWindowId").addEventListener('change', (event) => {
-            const items = event.target.value == "MAIN" ?
-                ["DEFAULT", "MEDIA", "NON-MEDIA", "NAV_FULLSCREEN_MAP", "WEB_VIEW"] :
-                ["TEXT_WITH_GRAPHIC", "BUTTONS_WITH_GRAPHIC", "GRAPHIC_WITH_TEXT"];
-
-            var content = "";
-            for (let item of items) {
-                content += "<option>" + item + "</option>";
-            }
-
-            document.getElementById("LayoutCombo").innerHTML = content;
-        });
-
-        // refresh items in layouts combobox
-        document.getElementById("LayoutWindowId").dispatchEvent(new Event('change'));
 
         document.getElementById("showAppMenu").addEventListener("click", function(){
             const show_app_menu = new SDL.rpc.messages.ShowAppMenu();
@@ -483,21 +494,27 @@
         cursor: pointer;
         position: absolute;
         top: 80px;
-        left: 5px;">Send Show
+        left: 5px;">Set layout
     </button>
     <select style="position: absolute; top: 80px; left: 100px; width: 80px;"  id="LayoutWindowId">
         <option selected="">MAIN</option>
     </select>
     <select style="position: absolute; top: 80px; left: 185px; width: 185px;" id="LayoutCombo">
     </select>
-    <input style="position: absolute; top: 80px; left: 380px; width: 75px;" id="mainField1" placeholder="Field 1">
-    <input style="position: absolute; top: 80px; left: 460px; width: 75px;" id="mainField2" placeholder="Field 2">
-    <input style="position: absolute; top: 80px; left: 540px; width: 75px;" id="mainField3" placeholder="Field 3">
-    <input style="position: absolute; top: 80px; left: 620px; width: 75px;" id="mainField4" placeholder="Field 4">
-    <label style="position: absolute; top: 64px; left: 700px; width: 51px; font-size: 14px; text-align: center; color: white;">
+    <button id="sendShow" style="
+        cursor: pointer;
+        position: absolute;
+        top: 105px;
+        left: 5px;">Send show
+    </button>
+    <input style="position: absolute; top: 105px; left: 100px; width: 75px;" id="mainField1" placeholder="Field 1">
+    <input style="position: absolute; top: 105px; left: 180px; width: 75px;" id="mainField2" placeholder="Field 2">
+    <input style="position: absolute; top: 105px; left: 260px; width: 75px;" id="mainField3" placeholder="Field 3">
+    <input style="position: absolute; top: 105px; left: 340px; width: 75px;" id="mainField4" placeholder="Field 4">
+    <label style="position: absolute; top: 89px; left: 420px; width: 51px; font-size: 14px; text-align: center; color: white;">
         Buttons:
     </label>
-    <select style="position: absolute;top: 80px;left: 700px;width: 50px;" id="SoftButtonsCount">
+    <select style="position: absolute; top: 105px; left: 420px; width: 50px;" id="SoftButtonsCount">
         <option>0</option>
         <option>1</option>
         <option>2</option>
@@ -511,35 +528,35 @@
     <button id="addWidget" style="
         cursor: pointer;
         position: absolute;
-        top: 105px;
+        top: 130px;
         left: 5px;">Add Widget
     </button>
-    <input type="checkbox" id="DuplicateMainWindow" style="position: absolute; top: 107px; left: 100px;">
-    <label for="DuplicateMainWindow" style="position: absolute; top: 108px; left: 123px; font-size: 15px; color: white;">
+    <input type="checkbox" id="DuplicateMainWindow" style="position: absolute; top: 131px; left: 100px;">
+    <label for="DuplicateMainWindow" style="position: absolute; top: 132px; left: 123px; font-size: 15px; color: white;">
         Duplicate MAIN window?
     </label>
     <button id="delWidget" style="
         cursor: pointer;
         position: absolute;
-        top: 130px;
+        top: 155px;
         left: 5px;">Del Widget
     </button>
     <button id="showAppMenu" style="
         cursor: pointer;
         position: absolute;
-        top: 155px;
+        top: 180px;
         left: 5px;">Show menu
     </button>
     <button id="closeApplication" style="
         cursor: pointer;
         position: absolute;
-        top: 180px;
+        top: 205px;
         left: 5px;">Close app
     </button>
     <button id="unregButton" style="
         cursor: pointer;
         position: absolute;
-        top: 205px;
+        top: 230px;
         left: 5px;">Unregister
     </button>
 </body>
