@@ -88,12 +88,16 @@
                     .start()
                     .addRpcListener(SDL.rpc.enums.FunctionID.OnHMIStatus, this._onHmiStatusListener.bind(this));
 
-                this._isFirstActivation = true;
+                this._currentTemplate = 'WEB_VIEW';
             }
 
             stop () {
                 this._logRegularMessage('Stop app');
                 this._sdlManager.dispose();
+            }
+
+            setCurrentTemplateName(template) {
+                this._currentTemplate = template;
             }
 
             async _onConnected () {
@@ -124,20 +128,27 @@
             async _onHmiStatusListener (onHmiStatus) {
                 const hmiLevel = onHmiStatus.getHmiLevel();
                 this._logRpcResponseMessage(onHmiStatus);
-                if (this._hmiLevel === hmiLevel) {
+
+                if (onHmiStatus.getWindowID() != SDL.rpc.enums.PredefinedWindows.DEFAULT_WINDOW) {
+                    this._logRegularMessage('Ignore OnHmiStatus for widgets');
                     return;
                 }
 
-                if (this._isFirstActivation && hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
-                    this._isFirstActivation = false;
+                if (this._hmiLevel === hmiLevel) {
+                    this._logRegularMessage('Ignore OnHmiStatus if hmi level has not changed');
                     return;
                 }
 
                 this._hmiLevel = hmiLevel;
-                this._logPermissions();
+
+                if (['WEB_VIEW', 'DEFAULT'].includes(this._currentTemplate) && hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
+                    this._logRegularMessage('Do nothing for a default WEB_VIEW template');
+                    return;
+                }
 
                 // wait for the FULL state for more functionality
                 if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
+                    this._logPermissions();
                     await this._sleep(2000);
 
                     const count = 3;
@@ -408,6 +419,7 @@
             configuration.setTemplate(template_name);
             show_template.setTemplateConfiguration(configuration);
 
+            app.setCurrentTemplateName(template_name);
             app.sendRpcRequest(show_template);
         });
 
