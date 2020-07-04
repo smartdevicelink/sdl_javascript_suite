@@ -428,12 +428,6 @@
             const main_field2 = document.getElementById('mainField2').value;
             show_template.setMainField2(main_field2);
 
-            const main_field3 = document.getElementById('mainField3').value;
-            show_template.setMainField3(main_field3);
-
-            const main_field4 = document.getElementById('mainField4').value;
-            show_template.setMainField4(main_field4);
-
             const btns_count = parseInt(document.getElementById('SoftButtonsCount').value);
             let soft_buttons = [];
             for (let i = 0; i < btns_count; ++i) {
@@ -509,21 +503,15 @@
     </button>
     <input style="position: absolute; top: 105px; left: 100px; width: 75px;" id="mainField1" placeholder="Field 1">
     <input style="position: absolute; top: 105px; left: 180px; width: 75px;" id="mainField2" placeholder="Field 2">
-    <input style="position: absolute; top: 105px; left: 260px; width: 75px;" id="mainField3" placeholder="Field 3">
-    <input style="position: absolute; top: 105px; left: 340px; width: 75px;" id="mainField4" placeholder="Field 4">
-    <label style="position: absolute; top: 89px; left: 420px; width: 51px; font-size: 14px; text-align: center; color: white;">
+    <label style="position: absolute; top: 107px; left: 265px; width: 51px; font-size: 14px; text-align: center; color: white;">
         Buttons:
     </label>
-    <select style="position: absolute; top: 105px; left: 420px; width: 50px;" id="SoftButtonsCount">
+    <select style="position: absolute; top: 105px; left: 320px; width: 50px;" id="SoftButtonsCount">
         <option>0</option>
         <option>1</option>
         <option>2</option>
         <option>3</option>
         <option>4</option>
-        <option>5</option>
-        <option>6</option>
-        <option>7</option>
-        <option>8</option>
     </select>
     <button id="addWidget" style="
         cursor: pointer;
