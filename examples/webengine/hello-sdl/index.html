@@ -422,24 +422,33 @@
                 show_template.setWindowID(parseInt(window_id));
             }
 
-            const main_field1 = document.getElementById('mainField1').value;
-            show_template.setMainField1(main_field1);
-
-            const main_field2 = document.getElementById('mainField2').value;
-            show_template.setMainField2(main_field2);
-
-            const btns_count = parseInt(document.getElementById('SoftButtonsCount').value);
-            let soft_buttons = [];
-            for (let i = 0; i < btns_count; ++i) {
-                const soft_button = new SDL.rpc.structs.SoftButton();
-                soft_button
-                    .setSoftButtonID(i)
-                    .setType(SDL.rpc.enums.SoftButtonType.SBT_TEXT)
-                    .setText(String(i + 1));
-                soft_buttons.push(soft_button);
+            const field1_enabled = document.getElementById('sendField1').checked;
+            if (field1_enabled) {
+                const main_field1 = document.getElementById('mainField1').value;
+                show_template.setMainField1(main_field1);
             }
 
-            show_template.setSoftButtons(soft_buttons);
+            const field2_enabled = document.getElementById('sendField2').checked;
+            if (field2_enabled) {
+                const main_field2 = document.getElementById('mainField2').value;
+                show_template.setMainField2(main_field2);
+            }
+
+            const soft_btn_enabled = document.getElementById('sendSoftButtons').checked;
+            if (soft_btn_enabled) {
+                const btns_count = parseInt(document.getElementById('SoftButtonsCount').value);
+                let soft_buttons = [];
+                for (let i = 0; i < btns_count; ++i) {
+                    const soft_button = new SDL.rpc.structs.SoftButton();
+                    soft_button
+                        .setSoftButtonID(i)
+                        .setType(SDL.rpc.enums.SoftButtonType.SBT_TEXT)
+                        .setText(String(i + 1));
+                    soft_buttons.push(soft_button);
+                }
+
+                show_template.setSoftButtons(soft_buttons);
+            }
 
             app.sendRpcRequest(show_template);
         });
@@ -448,6 +457,18 @@
             const show_app_menu = new SDL.rpc.messages.ShowAppMenu();
 
             app.sendRpcRequest(show_app_menu);
+        });
+
+        document.getElementById("sendField1").addEventListener("change", function(){
+            document.getElementById("mainField1").disabled = !this.checked;
+        });
+
+        document.getElementById("sendField2").addEventListener("change", function(){
+            document.getElementById("mainField2").disabled = !this.checked;
+        });
+
+        document.getElementById("sendSoftButtons").addEventListener("change", function(){
+            document.getElementById("SoftButtonsCount").disabled = !this.checked;
         });
 
         document.getElementById("closeApplication").addEventListener("click", function(){
@@ -501,12 +522,15 @@
         top: 105px;
         left: 5px;">Send show
     </button>
-    <input style="position: absolute; top: 105px; left: 100px; width: 75px;" id="mainField1" placeholder="Field 1">
-    <input style="position: absolute; top: 105px; left: 180px; width: 75px;" id="mainField2" placeholder="Field 2">
-    <label style="position: absolute; top: 107px; left: 265px; width: 51px; font-size: 14px; text-align: center; color: white;">
+    <input type="checkbox" id="sendField1" checked="true" style="position: absolute; top: 106px; left: 100px;">
+    <input style="position: absolute; top: 105px; left: 122px; width: 75px;" id="mainField1" placeholder="Field 1">
+    <input type="checkbox" id="sendField2" checked="true" style="position: absolute; top: 106px; left: 200px;">
+    <input style="position: absolute; top: 105px; left: 223px; width: 75px;" id="mainField2" placeholder="Field 2">
+    <input type="checkbox" id="sendSoftButtons" checked="true" style="position: absolute; top: 106px; left: 300px;">
+    <label style="position: absolute; top: 108px; left: 318px; width: 51px; font-size: 14px; text-align: center; color: white;">
         Buttons:
     </label>
-    <select style="position: absolute; top: 105px; left: 320px; width: 50px;" id="SoftButtonsCount">
+    <select style="position: absolute; top: 105px; left: 370px; width: 50px;" id="SoftButtonsCount">
         <option>0</option>
         <option>1</option>
         <option>2</option>
