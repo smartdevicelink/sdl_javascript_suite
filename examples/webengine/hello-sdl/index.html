@@ -194,10 +194,10 @@
                     softButtonObjects[0].transitionToNextState();
 
                     const show_template = new SDL.rpc.messages.Show();
-                    show_template.setTemplateTitle("DEFAULT");
+                    show_template.setTemplateTitle("WEB_VIEW");
 
                     const configuration = new SDL.rpc.structs.TemplateConfiguration();
-                    configuration.setTemplate("DEFAULT");
+                    configuration.setTemplate("WEB_VIEW");
                     show_template.setTemplateConfiguration(configuration);
 
                     await this.sendRpcRequest(show_template);
