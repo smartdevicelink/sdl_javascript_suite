@@ -40,6 +40,8 @@
 
         class HelloSdl {
             constructor () {
+                this._logRegularMessage('Start app');
+
                 this._lifecycleConfig = new SDL.manager.LifecycleConfig()
                     .loadManifest(sdl_manifest)
                     .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
@@ -69,16 +71,16 @@
                             ],
                             SDL.manager.permission.enums.PermissionGroupType.ANY,
                             (allowedPermissions, permissionGroupStatus) => {
-                                console.log('SubscribeVehicleData permissions changed!');
-                                console.log('Allowed Permissions: ', allowedPermissions);
-                                console.log('Permission Group Status: ', permissionGroupStatus);
+                                this._logRegularMessage('SubscribeVehicleData permissions changed!');
+                                this._logRegularMessage('Allowed Permissions: ' + allowedPermissions);
+                                this._logRegularMessage('Permission Group Status: ' + permissionGroupStatus);
                                 this._logPermissions();
                             }
                         );
                         this._onConnected();
                     })
                     .setOnError((sdlManager, info) => {
-                        console.error('Error from SdlManagerListener: ', info);
+                        this._logMessage('APP:', 'Error from SdlManagerListener: ' + info, true);
                     });
 
                 this._sdlManager = new SDL.manager.SdlManager(this._appConfig, managerListener);
@@ -89,18 +91,23 @@
                 this._isFirstActivation = true;
             }
 
+            stop () {
+                this._logRegularMessage('Stop app');
+                this._sdlManager.dispose();
+            }
+
             async _onConnected () {
                 // add voice commands for when the managers are ready
                 const screenManager = this._sdlManager.getScreenManager();
                 screenManager.setVoiceCommands([
                     new SDL.manager.screen.utils.VoiceCommand(['Option 1'], () => {
-                        console.log('Option one selected!');
+                        this._logRegularMessage('Option one selected!');
                     }),
                     new SDL.manager.screen.utils.VoiceCommand(['Option 2'], () => {
-                        console.log('Option two selected!');
+                        this._logRegularMessage('Option two selected!');
                     }),
                     new SDL.manager.screen.utils.VoiceCommand(['Option 3'], () => {
-                        console.log('Option three selected!');
+                        this._logRegularMessage('Option three selected!');
                     }),
                 ]);
 
@@ -116,7 +123,7 @@
 
             async _onHmiStatusListener (onHmiStatus) {
                 const hmiLevel = onHmiStatus.getHmiLevel();
-                console.log('HMI status:', hmiLevel);
+                this._logRpcResponseMessage(onHmiStatus);
                 if (this._hmiLevel === hmiLevel) {
                     return;
                 }
@@ -140,7 +147,7 @@
                             .setMainField2('')
                             .setMainField3('');
 
-                        this._sdlManager.sendRpcResolve(showCountdown); // don't wait for a response
+                        this.sendRpcRequest(showCountdown); // don't wait for a response
 
                         await this._sleep();
                     }
@@ -156,12 +163,12 @@
                     let softButtonObjects = [
                         new SDL.manager.screen.utils.SoftButtonObject('game', [state1, state2, state3], 'ROCK', (id, rpc) => {
                             if (rpc instanceof SDL.rpc.messages.OnButtonPress) {
-                                console.log('First button pressed!');
+                                this._logRegularMessage('First button pressed!');
                             }
                         }),
                         new SDL.manager.screen.utils.SoftButtonObject('button', [state4], 'BUTTON', (id, rpc) => {
                             if (rpc instanceof SDL.rpc.messages.OnButtonPress) {
-                                console.log('Second button pressed!');
+                                this._logRegularMessage('Second button pressed!');
                             }
                         }),
                     ];
@@ -182,7 +189,7 @@
                     configuration.setTemplate("DEFAULT");
                     show_template.setTemplateConfiguration(configuration);
 
-                    await this._sdlManager.sendRpcResolve(show_template);
+                    await this.sendRpcRequest(show_template);
                 }
             }
 
@@ -192,18 +199,80 @@
                 });
             }
 
+            async sendRpcRequest(request) {
+                return new Promise((resolve) => {
+                    this._logRpcRequestMessage(request);
+                    this._sdlManager.sendRpcResolve(request)
+                        .then( (response) => {
+                            this._logRpcResponseMessage(response);
+                            resolve();
+                        })
+                });
+            }
+
+            _logRpcRequestMessage(message) {
+                this._logRpcMessage('APP -> SDL', message);
+            }
+
+            _logRpcResponseMessage(message) {
+                this._logRpcMessage('SDL -> APP', message);
+            }
+
+            _logRegularMessage(message) {
+                this._logMessage('APP:', message);
+            }
+
+            _logRpcMessage(prefix, message) {
+                const paramify = function (rpcStruct) {
+                    if (rpcStruct instanceof SDL.rpc.RpcStruct) {
+                        const params = rpcStruct.getParameters();
+                        for (const key in params) {
+                            if (Array.isArray(params[key])) { // could be an array of structs
+                                for (let index = 0; index < params[key].length; index++) {
+                                    params[key][index] = paramify(params[key][index]);
+                                }
+                            } else { // not an array. handle normally
+                                params[key] = paramify(params[key]);
+                            }
+                        }
+                        return params;
+                    }
+                    return rpcStruct; // leave it alone
+                }
+
+                const msg_type = SDL.rpc.enums.MessageType.keyForValue(message.getMessageType());
+                this._logMessage(prefix, `Rpc: "${message.getFunctionId()}" Type: "${msg_type}" Params: ${JSON.stringify(paramify(message))}`);
+            }
+
+            _logMessage(prefix, message, isError = false) {
+                const get_time = function() {
+                    const logTime = new Date();
+                    const timeStr = logTime.getHours() + ':'
+                                  + logTime.getMinutes() + ':'
+                                  + logTime.getSeconds() + ':'
+                                  + logTime.getMilliseconds();
+                    return timeStr;
+                }
+
+                if (isError) {
+                    console.error(`${prefix} [${get_time()}]: ${message}`);
+                    return;
+                }
+
+                console.log(`${prefix} [${get_time()}]: ${message}`);
+            }
+
             _logPermissions () {
                 if (this._permissionManager) {
-                    console.log(`Show RPC allowed: ${this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.Show)}`);
-                    console.log(`PutFile RPC allowed: ${this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.PutFile)}`);
-                    console.log(`GetVehicleData RPC allowed: ${this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.GetVehicleData)}`);
-                    console.log(`SubscribeVehicleData RPC allowed: ${this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.SubscribeVehicleData)}`);
+                    this._logRegularMessage(`Show RPC allowed: ${this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.Show)}`);
+                    this._logRegularMessage(`PutFile RPC allowed: ${this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.PutFile)}`);
+                    this._logRegularMessage(`GetVehicleData RPC allowed: ${this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.GetVehicleData)}`);
+                    this._logRegularMessage(`SubscribeVehicleData RPC allowed: ${this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.SubscribeVehicleData)}`);
                 }
             }
 
         }
 
-        console.log('start app');
         const app = new HelloSdl();
 
         let cmd_counter = 0;
@@ -219,7 +288,7 @@
             add_command.setCmdID(cmd_counter)
                 .setMenuParams(menu_params);
 
-            app._sdlManager.sendRpcResolve(add_command);
+            app.sendRpcRequest(add_command);
         });
 
         document.getElementById("delButton").addEventListener("click", function(){
@@ -229,7 +298,7 @@
             const del_command = new SDL.rpc.messages.DeleteCommand();
             del_command.setCmdID(cmd_counter);
 
-            app._sdlManager.sendRpcResolve(del_command);
+            app.sendRpcRequest(del_command);
             cmd_counter--;
         });
 
@@ -252,14 +321,14 @@
 
             alert.setSoftButtons([btn1, btn2])
 
-            app._sdlManager.sendRpcResolve(alert);
+            app.sendRpcRequest(alert);
         });
 
         document.getElementById("unregButton").addEventListener("click", async function(){
             // tear down the app
-            await app._sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
+            await app.sendRpcRequest(new SDL.rpc.messages.UnregisterAppInterface());
 
-            app._sdlManager.dispose();
+            app.stop();
         });
 
         let widget_counter = 1;
@@ -280,7 +349,7 @@
 
             widget_counter++;
 
-            app._sdlManager.sendRpcResolve(create_window);
+            app.sendRpcRequest(create_window);
         });
 
         document.getElementById("delWidget").addEventListener("click", function(){
@@ -296,7 +365,7 @@
             const delete_window = new SDL.rpc.messages.DeleteWindow();
             delete_window.setWindowID(widget_counter);
 
-            app._sdlManager.sendRpcResolve(delete_window);
+            app.sendRpcRequest(delete_window);
         });
 
         document.getElementById("setLayout").addEventListener("click", function(){
@@ -339,7 +408,7 @@
             configuration.setTemplate(template_name);
             show_template.setTemplateConfiguration(configuration);
 
-            app._sdlManager.sendRpcResolve(show_template);
+            app.sendRpcRequest(show_template);
         });
 
         document.getElementById("LayoutWindowId").addEventListener('change', (event) => {
@@ -361,13 +430,13 @@
         document.getElementById("showAppMenu").addEventListener("click", function(){
             const show_app_menu = new SDL.rpc.messages.ShowAppMenu();
 
-            app._sdlManager.sendRpcResolve(show_app_menu);
+            app.sendRpcRequest(show_app_menu);
         });
 
         document.getElementById("closeApplication").addEventListener("click", function(){
             const close_app = new SDL.rpc.messages.CloseApplication();
 
-            app._sdlManager.sendRpcResolve(close_app);
+            app.sendRpcRequest(close_app);
         });
 
     </script>
