@@ -51,7 +51,7 @@ describe('PredefinedLayoutTests', function () {
 
         Validator.assertNotNull(enumDefault, 'DEFAULT returned null');
         Validator.assertNotNull(enumMedia, 'MEDIA returned null');
-        Validator.assertNotNull(enumNonMedia, 'NON-MEDIA returned null');
+        Validator.assertNotNull(enumNonMedia, 'NON_MEDIA returned null');
         Validator.assertNotNull(enumOnscreenPresets, 'ONSCREEN_PRESETS returned null');
         Validator.assertNotNull(enumNavFullscreenMap, 'NAV_FULLSCREEN_MAP returned null');
         Validator.assertNotNull(enumNavList, 'NAV_LIST returned null');
