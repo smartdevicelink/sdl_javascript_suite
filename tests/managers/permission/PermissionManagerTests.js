@@ -5,49 +5,48 @@ module.exports = function (appClient) {
     describe('PermissionManagerTests', function () {
         const permissionManager = appClient._sdlManager.getPermissionManager();
 
-        /**
-         * Safely attempt to send an RPC.
-         * @param {RpcMessage} rpcMessage - The RPC message to send.
-         */
-        function sendRpc (rpcMessage) {
-            if (rpcMessage !== null) {
-                appClient._sdlManager.sendRpc(rpcMessage);
-            }
-        }
-
         it('testListenersAllAllowed', function (done) {
             Validator.assertNotNullUndefined(permissionManager);
             Validator.assertTrue(!permissionManager.getRequiresEncryption());
             const permissionElements = [new SDL.manager.permission.PermissionElement(SDL.rpc.enums.FunctionID.Show),
                 new SDL.manager.permission.PermissionElement(SDL.rpc.enums.FunctionID.GetVehicleData, ['rpm', 'airbagStatus'])];
 
-            permissionManager.addListener(permissionElements, SDL.manager.permission.enums.PermissionGroupType.ALL_ALLOWED,
+            const functionID = permissionManager.addListener(permissionElements, SDL.manager.permission.enums.PermissionGroupType.ALL_ALLOWED,
                 function (allowedPermissions, permissionGroupStatus) {
-                    Validator.assertEquals(permissionGroupStatus, SDL.manager.permission.enums.PermissionGroupType.ALL_ALLOWED);
+                    Validator.assertEquals(permissionGroupStatus, SDL.manager.permission.enums.PermissionGroupStatus.ALLOWED);
                     Validator.assertTrue(allowedPermissions[SDL.rpc.enums.FunctionID.Show].getIsRpcAllowed());
                     Validator.assertTrue(allowedPermissions[SDL.rpc.enums.FunctionID.GetVehicleData].getIsRpcAllowed());
                     Validator.assertTrue(allowedPermissions[SDL.rpc.enums.FunctionID.GetVehicleData].getAllowedParameters().rpm);
                     Validator.assertTrue(allowedPermissions[SDL.rpc.enums.FunctionID.GetVehicleData].getAllowedParameters().airbagStatus);
                 });
-            sendRpc(new SDL.rpc.messages.Show());
+            permissionManager._onHMIStatusListener(
+                new SDL.rpc.messages.OnHMIStatus()
+                    .setHmiLevel(SDL.rpc.enums.HMILevel.HMI_LIMITED)
+                    .setWindowID(SDL.rpc.enums.PredefinedWindows.DEFAULT_WINDOW)
+            );
 
-            const permissionItems = [];
             const permissionItem1 = new SDL.rpc.structs.PermissionItem();
             permissionItem1.setRpcName(SDL.rpc.enums.FunctionID.Show);
-            permissionItem1.setHmiPermissions(new SDL.rpc.structs.HMIPermissions([
+            permissionItem1.setHmiPermissions(new SDL.rpc.structs.HMIPermissions().setAllowed([
                 SDL.rpc.enums.HMILevel.HMI_BACKGROUND,
                 SDL.rpc.enums.HMILevel.HMI_FULL,
-                SDL.rpc.enums.HMILevel.HMI_LIMITED]));
+                SDL.rpc.enums.HMILevel.HMI_LIMITED]).setUserDisallowed([]));
             permissionItem1.setParameterPermissions(new SDL.rpc.structs.ParameterPermissions());
-            permissionItems.push(permissionItem1);
+            permissionManager._currentPermissionItems[permissionItem1.getRpcName()] = permissionItem1;
             const permissionItem2 = new SDL.rpc.structs.PermissionItem();
             permissionItem2.setRpcName(SDL.rpc.enums.FunctionID.GetVehicleData);
-            permissionItem2.setHmiPermissions(new SDL.rpc.structs.HMIPermissions([
+            permissionItem2.setHmiPermissions(new SDL.rpc.structs.HMIPermissions().setAllowed([
                 SDL.rpc.enums.HMILevel.HMI_BACKGROUND,
-                SDL.rpc.enums.HMILevel.HMI_FULL]));
-            permissionItem2.setParameterPermissions(new SDL.rpc.structs.ParameterPermissions(['rpm', 'airbagStatus']));
-            permissionItems.push(permissionItem2);
-            appClient._sdlManager.sendRpc(new SDL.rpc.messages.Show());
+                SDL.rpc.enums.HMILevel.HMI_FULL]).setUserDisallowed([]));
+            permissionItem2.setParameterPermissions(new SDL.rpc.structs.ParameterPermissions().setAllowed(['rpm', 'airbagStatus']));
+            permissionManager._currentPermissionItems[permissionItem2.getRpcName()] = permissionItem2;
+
+            permissionManager._onHMIStatusListener(
+                new SDL.rpc.messages.OnHMIStatus()
+                    .setHmiLevel(SDL.rpc.enums.HMILevel.HMI_FULL)
+                    .setWindowID(SDL.rpc.enums.PredefinedWindows.DEFAULT_WINDOW)
+            );
+            permissionManager.removeListener(functionID);
             done();
         });
 
@@ -59,22 +58,25 @@ module.exports = function (appClient) {
             permissionManager.addListener(permissionElements, SDL.manager.permission.enums.PermissionGroupType.ANY,
                 function (allowedPermissions, permissionGroupStatus) {
                     if (listenerCalledCounter === 0) {
-                        Validator.assertEquals(permissionGroupStatus, SDL.manager.permission.PermissionGroupStatus.MIXED);
+                        Validator.assertEquals(permissionGroupStatus, SDL.manager.permission.enums.PermissionGroupStatus.ALLOWED);
                         Validator.assertTrue(allowedPermissions[SDL.rpc.enums.FunctionID.Show].getIsRpcAllowed());
                         Validator.assertTrue(allowedPermissions[SDL.rpc.enums.FunctionID.GetVehicleData].getIsRpcAllowed());
                         Validator.assertTrue(allowedPermissions[SDL.rpc.enums.FunctionID.GetVehicleData].getAllowedParameters().rpm);
                         Validator.assertTrue(allowedPermissions[SDL.rpc.enums.FunctionID.GetVehicleData].getAllowedParameters().airbagStatus);
                     } else if (listenerCalledCounter === 1) {
-                        Validator.assertEquals(permissionGroupStatus, SDL.manager.permission.PermissionGroupStatus.ALLOWED);
+                        Validator.assertEquals(permissionGroupStatus, SDL.manager.permission.enums.PermissionGroupStatus.MIXED);
                         Validator.assertTrue(allowedPermissions[SDL.rpc.enums.FunctionID.Show].getIsRpcAllowed());
-                        Validator.assertTrue(allowedPermissions[SDL.rpc.enums.FunctionID.GetVehicleData].getIsRpcAllowed());
-                        Validator.assertTrue(allowedPermissions[SDL.rpc.enums.FunctionID.GetVehicleData].getAllowedParameters().rpm);
-                        Validator.assertTrue(allowedPermissions[SDL.rpc.enums.FunctionID.GetVehicleData].getAllowedParameters().airbagStatus);
+                        Validator.assertTrue(!allowedPermissions[SDL.rpc.enums.FunctionID.GetVehicleData].getIsRpcAllowed());
+                        Validator.assertTrue(!allowedPermissions[SDL.rpc.enums.FunctionID.GetVehicleData].getAllowedParameters().rpm);
+                        Validator.assertTrue(!allowedPermissions[SDL.rpc.enums.FunctionID.GetVehicleData].getAllowedParameters().airbagStatus);
                     }
                     listenerCalledCounter++;
                 });
-            appClient._sdlManager.sendRpc(new SDL.rpc.messages.Show());
-            const permissionItems = [];
+            permissionManager._onHMIStatusListener(
+                new SDL.rpc.messages.OnHMIStatus()
+                    .setHmiLevel(SDL.rpc.enums.HMILevel.HMI_LIMITED)
+                    .setWindowID(SDL.rpc.enums.PredefinedWindows.DEFAULT_WINDOW)
+            );
             const permissionItem1 = new SDL.rpc.structs.PermissionItem();
             permissionItem1.setRpcName(SDL.rpc.enums.FunctionID.Show);
             permissionItem1.setHmiPermissions(new SDL.rpc.structs.HMIPermissions([
@@ -82,15 +84,21 @@ module.exports = function (appClient) {
                 SDL.rpc.enums.HMILevel.HMI_FULL,
                 SDL.rpc.enums.HMILevel.HMI_LIMITED]));
             permissionItem1.setParameterPermissions(new SDL.rpc.structs.ParameterPermissions());
-            permissionItems.push(permissionItem1);
+            permissionManager._currentPermissionItems[permissionItem1.getRpcName()] = permissionItem1;
+
             const permissionItem2 = new SDL.rpc.structs.PermissionItem();
             permissionItem2.setRpcName(SDL.rpc.enums.FunctionID.GetVehicleData);
             permissionItem2.setHmiPermissions(new SDL.rpc.structs.HMIPermissions([
                 SDL.rpc.enums.HMILevel.HMI_BACKGROUND,
                 SDL.rpc.enums.HMILevel.HMI_FULL]));
             permissionItem2.setParameterPermissions(new SDL.rpc.structs.ParameterPermissions(['rpm', 'airbagStatus']));
-            permissionItems.push(permissionItem2);
-            appClient._sdlManager.sendRpc(new SDL.rpc.messages.Show());
+
+            permissionManager._currentPermissionItems[permissionItem2.getRpcName()] = permissionItem2;
+            permissionManager._onHMIStatusListener(
+                new SDL.rpc.messages.OnHMIStatus()
+                    .setHmiLevel(SDL.rpc.enums.HMILevel.HMI_FULL)
+                    .setWindowID(SDL.rpc.enums.PredefinedWindows.DEFAULT_WINDOW)
+            );
             done();
         });
     });
