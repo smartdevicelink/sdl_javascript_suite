@@ -530,6 +530,23 @@ class Validator {
             // do nothing
         }
     }
+
+    /**
+     * VehicleDataResult equals validation.
+     * @param {VehicleDataResult} item1 - A VehicleDataResult.
+     * @param {VehicleDataResult} item2 - A VehicleDataResult.
+     * @returns {Boolean} - Whether or not they're equal.
+     */
+    static validateVehicleDataResult (item1, item2) {
+        if (item1 === null || item2 === null) {
+            expect(item1).to.equal(item2);
+            return true;
+        }
+        expect(item1.getDataType()).to.be.equal(item2.getDataType());
+        expect(item1.getOemCustomDataType()).to.be.equal(item2.getOemCustomDataType());
+        expect(item1.getResultCode()).to.be.equal(item2.getResultCode());
+        return true;
+    }
 }
 
 
