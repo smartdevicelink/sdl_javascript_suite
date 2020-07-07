@@ -6,7 +6,6 @@ const VehicleDataType = SDL.rpc.enums.VehicleDataType;
 const VehicleDataResult = SDL.rpc.structs.VehicleDataResult;
 
 const BaseRpcTests = require('./BaseRpcTests');
-const Test = require('./../../../Test.js');
 const Validator = require('./../../../Validator.js');
 
 
@@ -14,7 +13,10 @@ describe('SubscribeVehicleDataResponseTests', function () {
     before(function () {
         const vehicleDataResult = this.vehicleDataResult = new VehicleDataResult();
         vehicleDataResult.setDataType(VehicleDataType.VEHICLEDATA_HANDSOFFSTEERING);
-        this.JSON_VEHICLEDATARESULT = vehicleDataResult.getParameters();
+
+        const JSON_VEHICLEDATARESULT = {
+            [VehicleDataResult.KEY_DATA_TYPE]: VehicleDataType.VEHICLEDATA_HANDSOFFSTEERING,
+        };
 
         this.createMessage = function () {
             const msg = new SubscribeVehicleDataResponse();
@@ -24,7 +26,7 @@ describe('SubscribeVehicleDataResponseTests', function () {
 
         this.getExpectedParameters = function (sdlVersion) {
             const expectedParameters = {};
-            expectedParameters[SubscribeVehicleDataResponse.KEY_HANDS_OFF_STEERING] = this.JSON_VEHICLEDATARESULT;
+            expectedParameters[SubscribeVehicleDataResponse.KEY_HANDS_OFF_STEERING] = JSON_VEHICLEDATARESULT;
             return expectedParameters;
         };
 
