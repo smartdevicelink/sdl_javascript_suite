@@ -86,7 +86,8 @@
                 this._sdlManager = new SDL.manager.SdlManager(this._appConfig, managerListener);
                 this._sdlManager
                     .start()
-                    .addRpcListener(SDL.rpc.enums.FunctionID.OnHMIStatus, this._onHmiStatusListener.bind(this));
+                    .addRpcListener(SDL.rpc.enums.FunctionID.OnHMIStatus, this._onHmiStatusListener.bind(this))
+                    .addRpcListener(SDL.rpc.enums.FunctionID.OnSystemCapabilityUpdated, this._onSystemCapabilityUpdatedRpcListener.bind(this));
 
                 this._currentTemplate = 'WEB_VIEW';
                 this._isTemplateSwitchCommandAdded = false;
@@ -127,6 +128,11 @@
                     .setFilePath(sdl_manifest.appIcon));
             }
 
+            async _onSystemCapabilityUpdatedRpcListener (capabilityMessage) {
+                // just log that RPC and do nothing
+                this._logRpcResponseMessage(capabilityMessage);
+            }
+
             async _onCommandRpcListener (onCommand) {
                 if (onCommand.getCmdID() == this._templateSwitchCommandId) {
                     this._logRpcResponseMessage(onCommand);
@@ -153,7 +159,7 @@
                 }
 
                 if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
-                    if (!this._isTemplateSwitchCommandAdded && this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.AddCommand)) {
+                    if (!this._isTemplateSwitchCommandAdded && this._permissionManager && this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.AddCommand)) {
                         this._logRegularMessage('Adding return to WEB_VIEW template command');
                         this._isTemplateSwitchCommandAdded = true;
 
@@ -225,6 +231,20 @@
                         }
                         return params;
                     }
+
+                    if (Array.isArray(rpcStruct)) { // could be an array of structs
+                        for (let index = 0; index < rpcStruct.length; index++) {
+                            rpcStruct[index] = paramify(rpcStruct[index]);
+                        }
+                        return rpcStruct;
+                    }
+
+                    if (rpcStruct instanceof Object) { // could be an object with nested structs
+                        for (const key in rpcStruct) {
+                            rpcStruct[key] = paramify(rpcStruct[key]);
+                        }
+                    }
+
                     return rpcStruct; // leave it alone
                 }
 
