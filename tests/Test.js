@@ -23,6 +23,7 @@ const SoftButtonCapabilities = SDL.rpc.structs.SoftButtonCapabilities;
 const HMICapabilities = SDL.rpc.structs.HMICapabilities;
 const WindowState = SDL.rpc.structs.WindowState;
 const Grid = SDL.rpc.structs.Grid;
+const WindowStatus = SDL.rpc.structs.WindowStatus;
 
 // enums
 const SpeechCapabilities = SDL.rpc.enums.SpeechCapabilities;
@@ -397,5 +398,14 @@ const GENERAL_GRID = Test.GENERAL_GRID = new Grid()
     .setRow(Test.GENERAL_INTEGER);
 
 const JSON_GRID = Test.JSON_GRID = GENERAL_GRID.getParameters();
+
+const GENERAL_WINDOW_STATUS = Test.GENERAL_WINDOW_STATUS = new WindowStatus()
+    .setLocation(Test.GENERAL_GRID)
+    .setState(Test.GENERAL_WINDOW_STATE);
+
+const JSON_WINDOWSTATUS = Test.JSON_WINDOWSTATUS = {
+    [WindowStatus.KEY_LOCATION]: Test.JSON_GRID,
+    [WindowStatus.KEY_STATE]: Test.JSON_WINDOW_STATE,
+};
 
 module.exports = Test;
