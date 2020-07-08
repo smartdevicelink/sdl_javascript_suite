@@ -21,6 +21,8 @@ const TextField = SDL.rpc.structs.TextField;
 const TouchEventCapabilities = SDL.rpc.structs.TouchEventCapabilities;
 const SoftButtonCapabilities = SDL.rpc.structs.SoftButtonCapabilities;
 const HMICapabilities = SDL.rpc.structs.HMICapabilities;
+const WindowState = SDL.rpc.structs.WindowState;
+const Grid = SDL.rpc.structs.Grid;
 
 // enums
 const SpeechCapabilities = SDL.rpc.enums.SpeechCapabilities;
@@ -384,5 +386,16 @@ GENERAL_DEVICEINFO.setMaxNumberRFCOMMPorts(GENERAL_INT);
 GENERAL_DEVICEINFO.setOs(GENERAL_STRING);
 GENERAL_DEVICEINFO.setOsVersion(GENERAL_STRING);
 
+const GENERAL_WINDOW_STATE = Test.GENERAL_WINDOW_STATE = new WindowState()
+    .setApproximatePosition(Test.GENERAL_INTEGER)
+    .setDeviation(Test.GENERAL_INTEGER);
+
+const JSON_WINDOW_STATE = Test.JSON_WINDOW_STATE = GENERAL_WINDOW_STATE.getParameters();
+
+const GENERAL_GRID = Test.GENERAL_GRID = new Grid()
+    .setColumn(Test.GENERAL_INTEGER)
+    .setRow(Test.GENERAL_INTEGER);
+
+const JSON_GRID = Test.JSON_GRID = GENERAL_GRID.getParameters();
 
 module.exports = Test;
