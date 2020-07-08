@@ -46,6 +46,7 @@ const HMILevel = SDL.rpc.enums.HMILevel;
 const SystemContext = SDL.rpc.enums.SystemContext;
 const CapacityUnit = SDL.rpc.enums.CapacityUnit;
 const ComponentVolumeStatus = SDL.rpc.enums.ComponentVolumeStatus;
+const FuelType = SDL.rpc.enums.FuelType;
 
 class Test {
     constructor () {
@@ -389,5 +390,6 @@ GENERAL_DEVICEINFO.setOsVersion(GENERAL_STRING);
 
 const GENERAL_CAPACITY_UNIT = Test.GENERAL_CAPACITY_UNIT = CapacityUnit.LITERS;
 const GENERAL_COMPONENT_VOLUME_STATUS = Test.GENERAL_COMPONENT_VOLUME_STATUS = ComponentVolumeStatus.CVS_NORMAL;
+const GENERAL_FUEL_TYPE = Test.GENERAL_FUEL_TYPE = FuelType.GASOLINE;
 
 module.exports = Test;
