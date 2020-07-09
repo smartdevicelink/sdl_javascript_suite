@@ -44,6 +44,7 @@ const AudioStreamingState = SDL.rpc.enums.AudioStreamingState;
 const VideoStreamingState = SDL.rpc.enums.VideoStreamingState;
 const HMILevel = SDL.rpc.enums.HMILevel;
 const SystemContext = SDL.rpc.enums.SystemContext;
+const RequestType = SDL.rpc.enums.RequestType;
 
 class Test {
     constructor () {
@@ -63,7 +64,7 @@ const GENERAL_INTEGER = Test.GENERAL_INTEGER = 100;
 const GENERAL_BOOLEAN = Test.GENERAL_BOOLEAN = true;
 const GENERAL_STRING = Test.GENERAL_STRING = 'test';
 
-const GENERAL_FILETYPE  = FileType.BINARY;
+const GENERAL_FILETYPE  = Test.GENERAL_FILETYPE = FileType.BINARY;
 
 const GENERAL_SDLMSGVERSION = Test.GENERAL_SDLMSGVERSION = new SdlMsgVersion();
 GENERAL_SDLMSGVERSION.setMajorVersion(GENERAL_INT);
@@ -384,5 +385,6 @@ GENERAL_DEVICEINFO.setMaxNumberRFCOMMPorts(GENERAL_INT);
 GENERAL_DEVICEINFO.setOs(GENERAL_STRING);
 GENERAL_DEVICEINFO.setOsVersion(GENERAL_STRING);
 
+const GENERAL_REQUESTTYPE = Test.GENERAL_REQUESTTYPE = RequestType.AUTH_REQUEST;
 
 module.exports = Test;
