@@ -61,8 +61,8 @@ module.exports = async function (catalogRpc) {
     const weatherIcon = new SDL.manager.file.filetypes.SdlArtwork('weather-icon', SDL.rpc.enums.FileType.GRAPHIC_PNG)
         .setFilePath('./tests/templates/weather-icon.png');
 
-    await sdlManager.sendRpc(await fileManager._createPutFile(sdlLogo));
-    await sdlManager.sendRpc(await fileManager._createPutFile(weatherIcon));
+    await sdlManager.sendRpcResolve(await fileManager._createPutFile(sdlLogo));
+    await sdlManager.sendRpcResolve(await fileManager._createPutFile(weatherIcon));
 
     const templatesSupported = sdlManager
         .getSystemCapabilityManager()
@@ -73,10 +73,10 @@ module.exports = async function (catalogRpc) {
     // subscribe to preset buttons if supported
     if (templatesSupported.includes('ONSCREEN_PRESETS')) {
         await Promise.all([
-            sdlManager.sendRpc(new SDL.rpc.messages.SubscribeButton().setButtonName(SDL.rpc.enums.ButtonName.PRESET_0)),
-            sdlManager.sendRpc(new SDL.rpc.messages.SubscribeButton().setButtonName(SDL.rpc.enums.ButtonName.PRESET_1)),
-            sdlManager.sendRpc(new SDL.rpc.messages.SubscribeButton().setButtonName(SDL.rpc.enums.ButtonName.PRESET_2)),
-            sdlManager.sendRpc(new SDL.rpc.messages.SubscribeButton().setButtonName(SDL.rpc.enums.ButtonName.PRESET_3)),
+            sdlManager.sendRpcResolve(new SDL.rpc.messages.SubscribeButton().setButtonName(SDL.rpc.enums.ButtonName.PRESET_0)),
+            sdlManager.sendRpcResolve(new SDL.rpc.messages.SubscribeButton().setButtonName(SDL.rpc.enums.ButtonName.PRESET_1)),
+            sdlManager.sendRpcResolve(new SDL.rpc.messages.SubscribeButton().setButtonName(SDL.rpc.enums.ButtonName.PRESET_2)),
+            sdlManager.sendRpcResolve(new SDL.rpc.messages.SubscribeButton().setButtonName(SDL.rpc.enums.ButtonName.PRESET_3)),
         ]);
     }
 
@@ -110,14 +110,13 @@ module.exports = async function (catalogRpc) {
             .setTemplateConfiguration(new SDL.rpc.structs.TemplateConfiguration()
                 .setTemplate(template));  
 
-        const showResponse = await sdlManager.sendRpc(show)
-            .catch(err => err);
+        const showResponse = await sdlManager.sendRpcResolve(show)
 
         await sleep(2500);
     }
 
     // tear down the app
-    await sdlManager.sendRpc(new SDL.rpc.messages.UnregisterAppInterface());
+    await sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
     sdlManager.dispose();
 };
 

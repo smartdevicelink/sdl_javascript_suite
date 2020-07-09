@@ -88,7 +88,7 @@ module.exports = class SampleApp {
 
     async stop () {
         // tear down the app
-        await this.sdlManager.sendRpc(new SDL.rpc.messages.UnregisterAppInterface());
+        await this.sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
         this.sdlManager.dispose();
     }
 

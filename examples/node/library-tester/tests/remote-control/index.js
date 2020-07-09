@@ -98,7 +98,7 @@ module.exports = async function (catalogRpc) {
             .setButtonPressMode(pressMode)
             .setModuleType(buttonsToModules[buttonCapability.getNameParam()]);
 
-        await sdlManager.sendRpc(bpr);
+        await sdlManager.sendRpcResolve(bpr);
     }
 
     // RC DATA TESTS
@@ -115,7 +115,7 @@ module.exports = async function (catalogRpc) {
                 }],
             },
         }));
-    await sdlManager.sendRpc(audioData);
+    await sdlManager.sendRpcResolve(audioData);
 
     // set climate
     const climateData = new SDL.rpc.messages.SetInteriorVehicleData()
@@ -141,7 +141,7 @@ module.exports = async function (catalogRpc) {
                 climateEnable: true,
             },
         }));
-    await sdlManager.sendRpc(climateData);
+    await sdlManager.sendRpcResolve(climateData);
 
     // set hmi settings
     const hmiSettingsData = new SDL.rpc.messages.SetInteriorVehicleData()
@@ -153,7 +153,7 @@ module.exports = async function (catalogRpc) {
                 distanceUnit: SDL.rpc.enums.DistanceUnit.MILES,
             },
         }));
-    await sdlManager.sendRpc(hmiSettingsData);
+    await sdlManager.sendRpcResolve(hmiSettingsData);
 
     // set light
     const lightData = new SDL.rpc.messages.SetInteriorVehicleData()
@@ -172,7 +172,7 @@ module.exports = async function (catalogRpc) {
                 }],
             },
         }));
-    await sdlManager.sendRpc(lightData);
+    await sdlManager.sendRpcResolve(lightData);
 
     // set radio
     const radioData = new SDL.rpc.messages.SetInteriorVehicleData()
@@ -186,7 +186,7 @@ module.exports = async function (catalogRpc) {
                 radioEnable: true,
             },
         }));
-    await sdlManager.sendRpc(radioData);
+    await sdlManager.sendRpcResolve(radioData);
 
     // set seat
     const seatData = new SDL.rpc.messages.SetInteriorVehicleData()
@@ -221,35 +221,35 @@ module.exports = async function (catalogRpc) {
                 },
             },
         }));
-    await sdlManager.sendRpc(seatData);
+    await sdlManager.sendRpcResolve(seatData);
 
     // get tests. check for property coverage at the top level at the least
-    let getDataResponse = await sdlManager.sendRpc(new SDL.rpc.messages.GetInteriorVehicleData()
+    let getDataResponse = await sdlManager.sendRpcResolve(new SDL.rpc.messages.GetInteriorVehicleData()
         .setModuleType(SDL.rpc.enums.ModuleType.RADIO));
     let responseParams = getDataResponse.getModuleData().getRadioControlData().getParameters();
     rcPropCoverageTest(responseParams, 'RadioControlData');
 
-    getDataResponse = await sdlManager.sendRpc(new SDL.rpc.messages.GetInteriorVehicleData()
+    getDataResponse = await sdlManager.sendRpcResolve(new SDL.rpc.messages.GetInteriorVehicleData()
         .setModuleType(SDL.rpc.enums.ModuleType.CLIMATE));
     responseParams = getDataResponse.getModuleData().getClimateControlData().getParameters();
     rcPropCoverageTest(responseParams, 'ClimateControlData');
 
-    getDataResponse = await sdlManager.sendRpc(new SDL.rpc.messages.GetInteriorVehicleData()
+    getDataResponse = await sdlManager.sendRpcResolve(new SDL.rpc.messages.GetInteriorVehicleData()
         .setModuleType(SDL.rpc.enums.ModuleType.SEAT));
     responseParams = getDataResponse.getModuleData().getSeatControlData().getParameters();
     rcPropCoverageTest(responseParams, 'SeatControlData');
 
-    getDataResponse = await sdlManager.sendRpc(new SDL.rpc.messages.GetInteriorVehicleData()
+    getDataResponse = await sdlManager.sendRpcResolve(new SDL.rpc.messages.GetInteriorVehicleData()
         .setModuleType(SDL.rpc.enums.ModuleType.AUDIO));
     responseParams = getDataResponse.getModuleData().getAudioControlData().getParameters();
     rcPropCoverageTest(responseParams, 'AudioControlData');
 
-    getDataResponse = await sdlManager.sendRpc(new SDL.rpc.messages.GetInteriorVehicleData()
+    getDataResponse = await sdlManager.sendRpcResolve(new SDL.rpc.messages.GetInteriorVehicleData()
         .setModuleType(SDL.rpc.enums.ModuleType.LIGHT));
     responseParams = getDataResponse.getModuleData().getLightControlData().getParameters();
     rcPropCoverageTest(responseParams, 'LightControlData');
 
-    getDataResponse = await sdlManager.sendRpc(new SDL.rpc.messages.GetInteriorVehicleData()
+    getDataResponse = await sdlManager.sendRpcResolve(new SDL.rpc.messages.GetInteriorVehicleData()
         .setModuleType(SDL.rpc.enums.ModuleType.HMI_SETTINGS));
     responseParams = getDataResponse.getModuleData().getHmiSettingsControlData().getParameters();
     rcPropCoverageTest(responseParams, 'HmiSettingsControlData');
@@ -272,10 +272,10 @@ module.exports = async function (catalogRpc) {
 
             const climateData = new SDL.rpc.messages.SetInteriorVehicleData()
                 .setModuleData(moduleData);
-            await sdlManager.sendRpc(climateData);
+            await sdlManager.sendRpcResolve(climateData);
             await sleep(500); // show a brief moment of the HMI's changing module statuses
             // now release the module from this app's control
-            await sdlManager.sendRpc(new SDL.rpc.messages.ReleaseInteriorVehicleDataModule()
+            await sdlManager.sendRpcResolve(new SDL.rpc.messages.ReleaseInteriorVehicleDataModule()
                 .setModuleType(SDL.rpc.enums.ModuleType.CLIMATE)
                 .setModuleId(capability.getModuleInfo().getModuleId()));
         }
@@ -299,10 +299,10 @@ module.exports = async function (catalogRpc) {
 
             const radioData = new SDL.rpc.messages.SetInteriorVehicleData()
                 .setModuleData(moduleData);
-            await sdlManager.sendRpc(radioData);
+            await sdlManager.sendRpcResolve(radioData);
             await sleep(500); // show a brief moment of the HMI's changing module statuses
             // now release the module from this app's control
-            await sdlManager.sendRpc(new SDL.rpc.messages.ReleaseInteriorVehicleDataModule()
+            await sdlManager.sendRpcResolve(new SDL.rpc.messages.ReleaseInteriorVehicleDataModule()
                 .setModuleType(SDL.rpc.enums.ModuleType.RADIO)
                 .setModuleId(capability.getModuleInfo().getModuleId()));
         }
@@ -326,10 +326,10 @@ module.exports = async function (catalogRpc) {
 
             const audioData = new SDL.rpc.messages.SetInteriorVehicleData()
                 .setModuleData(moduleData);
-            await sdlManager.sendRpc(audioData);
+            await sdlManager.sendRpcResolve(audioData);
             await sleep(500); // show a brief moment of the HMI's changing module statuses
             // now release the module from this app's control
-            await sdlManager.sendRpc(new SDL.rpc.messages.ReleaseInteriorVehicleDataModule()
+            await sdlManager.sendRpcResolve(new SDL.rpc.messages.ReleaseInteriorVehicleDataModule()
                 .setModuleType(SDL.rpc.enums.ModuleType.AUDIO)
                 .setModuleId(capability.getModuleInfo().getModuleId()));
         }
@@ -345,7 +345,7 @@ module.exports = async function (catalogRpc) {
                 .setUserLocation(new SDL.rpc.structs.SeatLocation({
                     grid: capability.getModuleInfo().getLocation()
                 }));
-            await sdlManager.sendRpc(globalProperties);
+            await sdlManager.sendRpcResolve(globalProperties);
 
             if (!capability.getCoolingEnabledAvailable()) { // not available, so skip this module
                 console.warn(`Cooling not available in the ${capability.getModuleInfo().getModuleId()} module. Skipping test`);
@@ -361,10 +361,10 @@ module.exports = async function (catalogRpc) {
 
             const seatData = new SDL.rpc.messages.SetInteriorVehicleData()
                 .setModuleData(moduleData);
-            await sdlManager.sendRpc(seatData);
+            await sdlManager.sendRpcResolve(seatData);
             await sleep(500); // show a brief moment of the HMI's changing module statuses
             // now release the module from this app's control
-            await sdlManager.sendRpc(new SDL.rpc.messages.ReleaseInteriorVehicleDataModule()
+            await sdlManager.sendRpcResolve(new SDL.rpc.messages.ReleaseInteriorVehicleDataModule()
                 .setModuleType(SDL.rpc.enums.ModuleType.SEAT)
                 .setModuleId(capability.getModuleInfo().getModuleId()));
         }
@@ -373,7 +373,7 @@ module.exports = async function (catalogRpc) {
     }
 
     // tear down the app
-    await sdlManager.sendRpc(new SDL.rpc.messages.UnregisterAppInterface());
+    await sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
     sdlManager.dispose();
 };
 

@@ -86,9 +86,9 @@ class AppHelper {
                         this._checkState(resolve);
                     }
                 });
-            const sendFunc = this._sdlManager._lifecycleManager.sendRpcMessage;
+            const sendFunc = this._sdlManager._lifecycleManager.sendRpcResolve;
             // override the send rpc message to intercept requests
-            this._sdlManager._lifecycleManager.sendRpcMessage = async (message) => {
+            this._sdlManager._lifecycleManager.sendRpcResolve = async (message) => {
                 if (typeof this._catalogRpc === 'function') {
                     this._catalogRpc(message); // log the request
                 }

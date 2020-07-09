@@ -72,7 +72,7 @@ module.exports = async function (catalogRpc) {
             },
         }));
 
-    await sdlManager.sendRpc(show);
+    await sdlManager.sendRpcResolve(show);
 
     // speak file test
     // upload an audio file ahead of time
@@ -84,7 +84,7 @@ module.exports = async function (catalogRpc) {
         .setType(SDL.rpc.enums.FileType.AUDIO_MP3);
 
     const putFile = await fileManager._createPutFile(audioFile);
-    await sdlManager.sendRpc(putFile);
+    await sdlManager.sendRpcResolve(putFile);
 
     const speak = new SDL.rpc.messages.Speak()
         .setTtsChunks([
@@ -93,7 +93,7 @@ module.exports = async function (catalogRpc) {
                 type: SDL.rpc.enums.SpeechCapabilities.FILE,
             }),
         ]);
-    await sdlManager.sendRpc(speak);
+    await sdlManager.sendRpcResolve(speak);
 
     // alert icon test
     // upload a weather icon ahead of time for attaching to weather service data
@@ -103,7 +103,7 @@ module.exports = async function (catalogRpc) {
         .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG);
 
     const putFile2 = await fileManager._createPutFile(logo);
-    await sdlManager.sendRpc(putFile2);
+    await sdlManager.sendRpcResolve(putFile2);
 
     const alert = new SDL.rpc.messages.Alert()
         .setAlertText1('You should see an image with this alert')
@@ -113,7 +113,7 @@ module.exports = async function (catalogRpc) {
             imageType: SDL.rpc.enums.ImageType.DYNAMIC,
             isTemplate: false,
         }));
-    await sdlManager.sendRpc(alert);
+    await sdlManager.sendRpcResolve(alert);
 
     // voice command test
     // wait for the user to click on a voice command to continue
@@ -132,13 +132,12 @@ module.exports = async function (catalogRpc) {
     // send a alert that gets cancelled
     const alert2 = new SDL.rpc.messages.Alert()
         .setAlertText1('This alert should be cancelled in 2 seconds');
-    const alert2Promise = sdlManager.sendRpc(alert2)
-        .catch(err => err);
+    const alert2Promise = sdlManager.sendRpcResolve(alert2);
 
     await sleep(2000);
 
     // cancel the alert that was sent
-    sdlManager.sendRpc(new SDL.rpc.messages.CancelInteraction()
+    sdlManager.sendRpcResolve(new SDL.rpc.messages.CancelInteraction()
         .setFunctionIDParam(SDL.rpc.enums.FunctionID.Alert));
 
     const alert2Response = await alert2Promise;
@@ -147,7 +146,7 @@ module.exports = async function (catalogRpc) {
     }
 
     // tear down the app
-    await sdlManager.sendRpc(new SDL.rpc.messages.UnregisterAppInterface());
+    await sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
     sdlManager.dispose();
 };
 

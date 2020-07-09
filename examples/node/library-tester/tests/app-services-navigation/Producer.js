@@ -87,7 +87,7 @@ module.exports = class Producer {
                 ]
             }));
 
-        const pasrResponse = await this.sdlManager.sendRpc(pasr);
+        const pasrResponse = await this.sdlManager.sendRpcResolve(pasr);
         this._serviceId = pasrResponse.getAppServiceRecord()
             .getServiceID();
         // app published!
@@ -97,7 +97,7 @@ module.exports = class Producer {
             .setMainField1('An additional consumer app has been started')
             .setMainField2('Check the app list and activate the consumer app');
 
-        await this.sdlManager.sendRpc(show);
+        await this.sdlManager.sendRpcResolve(show);
     }
 
     sendLocationResponse (request) {
@@ -106,12 +106,12 @@ module.exports = class Producer {
             .setResultCode(SDL.rpc.enums.Result.SUCCESS)
             .setCorrelationId(request.getCorrelationId());
 
-        this.sdlManager.sendRpc(slResponse); // nothing to wait for
+        this.sdlManager.sendRpcResolve(slResponse); // nothing to wait for
     }
 
     async stop () {
         // tear down the app
-        await this.sdlManager.sendRpc(new SDL.rpc.messages.UnregisterAppInterface());
+        await this.sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
         this.sdlManager.dispose();
     }
 };

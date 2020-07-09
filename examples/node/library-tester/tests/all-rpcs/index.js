@@ -52,7 +52,7 @@ module.exports = async function (catalogRpc) {
     await app.start(); // after this point, we are in HMI FULL and managers are ready
     const sdlManager = app.getManager();
 
-    console.log('Sending a bunch of requests just to see if a response is returned. Ignore any errors related to invalid RPCs that follow.');
+    console.log('Sending a bunch of requests just to see if a response is returned.');
 
     // RECEIVE RESPONSE TESTS
 
@@ -72,8 +72,13 @@ module.exports = async function (catalogRpc) {
             continue;
         }
 
-        const response = await sdlManager.sendRpc(rpcInstance)
-            .catch(err => err);
+        // show updates to this test
+        const show = new SDL.rpc.messages.Show()
+            .setMainField1('Testing')
+            .setMainField2(rpc);
+        await sdlManager.sendRpcResolve(show);
+
+        const response = await sdlManager.sendRpcResolve(rpcInstance);
 
         if (!(response instanceof SDL.rpc.RpcResponse)) {
             console.error(response);
@@ -98,6 +103,12 @@ module.exports = async function (catalogRpc) {
         const version = protocolLayer._protocolVersion.getMajor();
         const isEncrypted = rpcInstance.isPayloadProtected();
 
+        // show updates to this test
+        const show = new SDL.rpc.messages.Show()
+            .setMainField1('Testing')
+            .setMainField2(rpc);
+        await sdlManager.sendRpcResolve(show);
+
         const sdlPacket = await new Promise((resolve, reject) => {
             SDL.protocol._MessageFrameDisassembler.buildRPC(rpcInstance, sessionId, messageId, mtu, version, isEncrypted, resolve);
         });
@@ -117,10 +128,10 @@ module.exports = async function (catalogRpc) {
     console.log('Finished sending the rpcs');
 
     // send CloseApplication last
-    await sdlManager.sendRpc(new SDL.rpc.messages.CloseApplication());
+    await sdlManager.sendRpcResolve(new SDL.rpc.messages.CloseApplication());
 
     // tear down the app
-    await sdlManager.sendRpc(new SDL.rpc.messages.UnregisterAppInterface());
+    await sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
     sdlManager.dispose();
 };
 

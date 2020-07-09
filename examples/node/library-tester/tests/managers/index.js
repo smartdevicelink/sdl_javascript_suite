@@ -96,7 +96,7 @@ module.exports = async function (catalogRpc) {
         .setGraphic(new SDL.rpc.structs.Image().setValueParam(fileName).setImageType(SDL.rpc.enums.ImageType.DYNAMIC))
         .setTemplateConfiguration(new SDL.rpc.structs.TemplateConfiguration()
             .setTemplate('TEXT_WITH_GRAPHIC'));  
-    await sdlManager.sendRpc(show);
+    await sdlManager.sendRpcResolve(show);
 
     await sleep(3000);
 
@@ -104,7 +104,7 @@ module.exports = async function (catalogRpc) {
     const show2 = new SDL.rpc.messages.Show()
         .setTemplateConfiguration(new SDL.rpc.structs.TemplateConfiguration()
             .setTemplate('NON-MEDIA'));
-    await sdlManager.sendRpc(show2);
+    await sdlManager.sendRpcResolve(show2);
 
     // set up the presentation for the manager
     const screenManager = sdlManager.getScreenManager();
@@ -163,13 +163,13 @@ module.exports = async function (catalogRpc) {
         ]);
     });
     
-    await sdlManager.sendRpc(new SDL.rpc.messages.CloseApplication());
+    await sdlManager.sendRpcResolve(new SDL.rpc.messages.CloseApplication());
     // wait for the permission change of Show to complete the test
     await permissionPromise;
 
     // tear down the app
     clearInterval(timer);
-    await sdlManager.sendRpc(new SDL.rpc.messages.UnregisterAppInterface());
+    await sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
     sdlManager.dispose();
 };
 

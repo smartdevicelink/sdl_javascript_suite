@@ -74,7 +74,7 @@ module.exports = class Producer1 {
             .setMainField1('An additional producer app has been started')
             .setMainField2('Check the app list and activate the producer app');
 
-        await this.sdlManager.sendRpc(show);
+        await this.sdlManager.sendRpcResolve(show);
 
         // upload a weather icon ahead of time for attaching to weather service data
         const fileManager = this.sdlManager.getFileManager();
@@ -85,7 +85,7 @@ module.exports = class Producer1 {
             .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG);
 
         const putFile = await fileManager._createPutFile(weatherFile);
-        await this.sdlManager.sendRpc(putFile);
+        await this.sdlManager.sendRpcResolve(putFile);
 
         this.respondToAppServiceRequests();
         this.respondToPerformAppServiceInteractions();
@@ -110,14 +110,14 @@ module.exports = class Producer1 {
                 },
             }));
 
-        const pasrResponse = await this.sdlManager.sendRpc(pasr);
+        const pasrResponse = await this.sdlManager.sendRpcResolve(pasr);
         this._serviceId = pasrResponse.getAppServiceRecord()
             .getServiceID();
         // app published!
     }
 
     async unpublishAppService () {
-        return this.sdlManager.sendRpc(new SDL.rpc.messages.UnpublishAppService().setServiceID(this._serviceId));
+        return this.sdlManager.sendRpcResolve(new SDL.rpc.messages.UnpublishAppService().setServiceID(this._serviceId));
     }
 
     respondToPerformAppServiceInteractions () {
@@ -128,7 +128,7 @@ module.exports = class Producer1 {
                     .setResultCode(SDL.rpc.enums.Result.SUCCESS)
                     .setCorrelationId(message.getCorrelationId());
 
-                this.sdlManager.sendRpc(pasiResponse); // nothing to wait for
+                this.sdlManager.sendRpcResolve(pasiResponse); // nothing to wait for
             }
         });
     }
@@ -218,7 +218,7 @@ module.exports = class Producer1 {
                     .setResultCode(SDL.rpc.enums.Result.SUCCESS)
                     .setCorrelationId(message.getCorrelationId());
 
-                this.sdlManager.sendRpc(gasResponse); // nothing to wait for
+                this.sdlManager.sendRpcResolve(gasResponse); // nothing to wait for
             }
         });
     }
@@ -229,12 +229,12 @@ module.exports = class Producer1 {
             .setResultCode(SDL.rpc.enums.Result.SUCCESS)
             .setCorrelationId(request.getCorrelationId());
 
-        this.sdlManager.sendRpc(slResponse); // nothing to wait for
+        this.sdlManager.sendRpcResolve(slResponse); // nothing to wait for
     }
 
     async stop () {
         // tear down the app
-        await this.sdlManager.sendRpc(new SDL.rpc.messages.UnregisterAppInterface());
+        await this.sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
         this.sdlManager.dispose();
     }
 };

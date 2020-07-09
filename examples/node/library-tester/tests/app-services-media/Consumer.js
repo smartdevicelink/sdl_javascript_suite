@@ -66,7 +66,7 @@ module.exports = class Consumer {
             .setServiceType(SDL.rpc.enums.AppServiceType.MEDIA)
             .setSubscribe(true); // future updates to app services will now be sent
 
-        return this.sdlManager.sendRpc(gap); // don't wait for the response!
+        return this.sdlManager.sendRpcResolve(gap); // don't wait for the response!
     }
 
     async sendPerformInteractionPromise () {
@@ -76,7 +76,7 @@ module.exports = class Consumer {
             .setOriginApp(this.appId)
             .setRequestServiceActive(true);
 
-        return this.sdlManager.sendRpc(pasi);
+        return this.sdlManager.sendRpcResolve(pasi);
     }
 
     async sendButtonPressPromise () {
@@ -86,12 +86,12 @@ module.exports = class Consumer {
             .setButtonName(SDL.rpc.enums.ButtonName.TEMP_UP)
             .setButtonPressMode(SDL.rpc.enums.ButtonPressMode.SHORT);
         
-        return this.sdlManager.sendRpc(bp);
+        return this.sdlManager.sendRpcResolve(bp);
     }
 
     async stop () {
         // tear down the app
-        await this.sdlManager.sendRpc(new SDL.rpc.messages.UnregisterAppInterface());
+        await this.sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
         this.sdlManager.dispose();
     }
 

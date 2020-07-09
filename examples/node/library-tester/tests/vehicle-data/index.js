@@ -54,7 +54,7 @@ module.exports = async function (catalogRpc) {
 
     // get vehicle data test
 
-    await sdlManager.sendRpc(new SDL.rpc.messages.GetVehicleData()
+    await sdlManager.sendRpcResolve(new SDL.rpc.messages.GetVehicleData()
         .setGps(true)
         .setSpeed(true)
         .setRpm(true)
@@ -99,7 +99,7 @@ module.exports = async function (catalogRpc) {
 
     // subscribe vehicle data test
     // can't subscribe to VIN
-    await sdlManager.sendRpc(new SDL.rpc.messages.SubscribeVehicleData()
+    await sdlManager.sendRpcResolve(new SDL.rpc.messages.SubscribeVehicleData()
         .setGps(true)
         .setSpeed(true)
         .setRpm(true)
@@ -145,7 +145,7 @@ module.exports = async function (catalogRpc) {
     });
 
     // unsubscribe from all
-    await sdlManager.sendRpc(new SDL.rpc.messages.UnsubscribeVehicleData()
+    await sdlManager.sendRpcResolve(new SDL.rpc.messages.UnsubscribeVehicleData()
         .setGps(true)
         .setSpeed(true)
         .setRpm(true)
@@ -178,7 +178,7 @@ module.exports = async function (catalogRpc) {
     );
 
     // tear down the app
-    await sdlManager.sendRpc(new SDL.rpc.messages.UnregisterAppInterface());
+    await sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
     sdlManager.dispose();
 };
 

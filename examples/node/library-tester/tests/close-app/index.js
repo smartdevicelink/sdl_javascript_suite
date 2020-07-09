@@ -56,7 +56,7 @@ module.exports = async function (catalogRpc) {
     const hmiStatus = listenForHmiStatus(sdlManager, SDL.rpc.enums.HMILevel.HMI_NONE);
 
     // send CloseApplication
-    await sdlManager.sendRpc(new SDL.rpc.messages.CloseApplication());
+    await sdlManager.sendRpcResolve(new SDL.rpc.messages.CloseApplication());
 
     // the application should now be in HMI NONE state
     await hmiStatus;
@@ -65,7 +65,7 @@ module.exports = async function (catalogRpc) {
     await listenForHmiStatus(sdlManager, SDL.rpc.enums.HMILevel.HMI_FULL);
 
     // tear down the app
-    await sdlManager.sendRpc(new SDL.rpc.messages.UnregisterAppInterface());
+    await sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
     sdlManager.dispose();
 };
 

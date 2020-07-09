@@ -67,12 +67,12 @@ module.exports = class Consumer {
             .setLatitudeDegrees(80)
             .setLocationName('Livio')
 
-        return this.sdlManager.sendRpc(location);
+        return this.sdlManager.sendRpcResolve(location);
     }
 
     async stop () {
         // tear down the app
-        await this.sdlManager.sendRpc(new SDL.rpc.messages.UnregisterAppInterface());
+        await this.sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
         this.sdlManager.dispose();
     }
 

@@ -80,8 +80,7 @@ module.exports = async function (catalogRpc) {
     for (let button of buttons) {
         const subscribeButton = new SDL.rpc.messages.SubscribeButton()
             .setButtonName(button);
-        const res = await sdlManager.sendRpc(subscribeButton)
-            .catch(err => err);
+        const res = await sdlManager.sendRpcResolve(subscribeButton);
         if (!res.getSuccess()) {
             console.warn(`${button} subscription returned with error code ${res.getResultCode()}`);
         } else {
@@ -104,12 +103,12 @@ module.exports = async function (catalogRpc) {
 
     // unsubscribe from all buttons
     for (let button of buttons) {
-        await sdlManager.sendRpc(new SDL.rpc.messages.UnsubscribeButton()
-            .setButtonName(button)).catch(err => err); // silently ignore errors
+        await sdlManager.sendRpcResolve(new SDL.rpc.messages.UnsubscribeButton()
+            .setButtonName(button));
     }
 
     // tear down the app
-    await sdlManager.sendRpc(new SDL.rpc.messages.UnregisterAppInterface());
+    await sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
     sdlManager.dispose();
 };
 

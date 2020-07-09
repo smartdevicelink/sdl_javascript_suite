@@ -66,7 +66,7 @@ module.exports = async function (catalogRpc) {
     // const displayCapabilities = await scm.updateCapability(SDL.rpc.enums.SystemCapabilityType.DISPLAYS);
 
     // tear down the app
-    await sdlManager.sendRpc(new SDL.rpc.messages.UnregisterAppInterface());
+    await sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
     sdlManager.dispose();
 };
 

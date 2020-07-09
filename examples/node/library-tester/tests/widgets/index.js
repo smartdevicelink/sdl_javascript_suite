@@ -55,39 +55,38 @@ module.exports = async function (catalogRpc) {
     // app logic start
 
     // send a CreateWindow as a way to see if the HMI supports widgets
-    const createWindowResponse = await sdlManager.sendRpc(new SDL.rpc.messages.CreateWindow()
+    const createWindowResponse = await sdlManager.sendRpcResolve(new SDL.rpc.messages.CreateWindow()
         .setWindowID(1)
         .setWindowName('Widget 1')
         .setType(SDL.rpc.enums.WindowType.WIDGET))
-        .catch(err => err); // catch disallowed errors
 
     if (!createWindowResponse.getSuccess()) {
         console.warn('The HMI does not support adding widgets. Skipping this test.');
         // tear down the app
-        await sdlManager.sendRpc(new SDL.rpc.messages.UnregisterAppInterface());
+        await sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
         return sdlManager.dispose();
     }
 
     // success! send a show to the main and widget window
 
-    sdlManager.sendRpc(new SDL.rpc.messages.Show()
+    sdlManager.sendRpcResolve(new SDL.rpc.messages.Show()
         .setMainField1('Make Widget 1 visible!'));
 
     await listenForHmiStatus(sdlManager, SDL.rpc.enums.HMILevel.HMI_FULL, 1);
 
-    await sdlManager.sendRpc(new SDL.rpc.messages.Show()
+    await sdlManager.sendRpcResolve(new SDL.rpc.messages.Show()
         .setMainField1('This text should be copied')
         .setMainField2('to the second widget!')
         .setWindowID(1));
 
     // make another widget duplicating the first widget
-    await sdlManager.sendRpc(new SDL.rpc.messages.CreateWindow()
+    await sdlManager.sendRpcResolve(new SDL.rpc.messages.CreateWindow()
         .setWindowID(2)
         .setWindowName('Widget 2')
         .setType(SDL.rpc.enums.WindowType.WIDGET)
         .setDuplicateUpdatesFromWindowID(1));
 
-    sdlManager.sendRpc(new SDL.rpc.messages.Show()
+    sdlManager.sendRpcResolve(new SDL.rpc.messages.Show()
         .setMainField1('Now make Widget 2 visible!'));
 
     await listenForHmiStatus(sdlManager, SDL.rpc.enums.HMILevel.HMI_FULL, 2);
@@ -95,14 +94,14 @@ module.exports = async function (catalogRpc) {
     await sleep(2000);
 
     // delete the duplicated window
-    await sdlManager.sendRpc(new SDL.rpc.messages.DeleteWindow()
+    await sdlManager.sendRpcResolve(new SDL.rpc.messages.DeleteWindow()
         .setWindowID(2));
 
-    await sdlManager.sendRpc(new SDL.rpc.messages.Show()
+    await sdlManager.sendRpcResolve(new SDL.rpc.messages.Show()
         .setMainField1('Now only one widget')
         .setMainField2('should be visible!'));
 
-    await sdlManager.sendRpc(new SDL.rpc.messages.Show()
+    await sdlManager.sendRpcResolve(new SDL.rpc.messages.Show()
         .setMainField1('Remove me to complete')
         .setMainField2('the test!')
         .setWindowID(1));
@@ -111,7 +110,7 @@ module.exports = async function (catalogRpc) {
     const widgetStatusPromise = await listenForHmiStatus(sdlManager, SDL.rpc.enums.HMILevel.HMI_NONE, 1);
 
     // tear down the app
-    await sdlManager.sendRpc(new SDL.rpc.messages.UnregisterAppInterface());
+    await sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
     sdlManager.dispose();
 };
 

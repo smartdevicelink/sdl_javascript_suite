@@ -66,7 +66,7 @@ module.exports = class Consumer {
             .setServiceType(SDL.rpc.enums.AppServiceType.WEATHER)
             .setSubscribe(true); // future updates to app services will now be sent
 
-        return this.sdlManager.sendRpc(gap); // don't wait for the response!
+        return this.sdlManager.sendRpcResolve(gap); // don't wait for the response!
     }
 
     async sendPerformInteractionPromise (serviceId) {
@@ -76,7 +76,7 @@ module.exports = class Consumer {
             .setOriginApp(this.appId)
             .setRequestServiceActive(true);
 
-        return this.sdlManager.sendRpc(pasi);
+        return this.sdlManager.sendRpcResolve(pasi);
     }
 
     async getAndShowImage (image, serviceId) {
@@ -84,7 +84,7 @@ module.exports = class Consumer {
             .setFileName(image.getValueParam())
             .setAppServiceId(serviceId);
 
-        await this.sdlManager.sendRpc(getFile);
+        await this.sdlManager.sendRpcResolve(getFile);
 
         // just show that getting an image that was uploaded from a producer app is possible
         // don't utilize the blob returned from the GetFile and have the consumer upload its own instead
@@ -97,7 +97,7 @@ module.exports = class Consumer {
             .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG);
 
         const putFile = await fileManager._createPutFile(weatherFile);
-        await this.sdlManager.sendRpc(putFile);
+        await this.sdlManager.sendRpcResolve(putFile);
 
         const show = new SDL.rpc.messages.Show()
             .setMainField1('An image of the sun from the weather app service should be shown!')
@@ -106,12 +106,12 @@ module.exports = class Consumer {
                 imageType: SDL.rpc.enums.ImageType.DYNAMIC,
             }));
 
-        await this.sdlManager.sendRpc(show);
+        await this.sdlManager.sendRpcResolve(show);
     }
 
     async stop () {
         // tear down the app
-        await this.sdlManager.sendRpc(new SDL.rpc.messages.UnregisterAppInterface());
+        await this.sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
         this.sdlManager.dispose();
     }
 };
