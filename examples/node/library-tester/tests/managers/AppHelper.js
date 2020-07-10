@@ -51,7 +51,7 @@ class AppHelper {
         return this;
     }
 
-    async start (permissionListener) {
+    async start (permissionListener, updateLifecycle = null) {
         console.log(`Waiting for app activation for ${this._lifecycleConfig.getAppId()}`);
         return new Promise((resolve, reject) => {
             const managerListener = new SDL.manager.SdlManagerListener();
@@ -71,6 +71,9 @@ class AppHelper {
                 .setOnError((sdlManager, info) => {
                     console.error('Error from SdlManagerListener: ', info);
                 });
+            if (updateLifecycle !== null) {
+                managerListener.setManagerShouldUpdateLifecycle(updateLifecycle);
+            }
 
             this._appConfig = new SDL.manager.AppConfig()
                 .setLifecycleConfig(this._lifecycleConfig);

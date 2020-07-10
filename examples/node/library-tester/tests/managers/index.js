@@ -40,7 +40,7 @@ module.exports = async function (catalogRpc) {
     const lifecycleConfig = new SDL.manager.LifecycleConfig()
         .setAppId(appId)
         .setAppName(appId)
-        .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
+        .setLanguageDesired(SDL.rpc.enums.Language.ES_MX)
         .setAppTypes([
             SDL.rpc.enums.AppHMIType.MEDIA,
             SDL.rpc.enums.AppHMIType.REMOTE_CONTROL,
@@ -75,11 +75,30 @@ module.exports = async function (catalogRpc) {
             }
         }
     });
+    let lifecycleUpdateHappened = false;
+    let hashResumeId = null;
 
-    await app.start(permissionListener); // after this point, we are in HMI FULL and managers are ready
+    // check for life cycle updates due to the HMI not expecting the ES_MX language
+    await app.start(permissionListener, language => {
+        lifecycleUpdateHappened = true;
+
+        return new SDL.manager.lifecycle.LifecycleConfigurationUpdate()
+            .setAppName(appId)
+            .setShortAppName('Hello');
+    });
+    // after this point, we are in HMI FULL and managers are ready
+    if (!lifecycleUpdateHappened) {
+        throw new Error("Lifecycle update did not happen! Check that the language passed in is different than what the HMI expects")
+    }
+
     const sdlManager = app.getManager();
 
     // app logic start
+    // listen for OnHashChange updates
+    sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.OnHashChange, onHashChange => {
+        hashResumeId = onHashChange.getHashID();
+    });
+
     // use file manager to upload this image
     const fileName = `${appId}_icon.gif`;
     const file = new SDL.manager.file.filetypes.SdlFile()
@@ -99,6 +118,53 @@ module.exports = async function (catalogRpc) {
     await sdlManager.sendRpcResolve(show);
 
     await sleep(3000);
+
+    // test the sendRpcResolve, sendRpcsResolve, and sendSequentialRpcsResolve methods 
+    // none should throw an error if the RPC is not successful
+    const testCommand = new SDL.rpc.messages.AddCommand();
+    await sdlManager.sendRpcResolve(testCommand);
+    await sdlManager.sendRpcsResolve([testCommand]);
+    await sdlManager.sendSequentialRpcsResolve([testCommand]);
+
+    // test the onUpdate cb function for sendRpcsResolve
+    await sdlManager.sendRpcResolve(new SDL.rpc.messages.Show()
+        .setMainField1('Testing sending batch RPCs. Check the voice commands list'));
+    await sleep(3000);
+
+    const voiceCommands = ['This', 'tests', 'the', 'batch', 'rpc', 'sending', 'capabilities.'];
+    const addCommands = voiceCommands.map((voiceCommand, index) => {
+        return new SDL.rpc.messages.AddCommand()
+            .setCmdID(index)
+            .setVrCommands([voiceCommand]);
+    });
+    let remainingRpcs = addCommands.length;
+    await sdlManager.sendRpcsResolve(addCommands, (result, remaining) => {
+        remainingRpcs--;
+        if (!result.getSuccess()) {
+            throw new Error(result);
+        }
+        if (remainingRpcs !== remaining) {
+            throw new Error(`Batch RPC counting is misaligned! Expected ${remainingRpcs} but got ${remaining}`)
+        }
+    });
+    await sleep(1500);
+
+    // test the onUpdate cb function for sendSequentialRpcsResolve
+    const deleteCommands = voiceCommands.map((voiceCommand, index) => {
+        return new SDL.rpc.messages.DeleteCommand()
+            .setCmdID(index);
+    });
+    remainingRpcs = deleteCommands.length;
+    await sdlManager.sendSequentialRpcsResolve(deleteCommands, (result, remaining) => {
+        remainingRpcs--;
+        if (!result.getSuccess()) {
+            throw new Error(result);
+        }
+        if (remainingRpcs !== remaining) {
+            throw new Error(`Batch RPC counting is misaligned! Expected ${remainingRpcs} but got ${remaining}`)
+        }
+    });
+    await sleep(1000);
 
     // switch to non media mode now
     const show2 = new SDL.rpc.messages.Show()
@@ -125,7 +191,7 @@ module.exports = async function (catalogRpc) {
 
     const state1 = new SDL.manager.screen.utils.SoftButtonState('ROCK', 'Find and click');
     const state2 = new SDL.manager.screen.utils.SoftButtonState('PAPER', 'the voice command');
-    const state3 = new SDL.manager.screen.utils.SoftButtonState('SCISSORS', 'to finish the test');
+    const state3 = new SDL.manager.screen.utils.SoftButtonState('SCISSORS', 'to continue the test');
     const state4 = new SDL.manager.screen.utils.SoftButtonState('BUTTON', 'button', staticFile);
 
     const softButtonObjects = [
@@ -154,10 +220,15 @@ module.exports = async function (catalogRpc) {
         softButtonObjects[0].transitionToNextState();
     }, 2000);
 
-    // add a voice command to finish the test when clicked on
+    // add a voice command to finish the test when clicked on, and one to remove after app hash resumption
+    const removeMeIndex = 485;
+    await sdlManager.sendRpcResolve(new SDL.rpc.messages.AddCommand()
+        .setCmdID(removeMeIndex)
+        .setVrCommands(['Activate the app after clicking the voice command below']));
+
     await new Promise((resolve, reject) => {
         sdlManager.getScreenManager().setVoiceCommands([
-            new SDL.manager.screen.utils.VoiceCommand(['Click on me to end the test!'], () => {
+            new SDL.manager.screen.utils.VoiceCommand(['Click on me to continue the test!'], () => {
                 resolve();
             }),
         ]);
@@ -169,8 +240,42 @@ module.exports = async function (catalogRpc) {
 
     // tear down the app
     clearInterval(timer);
-    await sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
+
+    // do not send a URAI, otherwise the hash resumption will not work
     sdlManager.dispose();
+
+
+
+
+    // start another app, where we try and reclaim the previous app's state using the hash resumption ID
+    const lifecycleConfig2 = new SDL.manager.LifecycleConfig()
+        .setAppId(appId)
+        .setAppName(appId)
+        .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
+        .setAppTypes([
+            SDL.rpc.enums.AppHMIType.MEDIA,
+            SDL.rpc.enums.AppHMIType.REMOTE_CONTROL,
+        ])
+        .setTransportConfig(new SDL.transport.TcpClientConfig(process.env.HOST, process.env.PORT))
+        .setResumeHash(hashResumeId);
+        
+    const app2 = new AppHelper(catalogRpc)
+        .setLifecycleConfig(lifecycleConfig2);
+
+    await app2.start(() => {});
+    
+    const sdlManager2 = app2.getManager();
+
+    // second app is ready. if app resumption worked, then the voice command(s) should re-appear
+    const removeCommandResult = await sdlManager2.sendRpcResolve(new SDL.rpc.messages.DeleteCommand()
+        .setCmdID(removeMeIndex));
+
+    if (!removeCommandResult.getSuccess()) {
+        throw new Error("App resumption did not bring back the state of the previous voice command!");
+    }
+    await sleep(1000);
+
+    await sdlManager2.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
 };
 
 function sleep (timeout = 1000) {
