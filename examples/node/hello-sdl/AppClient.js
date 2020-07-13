@@ -101,6 +101,7 @@ class AppClient {
         // for a cloud server app the hmi full will be received before the managers report that they're ready!
         this._managersReady = false;
         this._hmiFull = false;
+        this._sdlManager.initialize();
     }
 
     _onConnected () {
