@@ -70,6 +70,14 @@ module.exports = async function (catalogRpc) {
         .getWindowCapabilities()[0]
         .getTemplatesAvailable();
 
+    // stop if templatesSupported is null
+    if (templatesSupported === null) {
+        console.log('No template support information returned. Skipping test');
+        // tear down the app
+        await sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
+        return sdlManager.dispose();
+    }
+
     // subscribe to preset buttons if supported
     if (templatesSupported.includes('ONSCREEN_PRESETS')) {
         await Promise.all([
