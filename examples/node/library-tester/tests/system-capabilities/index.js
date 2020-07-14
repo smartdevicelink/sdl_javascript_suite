@@ -59,7 +59,40 @@ module.exports = async function (catalogRpc) {
     // retrieve the capabilities
     const scm = sdlManager.getSystemCapabilityManager();
     for (const sct in SDL.rpc.enums.SystemCapabilityType._MAP) {
-        await scm.updateCapability(sct);
+        console.log(`Retreiving ${sct}`)
+        const result = await scm.updateCapability(sct);
+        if (!result) {
+            console.log(`${sct} not found!`)
+        }
+    }
+
+    // retrieve the capabilities not defined by SystemCapabilityType
+    if (!scm.getHmiCapabilities()) {
+        console.log(`SCM's getHmiCapabilities() returned null or undefined!`);
+    }
+    if (!scm.getDisplayCapabilities()) {
+        console.log(`SCM's getDisplayCapabilities() returned null or undefined!`);
+    }
+    if (!scm.getPrerecordedSpeechCapabilities()) {
+        console.log(`SCM's getPrerecordedSpeechCapabilities() returned null or undefined!`);
+    }
+    if (!scm.getAudioPassThruCapabilities()) {
+        console.log(`SCM's getAudioPassThruCapabilities() returned null or undefined!`);
+    }
+    if (!scm.getPcmStreamCapabilities()) {
+        console.log(`SCM's getPcmStreamCapabilities() returned null or undefined!`);
+    }
+    if (!scm.getHmiZoneCapabilities()) {
+        console.log(`SCM's getHmiZoneCapabilities() returned null or undefined!`);
+    }
+    if (!scm.getPresetBankCapabilities()) {
+        console.log(`SCM's getPresetBankCapabilities() returned null or undefined!`);
+    }
+    if (!scm.getSpeechCapabilities()) {
+        console.log(`SCM's getSpeechCapabilities() returned null or undefined!`);
+    }
+    if (!scm.getVrCapabilities()) {
+        console.log(`SCM's getVrCapabilities() returned null or undefined!`);
     }
 
     // read the display capabilities object returned
