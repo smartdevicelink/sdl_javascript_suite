@@ -175,12 +175,12 @@ module.exports = function (appClient) {
             // add a listener to verify success
             sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.ListFiles, expectSuccess);
 
-            // "stubs" the sendRpcMessage so that any calls to it will instead go to onListFilesSuccess
-            const stub = sinon.stub(lifecycleManager, 'sendRpcMessage')
+            // "stubs" the sendRpcResolve so that any calls to it will instead go to onListFilesSuccess
+            const stub = sinon.stub(lifecycleManager, 'sendRpcResolve')
                 .callsFake(onListFilesSuccess);
             await fileManager._retrieveRemoteFiles();
 
-            // remove the stub on sendRpcMessage
+            // remove the stub on sendRpcResolve
             stub.restore();
 
             Validator.assertEquals(fileManager.getRemoteFileNames(), Test.GENERAL_STRING_LIST);
@@ -196,7 +196,7 @@ module.exports = function (appClient) {
             };
 
             sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.ListFiles, expectFailure);
-            const stub = sinon.stub(lifecycleManager, 'sendRpcMessage')
+            const stub = sinon.stub(lifecycleManager, 'sendRpcResolve')
                 .callsFake(onListFilesFailure);
 
             await fileManager._retrieveRemoteFiles();
@@ -216,12 +216,12 @@ module.exports = function (appClient) {
             sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.ListFiles, expectSuccess);
             sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.PutFile, expectFailure);
 
-            let stub = sinon.stub(lifecycleManager, 'sendRpcMessage')
+            let stub = sinon.stub(lifecycleManager, 'sendRpcResolve')
                 .callsFake(onListFilesSuccess);
             await fileManager._retrieveRemoteFiles();
             stub.restore();
 
-            stub = sinon.stub(lifecycleManager, 'sendRpcMessage')
+            stub = sinon.stub(lifecycleManager, 'sendRpcResolve')
                 .callsFake(onPutFileFailure);
             await fileManager.uploadFile(validFile);
             stub.restore();
@@ -241,12 +241,12 @@ module.exports = function (appClient) {
             sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.ListFiles, expectSuccess);
             sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.PutFile, expectSuccess);
 
-            let stub = sinon.stub(lifecycleManager, 'sendRpcMessage')
+            let stub = sinon.stub(lifecycleManager, 'sendRpcResolve')
                 .callsFake(onListFilesSuccess);
             await fileManager._retrieveRemoteFiles();
             stub.restore();
 
-            stub = sinon.stub(lifecycleManager, 'sendRpcMessage')
+            stub = sinon.stub(lifecycleManager, 'sendRpcResolve')
                 .callsFake(onPutFileSuccess);
             await fileManager.uploadFile(validFile);
             stub.restore();
@@ -266,7 +266,7 @@ module.exports = function (appClient) {
 
             sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.ListFiles, expectSuccess);
 
-            const stub = sinon.stub(lifecycleManager, 'sendRpcMessage')
+            const stub = sinon.stub(lifecycleManager, 'sendRpcResolve')
                 .callsFake(onListFilesSuccess);
             await fileManager._retrieveRemoteFiles();
             stub.restore();
@@ -316,7 +316,7 @@ module.exports = function (appClient) {
             sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.PutFile, expectSuccess);
             sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.DeleteFile, expectSuccess);
 
-            let stub = sinon.stub(lifecycleManager, 'sendRpcMessage')
+            let stub = sinon.stub(lifecycleManager, 'sendRpcResolve')
                 .callsFake(onListFilesSuccess);
             await fileManager._retrieveRemoteFiles();
             stub.restore();
@@ -336,7 +336,7 @@ module.exports = function (appClient) {
             sdlFile.setType(SDL.rpc.enums.FileType.BINARY);
             filesToUpload.push(sdlFile);
 
-            stub = sinon.stub(lifecycleManager, 'sendRpcMessage')
+            stub = sinon.stub(lifecycleManager, 'sendRpcResolve')
                 .callsFake(onPutFileSuccess);
             await fileManager.uploadFiles(filesToUpload);
             stub.restore();
@@ -345,7 +345,7 @@ module.exports = function (appClient) {
             Validator.assertTrue(uploadedFileNames.includes(filesToUpload[0].getName()));
             Validator.assertTrue(uploadedFileNames.includes(filesToUpload[1].getName()));
 
-            stub = sinon.stub(lifecycleManager, 'sendRpcMessage')
+            stub = sinon.stub(lifecycleManager, 'sendRpcResolve')
                 .callsFake(onDeleteFileSuccess);
             await fileManager.deleteRemoteFilesWithNames(uploadedFileNames);
             stub.restore();
@@ -375,7 +375,7 @@ module.exports = function (appClient) {
             sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.ListFiles, expectSuccess);
             sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.PutFile, expectSuccessThenFail);
 
-            let stub = sinon.stub(lifecycleManager, 'sendRpcMessage')
+            let stub = sinon.stub(lifecycleManager, 'sendRpcResolve')
                 .callsFake(onListFilesSuccess);
             await fileManager._retrieveRemoteFiles();
             stub.restore();
@@ -396,7 +396,7 @@ module.exports = function (appClient) {
             filesToUpload.push(sdlFile);
             let uploadedFileNames = fileManager.getRemoteFileNames();
 
-            stub = sinon.stub(lifecycleManager, 'sendRpcMessage')
+            stub = sinon.stub(lifecycleManager, 'sendRpcResolve')
                 .callsFake(onMultiplePutFileSuccess);
             await fileManager.uploadFiles(filesToUpload);
             stub.restore();
@@ -417,7 +417,7 @@ module.exports = function (appClient) {
             sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.ListFiles, expectSuccess);
             sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.PutFile, expectSuccess);
 
-            let stub = sinon.stub(lifecycleManager, 'sendRpcMessage')
+            let stub = sinon.stub(lifecycleManager, 'sendRpcResolve')
                 .callsFake(onMultipleListFilesSuccess);
             await fileManager._retrieveRemoteFiles();
             stub.restore();
@@ -436,7 +436,7 @@ module.exports = function (appClient) {
                 .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG);
             artworkToUpload.push(sdlArtwork);
 
-            stub = sinon.stub(lifecycleManager, 'sendRpcMessage')
+            stub = sinon.stub(lifecycleManager, 'sendRpcResolve')
                 .callsFake(onPutFileSuccess);
             await fileManager.uploadFiles(artworkToUpload);
             stub.restore();
@@ -457,7 +457,7 @@ module.exports = function (appClient) {
 
             sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.ListFiles, expectSuccess);
 
-            const stub = sinon.stub(lifecycleManager, 'sendRpcMessage')
+            const stub = sinon.stub(lifecycleManager, 'sendRpcResolve')
                 .callsFake(onListFilesSuccess);
             await fileManager._retrieveRemoteFiles();
             stub.restore();
