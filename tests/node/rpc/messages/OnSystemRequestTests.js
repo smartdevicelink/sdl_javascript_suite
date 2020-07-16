@@ -83,15 +83,24 @@ describe('OnSystemRequestTests', function () {
     });
 
     it('testUrlParam', function (done) {
-        // test the url length has not changed
         let longUrl = 'https://test.url';
         do {
             longUrl += '/test';
         } while (longUrl.length < 10000);
 
         const rpcMessage = new OnSystemRequest();
+
+        // test the url length has not changed
         rpcMessage.setUrl(longUrl);
         Validator.assertTrue(rpcMessage.getUrl().length >= 10000, 'url param length was changed');
+
+        // test empty url
+        rpcMessage.setUrl('');
+        Validator.assertTrue(rpcMessage.getUrl() === '', 'url param is not empty string');
+
+        // test exactly the length of the old limit (1000 characters)
+        rpcMessage.setUrl(longUrl.substring(0, 1000));
+        Validator.assertTrue(rpcMessage.getUrl().length === 1000, 'url param length was changed');
 
         done();
     });
