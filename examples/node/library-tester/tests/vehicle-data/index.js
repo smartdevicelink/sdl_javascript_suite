@@ -54,7 +54,7 @@ module.exports = async function (catalogRpc) {
 
     // get vehicle data test
 
-    await sdlManager.sendRpcResolve(new SDL.rpc.messages.GetVehicleData()
+    let result = await sdlManager.sendRpcResolve(new SDL.rpc.messages.GetVehicleData()
         .setGps(true)
         .setSpeed(true)
         .setRpm(true)
@@ -87,6 +87,10 @@ module.exports = async function (catalogRpc) {
         .setEmergencyEvent(true)
     );
 
+    if (!result.getSuccess()) {
+        throw new Error("GetVehicleData couldn't return all vehicle data requested!");
+    }
+
 
     // listen for vehicle data updates
     sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.OnVehicleData, (vehicleData) => {
@@ -99,7 +103,7 @@ module.exports = async function (catalogRpc) {
 
     // subscribe vehicle data test
     // can't subscribe to VIN
-    await sdlManager.sendRpcResolve(new SDL.rpc.messages.SubscribeVehicleData()
+    result = await sdlManager.sendRpcResolve(new SDL.rpc.messages.SubscribeVehicleData()
         .setGps(true)
         .setSpeed(true)
         .setRpm(true)
@@ -130,6 +134,10 @@ module.exports = async function (catalogRpc) {
         .setExternalTemperature(true)
         .setEmergencyEvent(true)
     );
+
+    if (!result.getSuccess()) {
+        throw new Error("SubscribeVehicleData couldn't subscribe to all vehicle data requested!");
+    }
 
     // wait for the user to click on a voice command to continue
     sdlManager.getScreenManager()
@@ -145,7 +153,7 @@ module.exports = async function (catalogRpc) {
     });
 
     // unsubscribe from all
-    await sdlManager.sendRpcResolve(new SDL.rpc.messages.UnsubscribeVehicleData()
+    result = await sdlManager.sendRpcResolve(new SDL.rpc.messages.UnsubscribeVehicleData()
         .setGps(true)
         .setSpeed(true)
         .setRpm(true)
@@ -176,6 +184,10 @@ module.exports = async function (catalogRpc) {
         .setExternalTemperature(true)
         .setEmergencyEvent(true)
     );
+
+    if (!result.getSuccess()) {
+        throw new Error("UnsubscribeVehicleData couldn't subscribe to all vehicle data requested!");
+    }
 
     // tear down the app
     await sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
