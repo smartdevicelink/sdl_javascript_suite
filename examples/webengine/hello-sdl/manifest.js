@@ -13,6 +13,6 @@ export default {
         }
     },
     "appVersion": "1.0.0",
-    "minRpcVersion": "6.2.0",
+    "minRpcVersion": "7.0.0",
     "minProtocolVersion": "5.0.0"
 };
