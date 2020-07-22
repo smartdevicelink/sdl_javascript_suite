@@ -38,9 +38,9 @@ module.exports = function (appClient) {
         }
         it('testRpcListener', function (done) {
             sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.ListFiles, validateRpcResponse);
-            const stub = sinon.stub(sdlManager.getFileManager()._lifecycleManager, 'sendRpcMessage')
+            const stub = sinon.stub(sdlManager.getFileManager()._lifecycleManager, 'sendRpcResolve')
                 .callsFake(handleRpcStub);
-            sdlManager._lifecycleManager.sendRpcMessage(new SDL.rpc.messages.ListFiles());
+            sdlManager._lifecycleManager.sendRpcResolve(new SDL.rpc.messages.ListFiles());
             stub.restore();
             sdlManager.removeRpcListener(SDL.rpc.enums.FunctionID.ListFiles, validateRpcResponse);
             done();

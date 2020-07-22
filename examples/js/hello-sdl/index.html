@@ -169,13 +169,13 @@
                             .setMainField2('')
                             .setMainField3('');
 
-                        this._sdlManager.sendRpc(showCountdown); // don't wait for a response
+                        this._sdlManager.sendRpcResolve(showCountdown); // don't wait for a response
 
                         await this._sleep();
                     }
 
                     // tear down the app
-                    await this._sdlManager.sendRpc(new SDL.rpc.messages.UnregisterAppInterface());
+                    await this._sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
 
                     this._sdlManager.dispose();
                 }
