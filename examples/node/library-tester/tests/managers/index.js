@@ -87,6 +87,11 @@ module.exports = async function (catalogRpc) {
             .setShortAppName('Hello');
     });
     // after this point, we are in HMI FULL and managers are ready
+    if (!app._gotRair) {
+        throw new Error("No RAIR received using the attached listener in AppHelper!");
+    }
+
+
     if (!lifecycleUpdateHappened) {
         throw new Error("Lifecycle update did not happen! Check that the language passed in is different than what the HMI expects")
     }
