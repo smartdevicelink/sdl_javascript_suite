@@ -87,8 +87,8 @@ module.exports = async function (catalogRpc) {
             .setShortAppName('Hello');
     });
     // after this point, we are in HMI FULL and managers are ready
-    if (!app._gotRair) {
-        throw new Error("No RAIR received using the attached listener in AppHelper!");
+    if (!app._gotNotif) {
+        throw new Error("No OnSystemCapabilityUpdated received using the attached listener in AppHelper!");
     }
 
 

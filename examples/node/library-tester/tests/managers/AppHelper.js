@@ -40,7 +40,7 @@ class AppHelper {
         this._managerReady = false;
         this._catalogRpc = catalogRpc;
         this._connected = false;
-        this._gotRair = false;
+        this._gotNotif = false;
     }
 
     getManager () {
@@ -86,10 +86,8 @@ class AppHelper {
                         this._checkState(resolve);
                     }
                 },
-                [SDL.rpc.enums.FunctionID.RegisterAppInterface]: rair => {
-                    if (rair.getMessageType() === SDL.rpc.enums.MessageType.response) {
-                        this._gotRair = true;
-                    }
+                [SDL.rpc.enums.FunctionID.OnSystemCapabilityUpdated]: rair => {
+                    this._gotNotif = true;
                 },
             });
 
