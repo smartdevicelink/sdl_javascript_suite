@@ -75,20 +75,24 @@ class AppHelper {
                 managerListener.setManagerShouldUpdateLifecycle(updateLifecycle);
             }
 
-            this._appConfig = new SDL.manager.AppConfig()
-                .setLifecycleConfig(this._lifecycleConfig);
-
-            this._sdlManager = new SDL.manager.SdlManager(this._appConfig, managerListener);
-            this._sdlManager
-                .start()
-                .addRpcListener(SDL.rpc.enums.FunctionID.OnHMIStatus, (onHmiStatus) => {
+            // use the lifecycleConfig setRpcNotificationListeners method for listening for OnHMIStatus notifications
+            this._lifecycleConfig.setRpcNotificationListeners({
+                [SDL.rpc.enums.FunctionID.OnHMIStatus]: (onHmiStatus) => {
                     const hmiLevel = onHmiStatus.getHmiLevel();
                     // wait for the FULL state for more functionality
                     if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
                         this._hmiReady = true;
                         this._checkState(resolve);
                     }
-                });
+                }
+            });
+
+            this._appConfig = new SDL.manager.AppConfig()
+                .setLifecycleConfig(this._lifecycleConfig);
+
+            this._sdlManager = new SDL.manager.SdlManager(this._appConfig, managerListener);
+            this._sdlManager.start();
+
             const sendFunc = this._sdlManager._lifecycleManager.sendRpcResolve;
             // override the send rpc message to intercept requests
             this._sdlManager._lifecycleManager.sendRpcResolve = async (message) => {

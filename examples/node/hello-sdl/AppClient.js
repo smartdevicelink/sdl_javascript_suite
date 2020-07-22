@@ -56,7 +56,10 @@ class AppClient {
                     CONFIG.connectionLostTimeout
                 )
             )
-            .setAppIcon(file);
+            .setAppIcon(file)
+            .setRpcNotificationListeners({
+                [SDL.rpc.enums.FunctionID.OnHMIStatus]: this._onHmiStatusListener.bind(this),
+            });
 
         this._appConfig = new SDL.manager.AppConfig()
             .setLifecycleConfig(this._lifecycleConfig);
@@ -94,9 +97,7 @@ class AppClient {
             });
 
         this._sdlManager = new SDL.manager.SdlManager(this._appConfig, managerListener);
-        this._sdlManager
-            .start()
-            .addRpcListener(SDL.rpc.enums.FunctionID.OnHMIStatus, this._onHmiStatusListener.bind(this));
+        this._sdlManager.start();
 
         // for a cloud server app the hmi full will be received before the managers report that they're ready!
         this._managersReady = false;
