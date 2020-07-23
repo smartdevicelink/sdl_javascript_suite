@@ -86,7 +86,7 @@ class AppHelper {
                         this._checkState(resolve);
                     }
                 },
-                [SDL.rpc.enums.FunctionID.OnSystemCapabilityUpdated]: rair => {
+                [SDL.rpc.enums.FunctionID.OnSystemCapabilityUpdated]: () => {
                     this._gotNotif = true;
                 },
             });
