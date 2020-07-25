@@ -456,6 +456,86 @@
             app.sendRpcRequest(show_app_menu);
         });
 
+        document.getElementById("scrollableMessage").addEventListener("click", function(){
+            const scrollable = new SDL.rpc.messages.ScrollableMessage();
+            scrollable.setScrollableMessageBody("This is a long long message test");
+
+            const btn1 = new SDL.rpc.structs.SoftButton();
+            btn1.setSystemAction(SDL.rpc.enums.SystemAction.DEFAULT_ACTION)
+                .setType(SDL.rpc.enums.SoftButtonType.SBT_TEXT)
+                .setText("ReRoute")
+                .setSoftButtonID(5504);
+
+            const btn2 = new SDL.rpc.structs.SoftButton();
+            btn2.setSystemAction(SDL.rpc.enums.SystemAction.DEFAULT_ACTION)
+                .setType(SDL.rpc.enums.SoftButtonType.SBT_TEXT)
+                .setText("Close")
+                .setSoftButtonID(5505);
+
+            scrollable.setSoftButtons([btn1, btn2]);
+
+            app.sendRpcRequest(scrollable);
+        });
+
+        document.getElementById("sliderButton").addEventListener("click", function(){
+            const slider = new SDL.rpc.messages.Slider();
+            slider.setNumTicks(3)
+                  .setPosition(1)
+                  .setSliderHeader("This is a slider header")
+                  .setSliderFooter(["This is a slider footer", "And new line", "And one more"]);
+
+            app.sendRpcRequest(slider);
+        });
+
+        document.getElementById("performInteraction").addEventListener("click", function(){
+            const choice_set_id = 1;
+
+            const get_create_choice_request = function() {
+                const choice_set = new SDL.rpc.messages.CreateInteractionChoiceSet();
+
+                const choice_item_1 = new SDL.rpc.structs.Choice();
+                choice_item_1.setChoiceID(10)
+                            .setMenuName("Menu Name 1");
+
+                const choice_item_2 = new SDL.rpc.structs.Choice();
+                choice_item_2.setChoiceID(11)
+                            .setMenuName("Menu Name 2");
+
+                choice_set.setInteractionChoiceSetID(choice_set_id);
+                choice_set.setChoiceSet([choice_item_1, choice_item_2]);
+
+                return choice_set;
+            };
+
+            const get_pi_request = function() {
+                const pi_request = new SDL.rpc.messages.PerformInteraction();
+
+                pi_request.setInitialText("Initial text")
+                          .setInteractionMode(SDL.rpc.enums.InteractionMode.MANUAL_ONLY)
+                          .setInteractionChoiceSetIDList([choice_set_id]);
+
+                return pi_request;
+            };
+
+            const get_del_choice_request = function() {
+                const del_request = new SDL.rpc.messages.DeleteInteractionChoiceSet();
+                del_request.setInteractionChoiceSetID(choice_set_id);
+
+                return del_request;
+            }
+
+            app.sendRpcRequest(get_create_choice_request())
+                .then( () => {
+                    app.sendRpcRequest(get_pi_request())
+                        .then( () => {
+                            setTimeout(() => {
+                                app.sendRpcRequest(get_del_choice_request());
+                            }, 10000);
+                        })
+                });
+
+        });
+
         document.getElementById("sendField1").addEventListener("change", function(){
             document.getElementById("mainField1").disabled = !this.checked;
         });
@@ -555,6 +635,27 @@
         position: absolute;
         top: 180px;
         left: 5px;">Show menu
+    </button>
+    <button id="scrollableMessage" style="
+        cursor: pointer;
+        position: absolute;
+        top: 180px;
+        left: 100px;
+        ">ScrollableMessage
+    </button>
+    <button id="sliderButton" style="
+        cursor: pointer;
+        position: absolute;
+        top: 180px;
+        left: 237px;
+        ">Slider
+    </button>
+    <button id="performInteraction" style="
+        cursor: pointer;
+        position: absolute;
+        top: 180px;
+        left: 295px;
+        ">PerformInteraction
     </button>
     <button id="closeApplication" style="
         cursor: pointer;
