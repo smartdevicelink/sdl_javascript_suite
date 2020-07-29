@@ -1,6 +1,6 @@
 {
   "name": "sdl_javascript_suite",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "The official JavaScript SDK for SmartDeviceLink.",
   "main": "/lib/js/dist/SDL.js",
   "engines": {
@@ -38,17 +38,16 @@
   "homepage": "https://github.com/smartdevicelink/sdl_javascript_suite#readme",
   "devDependencies": {
     "@babel/preset-env": "^7.7.1",
-    "babel-minify-webpack-plugin": "^0.3.1",
     "babel-plugin-transform-async-to-promises": "^0.8.15",
     "bson": "^4.0.2",
     "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
     "eslint": "^6.8.0",
     "eslint-plugin-jsdoc": "^22.1.0",
     "esm": "^3.2.25",
     "express": "^4.17.1",
     "express-ws": "^4.0.0",
     "lodash.merge": "^4.6.2",
-    "merge-dirs": "^0.2.1",
     "mocha": "^7.1.1",
     "openurl": "^1.1.1",
     "rimraf": "^3.0.0",
@@ -61,7 +60,7 @@
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-uglify": "^6.0.4",
     "sinon": "^9.0.1",
-    "webpack": "3.8.1",
+    "webpack": "4.43.0",
     "websocket": "^1.0.30"
   },
   "dependencies": {}
