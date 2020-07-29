@@ -1,4 +1,5 @@
 ## SDL Node.js App Startup Instructions
+1) Place the NodeJS SDL.min.js file into this directory
 1) Host the project on AWS EC2 or a comparable hosting platform
 1) On the server hosting the project, run `npm install` then `npm start` from within the `./examples/node/hello-sdl` directory
 1) Request a [Manticore instance](https://smartdevicelink.com/resources/manticore/)
