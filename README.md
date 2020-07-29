@@ -55,3 +55,13 @@ The JavaScript library will be open source and stored in a new smartdevicelink r
 The development should be done in JavaScript (not TypeScript) following ECMA-Script 2017. All the base source code should be developed using [JavaScript standard built-in objects](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects).
 
 The transport related source code for Node.js can use Node specific libraries needed (like socket.io). This code should be stored in a separate folder from the base source code in the repository.
+
+### Building the Project
+NodeJS, npm, and Python3 are required:
+
+```js
+npm install
+npm run build
+```
+
+The output will be in the `dist` folder. There is a vanilla JS and a NodeJS build, which can be placed into the corresponding example apps in the `examples` folder to test out the library.
