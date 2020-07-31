@@ -15,14 +15,22 @@ describe('SubscribeVehicleDataResponseTests', function () {
             .setDataType(VehicleDataType.VEHICLEDATA_STABILITYCONTROLSSTATUS);
         const JSON_STABILITYCONTROLSSTATUS = this.stabilityControlsStatus.getParameters();
 
+        this.vehicleDataResult = new VehicleDataResult()
+            .setDataType(VehicleDataType.VEHICLEDATA_HANDSOFFSTEERING);
+        const JSON_VEHICLEDATARESULT = {
+            [VehicleDataResult.KEY_DATA_TYPE]: VehicleDataType.VEHICLEDATA_HANDSOFFSTEERING,
+        };
+
         this.createMessage = function () {
             return new SubscribeVehicleDataResponse()
-                .setStabilityControlsStatus(this.stabilityControlsStatus);
+                .setStabilityControlsStatus(this.stabilityControlsStatus)
+                .setHandsOffSteering(this.vehicleDataResult);
         };
 
         this.getExpectedParameters = function (sdlVersion) {
             return {
                 [SubscribeVehicleDataResponse.KEY_STABILITY_CONTROLS_STATUS]: JSON_STABILITYCONTROLSSTATUS,
+                [SubscribeVehicleDataResponse.KEY_HANDS_OFF_STEERING]: JSON_VEHICLEDATARESULT,
             };
         };
 
@@ -42,9 +50,11 @@ describe('SubscribeVehicleDataResponseTests', function () {
         let rpcMessage = this.msg;
         // Test Values
         const testStabilityControlsStatus = rpcMessage.getStabilityControlsStatus();
+        const testHandsOffSteering = rpcMessage.getHandsOffSteering();
 
         // Valid Tests
         Validator.validateVehicleDataResult(this.stabilityControlsStatus, testStabilityControlsStatus);
+        Validator.validateVehicleDataResult(this.vehicleDataResult, testHandsOffSteering);
 
         // Invalid/Null Tests
         rpcMessage = new SubscribeVehicleDataResponse();
@@ -55,6 +65,7 @@ describe('SubscribeVehicleDataResponseTests', function () {
             rpcMessage);
 
         Validator.assertNullOrUndefined(rpcMessage.getStabilityControlsStatus());
+        Validator.assertNullOrUndefined(rpcMessage.getHandsOffSteering());
 
         done();
     });

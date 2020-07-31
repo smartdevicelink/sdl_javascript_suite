@@ -11,12 +11,14 @@ describe('GetVehicleDataTests', function () {
     before(function () {
         this.createMessage = function () {
             return new GetVehicleData()
-                .setStabilityControlsStatus(Test.GENERAL_BOOLEAN);
+                .setStabilityControlsStatus(Test.GENERAL_BOOLEAN)
+                .setHandsOffSteering(Test.GENERAL_BOOLEAN);
         };
 
         this.getExpectedParameters = function (sdlVersion) {
             return {
                 [GetVehicleData.KEY_STABILITY_CONTROLS_STATUS]: Test.GENERAL_BOOLEAN,
+                [GetVehicleData.KEY_HANDS_OFF_STEERING]: Test.GENERAL_BOOLEAN,
             };
         };
 
@@ -35,9 +37,11 @@ describe('GetVehicleDataTests', function () {
         let rpcMessage = this.msg;
         // Test Values
         const testStabilityControlsStatus = rpcMessage.getStabilityControlsStatus();
+        const testHandsOffSteering = rpcMessage.getHandsOffSteering();
 
         // Valid Tests
         Validator.assertEquals(Test.GENERAL_BOOLEAN, testStabilityControlsStatus);
+        Validator.assertEquals(Test.GENERAL_BOOLEAN, testHandsOffSteering);
 
         // Invalid/Null Tests
         rpcMessage = new GetVehicleData();
@@ -47,6 +51,7 @@ describe('GetVehicleDataTests', function () {
             rpcMessage);
 
         Validator.assertNullOrUndefined(rpcMessage.getStabilityControlsStatus());
+        Validator.assertNullOrUndefined(rpcMessage.getHandsOffSteering());
 
         done();
     });
