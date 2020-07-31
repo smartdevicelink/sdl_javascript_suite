@@ -10,15 +10,16 @@ const Validator = require('./../../../Validator.js');
 describe('GetVehicleDataTests', function () {
     before(function () {
         this.createMessage = function () {
-            const msg = new GetVehicleData();
-            msg.setHandsOffSteering(Test.GENERAL_BOOLEAN);
-            return msg;
+            return new GetVehicleData()
+                .setStabilityControlsStatus(Test.GENERAL_BOOLEAN)
+                .setHandsOffSteering(Test.GENERAL_BOOLEAN);
         };
 
         this.getExpectedParameters = function (sdlVersion) {
-            const expectedParameters = {};
-            expectedParameters[GetVehicleData.KEY_HANDS_OFF_STEERING] = Test.GENERAL_BOOLEAN;
-            return expectedParameters;
+            return {
+                [GetVehicleData.KEY_STABILITY_CONTROLS_STATUS]: Test.GENERAL_BOOLEAN,
+                [GetVehicleData.KEY_HANDS_OFF_STEERING]: Test.GENERAL_BOOLEAN,
+            };
         };
 
         this.getMessageType = function () {
@@ -35,9 +36,11 @@ describe('GetVehicleDataTests', function () {
     it ('testRpcValues', function (done) {
         let rpcMessage = this.msg;
         // Test Values
+        const testStabilityControlsStatus = rpcMessage.getStabilityControlsStatus();
         const testHandsOffSteering = rpcMessage.getHandsOffSteering();
 
         // Valid Tests
+        Validator.assertEquals(Test.GENERAL_BOOLEAN, testStabilityControlsStatus);
         Validator.assertEquals(Test.GENERAL_BOOLEAN, testHandsOffSteering);
 
         // Invalid/Null Tests
@@ -47,6 +50,7 @@ describe('GetVehicleDataTests', function () {
             MessageType.request,
             rpcMessage);
 
+        Validator.assertNullOrUndefined(rpcMessage.getStabilityControlsStatus());
         Validator.assertNullOrUndefined(rpcMessage.getHandsOffSteering());
 
         done();
