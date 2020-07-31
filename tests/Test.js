@@ -21,6 +21,9 @@ const TextField = SDL.rpc.structs.TextField;
 const TouchEventCapabilities = SDL.rpc.structs.TouchEventCapabilities;
 const SoftButtonCapabilities = SDL.rpc.structs.SoftButtonCapabilities;
 const HMICapabilities = SDL.rpc.structs.HMICapabilities;
+const WindowState = SDL.rpc.structs.WindowState;
+const Grid = SDL.rpc.structs.Grid;
+const WindowStatus = SDL.rpc.structs.WindowStatus;
 
 // enums
 const SpeechCapabilities = SDL.rpc.enums.SpeechCapabilities;
@@ -391,5 +394,26 @@ GENERAL_DEVICEINFO.setOsVersion(GENERAL_STRING);
 const GENERAL_CAPACITY_UNIT = Test.GENERAL_CAPACITY_UNIT = CapacityUnit.LITERS;
 const GENERAL_COMPONENT_VOLUME_STATUS = Test.GENERAL_COMPONENT_VOLUME_STATUS = ComponentVolumeStatus.CVS_NORMAL;
 const GENERAL_FUEL_TYPE = Test.GENERAL_FUEL_TYPE = FuelType.GASOLINE;
+
+const GENERAL_WINDOW_STATE = Test.GENERAL_WINDOW_STATE = new WindowState()
+    .setApproximatePosition(Test.GENERAL_INTEGER)
+    .setDeviation(Test.GENERAL_INTEGER);
+
+const JSON_WINDOW_STATE = Test.JSON_WINDOW_STATE = GENERAL_WINDOW_STATE.getParameters();
+
+const GENERAL_GRID = Test.GENERAL_GRID = new Grid()
+    .setColumn(Test.GENERAL_INTEGER)
+    .setRow(Test.GENERAL_INTEGER);
+
+const JSON_GRID = Test.JSON_GRID = GENERAL_GRID.getParameters();
+
+const GENERAL_WINDOW_STATUS = Test.GENERAL_WINDOW_STATUS = new WindowStatus()
+    .setLocation(Test.GENERAL_GRID)
+    .setState(Test.GENERAL_WINDOW_STATE);
+
+const JSON_WINDOWSTATUS = Test.JSON_WINDOWSTATUS = {
+    [WindowStatus.KEY_LOCATION]: Test.JSON_GRID,
+    [WindowStatus.KEY_STATE]: Test.JSON_WINDOW_STATE,
+};
 
 module.exports = Test;

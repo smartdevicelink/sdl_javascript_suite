@@ -21,16 +21,22 @@ describe('UnsubscribeVehicleDataResponseTests', function () {
             [VehicleDataResult.KEY_DATA_TYPE]: VehicleDataType.VEHICLEDATA_HANDSOFFSTEERING,
         };
 
+        this.windowStatus = new VehicleDataResult()
+            .setDataType(VehicleDataType.VEHICLEDATA_WINDOWSTATUS);
+        const JSON_WINDOWSTATUS = this.windowStatus.getParameters();
+
         this.createMessage = function () {
             return new UnsubscribeVehicleDataResponse()
                 .setStabilityControlsStatus(this.stabilityControlsStatus)
-                .setHandsOffSteering(this.vehicleDataResult);
+                .setHandsOffSteering(this.vehicleDataResult)
+                .setWindowStatus(this.windowStatus);
         };
 
         this.getExpectedParameters = function (sdlVersion) {
             return {
                 [UnsubscribeVehicleDataResponse.KEY_STABILITY_CONTROLS_STATUS]: JSON_STABILITYCONTROLSSTATUS,
                 [UnsubscribeVehicleDataResponse.KEY_HANDS_OFF_STEERING]: JSON_VEHICLEDATARESULT,
+                [UnsubscribeVehicleDataResponse.KEY_WINDOW_STATUS]: JSON_WINDOWSTATUS,
             };
         };
 
@@ -51,10 +57,12 @@ describe('UnsubscribeVehicleDataResponseTests', function () {
         // Test Values
         const testStabilityControlsStatus = rpcMessage.getStabilityControlsStatus();
         const testHandsOffSteering = rpcMessage.getHandsOffSteering();
+        const testWindowStatus = rpcMessage.getWindowStatus();
 
         // Valid Tests
         Validator.validateVehicleDataResult(this.stabilityControlsStatus, testStabilityControlsStatus);
         Validator.validateVehicleDataResult(this.vehicleDataResult, testHandsOffSteering);
+        Validator.validateVehicleDataResult(this.windowStatus, testWindowStatus);
 
         // Invalid/Null Tests
         rpcMessage = new UnsubscribeVehicleDataResponse();
@@ -66,6 +74,7 @@ describe('UnsubscribeVehicleDataResponseTests', function () {
 
         Validator.assertNullOrUndefined(rpcMessage.getStabilityControlsStatus());
         Validator.assertNullOrUndefined(rpcMessage.getHandsOffSteering());
+        Validator.assertNullOrUndefined(rpcMessage.getWindowStatus());
 
         done();
     });
