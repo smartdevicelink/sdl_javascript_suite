@@ -47,6 +47,9 @@ const AudioStreamingState = SDL.rpc.enums.AudioStreamingState;
 const VideoStreamingState = SDL.rpc.enums.VideoStreamingState;
 const HMILevel = SDL.rpc.enums.HMILevel;
 const SystemContext = SDL.rpc.enums.SystemContext;
+const CapacityUnit = SDL.rpc.enums.CapacityUnit;
+const ComponentVolumeStatus = SDL.rpc.enums.ComponentVolumeStatus;
+const FuelType = SDL.rpc.enums.FuelType;
 
 class Test {
     constructor () {
@@ -63,6 +66,7 @@ const JSON_FAIL = Test.JSON_FAIL = 'Json testing failed.';
 
 const GENERAL_INT = Test.GENERAL_INT = 100;
 const GENERAL_INTEGER = Test.GENERAL_INTEGER = 100;
+const GENERAL_NUMBER = Test.GENERAL_NUMBER = 10.5;
 const GENERAL_BOOLEAN = Test.GENERAL_BOOLEAN = true;
 const GENERAL_STRING = Test.GENERAL_STRING = 'test';
 
@@ -386,6 +390,10 @@ GENERAL_DEVICEINFO.setHardware(GENERAL_STRING);
 GENERAL_DEVICEINFO.setMaxNumberRFCOMMPorts(GENERAL_INT);
 GENERAL_DEVICEINFO.setOs(GENERAL_STRING);
 GENERAL_DEVICEINFO.setOsVersion(GENERAL_STRING);
+
+const GENERAL_CAPACITY_UNIT = Test.GENERAL_CAPACITY_UNIT = CapacityUnit.LITERS;
+const GENERAL_COMPONENT_VOLUME_STATUS = Test.GENERAL_COMPONENT_VOLUME_STATUS = ComponentVolumeStatus.CVS_NORMAL;
+const GENERAL_FUEL_TYPE = Test.GENERAL_FUEL_TYPE = FuelType.GASOLINE;
 
 const GENERAL_WINDOW_STATE = Test.GENERAL_WINDOW_STATE = new WindowState()
     .setApproximatePosition(Test.GENERAL_INTEGER)

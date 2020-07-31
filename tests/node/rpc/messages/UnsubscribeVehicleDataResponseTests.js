@@ -11,17 +11,31 @@ const Validator = require('./../../../Validator.js');
 
 describe('UnsubscribeVehicleDataResponseTests', function () {
     before(function () {
+        this.stabilityControlsStatus = new VehicleDataResult()
+            .setDataType(VehicleDataType.VEHICLEDATA_STABILITYCONTROLSSTATUS);
+        const JSON_STABILITYCONTROLSSTATUS = this.stabilityControlsStatus.getParameters();
+
+        this.vehicleDataResult = new VehicleDataResult()
+            .setDataType(VehicleDataType.VEHICLEDATA_HANDSOFFSTEERING);
+        const JSON_VEHICLEDATARESULT = {
+            [VehicleDataResult.KEY_DATA_TYPE]: VehicleDataType.VEHICLEDATA_HANDSOFFSTEERING,
+        };
+
         this.windowStatus = new VehicleDataResult()
             .setDataType(VehicleDataType.VEHICLEDATA_WINDOWSTATUS);
         const JSON_WINDOWSTATUS = this.windowStatus.getParameters();
 
         this.createMessage = function () {
             return new UnsubscribeVehicleDataResponse()
+                .setStabilityControlsStatus(this.stabilityControlsStatus)
+                .setHandsOffSteering(this.vehicleDataResult)
                 .setWindowStatus(this.windowStatus);
         };
 
         this.getExpectedParameters = function (sdlVersion) {
             return {
+                [UnsubscribeVehicleDataResponse.KEY_STABILITY_CONTROLS_STATUS]: JSON_STABILITYCONTROLSSTATUS,
+                [UnsubscribeVehicleDataResponse.KEY_HANDS_OFF_STEERING]: JSON_VEHICLEDATARESULT,
                 [UnsubscribeVehicleDataResponse.KEY_WINDOW_STATUS]: JSON_WINDOWSTATUS,
             };
         };
@@ -41,9 +55,13 @@ describe('UnsubscribeVehicleDataResponseTests', function () {
     it ('testRpcValues', function (done) {
         let rpcMessage = this.msg;
         // Test Values
+        const testStabilityControlsStatus = rpcMessage.getStabilityControlsStatus();
+        const testHandsOffSteering = rpcMessage.getHandsOffSteering();
         const testWindowStatus = rpcMessage.getWindowStatus();
 
         // Valid Tests
+        Validator.validateVehicleDataResult(this.stabilityControlsStatus, testStabilityControlsStatus);
+        Validator.validateVehicleDataResult(this.vehicleDataResult, testHandsOffSteering);
         Validator.validateVehicleDataResult(this.windowStatus, testWindowStatus);
 
         // Invalid/Null Tests
@@ -54,6 +72,8 @@ describe('UnsubscribeVehicleDataResponseTests', function () {
             MessageType.response,
             rpcMessage);
 
+        Validator.assertNullOrUndefined(rpcMessage.getStabilityControlsStatus());
+        Validator.assertNullOrUndefined(rpcMessage.getHandsOffSteering());
         Validator.assertNullOrUndefined(rpcMessage.getWindowStatus());
 
         done();
