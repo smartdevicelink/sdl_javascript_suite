@@ -51,7 +51,10 @@ class AppClient {
                 SDL.rpc.enums.AppHMIType.DEFAULT,
             ])
             .setTransportConfig(new SDL.transport.TcpClientConfig(CONFIG.host, CONFIG.port))
-            .setAppIcon(file);
+            .setAppIcon(file)
+            .setRpcNotificationListeners({
+                [SDL.rpc.enums.FunctionID.OnHMIStatus]: this._onHmiStatusListener.bind(this),
+            });
 
         this._appConfig = new SDL.manager.AppConfig()
             .setLifecycleConfig(this._lifecycleConfig);
@@ -89,9 +92,7 @@ class AppClient {
             });
 
         this._sdlManager = new SDL.manager.SdlManager(this._appConfig, managerListener);
-        this._sdlManager
-            .start()
-            .addRpcListener(SDL.rpc.enums.FunctionID.OnHMIStatus, this._onHmiStatusListener.bind(this));
+        this._sdlManager.start();
     }
 
     async _onConnected () {
@@ -163,13 +164,13 @@ class AppClient {
                     .setMainField2('')
                     .setMainField3('');
 
-                this._sdlManager.sendRpc(showCountdown); // don't wait for a response
+                this._sdlManager.sendRpcResolve(showCountdown); // don't wait for a response
 
                 await this._sleep();
             }
 
             // tear down the app
-            await this._sdlManager.sendRpc(new SDL.rpc.messages.UnregisterAppInterface());
+            await this._sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
 
             this._sdlManager.dispose();
         }
