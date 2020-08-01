@@ -78,8 +78,6 @@ describe('VehicleDataTypeTests', function () {
         const enumVehicledataWindowstatus = VehicleDataType.valueForKey(example);
         example = 'VEHICLEDATA_GEARSTATUS';
         const enumVehicledataGearstatus = VehicleDataType.valueForKey(example);
-        example = 'VEHICLEDATA_PRNDL';
-        const enumVehicledataPrndl = VehicleDataType.valueForKey(example);
 
         Validator.assertNotNullUndefined(enumVehicledataGps, 'VEHICLEDATA_GPS returned null.');
         Validator.assertNotNullUndefined(enumVehicledataSpeed, 'VEHICLEDATA_SPEED returned null.');
@@ -117,7 +115,6 @@ describe('VehicleDataTypeTests', function () {
         Validator.assertNotNullUndefined(enumVehicledataHandsoffsteering, 'VEHICLEDATA_HANDSOFFSTEERING returned null.');
         Validator.assertNotNullUndefined(enumVehicledataWindowstatus, 'VEHICLEDATA_WINDOWSTATUS returned null.');
         Validator.assertNotNullUndefined(enumVehicledataGearstatus, 'VEHICLEDATA_GEARSTATUS returned null.');
-        Validator.assertNotNullUndefined(enumVehicledataPrndl, 'VEHICLEDATA_PRNDL returned null.');
         done();
     });
 
