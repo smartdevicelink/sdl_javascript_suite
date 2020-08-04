@@ -50,6 +50,7 @@ const SystemContext = SDL.rpc.enums.SystemContext;
 const CapacityUnit = SDL.rpc.enums.CapacityUnit;
 const ComponentVolumeStatus = SDL.rpc.enums.ComponentVolumeStatus;
 const FuelType = SDL.rpc.enums.FuelType;
+const RequestType = SDL.rpc.enums.RequestType;
 
 class Test {
     constructor () {
@@ -70,7 +71,7 @@ const GENERAL_NUMBER = Test.GENERAL_NUMBER = 10.5;
 const GENERAL_BOOLEAN = Test.GENERAL_BOOLEAN = true;
 const GENERAL_STRING = Test.GENERAL_STRING = 'test';
 
-const GENERAL_FILETYPE  = FileType.BINARY;
+const GENERAL_FILETYPE  = Test.GENERAL_FILETYPE = FileType.BINARY;
 
 const GENERAL_SDLMSGVERSION = Test.GENERAL_SDLMSGVERSION = new SdlMsgVersion();
 GENERAL_SDLMSGVERSION.setMajorVersion(GENERAL_INT);
@@ -394,6 +395,7 @@ GENERAL_DEVICEINFO.setOsVersion(GENERAL_STRING);
 const GENERAL_CAPACITY_UNIT = Test.GENERAL_CAPACITY_UNIT = CapacityUnit.LITERS;
 const GENERAL_COMPONENT_VOLUME_STATUS = Test.GENERAL_COMPONENT_VOLUME_STATUS = ComponentVolumeStatus.CVS_NORMAL;
 const GENERAL_FUEL_TYPE = Test.GENERAL_FUEL_TYPE = FuelType.GASOLINE;
+const GENERAL_REQUESTTYPE = Test.GENERAL_REQUESTTYPE = RequestType.AUTH_REQUEST;
 
 const GENERAL_WINDOW_STATE = Test.GENERAL_WINDOW_STATE = new WindowState()
     .setApproximatePosition(Test.GENERAL_INTEGER)
