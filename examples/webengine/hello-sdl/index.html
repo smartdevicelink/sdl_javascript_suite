@@ -46,7 +46,11 @@
                     .loadManifest(sdl_manifest)
                     .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
                     .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
-                    .setTransportConfig(new SDL.transport.WebSocketClientConfig());
+                    .setTransportConfig(new SDL.transport.WebSocketClientConfig())
+                    .setRpcNotificationListeners({
+                        [SDL.rpc.enums.FunctionID.OnHMIStatus]: this._onHmiStatusListener.bind(this),
+                        [SDL.rpc.enums.FunctionID.OnSystemCapabilityUpdated]: this._onSystemCapabilityUpdatedRpcListener.bind(this),
+                    });
 
                 this._appConfig = new SDL.manager.AppConfig()
                     .setLifecycleConfig(this._lifecycleConfig);
@@ -84,10 +88,7 @@
                     });
 
                 this._sdlManager = new SDL.manager.SdlManager(this._appConfig, managerListener);
-                this._sdlManager
-                    .start()
-                    .addRpcListener(SDL.rpc.enums.FunctionID.OnHMIStatus, this._onHmiStatusListener.bind(this))
-                    .addRpcListener(SDL.rpc.enums.FunctionID.OnSystemCapabilityUpdated, this._onSystemCapabilityUpdatedRpcListener.bind(this));
+                this._sdlManager.start();
 
                 this._currentTemplate = 'WEB_VIEW';
                 this._isTemplateSwitchCommandAdded = false;
@@ -134,7 +135,7 @@
             }
 
             async _onCommandRpcListener (onCommand) {
-                if (onCommand.getCmdID() == this._templateSwitchCommandId) {
+                if (onCommand.getCmdID() === this._templateSwitchCommandId) {
                     this._logRpcResponseMessage(onCommand);
                     this._logRegularMessage('Switching to WEB_VIEW template');
 
@@ -153,11 +154,12 @@
                 const hmiLevel = onHmiStatus.getHmiLevel();
                 this._logRpcResponseMessage(onHmiStatus);
 
-                if (onHmiStatus.getWindowID() != SDL.rpc.enums.PredefinedWindows.DEFAULT_WINDOW) {
+                if (onHmiStatus.getWindowID() !== SDL.rpc.enums.PredefinedWindows.DEFAULT_WINDOW) {
                     this._logRegularMessage('Ignore OnHmiStatus for widgets');
                     return;
                 }
 
+                // wait for the FULL state for more functionality
                 if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
                     if (!this._isTemplateSwitchCommandAdded && this._permissionManager && this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.AddCommand)) {
                         this._logRegularMessage('Adding return to WEB_VIEW template command');
