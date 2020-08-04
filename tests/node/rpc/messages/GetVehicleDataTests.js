@@ -13,7 +13,9 @@ describe('GetVehicleDataTests', function () {
             return new GetVehicleData()
                 .setStabilityControlsStatus(Test.GENERAL_BOOLEAN)
                 .setHandsOffSteering(Test.GENERAL_BOOLEAN)
-                .setWindowStatus(Test.GENERAL_BOOLEAN);
+                .setWindowStatus(Test.GENERAL_BOOLEAN)
+                .setGearStatus(Test.GENERAL_BOOLEAN)
+                .setPrndl(Test.GENERAL_BOOLEAN);
         };
 
         this.getExpectedParameters = function (sdlVersion) {
@@ -21,6 +23,8 @@ describe('GetVehicleDataTests', function () {
                 [GetVehicleData.KEY_STABILITY_CONTROLS_STATUS]: Test.GENERAL_BOOLEAN,
                 [GetVehicleData.KEY_HANDS_OFF_STEERING]: Test.GENERAL_BOOLEAN,
                 [GetVehicleData.KEY_WINDOW_STATUS]: Test.GENERAL_BOOLEAN,
+                [GetVehicleData.KEY_GEAR_STATUS]: Test.GENERAL_BOOLEAN,
+                [GetVehicleData.KEY_PRNDL]: Test.GENERAL_BOOLEAN,
             };
         };
 
@@ -41,11 +45,15 @@ describe('GetVehicleDataTests', function () {
         const testStabilityControlsStatus = rpcMessage.getStabilityControlsStatus();
         const testHandsOffSteering = rpcMessage.getHandsOffSteering();
         const testWindowStatus = rpcMessage.getWindowStatus();
+        const testGearStatus = rpcMessage.getGearStatus();
+        const testPrndl = rpcMessage.getPrndl();
 
         // Valid Tests
         Validator.assertEquals(Test.GENERAL_BOOLEAN, testStabilityControlsStatus);
         Validator.assertEquals(Test.GENERAL_BOOLEAN, testHandsOffSteering);
         Validator.assertEquals(Test.GENERAL_BOOLEAN, testWindowStatus);
+        Validator.assertEquals(Test.GENERAL_BOOLEAN, testGearStatus);
+        Validator.assertEquals(Test.GENERAL_BOOLEAN, testPrndl);
 
         // Invalid/Null Tests
         rpcMessage = new GetVehicleData();
@@ -57,6 +65,8 @@ describe('GetVehicleDataTests', function () {
         Validator.assertNullOrUndefined(rpcMessage.getStabilityControlsStatus());
         Validator.assertNullOrUndefined(rpcMessage.getHandsOffSteering());
         Validator.assertNullOrUndefined(rpcMessage.getWindowStatus());
+        Validator.assertNullOrUndefined(rpcMessage.getGearStatus());
+        Validator.assertNullOrUndefined(rpcMessage.getPrndl());
 
         done();
     });

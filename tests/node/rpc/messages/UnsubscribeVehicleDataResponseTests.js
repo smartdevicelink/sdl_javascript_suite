@@ -21,6 +21,10 @@ describe('UnsubscribeVehicleDataResponseTests', function () {
             [VehicleDataResult.KEY_DATA_TYPE]: VehicleDataType.VEHICLEDATA_HANDSOFFSTEERING,
         };
 
+        this.gearStatus = new VehicleDataResult()
+            .setDataType(VehicleDataType.VEHICLEDATA_GEARSTATUS);
+        const JSON_GEARSTATUS = this.gearStatus.getParameters();
+
         this.windowStatus = new VehicleDataResult()
             .setDataType(VehicleDataType.VEHICLEDATA_WINDOWSTATUS);
         const JSON_WINDOWSTATUS = this.windowStatus.getParameters();
@@ -29,7 +33,8 @@ describe('UnsubscribeVehicleDataResponseTests', function () {
             return new UnsubscribeVehicleDataResponse()
                 .setStabilityControlsStatus(this.stabilityControlsStatus)
                 .setHandsOffSteering(this.vehicleDataResult)
-                .setWindowStatus(this.windowStatus);
+                .setWindowStatus(this.windowStatus)
+                .setGearStatus(this.gearStatus);
         };
 
         this.getExpectedParameters = function (sdlVersion) {
@@ -37,6 +42,7 @@ describe('UnsubscribeVehicleDataResponseTests', function () {
                 [UnsubscribeVehicleDataResponse.KEY_STABILITY_CONTROLS_STATUS]: JSON_STABILITYCONTROLSSTATUS,
                 [UnsubscribeVehicleDataResponse.KEY_HANDS_OFF_STEERING]: JSON_VEHICLEDATARESULT,
                 [UnsubscribeVehicleDataResponse.KEY_WINDOW_STATUS]: JSON_WINDOWSTATUS,
+                [UnsubscribeVehicleDataResponse.KEY_GEAR_STATUS]: JSON_GEARSTATUS,
             };
         };
 
@@ -58,11 +64,13 @@ describe('UnsubscribeVehicleDataResponseTests', function () {
         const testStabilityControlsStatus = rpcMessage.getStabilityControlsStatus();
         const testHandsOffSteering = rpcMessage.getHandsOffSteering();
         const testWindowStatus = rpcMessage.getWindowStatus();
+        const testGearStatus = rpcMessage.getGearStatus();
 
         // Valid Tests
         Validator.validateVehicleDataResult(this.stabilityControlsStatus, testStabilityControlsStatus);
         Validator.validateVehicleDataResult(this.vehicleDataResult, testHandsOffSteering);
         Validator.validateVehicleDataResult(this.windowStatus, testWindowStatus);
+        Validator.validateVehicleDataResult(this.gearStatus, testGearStatus);
 
         // Invalid/Null Tests
         rpcMessage = new UnsubscribeVehicleDataResponse();
@@ -75,6 +83,7 @@ describe('UnsubscribeVehicleDataResponseTests', function () {
         Validator.assertNullOrUndefined(rpcMessage.getStabilityControlsStatus());
         Validator.assertNullOrUndefined(rpcMessage.getHandsOffSteering());
         Validator.assertNullOrUndefined(rpcMessage.getWindowStatus());
+        Validator.assertNullOrUndefined(rpcMessage.getGearStatus());
 
         done();
     });

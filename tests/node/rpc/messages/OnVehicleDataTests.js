@@ -4,6 +4,9 @@ const FunctionID = SDL.rpc.enums.FunctionID;
 const MessageType = SDL.rpc.enums.MessageType;
 const VehicleDataStatus = SDL.rpc.enums.VehicleDataStatus;
 const StabilityControlsStatus = SDL.rpc.structs.StabilityControlsStatus;
+const PRNDL = SDL.rpc.enums.PRNDL;
+const TransmissionType = SDL.rpc.enums.TransmissionType;
+const GearStatus = SDL.rpc.structs.GearStatus;
 
 const BaseRpcTests = require('./BaseRpcTests');
 const Test = require('./../../../Test.js');
@@ -19,11 +22,22 @@ describe('OnVehicleDataTests', function () {
             [StabilityControlsStatus.KEY_TRAILER_SWAY_CONTROL]: VehicleDataStatus.VDS_ON,
         };
 
+        this.gearStatus = new GearStatus()
+            .setUserSelectedGear(PRNDL.NINTH)
+            .setActualGear(PRNDL.NINTH)
+            .setTransmissionType(TransmissionType.MANUAL);
+        const JSON_GEARSTATUS = {
+            [GearStatus.KEY_USER_SELECTED_GEAR]: PRNDL.NINTH,
+            [GearStatus.KEY_ACTUAL_GEAR]: PRNDL.NINTH,
+            [GearStatus.KEY_TRANSMISSION_TYPE]: TransmissionType.MANUAL,
+        };
+
         this.createMessage = function () {
             return new OnVehicleData()
                 .setStabilityControlsStatus(this.stabilityControlsStatus)
                 .setHandsOffSteering(Test.GENERAL_BOOLEAN)
-                .setWindowStatus([Test.GENERAL_WINDOW_STATUS]);
+                .setWindowStatus([Test.GENERAL_WINDOW_STATUS])
+                .setGearStatus(this.gearStatus);
         };
 
         this.getExpectedParameters = function (sdlVersion) {
@@ -31,6 +45,7 @@ describe('OnVehicleDataTests', function () {
                 [OnVehicleData.KEY_STABILITY_CONTROLS_STATUS]: JSON_STABILITYCONTROLSSTATUS,
                 [OnVehicleData.KEY_HANDS_OFF_STEERING]: Test.GENERAL_BOOLEAN,
                 [OnVehicleData.KEY_WINDOW_STATUS]: [Test.JSON_WINDOWSTATUS],
+                [OnVehicleData.KEY_GEAR_STATUS]: JSON_GEARSTATUS,
             };
         };
 
@@ -51,10 +66,12 @@ describe('OnVehicleDataTests', function () {
         const testStabilityControlsStatus = rpcMessage.getStabilityControlsStatus();
         const testHandsOffSteering = rpcMessage.getHandsOffSteering();
         const testWindowStatus = rpcMessage.getWindowStatus();
+        const testGearStatus = rpcMessage.getGearStatus();
 
         // Valid Tests
         Validator.assertEquals(this.stabilityControlsStatus, testStabilityControlsStatus);
         Validator.assertEquals([Test.GENERAL_WINDOW_STATUS], testWindowStatus);
+        Validator.assertEquals(this.gearStatus, testGearStatus);
 
         // Invalid/Null Tests
         rpcMessage = new OnVehicleData();
@@ -67,6 +84,7 @@ describe('OnVehicleDataTests', function () {
         Validator.assertNullOrUndefined(rpcMessage.getStabilityControlsStatus());
         Validator.assertEquals(Test.GENERAL_BOOLEAN, testHandsOffSteering);
         Validator.assertNullOrUndefined(rpcMessage.getWindowStatus());
+        Validator.assertNullOrUndefined(rpcMessage.getGearStatus());
 
         done();
     });
