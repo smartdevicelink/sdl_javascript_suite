@@ -40,8 +40,6 @@
 
         class HelloSdl {
             constructor () {
-                this._logRegularMessage('Start app');
-
                 this._lifecycleConfig = new SDL.manager.LifecycleConfig()
                     .loadManifest(sdl_manifest)
                     .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
@@ -51,6 +49,9 @@
                         [SDL.rpc.enums.FunctionID.OnHMIStatus]: this._onHmiStatusListener.bind(this),
                         [SDL.rpc.enums.FunctionID.OnSystemCapabilityUpdated]: this._onSystemCapabilityUpdatedRpcListener.bind(this),
                     });
+
+                this._appId = this._lifecycleConfig.getAppId();
+                this._logRegularMessage('Start app');
 
                 this._appConfig = new SDL.manager.AppConfig()
                     .setLifecycleConfig(this._lifecycleConfig);
@@ -207,15 +208,15 @@
             }
 
             _logRpcRequestMessage(message) {
-                this._logRpcMessage('APP -> SDL', message);
+                this._logRpcMessage(`APP[${this._appId}] -> SDL`, message);
             }
 
             _logRpcResponseMessage(message) {
-                this._logRpcMessage('SDL -> APP', message);
+                this._logRpcMessage(`SDL -> APP[${this._appId}]`, message);
             }
 
             _logRegularMessage(message) {
-                this._logMessage('APP:', message);
+                this._logMessage(`APP[${this._appId}]:`, message);
             }
 
             _logRpcMessage(prefix, message) {
