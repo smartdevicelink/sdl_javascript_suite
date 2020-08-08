@@ -36,12 +36,12 @@
     <script src='./SDL.min.js'></script>
 
     <script type='module'>
-        import sdl_manifest from './manifest.js';
+        import sdlManifest from './manifest.js';
 
         class HelloSdl {
             constructor () {
                 this._lifecycleConfig = new SDL.manager.LifecycleConfig()
-                    .loadManifest(sdl_manifest)
+                    .loadManifest(sdlManifest)
                     .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
                     .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
                     .setTransportConfig(new SDL.transport.WebSocketClientConfig())
@@ -127,7 +127,7 @@
                 screenManager.setTitle('JavaScript Library');
                 screenManager.setTextAlignment(SDL.rpc.enums.TextAlignment.RIGHT_ALIGNED);
                 screenManager.setPrimaryGraphic(new SDL.manager.file.filetypes.SdlArtwork('sdl-logo', SDL.rpc.enums.FileType.GRAPHIC_PNG)
-                    .setFilePath(sdl_manifest.appIcon));
+                    .setFilePath(sdlManifest.appIcon));
             }
 
             async _onSystemCapabilityUpdatedRpcListener (capabilityMessage) {
@@ -140,14 +140,14 @@
                     this._logRpcResponseMessage(onCommand);
                     this._logRegularMessage('Switching to WEB_VIEW template');
 
-                    const show_template = new SDL.rpc.messages.Show();
-                    show_template.setTemplateTitle("WEB_VIEW");
+                    const showTemplate = new SDL.rpc.messages.Show();
+                    showTemplate.setTemplateTitle("WEB_VIEW");
 
                     const configuration = new SDL.rpc.structs.TemplateConfiguration();
                     configuration.setTemplate("WEB_VIEW");
-                    show_template.setTemplateConfiguration(configuration);
+                    showTemplate.setTemplateConfiguration(configuration);
 
-                    await this.sendRpcRequest(show_template);
+                    await this.sendRpcRequest(showTemplate);
                 }
             }
 
@@ -166,18 +166,18 @@
                         this._logRegularMessage('Adding return to WEB_VIEW template command');
                         this._isTemplateSwitchCommandAdded = true;
 
-                        const menu_params = new SDL.rpc.structs.MenuParams();
-                        menu_params
+                        const menuParams = new SDL.rpc.structs.MenuParams();
+                        menuParams
                             .setMenuName("Return to WEB_VIEW")
                             .setPosition(0)
                             .setParentID(0);
 
-                        const add_command = new SDL.rpc.messages.AddCommand();
-                        add_command
+                        const addCommand = new SDL.rpc.messages.AddCommand();
+                        addCommand
                             .setCmdID(this._templateSwitchCommandId)
-                            .setMenuParams(menu_params);
+                            .setMenuParams(menuParams);
 
-                        await this.sendRpcRequest(add_command);
+                        await this.sendRpcRequest(addCommand);
 
                         this._sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.OnCommand, this._onCommandRpcListener.bind(this));
                     }
@@ -196,15 +196,17 @@
                 this._hmiLevel = hmiLevel;
             }
 
-            async sendRpcRequest(request) {
+            async _sleep (timeout = 1000) {
                 return new Promise((resolve) => {
-                    this._logRpcRequestMessage(request);
-                    this._sdlManager.sendRpcResolve(request)
-                        .then( (response) => {
-                            this._logRpcResponseMessage(response);
-                            resolve();
-                        })
+                    setTimeout(resolve, timeout);
                 });
+            }
+
+            async sendRpcRequest(request) {
+                this._logRpcRequestMessage(request);
+                const response = await this._sdlManager.sendRpcResolve(request);
+                this._logRpcResponseMessage(response);
+                return Promise.resolve();
             }
 
             _logRpcRequestMessage(message) {
@@ -223,7 +225,7 @@
                 const paramify = function (rpcStruct) {
                     if (rpcStruct instanceof SDL.rpc.RpcStruct) {
                         const params = rpcStruct.getParameters();
-                        for (const key in params) {
+                        Object.keys(params).forEach((key) => {
                             if (Array.isArray(params[key])) { // could be an array of structs
                                 for (let index = 0; index < params[key].length; index++) {
                                     params[key][index] = paramify(params[key][index]);
@@ -231,7 +233,7 @@
                             } else { // not an array. handle normally
                                 params[key] = paramify(params[key]);
                             }
-                        }
+                        });
                         return params;
                     }
 
@@ -243,34 +245,33 @@
                     }
 
                     if (rpcStruct instanceof Object) { // could be an object with nested structs
-                        for (const key in rpcStruct) {
+                        Object.keys(rpcStruct).forEach((key) => {
                             rpcStruct[key] = paramify(rpcStruct[key]);
-                        }
+                        });
                     }
 
                     return rpcStruct; // leave it alone
                 }
 
-                const msg_type = SDL.rpc.enums.MessageType.keyForValue(message.getMessageType());
-                this._logMessage(prefix, `Rpc: "${message.getFunctionId()}" Type: "${msg_type}" Params: ${JSON.stringify(paramify(message))}`);
+                const msgType = SDL.rpc.enums.MessageType.keyForValue(message.getMessageType());
+                this._logMessage(prefix, `Rpc: "${message.getFunctionId()}" Type: "${msgType}" Params: ${JSON.stringify(paramify(message))}`);
             }
 
             _logMessage(prefix, message, isError = false) {
-                const get_time = function() {
+                const _getTime = function() {
                     const logTime = new Date();
-                    const timeStr = logTime.getHours() + ':'
-                                  + logTime.getMinutes() + ':'
-                                  + logTime.getSeconds() + ':'
-                                  + logTime.getMilliseconds();
-                    return timeStr;
+                    return logTime.getHours() + ':'
+                        + logTime.getMinutes() + ':'
+                        + logTime.getSeconds() + ':'
+                        + logTime.getMilliseconds();
                 }
 
                 if (isError) {
-                    console.error(`${prefix} [${get_time()}]: ${message}`);
+                    console.error(`${prefix} [${_getTime()}]: ${message}`);
                     return;
                 }
 
-                console.log(`${prefix} [${get_time()}]: ${message}`);
+                console.log(`${prefix} [${_getTime()}]: ${message}`);
             }
 
             _logPermissions () {
@@ -286,31 +287,31 @@
 
         const app = new HelloSdl();
 
-        let cmd_counter = 0;
+        let cmdCounter = 0;
         document.getElementById("addButton").addEventListener("click", function(){
-            cmd_counter++;
+            cmdCounter++;
 
-            const menu_params = new SDL.rpc.structs.MenuParams();
-            menu_params.setMenuName("Test item " + cmd_counter)
-                .setPosition(cmd_counter)
+            const menuParams = new SDL.rpc.structs.MenuParams();
+            menuParams.setMenuName("Test item " + cmdCounter)
+                .setPosition(cmdCounter)
                 .setParentID(0);
 
-            const add_command = new SDL.rpc.messages.AddCommand();
-            add_command.setCmdID(cmd_counter)
-                .setMenuParams(menu_params);
+            const addCommand = new SDL.rpc.messages.AddCommand();
+            addCommand.setCmdID(cmdCounter)
+                .setMenuParams(menuParams);
 
-            app.sendRpcRequest(add_command);
+            app.sendRpcRequest(addCommand);
         });
 
         document.getElementById("delButton").addEventListener("click", function(){
-            if (cmd_counter === 0) {
+            if (cmdCounter === 0) {
                 return;
             }
-            const del_command = new SDL.rpc.messages.DeleteCommand();
-            del_command.setCmdID(cmd_counter);
+            const deleteCommand = new SDL.rpc.messages.DeleteCommand();
+            deleteCommand.setCmdID(cmdCounter);
 
-            app.sendRpcRequest(del_command);
-            cmd_counter--;
+            app.sendRpcRequest(deleteCommand);
+            cmdCounter--;
         });
 
         document.getElementById("alertButton").addEventListener("click", function(){
@@ -342,64 +343,64 @@
             app.stop();
         });
 
-        let widget_counter = 1;
+        let widgetCounter = 1;
         document.getElementById("addWidget").addEventListener("click", function(){
-            const create_window = new SDL.rpc.messages.CreateWindow();
-            create_window.setWindowID(widget_counter)
-                         .setWindowName("Test widget " + widget_counter)
+            const createWindow = new SDL.rpc.messages.CreateWindow();
+            createWindow.setWindowID(widgetCounter)
+                         .setWindowName("Test widget " + widgetCounter)
                          .setType(SDL.rpc.enums.WindowType.WIDGET);
 
             if (document.getElementById("DuplicateMainWindow").checked) {
-                create_window.setDuplicateUpdatesFromWindowID(0);
+                createWindow.setDuplicateUpdatesFromWindowID(0);
             }
 
             let option = document.createElement("option");
-            option.text = "Widget " + widget_counter;
-            option.value = widget_counter;
+            option.text = "Widget " + widgetCounter;
+            option.value = widgetCounter;
             document.getElementById("LayoutWindowId").appendChild(option);
 
-            widget_counter++;
+            widgetCounter++;
 
-            app.sendRpcRequest(create_window);
+            app.sendRpcRequest(createWindow);
         });
 
         document.getElementById("delWidget").addEventListener("click", function(){
-            if (widget_counter === 1) {
+            if (widgetCounter === 1) {
                 return;
             }
 
             let LayoutWindowId = document.getElementById("LayoutWindowId");
             LayoutWindowId.removeChild(LayoutWindowId.lastElementChild);
             LayoutWindowId.dispatchEvent(new Event('change'));
-            widget_counter--;
+            widgetCounter--;
 
-            const delete_window = new SDL.rpc.messages.DeleteWindow();
-            delete_window.setWindowID(widget_counter);
+            const deleteWindow = new SDL.rpc.messages.DeleteWindow();
+            deleteWindow.setWindowID(widgetCounter);
 
-            app.sendRpcRequest(delete_window);
+            app.sendRpcRequest(deleteWindow);
         });
 
         document.getElementById("setLayout").addEventListener("click", function(){
-            const show_template = new SDL.rpc.messages.Show();
+            const showTemplate = new SDL.rpc.messages.Show();
 
-            const window_id = document.getElementById("LayoutWindowId").value;
-            if (window_id != "MAIN") {
-                show_template.setWindowID(parseInt(window_id));
+            const windowId = document.getElementById("LayoutWindowId").value;
+            if (windowId !== "MAIN") {
+                showTemplate.setWindowID(parseInt(windowId));
             }
 
-            const template_name = document.getElementById("LayoutCombo").value;
-            show_template.setTemplateTitle(template_name);
+            const templateName = document.getElementById("LayoutCombo").value;
+            showTemplate.setTemplateTitle(templateName);
 
             const configuration = new SDL.rpc.structs.TemplateConfiguration();
-            configuration.setTemplate(template_name);
-            show_template.setTemplateConfiguration(configuration);
+            configuration.setTemplate(templateName);
+            showTemplate.setTemplateConfiguration(configuration);
 
-            app.setCurrentTemplateName(template_name);
-            app.sendRpcRequest(show_template);
+            app.setCurrentTemplateName(templateName);
+            app.sendRpcRequest(showTemplate);
         });
 
         document.getElementById("LayoutWindowId").addEventListener('change', (event) => {
-            const items = event.target.value == "MAIN" ?
+            const items = event.target.value === "MAIN" ?
                 ["DEFAULT", "MEDIA", "NON-MEDIA", "NAV_FULLSCREEN_MAP", "WEB_VIEW"] :
                 ["TEXT_WITH_GRAPHIC", "BUTTONS_WITH_GRAPHIC", "GRAPHIC_WITH_TEXT"];
 
@@ -415,48 +416,48 @@
         document.getElementById("LayoutWindowId").dispatchEvent(new Event('change'));
 
         document.getElementById("sendShow").addEventListener("click", function(){
-            const show_template = new SDL.rpc.messages.Show();
+            const showTemplate = new SDL.rpc.messages.Show();
 
-            const window_id = document.getElementById("LayoutWindowId").value;
-            if (window_id != "MAIN") {
-                show_template.setWindowID(parseInt(window_id));
+            const windowId = document.getElementById("LayoutWindowId").value;
+            if (windowId !== "MAIN") {
+                showTemplate.setWindowID(parseInt(windowId));
             }
 
-            const field1_enabled = document.getElementById('sendField1').checked;
-            if (field1_enabled) {
-                const main_field1 = document.getElementById('mainField1').value;
-                show_template.setMainField1(main_field1);
+            const field1Enabled = document.getElementById('sendField1').checked;
+            if (field1Enabled) {
+                const mainField1 = document.getElementById('mainField1').value;
+                showTemplate.setMainField1(mainField1);
             }
 
-            const field2_enabled = document.getElementById('sendField2').checked;
-            if (field2_enabled) {
-                const main_field2 = document.getElementById('mainField2').value;
-                show_template.setMainField2(main_field2);
+            const field2Enabled = document.getElementById('sendField2').checked;
+            if (field2Enabled) {
+                const mainField2 = document.getElementById('mainField2').value;
+                showTemplate.setMainField2(mainField2);
             }
 
-            const soft_btn_enabled = document.getElementById('sendSoftButtons').checked;
-            if (soft_btn_enabled) {
-                const btns_count = parseInt(document.getElementById('SoftButtonsCount').value);
-                let soft_buttons = [];
-                for (let i = 0; i < btns_count; ++i) {
-                    const soft_button = new SDL.rpc.structs.SoftButton();
-                    soft_button
+            const softBtnEnabled = document.getElementById('sendSoftButtons').checked;
+            if (softBtnEnabled) {
+                const btnsCount = parseInt(document.getElementById('SoftButtonsCount').value);
+                let softButtons = [];
+                for (let i = 0; i < btnsCount; ++i) {
+                    const softButton = new SDL.rpc.structs.SoftButton();
+                    softButton
                         .setSoftButtonID(i)
                         .setType(SDL.rpc.enums.SoftButtonType.SBT_TEXT)
                         .setText(String(i + 1));
-                    soft_buttons.push(soft_button);
+                    softButtons.push(softButton);
                 }
 
-                show_template.setSoftButtons(soft_buttons);
+                showTemplate.setSoftButtons(softButtons);
             }
 
-            app.sendRpcRequest(show_template);
+            app.sendRpcRequest(showTemplate);
         });
 
         document.getElementById("showAppMenu").addEventListener("click", function(){
-            const show_app_menu = new SDL.rpc.messages.ShowAppMenu();
+            const showAppMenu = new SDL.rpc.messages.ShowAppMenu();
 
-            app.sendRpcRequest(show_app_menu);
+            app.sendRpcRequest(showAppMenu);
         });
 
         document.getElementById("scrollableMessage").addEventListener("click", function(){
@@ -490,53 +491,47 @@
             app.sendRpcRequest(slider);
         });
 
-        document.getElementById("performInteraction").addEventListener("click", function(){
-            const choice_set_id = 1;
+        document.getElementById("performInteraction").addEventListener("click", async function(){
+            const choiceSetId = 1;
 
-            const get_create_choice_request = function() {
-                const choice_set = new SDL.rpc.messages.CreateInteractionChoiceSet();
+            const _getCreateChoiceRequest = function() {
+                const choiceSet = new SDL.rpc.messages.CreateInteractionChoiceSet();
 
-                const choice_item_1 = new SDL.rpc.structs.Choice();
-                choice_item_1.setChoiceID(10)
+                const choiceItem1 = new SDL.rpc.structs.Choice();
+                choiceItem1.setChoiceID(10)
                             .setMenuName("Menu Name 1");
 
-                const choice_item_2 = new SDL.rpc.structs.Choice();
-                choice_item_2.setChoiceID(11)
+                const choiceItem2 = new SDL.rpc.structs.Choice();
+                choiceItem2.setChoiceID(11)
                             .setMenuName("Menu Name 2");
 
-                choice_set.setInteractionChoiceSetID(choice_set_id);
-                choice_set.setChoiceSet([choice_item_1, choice_item_2]);
+                choiceSet.setInteractionChoiceSetID(choiceSetId);
+                choiceSet.setChoiceSet([choiceItem1, choiceItem2]);
 
-                return choice_set;
+                return choiceSet;
             };
 
-            const get_pi_request = function() {
-                const pi_request = new SDL.rpc.messages.PerformInteraction();
+            const _getPiRequest = function() {
+                const piRequest = new SDL.rpc.messages.PerformInteraction();
 
-                pi_request.setInitialText("Initial text")
+                piRequest.setInitialText("Initial text")
                           .setInteractionMode(SDL.rpc.enums.InteractionMode.MANUAL_ONLY)
-                          .setInteractionChoiceSetIDList([choice_set_id]);
+                          .setInteractionChoiceSetIDList([choiceSetId]);
 
-                return pi_request;
+                return piRequest;
             };
 
-            const get_del_choice_request = function() {
-                const del_request = new SDL.rpc.messages.DeleteInteractionChoiceSet();
-                del_request.setInteractionChoiceSetID(choice_set_id);
+            const _getDelChoiceRequest = function() {
+                const delRequest = new SDL.rpc.messages.DeleteInteractionChoiceSet();
+                delRequest.setInteractionChoiceSetID(choiceSetId);
 
-                return del_request;
+                return delRequest;
             }
 
-            app.sendRpcRequest(get_create_choice_request())
-                .then( () => {
-                    app.sendRpcRequest(get_pi_request())
-                        .then( () => {
-                            setTimeout(() => {
-                                app.sendRpcRequest(get_del_choice_request());
-                            }, 10000);
-                        })
-                });
-
+            await app.sendRpcRequest(_getCreateChoiceRequest());
+            await app.sendRpcRequest(_getPiRequest())
+            await app._sleep(10000);
+            await app.sendRpcRequest(_getDelChoiceRequest())
         });
 
         document.getElementById("sendField1").addEventListener("change", function(){
@@ -552,9 +547,9 @@
         });
 
         document.getElementById("closeApplication").addEventListener("click", function(){
-            const close_app = new SDL.rpc.messages.CloseApplication();
+            const closeApplication = new SDL.rpc.messages.CloseApplication();
 
-            app.sendRpcRequest(close_app);
+            app.sendRpcRequest(closeApplication);
         });
 
     </script>
