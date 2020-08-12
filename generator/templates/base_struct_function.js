@@ -39,10 +39,16 @@
      {% endif -%}
      {% if not method.description -%}
      * @param {{'%s%s%s %s'|format('{', method.type, '}', method.param_name)}} - The desired {{method.method_title}}.
+     {% if method.param_values is defined and method.param_values -%}
+     {{method.param_values}}
+     {% endif -%}
      {% else -%}
      * {% for d in method.description -%}
      {% if loop.index == 1 -%}
      @param {{'%s%s%s %s - %s'|format('{', method.type, '}', method.param_name, d)}} - The desired {{method.method_title}}.
+     {% if method.param_values is defined and method.param_values -%}
+     * {{method.param_values}}
+     {% endif -%}
      {% else -%}
      * {{d}}
      {% endif -%} {% endfor -%}

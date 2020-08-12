@@ -32,7 +32,7 @@ class InterfaceProducerCommon(ABC):
         self.mapping = mapping
         self.key_words = key_words
         self.imports = namedtuple('Imports', 'what wherefrom')
-        self.methods = namedtuple('Methods', 'key method_title external description param_name type')
+        self.methods = namedtuple('Methods', 'key method_title external description param_name param_values type')
         self.params = namedtuple('Params', 'key value')
 
     @property
@@ -65,6 +65,38 @@ class InterfaceProducerCommon(ABC):
         :return:
         """
         return name[:1].upper() + name[1:]
+
+    @staticmethod
+    def extract_values(param):
+        p = OrderedDict() 
+        if hasattr(param.param_type, 'max_size'):
+            p['array_max_size'] = param.param_type.max_size
+        if hasattr(param.param_type, 'min_size'):
+            p['array_min_size'] = param.param_type.min_size   
+        if hasattr(param, 'default_value'):
+            p['default_value'] = param.default_value
+        elif hasattr(param.param_type, 'default_value'):
+            p['default_value'] = param.param_type.default_value
+        if hasattr(param.param_type, 'max_value'):
+            p['num_max_value'] = param.param_type.max_value
+        elif hasattr(param.param_type, 'element_type') and hasattr(param.param_type.element_type, 'max_value'):
+            p['num_max_value'] = param.param_type.element_type.max_value
+        if hasattr(param.param_type, 'min_value'):
+            p['num_min_value'] = param.param_type.min_value
+        elif hasattr(param.param_type, 'element_type') and hasattr(param.param_type.element_type, 'min_value'):
+            p['num_min_value'] = param.param_type.element_type.min_value
+        if hasattr(param.param_type, 'max_length'):
+            p['string_max_length'] = param.param_type.max_length
+        elif hasattr(param.param_type, 'element_type') and hasattr(param.param_type.element_type, 'max_length'):
+            p['string_max_length'] = param.param_type.element_type.max_length
+        if hasattr(param.param_type, 'min_length'):
+            p['string_min_length'] = param.param_type.min_length
+        elif hasattr(param.param_type, 'element_type') and hasattr(param.param_type.element_type, 'min_length'):
+            p['string_min_length'] = param.param_type.element_type.min_length
+
+        # Filter None values
+        filtered_values = {k: v for k, v in p.items() if v is not None}
+        return filtered_values
 
     @staticmethod
     def replace_sync(name):
@@ -160,11 +192,13 @@ class InterfaceProducerCommon(ABC):
         key = self.key(param_name)
         key = self.replace_keywords(key)
 
+        param_values = self.extract_values(param)
+
         title = self.replace_keywords(param_name)
         title = self.capitalize(title)
 
         methods = self.methods(key=key, method_title=title, external=name, description=description,
-                               param_name=short_name, type=type_name)
+                               param_name=short_name, param_values=param_values, type=type_name)
         params = self.params(key=key, value="'{}'".format(param.name))
         return imports, methods, params
 
