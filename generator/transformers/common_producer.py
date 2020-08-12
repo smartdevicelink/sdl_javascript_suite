@@ -10,7 +10,9 @@ from collections import namedtuple, OrderedDict
 from pathlib import Path
 
 from model.array import Array
+from model.boolean import Boolean
 from model.enum import Enum
+from model.enum_element import EnumElement
 from model.float import Float
 from model.function import Function
 from model.integer import Integer
@@ -74,9 +76,15 @@ class InterfaceProducerCommon(ABC):
         if hasattr(param.param_type, 'min_size'):
             p['array_min_size'] = param.param_type.min_size   
         if hasattr(param, 'default_value'):
-            p['default_value'] = param.default_value
+            if hasattr(param.default_value, 'name'):
+                p['default_value'] = param.default_value.name
+            else:
+                p['default_value'] = param.default_value
         elif hasattr(param.param_type, 'default_value'):
-            p['default_value'] = param.param_type.default_value
+            if hasattr(param.param_type.default_value, 'name'):
+                p['default_value'] = param.param_type.default_value.name
+            else:  
+                p['default_value'] = param.param_type.default_value
         if hasattr(param.param_type, 'max_value'):
             p['num_max_value'] = param.param_type.max_value
         elif hasattr(param.param_type, 'element_type') and hasattr(param.param_type.element_type, 'max_value'):
