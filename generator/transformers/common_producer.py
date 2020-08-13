@@ -186,7 +186,6 @@ class InterfaceProducerCommon(ABC):
         :param item_type: type of parent element from initial Model
         :return: tuple with 3 element, which going to be applied to jinja2 template
         """
-        print(param.deprecated)
         name, description = self.extract_name_description(param)
         type_name = self.extract_type(param)
         imports = self.extract_imports(param, item_type)
