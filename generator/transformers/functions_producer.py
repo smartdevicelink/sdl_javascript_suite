@@ -63,10 +63,6 @@ class FunctionsProducer(InterfaceProducerCommon):
             param.name = self.replace_keywords(param.name)
             p = self.extract_param(param)
             params.update({param.name: p})
-        '''
-        if params:
-            render['params'] = tuple(params.values())
-        '''
         return render
 
     def extract_param(self, param: Param):
@@ -85,9 +81,5 @@ class FunctionsProducer(InterfaceProducerCommon):
             d = 'whether the request is successfully processed'
         if param.name == 'resultCode':
             d = 'additional information about a response returning a failed outcome'
-        '''
-        if d:
-            p['description'] = textwrap.wrap(d, 90)
-        '''
         Params = namedtuple('Params', sorted(p))
         return Params(**p)

@@ -10,9 +10,7 @@ from collections import namedtuple, OrderedDict
 from pathlib import Path
 
 from model.array import Array
-from model.boolean import Boolean
 from model.enum import Enum
-from model.enum_element import EnumElement
 from model.float import Float
 from model.function import Function
 from model.integer import Integer
@@ -188,6 +186,7 @@ class InterfaceProducerCommon(ABC):
         :param item_type: type of parent element from initial Model
         :return: tuple with 3 element, which going to be applied to jinja2 template
         """
+        print(param.deprecated)
         name, description = self.extract_name_description(param)
         type_name = self.extract_type(param)
         imports = self.extract_imports(param, item_type)
