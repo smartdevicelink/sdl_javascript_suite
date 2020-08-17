@@ -32,7 +32,7 @@ class InterfaceProducerCommon(ABC):
         self.mapping = mapping
         self.key_words = key_words
         self.imports = namedtuple('Imports', 'what wherefrom')
-        self.methods = namedtuple('Methods', 'key method_title external description param_name param_values type')
+        self.methods = namedtuple('Methods', 'key method_title external description param_name param_values type deprecated history')
         self.params = namedtuple('Params', 'key value')
 
     @property
@@ -203,8 +203,12 @@ class InterfaceProducerCommon(ABC):
         title = self.replace_keywords(param_name)
         title = self.capitalize(title)
 
+        deprecated = param.deprecated
+        history = param.history
+
         methods = self.methods(key=key, method_title=title, external=name, description=description,
-                               param_name=short_name, param_values=param_values, type=type_name)
+                               param_name=short_name, param_values=param_values, type=type_name, 
+                               deprecated=deprecated, history=history)
         params = self.params(key=key, value="'{}'".format(param.name))
         return imports, methods, params
 

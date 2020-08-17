@@ -28,7 +28,7 @@
 
     /**
      * Get the enum value for {{method.method_title}}.
-     {%- if deprecated is defined %}
+     {%- if method.deprecated is defined and method.deprecated %}
      * @deprecated
      {%- endif %}
      {%- for d in method.description %}
