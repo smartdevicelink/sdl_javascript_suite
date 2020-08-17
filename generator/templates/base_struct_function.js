@@ -47,6 +47,9 @@
      * {{d}}
      {% endif -%} {% endfor -%}
      {% endif -%}
+     {% if method.param_values is defined and method.param_values -%}
+     * {{method.param_values}}
+     {% endif -%}
      * @returns {{'%s%s%s'|format('{', name, '}')}} - The class instance for method chaining.
      */
     set{{method.method_title}} ({{method.param_name}}) {
