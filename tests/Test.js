@@ -24,6 +24,8 @@ const HMICapabilities = SDL.rpc.structs.HMICapabilities;
 const WindowState = SDL.rpc.structs.WindowState;
 const Grid = SDL.rpc.structs.Grid;
 const WindowStatus = SDL.rpc.structs.WindowStatus;
+const AppCapability = SDL.rpc.structs.AppCapability;
+const VideoStreamingCapability = SDL.rpc.structs.VideoStreamingCapability;
 
 // enums
 const SpeechCapabilities = SDL.rpc.enums.SpeechCapabilities;
@@ -51,6 +53,7 @@ const CapacityUnit = SDL.rpc.enums.CapacityUnit;
 const ComponentVolumeStatus = SDL.rpc.enums.ComponentVolumeStatus;
 const FuelType = SDL.rpc.enums.FuelType;
 const RequestType = SDL.rpc.enums.RequestType;
+const AppCapabilityType = SDL.rpc.enums.AppCapabilityType;
 
 class Test {
     constructor () {
@@ -416,6 +419,23 @@ const GENERAL_WINDOW_STATUS = Test.GENERAL_WINDOW_STATUS = new WindowStatus()
 const JSON_WINDOWSTATUS = Test.JSON_WINDOWSTATUS = {
     [WindowStatus.KEY_LOCATION]: Test.JSON_GRID,
     [WindowStatus.KEY_STATE]: Test.JSON_WINDOW_STATE,
+};
+
+const GENERAL_VIDEO_STREAMING_CAPABILITY = Test.GENERAL_VIDEO_STREAMING_CAPABILITY = new VideoStreamingCapability()
+    .setAdditionalVideoStreamingCapabilities([new VideoStreamingCapability()]);
+
+const JSON_VIDEO_STREAMING_CAPABILITY = Test.JSON_VIDEO_STREAMING_CAPABILITY = {
+    [VideoStreamingCapability.KEY_ADDITIONAL_VIDEO_STREAMING_CAPABILITIES]: [new VideoStreamingCapability().getParameters()],
+};
+
+const GENERAL_APP_CAPABILITY_TYPE = Test.GENERAL_APP_CAPABILITY_TYPE = AppCapabilityType.VIDEO_STREAMING;
+const GENERAL_APP_CAPABILITY = Test.GENERAL_APP_CAPABILITY = new AppCapability()
+    .setAppCapabilityType(Test.GENERAL_APP_CAPABILITY_TYPE)
+    .setVideoStreamingCapability(Test.GENERAL_VIDEO_STREAMING_CAPABILITY);
+
+const JSON_APP_CAPABILITY = Test.JSON_APP_CAPABILITY = {
+    [AppCapability.KEY_APP_CAPABILITY_TYPE]: Test.GENERAL_APP_CAPABILITY_TYPE,
+    [AppCapability.KEY_VIDEO_STREAMING_CAPABILITY]: Test.JSON_VIDEO_STREAMING_CAPABILITY,
 };
 
 module.exports = Test;
