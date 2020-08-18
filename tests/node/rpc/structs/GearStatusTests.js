@@ -1,4 +1,4 @@
-const SDL = require('./../../../../lib/js/dist/SDL.min.js');
+const SDL = require('./../../../../dist/js/SDL.min.js');
 const GearStatus = SDL.rpc.structs.GearStatus;
 const PRNDL = SDL.rpc.enums.PRNDL;
 const TransmissionType = SDL.rpc.enums.TransmissionType;

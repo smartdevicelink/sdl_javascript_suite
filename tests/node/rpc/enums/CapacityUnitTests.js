@@ -1,4 +1,4 @@
-const SDL = require('./../../../../lib/js/dist/SDL.min.js');
+const SDL = require('./../../../../dist/js/SDL.min.js');
 
 const CapacityUnit = SDL.rpc.enums.CapacityUnit;
 const Validator = require('./../../../Validator.js');

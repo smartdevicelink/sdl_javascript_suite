@@ -1,4 +1,4 @@
-const SDL = require('./../../../../lib/js/dist/SDL.min.js');
+const SDL = require('./../../../../dist/js/SDL.min.js');
 
 const RpcRequest = SDL.rpc.RpcRequest;
 const RpcResponse = SDL.rpc.RpcResponse;

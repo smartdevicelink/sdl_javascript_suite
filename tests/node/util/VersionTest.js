@@ -1,5 +1,5 @@
 
-const SDL = require('./../../../lib/js/dist/SDL.min.js');
+const SDL = require('./../../../dist/js/SDL.min.js');
 const Validator = require('./../../Validator.js');
 
 const Version = SDL.util.Version;

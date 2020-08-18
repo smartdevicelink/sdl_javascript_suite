@@ -1,4 +1,4 @@
-const SDL = require('./../../../../lib/js/dist/SDL.min.js');
+const SDL = require('./../../../../dist/js/SDL.min.js');
 const FuelRange = SDL.rpc.structs.FuelRange;
 
 const Test = require('./../../../Test.js');
