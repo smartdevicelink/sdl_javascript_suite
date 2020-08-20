@@ -8,7 +8,7 @@ describe('AppCapabilityTypeTests', function () {
         const example = 'VIDEO_STREAMING';
         const enumVideoStreaming = AppCapabilityType.valueForKey(example);
 
-        Validator.assertNotNull(enumVideoStreaming, 'VIDEO_STREAMING returned null');
+        Validator.assertNotNullUndefined(enumVideoStreaming, 'VIDEO_STREAMING returned null');
         done();
     });
 
