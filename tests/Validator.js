@@ -1,5 +1,5 @@
 const expect = require('chai').expect;
-const SDL = require('./../lib/js/dist/SDL.min.js');
+const SDL = require('./config.js').node;
 
 const RpcResponse = SDL.rpc.RpcResponse;
 const RpcRequest = SDL.rpc.RpcRequest;

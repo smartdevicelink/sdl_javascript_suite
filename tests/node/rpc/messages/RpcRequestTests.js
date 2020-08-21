@@ -1,4 +1,4 @@
-const SDL = require('./../../../../lib/js/dist/SDL.min.js');
+const SDL = require('../../../config.js').node;
 const MessageType = SDL.rpc.enums.MessageType;
 const RpcRequest = SDL.rpc.RpcRequest;
 
