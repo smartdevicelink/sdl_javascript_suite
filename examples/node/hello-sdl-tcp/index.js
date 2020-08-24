@@ -126,6 +126,16 @@ class AppClient {
 
         // wait for the FULL state for more functionality
         if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
+            const screenManager = this._sdlManager.getScreenManager();
+            const ButtonName = SDL.rpc.enums.ButtonName;
+            const buttonNames = [ButtonName.PLAY_PAUSE, ButtonName.SEEKLEFT, ButtonName.SEEKRIGHT, ButtonName.AC_MAX, ButtonName.AC, ButtonName.RECIRCULATE,
+                ButtonName.FAN_UP, ButtonName.FAN_DOWN, ButtonName.TEMP_UP, ButtonName.TEMP_DOWN, ButtonName.FAN_DOWN, ButtonName.DEFROST_MAX, ButtonName.DEFROST_REAR, ButtonName.DEFROST,
+                ButtonName.UPPER_VENT, ButtonName.LOWER_VENT, ButtonName.VOLUME_UP, ButtonName.VOLUME_DOWN, ButtonName.EJECT, ButtonName.SOURCE, ButtonName.SHUFFLE, ButtonName.REPEAT];
+
+            for (const buttonName in buttonNames) {
+                screenManager.addButtonListener(buttonName, this._onButtonListener);
+            }
+
             const art1 = new SDL.manager.file.filetypes.SdlArtwork('logo', SDL.rpc.enums.FileType.GRAPHIC_PNG)
                 .setFilePath(this._filePath);
 
@@ -148,7 +158,6 @@ class AppClient {
             ];
 
             // set the softbuttons now and rotate through the states of the first softbutton
-            const screenManager = this._sdlManager.getScreenManager();
             await screenManager.setSoftButtonObjects(softButtonObjects);
 
             await this._sleep(2000);
@@ -173,6 +182,14 @@ class AppClient {
             await this._sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
 
             this._sdlManager.dispose();
+        }
+    }
+
+    _onButtonListener (onButton) {
+        if (onButton instanceof SDL.rpc.messages.OnButtonPress) {
+            this._sdlManager.getScreenManager().setTextField1(`${onButton.getButtonName()} pressed`);
+        } else if (onButton instanceof SDL.rpc.messages.OnButtonEvent) {
+            this._sdlManager.getScreenManager().setTextField2(`${onButton.getButtonName()} ${onButton.getButtonEventMode()}`);
         }
     }
 
