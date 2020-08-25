@@ -132,8 +132,8 @@ class AppClient {
                 ButtonName.FAN_UP, ButtonName.FAN_DOWN, ButtonName.TEMP_UP, ButtonName.TEMP_DOWN, ButtonName.FAN_DOWN, ButtonName.DEFROST_MAX, ButtonName.DEFROST_REAR, ButtonName.DEFROST,
                 ButtonName.UPPER_VENT, ButtonName.LOWER_VENT, ButtonName.VOLUME_UP, ButtonName.VOLUME_DOWN, ButtonName.EJECT, ButtonName.SOURCE, ButtonName.SHUFFLE, ButtonName.REPEAT];
 
-            for (const buttonName in buttonNames) {
-                screenManager.addButtonListener(buttonName, this._onButtonListener);
+            for (let buttonName of buttonNames) {
+                await screenManager.addButtonListener(buttonName, this._onButtonListener.bind(this));
             }
 
             const art1 = new SDL.manager.file.filetypes.SdlArtwork('logo', SDL.rpc.enums.FileType.GRAPHIC_PNG)
@@ -185,11 +185,11 @@ class AppClient {
         }
     }
 
-    _onButtonListener (onButton) {
+    _onButtonListener (buttonName, onButton) {
         if (onButton instanceof SDL.rpc.messages.OnButtonPress) {
-            this._sdlManager.getScreenManager().setTextField1(`${onButton.getButtonName()} pressed`);
+            this._sdlManager.getScreenManager().setTextField1(`${buttonName} pressed`);
         } else if (onButton instanceof SDL.rpc.messages.OnButtonEvent) {
-            this._sdlManager.getScreenManager().setTextField2(`${onButton.getButtonName()} ${onButton.getButtonEventMode()}`);
+            this._sdlManager.getScreenManager().setTextField2(`${buttonName} ${onButton.getButtonEventMode()}`);
         }
     }
 
