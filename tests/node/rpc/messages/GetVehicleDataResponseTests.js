@@ -1,4 +1,4 @@
-const SDL = require('./../../../../lib/js/dist/SDL.min.js');
+const SDL = require('../../../config.js').node;
 const GetVehicleDataResponse = SDL.rpc.messages.GetVehicleDataResponse;
 const FunctionID = SDL.rpc.enums.FunctionID;
 const MessageType = SDL.rpc.enums.MessageType;

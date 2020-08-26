@@ -1,4 +1,4 @@
-const SDL = require('./../../../lib/js/dist/SDL.min.js');
+const SDL = require('../../config.js').node;
 
 const FunctionID = SDL.rpc.enums.FunctionID;
 const _BinaryFrameHeader = SDL.protocol._BinaryFrameHeader;

@@ -29,8 +29,7 @@
 * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 * POSSIBILITY OF SUCH DAMAGE.
 */
-
-const SDL = require('../../lib/node/dist/SDL.min.js');
+const SDL = require('../config.js').node;
 const CONFIG = require('./config.js');
 
 class AppClient {
