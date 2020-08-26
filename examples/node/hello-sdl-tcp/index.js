@@ -126,13 +126,14 @@ class AppClient {
 
         // wait for the FULL state for more functionality
         if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
+            // add button listeners
             const screenManager = this._sdlManager.getScreenManager();
             const ButtonName = SDL.rpc.enums.ButtonName;
             const buttonNames = [ButtonName.PLAY_PAUSE, ButtonName.SEEKLEFT, ButtonName.SEEKRIGHT, ButtonName.AC_MAX, ButtonName.AC, ButtonName.RECIRCULATE,
                 ButtonName.FAN_UP, ButtonName.FAN_DOWN, ButtonName.TEMP_UP, ButtonName.TEMP_DOWN, ButtonName.FAN_DOWN, ButtonName.DEFROST_MAX, ButtonName.DEFROST_REAR, ButtonName.DEFROST,
                 ButtonName.UPPER_VENT, ButtonName.LOWER_VENT, ButtonName.VOLUME_UP, ButtonName.VOLUME_DOWN, ButtonName.EJECT, ButtonName.SOURCE, ButtonName.SHUFFLE, ButtonName.REPEAT];
 
-            for (let buttonName of buttonNames) {
+            for (const buttonName of buttonNames) {
                 await screenManager.addButtonListener(buttonName, this._onButtonListener.bind(this));
             }
 

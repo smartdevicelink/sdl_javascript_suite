@@ -122,8 +122,18 @@ class AppClient {
 
     async _checkReadyState () {
         if (this._managersReady && this._hmiFull) {
-            // add voice commands
+            // add button listeners
             const screenManager = this._sdlManager.getScreenManager();
+            const ButtonName = SDL.rpc.enums.ButtonName;
+            const buttonNames = [ButtonName.PLAY_PAUSE, ButtonName.SEEKLEFT, ButtonName.SEEKRIGHT, ButtonName.AC_MAX, ButtonName.AC, ButtonName.RECIRCULATE,
+                ButtonName.FAN_UP, ButtonName.FAN_DOWN, ButtonName.TEMP_UP, ButtonName.TEMP_DOWN, ButtonName.FAN_DOWN, ButtonName.DEFROST_MAX, ButtonName.DEFROST_REAR, ButtonName.DEFROST,
+                ButtonName.UPPER_VENT, ButtonName.LOWER_VENT, ButtonName.VOLUME_UP, ButtonName.VOLUME_DOWN, ButtonName.EJECT, ButtonName.SOURCE, ButtonName.SHUFFLE, ButtonName.REPEAT];
+
+            for (const buttonName of buttonNames) {
+                await screenManager.addButtonListener(buttonName, this._onButtonListener.bind(this));
+            }
+
+            // add voice commands
             screenManager.setVoiceCommands([
                 new SDL.manager.screen.utils.VoiceCommand(['Option 1'], () => {
                     console.log('Option one selected!');
@@ -181,6 +191,14 @@ class AppClient {
         return new Promise((resolve) => {
             setTimeout(resolve, timeout);
         });
+    }
+
+    _onButtonListener (buttonName, onButton) {
+        if (onButton instanceof SDL.rpc.messages.OnButtonPress) {
+            this._sdlManager.getScreenManager().setTextField1(`${buttonName} pressed`);
+        } else if (onButton instanceof SDL.rpc.messages.OnButtonEvent) {
+            this._sdlManager.getScreenManager().setTextField2(`${buttonName} ${onButton.getButtonEventMode()}`);
+        }
     }
 
     _logPermissions () {
