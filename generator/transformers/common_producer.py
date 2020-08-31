@@ -193,7 +193,7 @@ class InterfaceProducerCommon(ABC):
 
         short_name = re.sub(r'(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])', '=^.^=', param_name) \
             .split('=^.^=').pop().lower()
-        description = self.extract_description(description, 100 - len(type_name) - len(short_name))
+        description = self.extract_description(description)
 
         key = self.key(param_name)
         key = self.replace_keywords(key)
@@ -246,7 +246,7 @@ class InterfaceProducerCommon(ABC):
         return name
 
     @staticmethod
-    def extract_description(data, length: int = 116) -> list:
+    def extract_description(data, length: int = 2048) -> list:
         """
         Evaluate, align and delete @TODO
         :param data: list with description

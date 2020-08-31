@@ -52,7 +52,7 @@ class EnumsProducer(InterfaceProducerCommon):
         """
         (name, description) = self.extract_name_description(param)
         type_name = self.extract_type(param)
-        description = self.extract_description(description, 117 - len(type_name))
+        description = self.extract_description(description)
         name = self.ending_cutter(name)
         deprecated = param.deprecated
         methods = self.methods(method_title=name, description=description, type=type_name, deprecated=deprecated)
