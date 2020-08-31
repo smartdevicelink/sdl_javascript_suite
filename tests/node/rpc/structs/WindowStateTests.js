@@ -1,4 +1,4 @@
-const SDL = require('./../../../../lib/js/dist/SDL.min.js');
+const SDL = require('../../../config.js').node;
 const WindowState = SDL.rpc.structs.WindowState;
 
 const Validator = require('./../../../Validator.js');

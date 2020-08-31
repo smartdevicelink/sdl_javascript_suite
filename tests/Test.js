@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 
-const SDL = require('./../lib/js/dist/SDL.min.js');
+const SDL = require('./config.js').node;
 
 const SdlMsgVersion = SDL.rpc.structs.SdlMsgVersion;
 const TTSChunk = SDL.rpc.structs.TTSChunk;
