@@ -129,12 +129,14 @@ class AppClient {
             // add button listeners
             const screenManager = this._sdlManager.getScreenManager();
             const ButtonName = SDL.rpc.enums.ButtonName;
-            const buttonNames = [ButtonName.PLAY_PAUSE, ButtonName.SEEKLEFT, ButtonName.SEEKRIGHT, ButtonName.AC_MAX, ButtonName.AC, ButtonName.RECIRCULATE,
-                ButtonName.FAN_UP, ButtonName.FAN_DOWN, ButtonName.TEMP_UP, ButtonName.TEMP_DOWN, ButtonName.FAN_DOWN, ButtonName.DEFROST_MAX, ButtonName.DEFROST_REAR, ButtonName.DEFROST,
-                ButtonName.UPPER_VENT, ButtonName.LOWER_VENT, ButtonName.VOLUME_UP, ButtonName.VOLUME_DOWN, ButtonName.EJECT, ButtonName.SOURCE, ButtonName.SHUFFLE, ButtonName.REPEAT];
+            const buttonNames = [ButtonName.AC_MAX, ButtonName.AC, ButtonName.RECIRCULATE, ButtonName.FAN_UP, ButtonName.FAN_DOWN, ButtonName.TEMP_UP, 
+                ButtonName.TEMP_DOWN, ButtonName.FAN_DOWN, ButtonName.DEFROST_MAX, ButtonName.DEFROST_REAR, ButtonName.DEFROST, ButtonName.UPPER_VENT,
+                ButtonName.LOWER_VENT, ButtonName.VOLUME_UP, ButtonName.VOLUME_DOWN, ButtonName.EJECT, ButtonName.SOURCE, ButtonName.SHUFFLE, ButtonName.REPEAT];
 
             for (const buttonName of buttonNames) {
-                await screenManager.addButtonListener(buttonName, this._onButtonListener.bind(this));
+                await screenManager.addButtonListener(buttonName, this._onButtonListener.bind(this)).catch(function (err) {
+                    console.error(err);
+                });
             }
 
             const art1 = new SDL.manager.file.filetypes.SdlArtwork('logo', SDL.rpc.enums.FileType.GRAPHIC_PNG)
