@@ -30,9 +30,6 @@
      {%- else -%}
      * @since SmartDeviceLink {{since}}
      {%- endif -%}
-     {%- if see is defined %}
-     * @see {{see}}
-     {%- endif %}
      {%- endif %}
      */
 {%- block constructor %}
@@ -53,9 +50,6 @@
      {%- else -%}
      * @since SmartDeviceLink {{method.since}}
      {%- endif -%}
-     {%- if method.see is defined %}
-     * @see {{method.see}}
-     {%- endif %}
      {%- endif %}
      {% if not method.description -%}
      * @param {{'%s%s%s %s'|format('{', method.type, '}', method.param_name)}} - The desired {{method.method_title}}.

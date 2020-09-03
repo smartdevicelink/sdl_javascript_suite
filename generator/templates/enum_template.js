@@ -23,9 +23,6 @@
      {%- else -%}
      * @since SmartDeviceLink {{since}}
      {%- endif -%}
-     {%- if see is defined %}
-     * @see {{see}}
-     {%- endif %}
      {%- endif %}
      */
     constructor () {
@@ -44,9 +41,6 @@
      {%- else -%}
      * @since SmartDeviceLink {{method.since}}
      {%- endif -%}
-     {%- if method.see is defined %}
-     * @see {{method.see}}
-     {%- endif %}
      {%- endif %}
      {%- for d in method.description %}
      * {{d}}
