@@ -5,6 +5,8 @@ const softButtonManagerTests = require('./screen/SoftButtonManagerTests');
 const screenManagerTests = require('./screen/ScreenManagerTests');
 const lifecycleManagerTests = require('./lifecycle/LifecycleManagerTests');
 const fileManagerTests = require('./file/FileManagerTests');
+const taskTests = require('./TaskTests');
+const queueTests = require('./QueueTests');
 
 // connect to core and select the app on the HMI to run the tests
 describe('ManagerTests', function () {
@@ -19,6 +21,8 @@ describe('ManagerTests', function () {
                 screenManagerTests(appClient);
                 lifecycleManagerTests(appClient);
                 fileManagerTests(appClient);
+                taskTests(appClient);
+                queueTests(appClient);
                 setTimeout(function () {
                     teardown();
                     done();

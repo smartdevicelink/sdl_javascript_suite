@@ -1,4 +1,4 @@
-const SDL = require('./../../../../lib/js/dist/SDL.min.js');
+const SDL = require('../../../config.js').node;
 
 const PredefinedLayout = SDL.rpc.enums.PredefinedLayout;
 const Validator = require('./../../../Validator.js');

@@ -1,7 +1,7 @@
 <html>
 
 <head>
-    <script src='./../../lib/js/dist/SDL.min.js'></script>
+    <script src='./../../dist/js/SDL.min.js'></script>
 
     <script>
         function test(Bson) {
@@ -11,7 +11,7 @@
             let deserial = Bson.deserialize(serial)
             console.log(deserial);
         }
-        test(SDL.util.Bson);
+        test(SDL.util._Bson);
     </script>
 </head>
 
