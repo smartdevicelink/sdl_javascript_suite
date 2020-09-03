@@ -24,7 +24,7 @@ class EnumsProducer(InterfaceProducerCommon):
         self._container_name = 'elements'
         self.logger = logging.getLogger(self.__class__.__name__)
         self.enum_class = paths.path_to_enum_class
-        self.methods = namedtuple('Methods', 'method_title description type deprecated')
+        self.methods = namedtuple('Methods', 'method_title description type deprecated since history')
 
     @property
     def container_name(self):
@@ -55,7 +55,9 @@ class EnumsProducer(InterfaceProducerCommon):
         description = self.extract_description(description, 117 - len(type_name))
         name = self.ending_cutter(name)
         deprecated = param.deprecated
-        methods = self.methods(method_title=name, description=description, type=type_name, deprecated=deprecated)
+        since = param.since
+        history = param.history
+        methods = self.methods(method_title=name, description=description, type=type_name, deprecated=deprecated, since=since, history=history)
         params = self.extract_param(param)
 
         imports = None

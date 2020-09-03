@@ -6,9 +6,6 @@
  * {{d}}
  {% endfor -%}
  {% endif -%}
- {% if deprecated is defined -%}
- * @deprecated
- {% endif -%}
  * @typedef {{'%s%s%s %s'|format('{', extend, '}', name)}}
  * @property {Object} _MAP
  */
@@ -17,8 +14,18 @@
     /**
      * Constructor for {{name}}.
      * @class
-     {%- if deprecated is defined %}
-     * @deprecated
+     {%- if since is defined and since is not none %}
+     {% if deprecated is defined and deprecated is not none -%}
+     * @since SmartDeviceLink {{history[0].since}}
+     * @deprecated in SmartDeviceLink {{since}}
+     {%- elif history is defined and history is not none %}
+     * @since SmartDeviceLink {{history[0].since}}
+     {%- else -%}
+     * @since SmartDeviceLink {{since}}
+     {%- endif -%}
+     {%- if see is defined %}
+     * @see {{see}}
+     {%- endif %}
      {%- endif %}
      */
     constructor () {
@@ -28,8 +35,18 @@
 
     /**
      * Get the enum value for {{method.method_title}}.
-     {%- if method.deprecated is defined and method.deprecated %}
-     * @deprecated
+     {%- if method.since is defined and method.since is not none %}
+     {% if method.deprecated is defined and method.deprecated is not none -%}
+     * @since SmartDeviceLink {{method.history[0].since}}
+     * @deprecated in SmartDeviceLink {{method.since}}
+     {%- elif method.history is defined and method.history is not none %}
+     * @since SmartDeviceLink {{method.history[0].since}}
+     {%- else -%}
+     * @since SmartDeviceLink {{method.since}}
+     {%- endif -%}
+     {%- if method.see is defined %}
+     * @see {{method.see}}
+     {%- endif %}
      {%- endif %}
      {%- for d in method.description %}
      * {{d}}
