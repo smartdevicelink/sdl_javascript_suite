@@ -126,6 +126,19 @@ class AppClient {
 
         // wait for the FULL state for more functionality
         if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
+            // add button listeners
+            const screenManager = this._sdlManager.getScreenManager();
+            const ButtonName = SDL.rpc.enums.ButtonName;
+            const buttonNames = [ButtonName.AC_MAX, ButtonName.AC, ButtonName.RECIRCULATE, ButtonName.FAN_UP, ButtonName.FAN_DOWN, ButtonName.TEMP_UP, 
+                ButtonName.TEMP_DOWN, ButtonName.FAN_DOWN, ButtonName.DEFROST_MAX, ButtonName.DEFROST_REAR, ButtonName.DEFROST, ButtonName.UPPER_VENT,
+                ButtonName.LOWER_VENT, ButtonName.VOLUME_UP, ButtonName.VOLUME_DOWN, ButtonName.EJECT, ButtonName.SOURCE, ButtonName.SHUFFLE, ButtonName.REPEAT];
+
+            for (const buttonName of buttonNames) {
+                await screenManager.addButtonListener(buttonName, this._onButtonListener.bind(this)).catch(function (err) {
+                    console.error(err);
+                });
+            }
+
             const art1 = new SDL.manager.file.filetypes.SdlArtwork('logo', SDL.rpc.enums.FileType.GRAPHIC_PNG)
                 .setFilePath(this._filePath);
 
@@ -148,7 +161,6 @@ class AppClient {
             ];
 
             // set the softbuttons now and rotate through the states of the first softbutton
-            const screenManager = this._sdlManager.getScreenManager();
             await screenManager.setSoftButtonObjects(softButtonObjects);
 
             await this._sleep(2000);
@@ -173,6 +185,14 @@ class AppClient {
             await this._sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
 
             this._sdlManager.dispose();
+        }
+    }
+
+    _onButtonListener (buttonName, onButton) {
+        if (onButton instanceof SDL.rpc.messages.OnButtonPress) {
+            this._sdlManager.getScreenManager().setTextField1(`${buttonName} pressed`);
+        } else if (onButton instanceof SDL.rpc.messages.OnButtonEvent) {
+            this._sdlManager.getScreenManager().setTextField2(`${buttonName} ${onButton.getButtonEventMode()}`);
         }
     }
 
