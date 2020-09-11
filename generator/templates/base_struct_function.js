@@ -21,9 +21,16 @@
      * Initalizes an instance of {{name}}.
      * @class
      * @param {object} parameters - An object map of parameters.
-     {% if deprecated is defined -%}
-     * @deprecated
-     {% endif -%}
+     {%- if since is defined and since is not none %}
+     {% if deprecated is defined and deprecated is not none -%}
+     * @since SmartDeviceLink {{history[0].since}}
+     * @deprecated in SmartDeviceLink {{since}}
+     {%- elif history is defined and history is not none %}
+     * @since SmartDeviceLink {{history[0].since}}
+     {%- else -%}
+     * @since SmartDeviceLink {{since}}
+     {%- endif -%}
+     {%- endif %}
      */
 {%- block constructor %}
 {% endblock -%}
@@ -34,9 +41,16 @@
     {% set len = method.type|length + method.param_name|length + 13 -%}
     /**
      * Set the {{method.method_title}}
-     {% if deprecated is defined -%}
-     * @deprecated
-     {% endif -%}
+     {%- if method.since is defined and method.since is not none %}
+     {% if method.deprecated is defined and method.deprecated is not none -%}
+     * @since SmartDeviceLink {{method.history[0].since}}
+     * @deprecated in SmartDeviceLink {{method.since}}
+     {%- elif method.history is defined and method.history is not none %}
+     * @since SmartDeviceLink {{method.history[0].since}}
+     {%- else -%}
+     * @since SmartDeviceLink {{method.since}}
+     {%- endif -%}
+     {%- endif %}
      {% if not method.description -%}
      * @param {{'%s%s%s %s'|format('{', method.type, '}', method.param_name)}} - The desired {{method.method_title}}.
      {% else -%}
