@@ -58,7 +58,7 @@
     "rollup-plugin-node-builtins": "^2.1.2",
     "rollup-plugin-node-globals": "^1.4.0",
     "rollup-plugin-node-resolve": "^5.2.0",
-    "rollup-plugin-uglify": "^6.0.4",
+    "rollup-plugin-terser": "^7.0.2",
     "sinon": "^9.0.1",
     "webpack": "4.43.0",
     "websocket": "^1.0.30"
