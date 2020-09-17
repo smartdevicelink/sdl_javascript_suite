@@ -129,7 +129,7 @@ class AppClient {
             // add button listeners
             const screenManager = this._sdlManager.getScreenManager();
             const ButtonName = SDL.rpc.enums.ButtonName;
-            const buttonNames = [ButtonName.AC_MAX, ButtonName.AC, ButtonName.RECIRCULATE, ButtonName.FAN_UP, ButtonName.FAN_DOWN, ButtonName.TEMP_UP, 
+            const buttonNames = [ButtonName.AC_MAX, ButtonName.AC, ButtonName.RECIRCULATE, ButtonName.FAN_UP, ButtonName.FAN_DOWN, ButtonName.TEMP_UP,
                 ButtonName.TEMP_DOWN, ButtonName.FAN_DOWN, ButtonName.DEFROST_MAX, ButtonName.DEFROST_REAR, ButtonName.DEFROST, ButtonName.UPPER_VENT,
                 ButtonName.LOWER_VENT, ButtonName.VOLUME_UP, ButtonName.VOLUME_DOWN, ButtonName.EJECT, ButtonName.SOURCE, ButtonName.SHUFFLE, ButtonName.REPEAT];
 
