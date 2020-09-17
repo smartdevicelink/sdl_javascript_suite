@@ -58,8 +58,7 @@ module.exports = function (appClient) {
 
         it('testSetPrimaryGraphicWithBlankImage', function (done) {
             screenManager.setPrimaryGraphic(null);
-            Validator.assertNotNull(screenManager.getPrimaryGraphic());
-            Validator.assertEquals(screenManager.getPrimaryGraphic().getName(), 'blankArtwork');
+            Validator.assertNull(screenManager.getPrimaryGraphic());
             done();
         });
 
@@ -71,8 +70,7 @@ module.exports = function (appClient) {
 
         it('testSetSecondaryGraphicWithBlankImage', function (done) {
             screenManager.setSecondaryGraphic(null);
-            Validator.assertNotNull(screenManager.getSecondaryGraphic());
-            Validator.assertEquals(screenManager.getSecondaryGraphic().getName(), 'blankArtwork');
+            Validator.assertNull(screenManager.getSecondaryGraphic());
             done();
         });
 
