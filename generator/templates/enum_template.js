@@ -71,6 +71,14 @@
     static keyForValue (value) {
         return {{name}}._keyForValue(value, {{name}}._MAP);
     }
+
+    /**
+     * Retrieve all enumerated values for this class
+     * @returns {*} - Returns an array of values
+     */
+    static values () {
+        return Object.values({{name}}._MAP);
+    }
 {% endblock %}
 {% block properties %}
 {{name}}._MAP = Object.freeze({
