@@ -38,7 +38,7 @@
   "homepage": "https://github.com/smartdevicelink/sdl_javascript_suite#readme",
   "devDependencies": {
     "@babel/preset-env": "^7.7.1",
-    "@crokita/rollup-plugin-node-globals": "^1.4.0",
+    "@crokita/rollup-plugin-node-globals": "^1.4.1",
     "babel-plugin-transform-async-to-promises": "^0.8.15",
     "bson": "^4.0.2",
     "chai": "^4.2.0",
