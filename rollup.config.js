@@ -2,7 +2,7 @@ import resolve from 'rollup-plugin-node-resolve';
 import babel from 'rollup-plugin-babel';
 import commonjs from 'rollup-plugin-commonjs';
 import { terser } from "rollup-plugin-terser";
-import builtins from '@gqio/rollup-plugin-node-builtins';
+import builtins from '@crokita/rollup-plugin-node-builtins';
 import globals from '@crokita/rollup-plugin-node-globals';
 
 export default [{ // Vanilla JS source
