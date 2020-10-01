@@ -253,7 +253,7 @@ class InterfaceProducerCommon(ABC):
     @staticmethod
     def extract_description(data, length: int = 2048) -> list:
         """
-        Evaluate, align and delete @TODO
+        Extract description
         :param data: list with description
         :param length:
         :return: evaluated string
@@ -262,7 +262,7 @@ class InterfaceProducerCommon(ABC):
             return []
         if isinstance(data, list):
             data = ' '.join(data)
-        return textwrap.wrap(re.sub(r'(\s{2,}|\n|\[@TODO.+)', ' ', data).strip(), length)
+        return textwrap.wrap(re.sub(r'(\s{2,}|\n)', ' ', data).strip(), length)
 
     def extract_name_description(self, param):
         """
