@@ -93,6 +93,7 @@ class AppClient {
 
         this._sdlManager = new SDL.manager.SdlManager(this._appConfig, managerListener);
         this._sdlManager.start();
+        this._isButtonSubscriptionRequested = false;
     }
 
     async _onConnected () {
@@ -126,17 +127,22 @@ class AppClient {
 
         // wait for the FULL state for more functionality
         if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
-            // add button listeners
             const screenManager = this._sdlManager.getScreenManager();
-            const ButtonName = SDL.rpc.enums.ButtonName;
-            const buttonNames = [ButtonName.AC_MAX, ButtonName.AC, ButtonName.RECIRCULATE, ButtonName.FAN_UP, ButtonName.FAN_DOWN, ButtonName.TEMP_UP,
-                ButtonName.TEMP_DOWN, ButtonName.FAN_DOWN, ButtonName.DEFROST_MAX, ButtonName.DEFROST_REAR, ButtonName.DEFROST, ButtonName.UPPER_VENT,
-                ButtonName.LOWER_VENT, ButtonName.VOLUME_UP, ButtonName.VOLUME_DOWN, ButtonName.EJECT, ButtonName.SOURCE, ButtonName.SHUFFLE, ButtonName.REPEAT];
+            if (!this._isButtonSubscriptionRequested) {
+                // add button listeners
+                const ButtonName = SDL.rpc.enums.ButtonName;
+                const buttonNames = [ButtonName.PRESET_0, ButtonName.PRESET_1, ButtonName.PRESET_2, ButtonName.PRESET_3,
+                    ButtonName.PRESET_4, ButtonName.PRESET_5, ButtonName.PRESET_6, ButtonName.PRESET_7, ButtonName.PRESET_8,
+                    ButtonName.PRESET_9, ButtonName.PLAY_PAUSE, ButtonName.OK, ButtonName.SEEKLEFT, ButtonName.SEEKRIGHT,
+                    ButtonName.TUNEUP, ButtonName.TUNEDOWN];
 
-            for (const buttonName of buttonNames) {
-                await screenManager.addButtonListener(buttonName, this._onButtonListener.bind(this)).catch(function (err) {
-                    console.error(err);
-                });
+                for (const buttonName of buttonNames) {
+                    await screenManager.addButtonListener(buttonName, this._onButtonListener.bind(this)).catch(function (err) {
+                        console.error(err);
+                    });
+                }
+
+                this._isButtonSubscriptionRequested = true;
             }
 
             const art1 = new SDL.manager.file.filetypes.SdlArtwork('logo', SDL.rpc.enums.FileType.GRAPHIC_PNG)

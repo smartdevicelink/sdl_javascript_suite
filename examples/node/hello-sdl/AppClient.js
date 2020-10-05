@@ -102,6 +102,7 @@ class AppClient {
         // for a cloud server app the hmi full will be received before the managers report that they're ready!
         this._managersReady = false;
         this._hmiFull = false;
+        this._isButtonSubscriptionRequested = false;
     }
 
     _onConnected () {
@@ -122,15 +123,23 @@ class AppClient {
 
     async _checkReadyState () {
         if (this._managersReady && this._hmiFull) {
-            // add button listeners
             const screenManager = this._sdlManager.getScreenManager();
-            const ButtonName = SDL.rpc.enums.ButtonName;
-            const buttonNames = [ButtonName.AC_MAX, ButtonName.AC, ButtonName.RECIRCULATE, ButtonName.FAN_UP, ButtonName.FAN_DOWN, ButtonName.TEMP_UP,
-                ButtonName.TEMP_DOWN, ButtonName.FAN_DOWN, ButtonName.DEFROST_MAX, ButtonName.DEFROST_REAR, ButtonName.DEFROST, ButtonName.UPPER_VENT,
-                ButtonName.LOWER_VENT, ButtonName.VOLUME_UP, ButtonName.VOLUME_DOWN, ButtonName.EJECT, ButtonName.SOURCE, ButtonName.SHUFFLE, ButtonName.REPEAT];
+            if (!this._isButtonSubscriptionRequested) {
+                // add button listeners
+                const ButtonName = SDL.rpc.enums.ButtonName;
+                const buttonNames = [ButtonName.PRESET_0, ButtonName.PRESET_1, ButtonName.PRESET_2, ButtonName.PRESET_3,
+                    ButtonName.PRESET_4, ButtonName.PRESET_5, ButtonName.PRESET_6, ButtonName.PRESET_7, ButtonName.PRESET_8,
+                    ButtonName.PRESET_9, ButtonName.PLAY_PAUSE, ButtonName.OK, ButtonName.SEEKLEFT, ButtonName.SEEKRIGHT,
+                    ButtonName.TUNEUP, ButtonName.TUNEDOWN];
 
-            for (const buttonName of buttonNames) {
-                await screenManager.addButtonListener(buttonName, this._onButtonListener.bind(this));
+                for (const buttonName of buttonNames) {
+                    await screenManager.addButtonListener(buttonName, this._onButtonListener.bind(this))
+                        .catch((reason) => {
+                            console.error(`Unable to subscribe to button: ${reason}`);
+                        });
+                }
+
+                this._isButtonSubscriptionRequested = true;
             }
 
             // add voice commands
