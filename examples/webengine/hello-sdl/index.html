@@ -93,6 +93,7 @@
 
                 this._currentTemplate = 'WEB_VIEW';
                 this._isTemplateSwitchCommandAdded = false;
+                this._isButtonSubscriptionRequested = false;
                 this._templateSwitchCommandId = 1001;
             }
 
@@ -162,18 +163,31 @@
 
                 // wait for the FULL state for more functionality
                 if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
-                    // add button listeners
-                    const screenManager = this._sdlManager.getScreenManager();
-                    const ButtonName = SDL.rpc.enums.ButtonName;
-                    const buttonNames = [ButtonName.AC_MAX, ButtonName.AC, ButtonName.RECIRCULATE, ButtonName.FAN_UP, ButtonName.FAN_DOWN, ButtonName.TEMP_UP,
-                        ButtonName.TEMP_DOWN, ButtonName.FAN_DOWN, ButtonName.DEFROST_MAX, ButtonName.DEFROST_REAR, ButtonName.DEFROST, ButtonName.UPPER_VENT,
-                        ButtonName.LOWER_VENT, ButtonName.VOLUME_UP, ButtonName.VOLUME_DOWN, ButtonName.EJECT, ButtonName.SOURCE, ButtonName.SHUFFLE, ButtonName.REPEAT];
+                    const isRpcAllowed = (rpc) => {
+                        return this._permissionManager &&
+                            this._permissionManager.isRpcAllowed(rpc);
+                    };
 
-                    for (const buttonName of buttonNames) {
-                        await screenManager.addButtonListener(buttonName, this._onButtonListener.bind(this));
+                    if (!this._isButtonSubscriptionRequested && isRpcAllowed(SDL.rpc.enums.FunctionID.SubscribeButton)) {
+                        // add button listeners
+                        const screenManager = this._sdlManager.getScreenManager();
+                        const ButtonName = SDL.rpc.enums.ButtonName;
+                        const buttonNames = [ButtonName.PRESET_0, ButtonName.PRESET_1, ButtonName.PRESET_2, ButtonName.PRESET_3,
+                                    ButtonName.PRESET_4, ButtonName.PRESET_5, ButtonName.PRESET_6, ButtonName.PRESET_7, ButtonName.PRESET_8,
+                                    ButtonName.PRESET_9, ButtonName.PLAY_PAUSE, ButtonName.OK, ButtonName.SEEKLEFT, ButtonName.SEEKRIGHT,
+                                    ButtonName.TUNEUP, ButtonName.TUNEDOWN];
+
+                        for (const buttonName of buttonNames) {
+                            await screenManager.addButtonListener(buttonName, this._onButtonListener.bind(this))
+                                .catch((reason) => {
+                                    this._logRegularMessage(`Unable to subscribe to button: ${reason}`);
+                                });
+                        }
+
+                        this._isButtonSubscriptionRequested = true;
                     }
 
-                    if (!this._isTemplateSwitchCommandAdded && this._permissionManager && this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.AddCommand)) {
+                    if (!this._isTemplateSwitchCommandAdded && isRpcAllowed(SDL.rpc.enums.FunctionID.AddCommand)) {
                         this._logRegularMessage('Adding return to WEB_VIEW template command');
                         this._isTemplateSwitchCommandAdded = true;
 
