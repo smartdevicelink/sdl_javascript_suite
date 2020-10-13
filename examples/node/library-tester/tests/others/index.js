@@ -52,6 +52,9 @@ module.exports = async function (catalogRpc) {
     await app.start(); // after this point, we are in HMI FULL and managers are ready
     const sdlManager = app.getManager();
 
+    // check that Enum .values() exists. calling this method is enough to check it
+    SDL.rpc.enums.FunctionID.values();
+
     // set template color test
     const color1 = { red: 214, green: 165, blue: 30 };
     const color2 = { red: 159, green: 224, blue: 185 };
