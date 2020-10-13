@@ -123,6 +123,18 @@ module.exports = async function (catalogRpc) {
         await sleep(2500);
     }
 
+    // now use the screen manager for the same thing. notice how there's no need to set all the text and buttons again
+    for (let template of templatesSupported) {
+        console.log(template);
+
+        await sdlManager.getScreenManager().changeLayout(
+            new SDL.rpc.structs.TemplateConfiguration()
+                .setTemplate(template)
+        );
+
+        await sleep(500);
+    }
+
     // tear down the app
     await sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
     sdlManager.dispose();
