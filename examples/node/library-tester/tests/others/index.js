@@ -115,6 +115,16 @@ module.exports = async function (catalogRpc) {
         }));
     await sdlManager.sendRpcResolve(alert);
 
+    // subtle alert icon test
+    const subtleAlert = new SDL.rpc.messages.SubtleAlert()
+        .setAlertText1('Small alert + image test')
+        .setAlertIcon(new SDL.rpc.structs.Image({
+            value: 'test-icon',
+            imageType: SDL.rpc.enums.ImageType.DYNAMIC,
+            isTemplate: false,
+        }));
+    await sdlManager.sendRpcResolve(subtleAlert);
+
     // voice command test
     // wait for the user to click on a voice command to continue
     sdlManager.getScreenManager()
@@ -143,6 +153,22 @@ module.exports = async function (catalogRpc) {
     const alert2Response = await alert2Promise;
     if (alert2Response.getResultCode() !== SDL.rpc.enums.Result.ABORTED) {
         console.error(`Expected result code ${SDL.rpc.enums.Result.ABORTED} from cancelled Alert! Got ${alert2Response.getResultCode()}`);
+    }
+
+    // send a subtle alert that gets cancelled
+    const subtleAlert2 = new SDL.rpc.messages.SubtleAlert()
+        .setAlertText1('Another one! Cancel in 2 seconds');
+    const subtleAlert2Promise = sdlManager.sendRpcResolve(subtleAlert2);
+
+    await sleep(2000);
+
+    // cancel the alert that was sent
+    sdlManager.sendRpcResolve(new SDL.rpc.messages.CancelInteraction()
+        .setFunctionIDParam(SDL.rpc.enums.FunctionID.SubtleAlert));
+
+    const subtleAlert2Response = await subtleAlert2Promise;
+    if (subtleAlert2Response.getResultCode() !== SDL.rpc.enums.Result.ABORTED) {
+        console.error(`Expected result code ${SDL.rpc.enums.Result.ABORTED} from cancelled SubtleAlert! Got ${subtleAlert2Response.getResultCode()}`);
     }
 
     // tear down the app
