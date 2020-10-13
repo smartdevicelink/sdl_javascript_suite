@@ -30,8 +30,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 */
 
-const fs = require('fs');
-const SDL = require('./SDL.min.js');
 const CONFIG = require('./config.js');
 const WS = require('ws');
 const AppClient = require('./AppClient.js');

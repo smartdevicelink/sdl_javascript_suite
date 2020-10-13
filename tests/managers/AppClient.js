@@ -29,8 +29,7 @@
 * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 * POSSIBILITY OF SUCH DAMAGE.
 */
-
-const SDL = require('../../lib/node/dist/SDL.min.js');
+const SDL = require('../config.js').node;
 const CONFIG = require('./config.js');
 
 class AppClient {
@@ -47,7 +46,10 @@ class AppClient {
                     wsClient,
                     CONFIG.connectionLostTimeout
                 )
-            );
+            )
+            .setRpcNotificationListeners({
+                [SDL.rpc.enums.FunctionID.OnHMIStatus]: this._onHmiStatusListener.bind(this),
+            });
 
         this._appConfig = new SDL.manager.AppConfig()
             .setLifecycleConfig(this._lifecycleConfig);
@@ -63,8 +65,7 @@ class AppClient {
 
         this._sdlManager = new SDL.manager.SdlManager(this._appConfig, managerListener);
         this._sdlManager
-            .start()
-            .addRpcListener(SDL.rpc.enums.FunctionID.OnHMIStatus, this._onHmiStatusListener.bind(this));
+            .start();
 
         this._ready = ready;
         // for a cloud server app the hmi full will be received before the managers report that they're ready!

@@ -1,4 +1,4 @@
-const SDL = require('./../../../lib/js/dist/SDL.min.js');
+const SDL = require('../../config.js').node;
 
 // Mocking framework used so that some RPCs are not actually sent to Core, but the response mimicked
 const sinon = require('sinon');

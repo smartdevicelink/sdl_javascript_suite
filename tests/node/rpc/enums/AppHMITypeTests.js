@@ -1,4 +1,4 @@
-const SDL = require('./../../../../lib/js/dist/SDL.min.js');
+const SDL = require('../../../config.js').node;
 
 const AppHMIType = SDL.rpc.enums.AppHMIType;
 const Validator = require('./../../../Validator.js');
@@ -30,6 +30,8 @@ describe('AppHMITypeTests', function () {
         const enumSystem = AppHMIType.valueForKey(example);
         example = 'REMOTE_CONTROL';
         const enumRemoteControl = AppHMIType.valueForKey(example);
+        example = 'WEB_VIEW';
+        const enumWebView = AppHMIType.valueForKey(example);
 
         Validator.assertNotNull(enumDefault, 'DEFAULT returned null');
         Validator.assertNotNull(enumCommunication, 'COMMUNICATION returned null');
@@ -43,6 +45,7 @@ describe('AppHMITypeTests', function () {
         Validator.assertNotNull(enumTesting, 'TESTING returned null');
         Validator.assertNotNull(enumSystem, 'SYSTEM returned null');
         Validator.assertNotNull(enumRemoteControl, 'REMOTE_CONTROL returned null');
+        Validator.assertNotNull(enumWebView, 'WEB_VIEW returned null');
         done();
     });
 

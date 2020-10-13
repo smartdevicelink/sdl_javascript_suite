@@ -102,6 +102,7 @@ class AppClient {
         // for a cloud server app the hmi full will be received before the managers report that they're ready!
         this._managersReady = false;
         this._hmiFull = false;
+        this._isButtonSubscriptionRequested = false;
     }
 
     _onConnected () {
@@ -122,8 +123,26 @@ class AppClient {
 
     async _checkReadyState () {
         if (this._managersReady && this._hmiFull) {
-            // add voice commands
             const screenManager = this._sdlManager.getScreenManager();
+            if (!this._isButtonSubscriptionRequested) {
+                // add button listeners
+                const ButtonName = SDL.rpc.enums.ButtonName;
+                const buttonNames = [ButtonName.PRESET_0, ButtonName.PRESET_1, ButtonName.PRESET_2, ButtonName.PRESET_3,
+                    ButtonName.PRESET_4, ButtonName.PRESET_5, ButtonName.PRESET_6, ButtonName.PRESET_7, ButtonName.PRESET_8,
+                    ButtonName.PRESET_9, ButtonName.PLAY_PAUSE, ButtonName.OK, ButtonName.SEEKLEFT, ButtonName.SEEKRIGHT,
+                    ButtonName.TUNEUP, ButtonName.TUNEDOWN];
+
+                for (const buttonName of buttonNames) {
+                    await screenManager.addButtonListener(buttonName, this._onButtonListener.bind(this))
+                        .catch((reason) => {
+                            console.error(`Unable to subscribe to button: ${reason}`);
+                        });
+                }
+
+                this._isButtonSubscriptionRequested = true;
+            }
+
+            // add voice commands
             screenManager.setVoiceCommands([
                 new SDL.manager.screen.utils.VoiceCommand(['Option 1'], () => {
                     console.log('Option one selected!');
@@ -181,6 +200,14 @@ class AppClient {
         return new Promise((resolve) => {
             setTimeout(resolve, timeout);
         });
+    }
+
+    _onButtonListener (buttonName, onButton) {
+        if (onButton instanceof SDL.rpc.messages.OnButtonPress) {
+            this._sdlManager.getScreenManager().setTextField1(`${buttonName} pressed`);
+        } else if (onButton instanceof SDL.rpc.messages.OnButtonEvent) {
+            this._sdlManager.getScreenManager().setTextField2(`${buttonName} ${onButton.getButtonEventMode()}`);
+        }
     }
 
     _logPermissions () {
