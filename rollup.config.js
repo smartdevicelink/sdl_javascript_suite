@@ -39,7 +39,6 @@ export default [{ // Vanilla JS source
             globals: {
                 ws: 'ws',
             },
-<<<<<<< HEAD
         },
         {
             file: 'examples/node/library-tester/SDL.min.js',
@@ -50,9 +49,6 @@ export default [{ // Vanilla JS source
                 ws: 'ws',
             },
         },
-=======
-        }
->>>>>>> develop
     ],
     plugins: [
         globals(),
