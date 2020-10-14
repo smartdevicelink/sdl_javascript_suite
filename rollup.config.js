@@ -13,6 +13,18 @@ export default [{ // Vanilla JS source
             format: 'umd',
             sourcemap: 'inline',
             name: 'SDL',
+        },
+        {
+            file: 'examples/js/hello-sdl/SDL.min.js',
+            format: 'umd',
+            sourcemap: 'inline',
+            name: 'SDL',
+        },
+        {
+            file: 'examples/webengine/hello-sdl/SDL.min.js',
+            format: 'umd',
+            sourcemap: 'inline',
+            name: 'SDL',
         }
     ],
     plugins: [
@@ -33,6 +45,24 @@ export default [{ // Vanilla JS source
     output: [
         {
             file: 'dist/node/SDL.min.js',
+            format: 'umd',
+            sourcemap: 'inline',
+            name: 'SDL',
+            globals: {
+                ws: 'ws',
+            },
+        },
+        {
+            file: 'examples/node/hello-sdl/SDL.min.js',
+            format: 'umd',
+            sourcemap: 'inline',
+            name: 'SDL',
+            globals: {
+                ws: 'ws',
+            },
+        },
+        {
+            file: 'examples/node/hello-sdl-tcp/SDL.min.js',
             format: 'umd',
             sourcemap: 'inline',
             name: 'SDL',

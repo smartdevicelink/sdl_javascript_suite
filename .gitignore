@@ -10,3 +10,4 @@
 hello-sdl*.zip
 app-directory.json
 **/dist/
+**/SDL.min.js
