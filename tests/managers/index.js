@@ -18,10 +18,10 @@ describe('ManagerTests', function () {
         appWebSocketServer.on('connection', function (connection) {
             console.log('Connection');
             const appClient = new AppClient(connection, async (teardown) => {
-                await textAndGraphicManagerTests(appClient);
+                textAndGraphicManagerTests(appClient);
                 permissionManagerTests(appClient);
                 softButtonManagerTests(appClient);
-                await screenManagerTests(appClient);
+                screenManagerTests(appClient);
                 lifecycleManagerTests(appClient);
                 fileManagerTests(appClient);
                 taskTests(appClient);
