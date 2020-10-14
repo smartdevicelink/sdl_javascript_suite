@@ -45,7 +45,7 @@
      {% if method.deprecated is defined and method.deprecated is not none -%}
      * @since SmartDeviceLink {{method.history[0].since}}
      * @deprecated in SmartDeviceLink {{method.since}}
-     {%- elif method.history is defined and method.history is not none %}
+     {%- elif method.history is defined and method.history is not none -%}
      * @since SmartDeviceLink {{method.history[0].since}}
      {%- else -%}
      * @since SmartDeviceLink {{method.since}}

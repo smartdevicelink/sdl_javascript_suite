@@ -111,7 +111,6 @@
         "jsdoc/check-param-names": 1,
         "jsdoc/check-property-names": 1,
         "jsdoc/check-tag-names": 1,
-        "jsdoc/check-values": 1,
         "jsdoc/empty-tags": 1,
         "jsdoc/implements-on-classes": 1,
         "jsdoc/require-description": 1,
