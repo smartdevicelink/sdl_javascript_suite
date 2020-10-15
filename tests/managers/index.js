@@ -7,6 +7,8 @@ const lifecycleManagerTests = require('./lifecycle/LifecycleManagerTests');
 const fileManagerTests = require('./file/FileManagerTests');
 const taskTests = require('./TaskTests');
 const queueTests = require('./QueueTests');
+const textAndGraphicManagerTests = require('./screen/TextAndGraphicManagerTests');
+const textAndGraphicUpdateOperationTests = require('./screen/TextAndGraphicUpdateOperationTests');
 
 // connect to core and select the app on the HMI to run the tests
 describe('ManagerTests', function () {
@@ -16,6 +18,7 @@ describe('ManagerTests', function () {
         appWebSocketServer.on('connection', function (connection) {
             console.log('Connection');
             const appClient = new AppClient(connection, async (teardown) => {
+                textAndGraphicManagerTests(appClient);
                 permissionManagerTests(appClient);
                 softButtonManagerTests(appClient);
                 screenManagerTests(appClient);
@@ -23,6 +26,7 @@ describe('ManagerTests', function () {
                 fileManagerTests(appClient);
                 taskTests(appClient);
                 queueTests(appClient);
+                textAndGraphicUpdateOperationTests(appClient);
                 setTimeout(function () {
                     teardown();
                     done();
