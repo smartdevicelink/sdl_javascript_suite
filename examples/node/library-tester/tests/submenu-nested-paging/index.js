@@ -1,0 +1,137 @@
+/*
+* Copyright (c) 2019, Livio, Inc.
+* All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*
+* Redistributions of source code must retain the above copyright notice, this
+* list of conditions and the following disclaimer.
+*
+* Redistributions in binary form must reproduce the above copyright notice,
+* this list of conditions and the following
+* disclaimer in the documentation and/or other materials provided with the
+* distribution.
+*
+* Neither the name of the Livio Inc. nor the names of its contributors
+* may be used to endorse or promote products derived from this software
+* without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*/
+
+const SDL = require('../../SDL.min.js');
+const AppHelper = require('../../AppHelper.js');
+
+module.exports = async function (catalogRpc) {
+    const appId = 'submenu-nested-paging';
+
+    const lifecycleConfig = new SDL.manager.LifecycleConfig()
+        .setAppId(appId)
+        .setAppName(appId)
+        .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
+        .setAppTypes([
+            SDL.rpc.enums.AppHMIType.MEDIA,
+            SDL.rpc.enums.AppHMIType.REMOTE_CONTROL,
+        ])
+        .setTransportConfig(new SDL.transport.TcpClientConfig(process.env.HOST, process.env.PORT));
+
+    const app = new AppHelper(catalogRpc)
+        .setLifecycleConfig(lifecycleConfig);
+
+    await app.start(); // after this point, we are in HMI FULL and managers are ready
+    const sdlManager = app.getManager();
+    const screenManager = sdlManager.getScreenManager();
+    let supportsDynamicSubmenus = false;
+    let gotUpdateFileNotif = false;
+    let gotUpdateSubmenuNotif = false;
+
+    // use file manager to upload this image
+    const fileName = `${appId}_icon.png`;
+    const file = new SDL.manager.file.filetypes.SdlFile()
+        .setName(fileName)
+        .setFilePath('./tests/submenu-nested-paging/test_icon_1.png')
+        .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG)
+        .setPersistent(true);
+    await sdlManager.getFileManager().uploadFile(file);
+
+    // check for dynamic submenu support
+    const windowCapability = sdlManager.getSystemCapabilityManager().getDefaultMainWindowCapability();
+    if (windowCapability.getDynamicUpdateCapabilities().getSupportsDynamicSubMenus()) {
+        console.log("The HMI supports dynamic submenus!");
+        supportsDynamicSubmenus = true;
+
+        sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.OnUpdateFile, onUpdateFile => {
+            gotUpdateFileNotif = true;
+        });
+        sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.OnUpdateSubMenu, onUpdateSubMenu => {
+            gotUpdateSubmenuNotif = true;
+        });
+
+    } else {
+        console.log("The HMI does not support dynamic submenus!");
+    }
+
+    screenManager.setTextField1(`Go into the menu to find the item to end the test!`)
+
+    const addMenu1 = new SDL.rpc.messages.AddSubMenu()
+        .setMenuID(1)
+        .setMenuIcon(new SDL.rpc.structs.Image().setValueParam('does_not_exist').setImageType(SDL.rpc.enums.ImageType.DYNAMIC))
+        .setMenuName('Not deep enough. Click again.');
+    await sdlManager.sendRpcResolve(addMenu1);
+
+    const addMenu2 = new SDL.rpc.messages.AddSubMenu()
+        .setMenuID(2)
+        .setMenuName('Getting closer... is there an image here?')
+        .setParentID(1)
+        .setMenuIcon(new SDL.rpc.structs.Image().setValueParam(fileName).setImageType(SDL.rpc.enums.ImageType.DYNAMIC))
+    await sdlManager.sendRpcResolve(addMenu2);
+
+    const addMenu3 = new SDL.rpc.messages.AddSubMenu()
+        .setMenuID(3)
+        .setMenuName('Almost there...')
+        .setParentID(2)
+    await sdlManager.sendRpcResolve(addMenu3);
+
+    const addMenu4 = new SDL.rpc.messages.AddCommand()
+        .setCmdID(4)
+        .setMenuParams(new SDL.rpc.structs.MenuParams().setParentID(3).setMenuName('Done! Click to end the test.'));
+    await sdlManager.sendRpcResolve(addMenu4);
+
+    const addMenu5 = new SDL.rpc.messages.AddSubMenu()
+        .setMenuID(5)
+        .setMenuName('Pretend I am not here, please!')
+        .setParentID(3)
+    await sdlManager.sendRpcResolve(addMenu5);
+
+    await new Promise((resolve, reject) => {
+        sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.OnCommand, onCommand => {
+            if (onCommand.getCmdID() === 4) {
+                return resolve();
+            }
+            return reject(`Wrong command received! Got command id ${onCommand.getCmdID()}`)
+        });
+    });
+
+    // check if certain notifications were received
+    if (supportsDynamicSubmenus && !gotUpdateFileNotif) {
+        throw new Error("No OnUpdateFile notification was received in this test!");
+    }
+    if (supportsDynamicSubmenus && !gotUpdateSubmenuNotif) {
+        throw new Error("No OnUpdateSubMenu notification was received in this test!");
+    }
+
+    // tear down the app
+    await sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
+    sdlManager.dispose();
+};
