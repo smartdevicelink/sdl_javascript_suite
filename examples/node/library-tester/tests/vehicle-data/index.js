@@ -53,48 +53,53 @@ module.exports = async function (catalogRpc) {
     const sdlManager = app.getManager();
 
     // get vehicle data test
+    let methods = [
+        'setGps',
+        'setSpeed',
+        'setRpm',
+        'setFuelLevel',
+        'setFuelLevel_State',
+        'setInstantFuelConsumption',
+        'setFuelRange',
+        'setExternalTemperature',
+        'setTurnSignal',
+        'setVin',
+        'setGearStatus',
+        'setPrndl',
+        'setTirePressure',
+        'setOdometer',
+        'setBeltStatus',
+        'setBodyInformation',
+        'setDeviceStatus',
+        'setDriverBraking',
+        'setWiperStatus',
+        'setHeadLampStatus',
+        'setEngineTorque',
+        'setAccPedalPosition',
+        'setSteeringWheelAngle',
+        'setEngineOilLife',
+        'setElectronicParkBrakeStatus',
+        'setCloudAppVehicleID',
+        'setStabilityControlsStatus',
+        'setECallInfo',
+        'setAirbagStatus',
+        'setEmergencyEvent',
+        'setClusterModeStatus',
+        'setMyKey',
+        'setWindowStatus',
+        'setHandsOffSteering',
+    ];
+    let result;
 
-    let result = await sdlManager.sendRpcResolve(new SDL.rpc.messages.GetVehicleData()
-        .setGps(true)
-        .setSpeed(true)
-        .setRpm(true)
-        .setFuelLevel(true)
-        .setFuelLevel_State(true)
-        .setInstantFuelConsumption(true)
-        .setFuelRange(true)
-        .setExternalTemperature(true)
-        .setTurnSignal(true)
-        .setVin(true)
-        .setGearStatus(true)
-        .setPrndl(true)
-        .setTirePressure(true)
-        .setOdometer(true)
-        .setBeltStatus(true)
-        .setBodyInformation(true)
-        .setDeviceStatus(true)
-        .setDriverBraking(true)
-        .setWiperStatus(true)
-        .setHeadLampStatus(true)
-        .setEngineTorque(true)
-        .setAccPedalPosition(true)
-        .setSteeringWheelAngle(true)
-        .setEngineOilLife(true)
-        .setElectronicParkBrakeStatus(true)
-        .setCloudAppVehicleID(true)
-        .setStabilityControlsStatus(true)
-        .setECallInfo(true)
-        .setAirbagStatus(true)
-        .setEmergencyEvent(true)
-        .setClusterModeStatus(true)
-        .setMyKey(true)
-        .setWindowStatus(true)
-        .setHandsOffSteering(true)
-    );
-
-    if (!result.getSuccess()) {
-        throw new Error("GetVehicleData couldn't return all vehicle data requested!");
+    console.log("Getting vehicle data:")
+    for (let i = 0; i < methods.length; i++) {
+        console.log(methods[i])
+        result = await sdlManager.sendRpcResolve(new SDL.rpc.messages.GetVehicleData()[methods[i]](true));
+        if (!result.getSuccess()) {
+            console.error("GetVehicleData couldn't get data via " + methods[i]);
+        }  
+        await sleep(500)
     }
-
 
     // listen for vehicle data updates
     sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.OnVehicleData, (vehicleData) => {
@@ -107,45 +112,47 @@ module.exports = async function (catalogRpc) {
 
     // subscribe vehicle data test
     // can't subscribe to VIN
-    result = await sdlManager.sendRpcResolve(new SDL.rpc.messages.SubscribeVehicleData()
-        .setGps(true)
-        .setSpeed(true)
-        .setRpm(true)
-        .setFuelLevel(true)
-        .setFuelLevel_State(true)
-        .setInstantFuelConsumption(true)
-        .setFuelRange(true)
-        .setExternalTemperature(true)
-        .setTurnSignal(true)
-        .setVin(true)
-        .setGearStatus(true)
-        .setPrndl(true)
-        .setTirePressure(true)
-        .setOdometer(true)
-        .setBeltStatus(true)
-        .setBodyInformation(true)
-        .setDeviceStatus(true)
-        .setDriverBraking(true)
-        .setWiperStatus(true)
-        .setHeadLampStatus(true)
-        .setEngineTorque(true)
-        .setAccPedalPosition(true)
-        .setSteeringWheelAngle(true)
-        .setEngineOilLife(true)
-        .setElectronicParkBrakeStatus(true)
-        .setCloudAppVehicleID(true)
-        .setStabilityControlsStatus(true)
-        .setECallInfo(true)
-        .setAirbagStatus(true)
-        .setEmergencyEvent(true)
-        .setClusterModeStatus(true)
-        .setMyKey(true)
-        .setWindowStatus(true)
-        .setHandsOffSteering(true)
-    );
-
-    if (!result.getSuccess()) {
-        throw new Error("SubscribeVehicleData couldn't subscribe to all vehicle data requested!");
+    methods = [
+        'setGps',
+        'setSpeed',
+        'setRpm',
+        'setFuelLevel',
+        'setFuelLevel_State',
+        'setInstantFuelConsumption',
+        'setFuelRange',
+        'setExternalTemperature',
+        'setTurnSignal',
+        'setGearStatus',
+        'setPrndl',
+        'setTirePressure',
+        'setOdometer',
+        'setBeltStatus',
+        'setBodyInformation',
+        'setDeviceStatus',
+        'setDriverBraking',
+        'setWiperStatus',
+        'setHeadLampStatus',
+        'setEngineTorque',
+        'setAccPedalPosition',
+        'setSteeringWheelAngle',
+        'setEngineOilLife',
+        'setElectronicParkBrakeStatus',
+        'setCloudAppVehicleID',
+        'setStabilityControlsStatus',
+        'setECallInfo',
+        'setAirbagStatus',
+        'setEmergencyEvent',
+        'setClusterModeStatus',
+        'setMyKey',
+        'setWindowStatus',
+        'setHandsOffSteering',
+    ];
+ 
+    for (let i = 0; i < methods.length; i++) {
+        result = await sdlManager.sendRpcResolve(new SDL.rpc.messages.SubscribeVehicleData()[methods[i]](true));
+        if (!result.getSuccess()) {
+            console.error("SubscribeVehicleData couldn't subscribe via " + methods[i]);
+        }  
     }
 
     // wait for the user to click on a voice command to continue
@@ -161,46 +168,13 @@ module.exports = async function (catalogRpc) {
         ]);
     });
 
-    // unsubscribe from all
-    result = await sdlManager.sendRpcResolve(new SDL.rpc.messages.UnsubscribeVehicleData()
-        .setGps(true)
-        .setSpeed(true)
-        .setRpm(true)
-        .setFuelLevel(true)
-        .setFuelLevel_State(true)
-        .setInstantFuelConsumption(true)
-        .setFuelRange(true)
-        .setExternalTemperature(true)
-        .setTurnSignal(true)
-        .setVin(true)
-        .setGearStatus(true)
-        .setPrndl(true)
-        .setTirePressure(true)
-        .setOdometer(true)
-        .setBeltStatus(true)
-        .setBodyInformation(true)
-        .setDeviceStatus(true)
-        .setDriverBraking(true)
-        .setWiperStatus(true)
-        .setHeadLampStatus(true)
-        .setEngineTorque(true)
-        .setAccPedalPosition(true)
-        .setSteeringWheelAngle(true)
-        .setEngineOilLife(true)
-        .setElectronicParkBrakeStatus(true)
-        .setCloudAppVehicleID(true)
-        .setStabilityControlsStatus(true)
-        .setECallInfo(true)
-        .setAirbagStatus(true)
-        .setEmergencyEvent(true)
-        .setClusterModeStatus(true)
-        .setMyKey(true)
-        .setWindowStatus(true)
-        .setHandsOffSteering(true)
-    );
 
-    if (!result.getSuccess()) {
-        throw new Error("UnsubscribeVehicleData couldn't subscribe to all vehicle data requested!");
+    // unsubscribe from all
+    for (let i = 0; i < methods.length; i++) {
+        result = await sdlManager.sendRpcResolve(new SDL.rpc.messages.UnsubscribeVehicleData()[methods[i]](true));
+        if (!result.getSuccess()) {
+            console.error("UnsubscribeVehicleData couldn't unsubscribe via " + methods[i]);
+        }  
     }
 
     // tear down the app

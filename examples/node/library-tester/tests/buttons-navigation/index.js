@@ -42,7 +42,7 @@ module.exports = async function (catalogRpc) {
         .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
         .setAppTypes([
             SDL.rpc.enums.AppHMIType.MEDIA,
-            SDL.rpc.enums.AppHMIType.REMOTE_CONTROL,
+            SDL.rpc.enums.AppHMIType.NAVIGATION,
         ])
         .setTransportConfig(new SDL.transport.TcpClientConfig(process.env.HOST, process.env.PORT));
 
