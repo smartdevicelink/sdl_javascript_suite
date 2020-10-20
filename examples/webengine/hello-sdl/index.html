@@ -129,6 +129,8 @@
                 screenManager.setTextAlignment(SDL.rpc.enums.TextAlignment.RIGHT_ALIGNED);
                 screenManager.setPrimaryGraphic(new SDL.manager.file.filetypes.SdlArtwork('sdl-logo', SDL.rpc.enums.FileType.GRAPHIC_PNG)
                     .setFilePath(sdlManifest.appIcon));
+                screenManager.changeLayout(new SDL.rpc.structs.TemplateConfiguration()
+                    .setTemplate(SDL.rpc.enums.PredefinedLayout.NON_MEDIA));
             }
 
             async _onSystemCapabilityUpdatedRpcListener (capabilityMessage) {
