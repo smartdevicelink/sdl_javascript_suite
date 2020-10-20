@@ -123,7 +123,35 @@ module.exports = async function (catalogRpc) {
         await sleep(2500);
     }
 
-    // now use the screen manager for the same thing. notice how there's no need to set all the text and buttons again
+    // now use the screen manager for the same thing
+    // set up the presentation for the manager
+    const screenManager = sdlManager.getScreenManager();
+    // put all the screen manager updates below into one transaction
+    screenManager.beginTransaction();
+
+    screenManager.setTextField1('Text 1');
+    screenManager.setTextField2('Text 2');
+    screenManager.setTextField3('Text 3');
+    screenManager.setTextField4('Text 4');
+    screenManager.setPrimaryGraphic(new SDL.manager.file.filetypes.SdlArtwork('sdl-logo', SDL.rpc.enums.FileType.GRAPHIC_PNG)
+        .setFilePath('./tests/templates/test_icon_1.png'));
+    screenManager.setSecondaryGraphic(new SDL.manager.file.filetypes.SdlArtwork('weather-icon', SDL.rpc.enums.FileType.GRAPHIC_PNG)
+        .setFilePath('./tests/templates/weather-icon.png'));
+
+    const softButtonObjects = [ // 2 hybrid buttons, 2 text buttons, 2 image buttons
+        makeSoftButtonObject('Button 1', 12, SDL.rpc.enums.SoftButtonType.SBT_BOTH),
+        makeSoftButtonObject('Button 2', 13, SDL.rpc.enums.SoftButtonType.SBT_BOTH),
+        makeSoftButtonObject('Button 3', 14, SDL.rpc.enums.SoftButtonType.SBT_TEXT),
+        makeSoftButtonObject('Button 4', 15, SDL.rpc.enums.SoftButtonType.SBT_TEXT),
+        makeSoftButtonObject('Button 5', 16, SDL.rpc.enums.SoftButtonType.SBT_IMAGE),
+        makeSoftButtonObject('Button 6', 17, SDL.rpc.enums.SoftButtonType.SBT_IMAGE)
+    ];
+
+    // set the softbuttons now and rotate through the states of the first softbutton
+    await screenManager.setSoftButtonObjects(softButtonObjects);
+    // commit the transaction!
+    const success = await screenManager.commit();
+
     for (let template of templatesSupported) {
         console.log(template);
 
@@ -132,13 +160,31 @@ module.exports = async function (catalogRpc) {
                 .setTemplate(template)
         );
 
-        await sleep(500);
+        await sleep(2500);
     }
 
     // tear down the app
     await sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
     sdlManager.dispose();
 };
+
+function makeSoftButtonObject (text, id, softButtonType) {
+    let state;
+
+    if (softButtonType === SDL.rpc.enums.SoftButtonType.SBT_BOTH) {
+        state = new SDL.manager.screen.utils.SoftButtonState('button-' + id, text, new SDL.manager.file.filetypes.SdlArtwork('sdl-logo', SDL.rpc.enums.FileType.GRAPHIC_PNG)
+            .setFilePath('./tests/templates/test_icon_1.png'));
+    }
+    if (softButtonType === SDL.rpc.enums.SoftButtonType.SBT_IMAGE) {
+        state = new SDL.manager.screen.utils.SoftButtonState('button-' + id, '', new SDL.manager.file.filetypes.SdlArtwork('sdl-logo', SDL.rpc.enums.FileType.GRAPHIC_PNG)
+            .setFilePath('./tests/templates/test_icon_1.png'));
+    }
+    if (softButtonType === SDL.rpc.enums.SoftButtonType.SBT_TEXT) {
+        state = new SDL.manager.screen.utils.SoftButtonState('button-' + id, text);
+    }
+
+    return new SDL.manager.screen.utils.SoftButtonObject('button-' + id, [state], 'button-' + id);
+}
 
 function makeSoftButton (text, id, softButtonType) {
     const softButton = new SDL.rpc.structs.SoftButton()
