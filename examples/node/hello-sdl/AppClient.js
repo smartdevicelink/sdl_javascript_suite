@@ -143,7 +143,7 @@ class AppClient {
                     ButtonName.TUNEUP, ButtonName.TUNEDOWN];
 
                 for (const buttonName of buttonNames) {
-                    if (availableButtons.indexOf(buttonName) > 0) {
+                    if (availableButtons.indexOf(buttonName) !== -1) {
                         console.log('Subscribing to', buttonName);
                         await screenManager.addButtonListener(buttonName, this._onButtonListener.bind(this)).catch(function (err) {
                             console.error(err);
