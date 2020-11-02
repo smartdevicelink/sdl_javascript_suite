@@ -93,6 +93,7 @@
 
                 this._currentTemplate = 'WEB_VIEW';
                 this._isTemplateSwitchCommandAdded = false;
+                this._isButtonSubscriptionRequested = false;
                 this._templateSwitchCommandId = 1001;
             }
 
@@ -162,7 +163,31 @@
 
                 // wait for the FULL state for more functionality
                 if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
-                    if (!this._isTemplateSwitchCommandAdded && this._permissionManager && this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.AddCommand)) {
+                    const isRpcAllowed = (rpc) => {
+                        return this._permissionManager &&
+                            this._permissionManager.isRpcAllowed(rpc);
+                    };
+
+                    if (!this._isButtonSubscriptionRequested && isRpcAllowed(SDL.rpc.enums.FunctionID.SubscribeButton)) {
+                        // add button listeners
+                        const screenManager = this._sdlManager.getScreenManager();
+                        const ButtonName = SDL.rpc.enums.ButtonName;
+                        const buttonNames = [ButtonName.PRESET_0, ButtonName.PRESET_1, ButtonName.PRESET_2, ButtonName.PRESET_3,
+                                    ButtonName.PRESET_4, ButtonName.PRESET_5, ButtonName.PRESET_6, ButtonName.PRESET_7, ButtonName.PRESET_8,
+                                    ButtonName.PRESET_9, ButtonName.PLAY_PAUSE, ButtonName.OK, ButtonName.SEEKLEFT, ButtonName.SEEKRIGHT,
+                                    ButtonName.TUNEUP, ButtonName.TUNEDOWN];
+
+                        for (const buttonName of buttonNames) {
+                            await screenManager.addButtonListener(buttonName, this._onButtonListener.bind(this))
+                                .catch((reason) => {
+                                    this._logRegularMessage(`Unable to subscribe to button: ${reason}`);
+                                });
+                        }
+
+                        this._isButtonSubscriptionRequested = true;
+                    }
+
+                    if (!this._isTemplateSwitchCommandAdded && isRpcAllowed(SDL.rpc.enums.FunctionID.AddCommand)) {
                         this._logRegularMessage('Adding return to WEB_VIEW template command');
                         this._isTemplateSwitchCommandAdded = true;
 
@@ -200,6 +225,14 @@
                 return new Promise((resolve) => {
                     setTimeout(resolve, timeout);
                 });
+            }
+
+            _onButtonListener (buttonName, onButton) {
+                if (onButton instanceof SDL.rpc.messages.OnButtonPress) {
+                    this._sdlManager.getScreenManager().setTextField1(`${buttonName} pressed`);
+                } else if (onButton instanceof SDL.rpc.messages.OnButtonEvent) {
+                    this._sdlManager.getScreenManager().setTextField2(`${buttonName} ${onButton.getButtonEventMode()}`);
+                }
             }
 
             async sendRpcRequest(request) {

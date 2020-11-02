@@ -32,7 +32,7 @@ class InterfaceProducerCommon(ABC):
         self.mapping = mapping
         self.key_words = key_words
         self.imports = namedtuple('Imports', 'what wherefrom')
-        self.methods = namedtuple('Methods', 'key method_title external description param_name param_values type deprecated history')
+        self.methods = namedtuple('Methods', 'key method_title external description param_name param_values type deprecated history since')
         self.params = namedtuple('Params', 'key value')
 
     @property
@@ -144,6 +144,10 @@ class InterfaceProducerCommon(ABC):
             render['description'] = self.extract_description(item.description)
         if item.deprecated:
             render['deprecated'] = item.deprecated
+        if item.history:
+            render['history'] = item.history
+        if item.since:
+            render['since'] = item.since
 
         self.custom_mapping(render, item)
 
@@ -193,7 +197,7 @@ class InterfaceProducerCommon(ABC):
 
         short_name = re.sub(r'(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])', '=^.^=', param_name) \
             .split('=^.^=').pop().lower()
-        description = self.extract_description(description, 100 - len(type_name) - len(short_name))
+        description = self.extract_description(description)
 
         key = self.key(param_name)
         key = self.replace_keywords(key)
@@ -205,10 +209,11 @@ class InterfaceProducerCommon(ABC):
 
         deprecated = param.deprecated
         history = param.history
+        since = param.since
 
         methods = self.methods(key=key, method_title=title, external=name, description=description,
                                param_name=short_name, param_values=param_values, type=type_name, 
-                               deprecated=deprecated, history=history)
+                               deprecated=deprecated, history=history, since=since)
         params = self.params(key=key, value="'{}'".format(param.name))
         return imports, methods, params
 
@@ -246,9 +251,9 @@ class InterfaceProducerCommon(ABC):
         return name
 
     @staticmethod
-    def extract_description(data, length: int = 116) -> list:
+    def extract_description(data, length: int = 2048) -> list:
         """
-        Evaluate, align and delete @TODO
+        Extract description
         :param data: list with description
         :param length:
         :return: evaluated string
@@ -257,7 +262,7 @@ class InterfaceProducerCommon(ABC):
             return []
         if isinstance(data, list):
             data = ' '.join(data)
-        return textwrap.wrap(re.sub(r'(\s{2,}|\n|\[@TODO.+)', ' ', data).strip(), length)
+        return textwrap.wrap(re.sub(r'(\s{2,}|\n)', ' ', data).strip(), length)
 
     def extract_name_description(self, param):
         """

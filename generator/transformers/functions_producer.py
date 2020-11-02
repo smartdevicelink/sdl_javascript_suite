@@ -74,6 +74,7 @@ class FunctionsProducer(InterfaceProducerCommon):
         if param.since:
             p['since'] = param.since
         p['deprecated'] = param.deprecated
+        p['history'] = param.history
         p['origin'] = param.origin
         p['values'] = self.extract_values(param)
         d = self.extract_description(param.description)
