@@ -2,9 +2,11 @@
 Functions transformation
 """
 import logging
-from collections import OrderedDict
+import textwrap
+from collections import namedtuple, OrderedDict
 
 from model.function import Function
+from model.param import Param
 from transformers.common_producer import InterfaceProducerCommon
 
 
@@ -54,4 +56,31 @@ class FunctionsProducer(InterfaceProducerCommon):
             render['extend'] = what_where.what
             render['imports'].add(what_where)
         render['imports'].add(self.imports(what='FunctionID', wherefrom='{}/FunctionID.js'.format(self.enums_dir)))
+
+        params = OrderedDict()
+        for param in getattr(item, self._container_name).values():
+            param.origin = param.name
+            param.name = self.replace_keywords(param.name)
+            p = self.extract_param(param)
+            params.update({param.name: p})
         return render
+
+    def extract_param(self, param: Param):
+        p = OrderedDict()
+        p['title'] = param.name[:1].upper() + param.name[1:]
+        p['key'] = 'KEY_' + self.key(param.name)
+        p['mandatory'] = param.is_mandatory
+        p['last'] = param.name
+        if param.since:
+            p['since'] = param.since
+        p['deprecated'] = param.deprecated
+        p['history'] = param.history
+        p['origin'] = param.origin
+        p['values'] = self.extract_values(param)
+        d = self.extract_description(param.description)
+        if param.name == 'success':
+            d = 'whether the request is successfully processed'
+        if param.name == 'resultCode':
+            d = 'additional information about a response returning a failed outcome'
+        Params = namedtuple('Params', sorted(p))
+        return Params(**p)

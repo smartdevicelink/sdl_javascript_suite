@@ -1,7 +1,7 @@
 const chai = require('chai');
 const expect = chai.expect;
 chai.use(require('chai-as-promised'));
-const SDL = require('./../../../lib/node/dist/SDL.min.js');
+const SDL = require('../../config.js').node;
 
 // Mocking framework
 // Used to stub an RPC call so that it isn't actually sent to Core

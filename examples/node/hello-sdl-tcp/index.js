@@ -48,7 +48,7 @@ class AppClient {
             .setAppName(CONFIG.appName)
             .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
             .setAppTypes([
-                SDL.rpc.enums.AppHMIType.DEFAULT,
+                SDL.rpc.enums.AppHMIType.MEDIA,
             ])
             .setTransportConfig(new SDL.transport.TcpClientConfig(CONFIG.host, CONFIG.port))
             .setAppIcon(file)
@@ -93,6 +93,7 @@ class AppClient {
 
         this._sdlManager = new SDL.manager.SdlManager(this._appConfig, managerListener);
         this._sdlManager.start();
+        this._isButtonSubscriptionRequested = false;
     }
 
     async _onConnected () {
@@ -118,6 +119,8 @@ class AppClient {
         screenManager.setTextAlignment(SDL.rpc.enums.TextAlignment.RIGHT_ALIGNED);
         screenManager.setPrimaryGraphic(new SDL.manager.file.filetypes.SdlArtwork('sdl-logo', SDL.rpc.enums.FileType.GRAPHIC_PNG)
             .setFilePath(this._filePath));
+        screenManager.changeLayout(new SDL.rpc.structs.TemplateConfiguration()
+            .setTemplate(SDL.rpc.enums.PredefinedLayout.NON_MEDIA));
     }
 
     async _onHmiStatusListener (onHmiStatus) {
@@ -126,6 +129,39 @@ class AppClient {
 
         // wait for the FULL state for more functionality
         if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
+            const screenManager = this._sdlManager.getScreenManager();
+            const isRpcAllowed = (rpc) => {
+                return this._permissionManager &&
+                    this._permissionManager.isRpcAllowed(rpc);
+            };
+
+            if (!this._isButtonSubscriptionRequested && isRpcAllowed(SDL.rpc.enums.FunctionID.SubscribeButton)) {
+                // Get supported buttons
+                const availableButtons = this._sdlManager.getRegisterAppInterfaceResponse().getButtonCapabilities().map(function (capability) {
+                    return capability.getNameParam();
+                });
+
+                // add button listeners
+                const ButtonName = SDL.rpc.enums.ButtonName;
+                const buttonNames = [ButtonName.PRESET_0, ButtonName.PRESET_1, ButtonName.PRESET_2, ButtonName.PRESET_3,
+                    ButtonName.PRESET_4, ButtonName.PRESET_5, ButtonName.PRESET_6, ButtonName.PRESET_7, ButtonName.PRESET_8,
+                    ButtonName.PRESET_9, ButtonName.PLAY_PAUSE, ButtonName.OK, ButtonName.SEEKLEFT, ButtonName.SEEKRIGHT,
+                    ButtonName.TUNEUP, ButtonName.TUNEDOWN];
+
+                for (const buttonName of buttonNames) {
+                    if (availableButtons.indexOf(buttonName) !== -1) {
+                        console.log('Subscribing to', buttonName);
+                        await screenManager.addButtonListener(buttonName, this._onButtonListener.bind(this)).catch(function (err) {
+                            console.error(err);
+                        });
+                    } else {
+                        console.log('No capability found for button', buttonName);
+                    }
+                }
+
+                this._isButtonSubscriptionRequested = true;
+            }
+
             const art1 = new SDL.manager.file.filetypes.SdlArtwork('logo', SDL.rpc.enums.FileType.GRAPHIC_PNG)
                 .setFilePath(this._filePath);
 
@@ -148,7 +184,6 @@ class AppClient {
             ];
 
             // set the softbuttons now and rotate through the states of the first softbutton
-            const screenManager = this._sdlManager.getScreenManager();
             await screenManager.setSoftButtonObjects(softButtonObjects);
 
             await this._sleep(2000);
@@ -159,12 +194,9 @@ class AppClient {
 
             const count = 3;
             for (let i = 0; i < count; i++) {
-                const showCountdown = new SDL.rpc.messages.Show();
-                showCountdown.setMainField1(`Exiting in ${(count - i).toString()}`)
-                    .setMainField2('')
-                    .setMainField3('');
-
-                this._sdlManager.sendRpcResolve(showCountdown); // don't wait for a response
+                screenManager.setTextField1(`Exiting in ${(count - i).toString()}`)
+                    .setTextField2('')
+                    .setTextField3('');
 
                 await this._sleep();
             }
@@ -173,6 +205,14 @@ class AppClient {
             await this._sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
 
             this._sdlManager.dispose();
+        }
+    }
+
+    _onButtonListener (buttonName, onButton) {
+        if (onButton instanceof SDL.rpc.messages.OnButtonPress) {
+            this._sdlManager.getScreenManager().setTextField1(`${buttonName} pressed`);
+        } else if (onButton instanceof SDL.rpc.messages.OnButtonEvent) {
+            this._sdlManager.getScreenManager().setTextField2(`${buttonName} ${onButton.getButtonEventMode()}`);
         }
     }
 
