@@ -31,12 +31,15 @@ class TestStructsProducer(TestCase):
         expected['methods'] = (
             self.producer.methods(
                 description=['Optional image'], external='Image', key='KEY_IMAGE', method_title='Image',
-                param_name='image', type='Image'),
+                param_name='image', type='Image', param_values={}, deprecated=None, history=None, since=None),
             self.producer.methods(
                 description=[], external=None, key='KEY_VALUE', method_title='ValueParam',
-                param_name='value', type='String'))
+                param_name='value', type='String', param_values={}, deprecated=None, history=None, since=None))
         expected['params'] = (self.producer.params(key='KEY_IMAGE', value="'image'"),
                               self.producer.params(key='KEY_VALUE', value="'value'"))
+        expected['since'] = None
+        expected['history'] = None
+        expected['deprecated'] = None
         expected['extend'] = 'RpcStruct'
         result = self.producer.transform(item)
         self.assertDictEqual(expected, result)
