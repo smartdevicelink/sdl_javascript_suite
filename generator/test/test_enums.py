@@ -27,14 +27,17 @@ class TestEnumsProducer(TestCase):
         expected['name'] = 'FunctionID'
         expected['imports'] = {self.producer.imports(what='Enum', wherefrom='../../util/Enum.js')}
         expected['methods'] = (self.producer.methods(method_title='RESERVED',
-                                                     description=[], type='Number'),
+                                                     description=[], type='Number', since=None, history=None, deprecated=None),
                                self.producer.methods(method_title='RegisterAppInterface',
-                                                     description=[], type='Number'),
+                                                     description=[], type='Number', since=None, history=None, deprecated=None),
                                self.producer.methods(method_title='PerformAudioPassThru',
-                                                     description=[], type='Number'))
+                                                     description=[], type='Number', since=None, history=None, deprecated=None))
         expected['params'] = (self.producer.params(key='RESERVED', value="'RESERVED'"),
                               self.producer.params(key='RegisterAppInterface', value='0x01'),
                               self.producer.params(key='PerformAudioPassThru', value='0x10'))
+        expected['since'] = None
+        expected['history'] = None
+        expected['deprecated'] = None
         expected['extend'] = 'Enum'
         result = self.producer.transform(item)
         self.assertDictEqual(expected, result)
@@ -49,8 +52,11 @@ class TestEnumsProducer(TestCase):
         expected['file_name'] = 'Result'
         expected['imports'] = {self.producer.imports(what='Enum', wherefrom='../../util/Enum.js')}
         expected['methods'] = (self.producer.methods(method_title='SUCCESS',
-                                                      description=[], type='String'),)
+                                                      description=[], type='String', since=None, history=None, deprecated=None),)
         expected['params'] = (self.producer.params(key='SUCCESS', value="'SUCCESS'"),)
+        expected['since'] = None
+        expected['history'] = None
+        expected['deprecated'] = None
         expected['extend'] = 'Enum'
         result = self.producer.transform(item)
         self.assertDictEqual(expected, result)

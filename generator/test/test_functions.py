@@ -85,22 +85,25 @@ class TestFunctionsProducer(TestCase):
         expected['methods'] = (self.producer.methods(key='KEY_SDL_MSG_VERSION',
                                                      method_title='SdlMsgVersion', external='SdlMsgVersion',
                                                      description=['See SyncMsgVersion'], param_name='version',
-                                                     type='SdlMsgVersion'),
+                                                     type='SdlMsgVersion', param_values={}, since=None, history=None, deprecated=None),
                                self.producer.methods(key='KEY_FULL_APP_ID', method_title='FullAppID',
                                                      external=None, description=['ID used'], param_name='id',
-                                                     type='String'),
+                                                     type='String', param_values={}, since=None, history=None, deprecated=None),
                                self.producer.methods(key='KEY_DAY_COLOR_SCHEME', param_name='scheme',
                                                      method_title='DayColorScheme', external='TemplateColorScheme',
                                                      description=['A color scheme for all display layout templates.'],
-                                                     type='TemplateColorScheme'),
+                                                     type='TemplateColorScheme', param_values={}, since=None, history=None, deprecated=None),
                                self.producer.methods(key='KEY_TTS_NAME', param_name='name',
                                                      method_title='TtsName', external='TTSChunk',
-                                                     description=['TTS string for'], type='TTSChunk[]'))
+                                                     description=['TTS string for'], type='TTSChunk[]', param_values={}, since=None, history=None, deprecated=None))
         expected['params'] = (self.producer.params(key='KEY_SDL_MSG_VERSION', value="'syncMsgVersion'"),
                               self.producer.params(key='KEY_FULL_APP_ID', value="'fullAppID'"),
                               self.producer.params(key='KEY_DAY_COLOR_SCHEME', value="'dayColorScheme'"),
                               self.producer.params(key='KEY_TTS_NAME', value="'ttsName'"),
                               self.producer.params(key='APP_ID_MAX_LENGTH', value=10))
+        expected['since'] = None
+        expected['history'] = None
+        expected['deprecated'] = None
         expected['func'] = 'RegisterAppInterface'
         expected['extend'] = 'RpcRequest'
 
@@ -128,14 +131,17 @@ class TestFunctionsProducer(TestCase):
         expected['methods'] = (self.producer.methods(key='KEY_LANGUAGE',
                                                      method_title='Language', external='Language',
                                                      description=['The currently'], param_name='language',
-                                                     type='Language'),
+                                                     type='Language', param_values={}, since=None, history=None, deprecated=None),
                                self.producer.methods(key='KEY_SUPPORTED_DIAG_MODES',
                                                      method_title='SupportedDiagModes', external=None,
                                                      description=['Specifies the'], param_name='modes',
-                                                     type='Number[]'))
+                                                     type='Number[]', param_values={}, since=None, history=None, deprecated=None))
         expected['params'] = (self.producer.params(key='KEY_LANGUAGE', value="'language'"),
                               self.producer.params(key='KEY_SUPPORTED_DIAG_MODES', value="'supportedDiagModes'"))
         expected['description'] = ['The response']
+        expected['since'] = None
+        expected['history'] = None
+        expected['deprecated'] = None
         expected['func'] = 'RegisterAppInterface'
         expected['extend'] = 'RpcResponse'
         result = self.producer.transform(item)
@@ -151,6 +157,9 @@ class TestFunctionsProducer(TestCase):
                                self.producer.imports(what='FunctionID', wherefrom='../enums/FunctionID.js')}
         expected['methods'] = ()
         expected['params'] = ()
+        expected['since'] = None
+        expected['history'] = None
+        expected['deprecated'] = None
         expected['func'] = 'UnregisterAppInterface'
         expected['extend'] = 'RpcRequest'
         result = self.producer.transform(item)
@@ -173,9 +182,12 @@ class TestFunctionsProducer(TestCase):
         expected['methods'] = (self.producer.methods(key='KEY_FILE_TYPE',
                                                      method_title='FileType', external='FileType',
                                                      description=['Selected file type.'], param_name='type',
-                                                     type='FileType'),)
+                                                     type='FileType', param_values={}, since=None, history=None, deprecated=None),)
         expected['params'] = (self.producer.params(key='KEY_FILE_TYPE', value="'fileType'"),)
         expected['description'] = ['Used to']
+        expected['since'] = None
+        expected['history'] = None
+        expected['deprecated'] = None
         expected['script'] = self.producer.get_file_content('templates/scripts/PutFileRequest.js')
         expected['func'] = 'PutFile'
         expected['extend'] = 'RpcRequest'
@@ -196,9 +208,12 @@ class TestFunctionsProducer(TestCase):
         expected['methods'] = (self.producer.methods(key='KEY_URL',
                                                      method_title='URL', external=None,
                                                      description=['If'], param_name='url',
-                                                     type='String'),)
+                                                     type='String', param_values={}, since=None, history=None, deprecated=None),)
         expected['params'] = (self.producer.params(key='KEY_URL', value="'URL'"),)
         expected['description'] = ['Callback including']
+        expected['since'] = None
+        expected['history'] = None
+        expected['deprecated'] = None
         expected['func'] = 'OnEncodedSyncPData'
         expected['extend'] = 'RpcNotification'
         result = self.producer.transform(item)
@@ -220,9 +235,12 @@ class TestFunctionsProducer(TestCase):
         expected['methods'] = (self.producer.methods(key='KEY_CHOICE_SET',
                                                      method_title='ChoiceSet', external='Choice',
                                                      description=['A choice is an option given to'], param_name='set',
-                                                     type='Choice[]'),)
+                                                     type='Choice[]', param_values={}, since=None, history=None, deprecated=None),)
         expected['params'] = (self.producer.params(key='KEY_CHOICE_SET', value="'choiceSet'"),)
         expected['description'] = ['creates interaction']
+        expected['since'] = None
+        expected['history'] = None
+        expected['deprecated'] = None
         expected['func'] = 'CreateInteractionChoiceSet'
         expected['extend'] = 'RpcRequest'
         result = self.producer.transform(item)
