@@ -24,6 +24,7 @@ const HMICapabilities = SDL.rpc.structs.HMICapabilities;
 const WindowState = SDL.rpc.structs.WindowState;
 const Grid = SDL.rpc.structs.Grid;
 const WindowStatus = SDL.rpc.structs.WindowStatus;
+const Temperature = SDL.rpc.structs.Temperature;
 
 // enums
 const SpeechCapabilities = SDL.rpc.enums.SpeechCapabilities;
@@ -51,6 +52,7 @@ const CapacityUnit = SDL.rpc.enums.CapacityUnit;
 const ComponentVolumeStatus = SDL.rpc.enums.ComponentVolumeStatus;
 const FuelType = SDL.rpc.enums.FuelType;
 const RequestType = SDL.rpc.enums.RequestType;
+const TemperatureUnit = SDL.rpc.enums.TemperatureUnit;
 
 class Test {
     constructor () {
@@ -417,5 +419,12 @@ const JSON_WINDOWSTATUS = Test.JSON_WINDOWSTATUS = {
     [WindowStatus.KEY_LOCATION]: Test.JSON_GRID,
     [WindowStatus.KEY_STATE]: Test.JSON_WINDOW_STATE,
 };
+
+const GENERAL_TEMPERATURE_UNIT = Test.GENERAL_TEMPERATURE_UNIT = TemperatureUnit.CELSIUS;
+const GENERAL_TEMPERATURE = Test.GENERAL_TEMPERATURE = new Temperature()
+    .setUnit(Test.GENERAL_TEMPERATURE_UNIT)
+    .setValueParam(Test.GENERAL_NUMBER);
+
+const JSON_TEMPERATURE = Test.JSON_TEMPERATURE = GENERAL_TEMPERATURE.getParameters();
 
 module.exports = Test;
