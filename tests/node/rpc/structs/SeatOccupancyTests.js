@@ -9,14 +9,14 @@ describe('SeatOccupancyTests', function () {
     before(function () {
         this.create = function () {
             return new SeatOccupancy()
-                .setSeatsOccupied([Test.GENERAL_SEAT_STATUS])
-                .setSeatsBelted([Test.GENERAL_SEAT_STATUS]);
+                .setSeatsOccupied(Test.GENERAL_SEAT_STATUS_LIST)
+                .setSeatsBelted(Test.GENERAL_SEAT_STATUS_LIST);
         };
 
         this.getExpectedParameters = function (sdlVersion) {
             return {
-                [SeatOccupancy.KEY_SEATS_OCCUPIED]: [Test.JSON_SEATSTATUS],
-                [SeatOccupancy.KEY_SEATS_BELTED]: [Test.JSON_SEATSTATUS],
+                [SeatOccupancy.KEY_SEATS_OCCUPIED]: Test.JSON_SEATSTATUS_LIST,
+                [SeatOccupancy.KEY_SEATS_BELTED]: Test.JSON_SEATSTATUS_LIST,
             };
         };
     });
@@ -26,8 +26,8 @@ describe('SeatOccupancyTests', function () {
     it('testRpcValues', function (done) {
         let msg = this.msg;
         // Valid Tests
-        Validator.assertEquals([Test.GENERAL_SEAT_STATUS], msg.getSeatsOccupied());
-        Validator.assertEquals([Test.GENERAL_SEAT_STATUS], msg.getSeatsBelted());
+        Validator.assertEquals(Test.GENERAL_SEAT_STATUS_LIST, msg.getSeatsOccupied());
+        Validator.assertEquals(Test.GENERAL_SEAT_STATUS_LIST, msg.getSeatsBelted());
 
         // Invalid/Null Tests
         msg = new SeatOccupancy();

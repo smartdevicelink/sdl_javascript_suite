@@ -432,18 +432,26 @@ const GENERAL_SEAT_STATUS = Test.GENERAL_SEAT_STATUS = new SeatStatus()
     .setSeatLocation(Test.GENERAL_SEAT_LOCATION)
     .setConditionActive(Test.GENERAL_BOOLEAN);
 
+const GENERAL_SEAT_STATUS_LIST = Test.GENERAL_SEAT_STATUS_LIST = [
+    GENERAL_SEAT_STATUS,
+];
+
 const JSON_SEATSTATUS = Test.JSON_SEATSTATUS = {
     [SeatStatus.KEY_SEAT_LOCATION]: Test.JSON_SEATLOCATION,
     [SeatStatus.KEY_CONDITION_ACTIVE]: Test.GENERAL_BOOLEAN,
 };
 
+const JSON_SEATSTATUS_LIST = Test.JSON_SEATSTATUS_LIST = [
+    JSON_SEATSTATUS,
+];
+
 const GENERAL_SEAT_OCCUPANCY = Test.GENERAL_SEAT_OCCUPANCY = new SeatOccupancy()
-    .setSeatsOccupied([Test.GENERAL_SEAT_STATUS])
-    .setSeatsBelted([Test.GENERAL_SEAT_STATUS]);
+    .setSeatsOccupied(Test.GENERAL_SEAT_STATUS_LIST)
+    .setSeatsBelted(Test.GENERAL_SEAT_STATUS_LIST);
 
 const JSON_SEATOCCUPANCY = Test.JSON_SEATOCCUPANCY = {
-    [SeatOccupancy.KEY_SEATS_OCCUPIED]: [Test.JSON_SEATSTATUS],
-    [SeatOccupancy.KEY_SEATS_BELTED]: [Test.JSON_SEATSTATUS],
+    [SeatOccupancy.KEY_SEATS_OCCUPIED]: Test.JSON_SEATSTATUS_LIST,
+    [SeatOccupancy.KEY_SEATS_BELTED]: Test.JSON_SEATSTATUS_LIST,
 };
 
 module.exports = Test;
