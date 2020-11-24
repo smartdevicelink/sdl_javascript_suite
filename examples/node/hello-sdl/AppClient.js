@@ -48,7 +48,7 @@ class AppClient {
             .setAppName(CONFIG.appName)
             .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
             .setAppTypes([
-                SDL.rpc.enums.AppHMIType.DEFAULT,
+                SDL.rpc.enums.AppHMIType.MEDIA,
             ])
             .setTransportConfig(
                 new SDL.transport.WebSocketServerConfig(
@@ -124,7 +124,17 @@ class AppClient {
     async _checkReadyState () {
         if (this._managersReady && this._hmiFull) {
             const screenManager = this._sdlManager.getScreenManager();
-            if (!this._isButtonSubscriptionRequested) {
+            const isRpcAllowed = (rpc) => {
+                return this._permissionManager &&
+                    this._permissionManager.isRpcAllowed(rpc);
+            };
+
+            if (!this._isButtonSubscriptionRequested && isRpcAllowed(SDL.rpc.enums.FunctionID.SubscribeButton)) {
+                // Get supported buttons
+                const availableButtons = this._sdlManager.getRegisterAppInterfaceResponse().getButtonCapabilities().map(function (capability) {
+                    return capability.getNameParam();
+                });
+
                 // add button listeners
                 const ButtonName = SDL.rpc.enums.ButtonName;
                 const buttonNames = [ButtonName.PRESET_0, ButtonName.PRESET_1, ButtonName.PRESET_2, ButtonName.PRESET_3,
@@ -133,10 +143,14 @@ class AppClient {
                     ButtonName.TUNEUP, ButtonName.TUNEDOWN];
 
                 for (const buttonName of buttonNames) {
-                    await screenManager.addButtonListener(buttonName, this._onButtonListener.bind(this))
-                        .catch((reason) => {
-                            console.error(`Unable to subscribe to button: ${reason}`);
+                    if (availableButtons.indexOf(buttonName) !== -1) {
+                        console.log('Subscribing to', buttonName);
+                        await screenManager.addButtonListener(buttonName, this._onButtonListener.bind(this)).catch(function (err) {
+                            console.error(err);
                         });
+                    } else {
+                        console.log('No capability found for button', buttonName);
+                    }
                 }
 
                 this._isButtonSubscriptionRequested = true;
@@ -163,6 +177,8 @@ class AppClient {
             screenManager.setTextAlignment(SDL.rpc.enums.TextAlignment.RIGHT_ALIGNED);
             screenManager.setPrimaryGraphic(new SDL.manager.file.filetypes.SdlArtwork('sdl-logo', SDL.rpc.enums.FileType.GRAPHIC_PNG)
                 .setFilePath(this._filePath));
+            screenManager.changeLayout(new SDL.rpc.structs.TemplateConfiguration()
+                .setTemplate(SDL.rpc.enums.PredefinedLayout.NON_MEDIA));
 
             const art1 = new SDL.manager.file.filetypes.SdlArtwork('logo', SDL.rpc.enums.FileType.GRAPHIC_PNG)
                 .setFilePath(this._filePath);
