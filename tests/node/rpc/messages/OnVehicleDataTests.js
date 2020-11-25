@@ -13,7 +13,6 @@ const TransmissionType = SDL.rpc.enums.TransmissionType;
 
 // structs
 const GearStatus = SDL.rpc.structs.GearStatus;
-const ClimateData = SDL.rpc.structs.ClimateData;
 
 const BaseRpcTests = require('./BaseRpcTests');
 const Test = require('./../../../Test.js');
@@ -39,23 +38,13 @@ describe('OnVehicleDataTests', function () {
             [GearStatus.KEY_TRANSMISSION_TYPE]: TransmissionType.MANUAL,
         };
 
-        this.climateData = new ClimateData()
-            .setAtmosphericPressure(Test.GENERAL_NUMBER)
-            .setCabinTemperature(Test.GENERAL_TEMPERATURE)
-            .setExternalTemperature(Test.GENERAL_TEMPERATURE);
-        const JSON_CLIMATE_DATA = {
-            [ClimateData.KEY_ATMOSPHERIC_PRESSURE]: Test.GENERAL_NUMBER,
-            [ClimateData.KEY_CABIN_TEMPERATURE]: Test.JSON_TEMPERATURE,
-            [ClimateData.KEY_EXTERNAL_TEMPERATURE]: Test.JSON_TEMPERATURE,
-        };
-
         this.createMessage = function () {
             return new OnVehicleData()
                 .setStabilityControlsStatus(this.stabilityControlsStatus)
                 .setHandsOffSteering(Test.GENERAL_BOOLEAN)
                 .setWindowStatus([Test.GENERAL_WINDOW_STATUS])
                 .setGearStatus(this.gearStatus)
-                .setClimateData(this.climateData);
+                .setClimateData(Test.GENERAL_CLIMATE_DATA);
         };
 
         this.getExpectedParameters = function (sdlVersion) {
@@ -64,7 +53,7 @@ describe('OnVehicleDataTests', function () {
                 [OnVehicleData.KEY_HANDS_OFF_STEERING]: Test.GENERAL_BOOLEAN,
                 [OnVehicleData.KEY_WINDOW_STATUS]: [Test.JSON_WINDOWSTATUS],
                 [OnVehicleData.KEY_GEAR_STATUS]: JSON_GEARSTATUS,
-                [OnVehicleData.KEY_CLIMATE_DATA]: JSON_CLIMATE_DATA,
+                [OnVehicleData.KEY_CLIMATE_DATA]: Test.JSON_CLIMATE_DATA,
             };
         };
 

@@ -25,6 +25,7 @@ const WindowState = SDL.rpc.structs.WindowState;
 const Grid = SDL.rpc.structs.Grid;
 const WindowStatus = SDL.rpc.structs.WindowStatus;
 const Temperature = SDL.rpc.structs.Temperature;
+const ClimateData = SDL.rpc.structs.ClimateData;
 
 // enums
 const SpeechCapabilities = SDL.rpc.enums.SpeechCapabilities;
@@ -426,5 +427,16 @@ const GENERAL_TEMPERATURE = Test.GENERAL_TEMPERATURE = new Temperature()
     .setValueParam(Test.GENERAL_NUMBER);
 
 const JSON_TEMPERATURE = Test.JSON_TEMPERATURE = GENERAL_TEMPERATURE.getParameters();
+
+const GENERAL_CLIMATE_DATA = Test.GENERAL_CLIMATE_DATA = new ClimateData()
+    .setAtmosphericPressure(Test.GENERAL_NUMBER)
+    .setCabinTemperature(Test.GENERAL_TEMPERATURE)
+    .setExternalTemperature(Test.GENERAL_TEMPERATURE);
+
+const JSON_CLIMATE_DATA = Test.JSON_CLIMATE_DATA = {
+    [ClimateData.KEY_ATMOSPHERIC_PRESSURE]: Test.GENERAL_NUMBER,
+    [ClimateData.KEY_CABIN_TEMPERATURE]: Test.JSON_TEMPERATURE,
+    [ClimateData.KEY_EXTERNAL_TEMPERATURE]: Test.JSON_TEMPERATURE,
+};
 
 module.exports = Test;
