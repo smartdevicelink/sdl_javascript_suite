@@ -81,7 +81,7 @@ describe('OnVehicleDataTests', function () {
         Validator.assertEquals(this.stabilityControlsStatus, testStabilityControlsStatus);
         Validator.assertEquals([Test.GENERAL_WINDOW_STATUS], testWindowStatus);
         Validator.assertEquals(this.gearStatus, testGearStatus);
-        Validator.assertEquals(this.climateData, testClimateData);
+        Validator.assertEquals(Test.GENERAL_CLIMATE_DATA, testClimateData);
 
         // Invalid/Null Tests
         rpcMessage = new OnVehicleData();
