@@ -1,7 +1,7 @@
 {% extends 'base_template.js' %}
 
 {% block typedef %}
-{%- if description is defined or deprecated is defined %}
+{%- if description is defined or deprecated is defined and deprecated is not none %}
 /**
  {% if description is defined -%}
  {% for d in description -%}
@@ -10,7 +10,7 @@
  {% else -%}
  * Struct description not available.
  {% endif -%}
- {% if deprecated is defined -%}
+ {% if deprecated is defined and deprecated is not none -%}
  * @deprecated
  {% endif -%}
  */
@@ -76,7 +76,7 @@
 
     /**
      * Get the {{method.method_title}}
-     {% if deprecated is defined -%}
+     {% if deprecated is defined and deprecated is not none -%}
      * @deprecated
      {% endif -%}
      * @returns {{'%s%s%s'|format('{', method.type, '}')}} - the {{method.key}} value
