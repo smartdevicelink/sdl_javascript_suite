@@ -91,6 +91,7 @@ describe('VideoStreamingParametersTest', function () {
 
         format = new VideoStreamingFormat(VideoStreamingProtocol.RTP, VideoStreamingCodec.H264);
         capability.setSupportedFormats([format]);
+        capability.setPreferredFPS(15);
         params.update(capability);
         Validator.assertEquals(params.getFormat(), format);
 
