@@ -9,6 +9,7 @@ const taskTests = require('./TaskTests');
 const queueTests = require('./QueueTests');
 const textAndGraphicManagerTests = require('./screen/TextAndGraphicManagerTests');
 const textAndGraphicUpdateOperationTests = require('./screen/TextAndGraphicUpdateOperationTests');
+const alertManagerTests = require('./screen/AlertManagerTests');
 
 // connect to core and select the app on the HMI to run the tests
 describe('ManagerTests', function () {
@@ -27,6 +28,7 @@ describe('ManagerTests', function () {
                 taskTests(appClient);
                 queueTests(appClient);
                 textAndGraphicUpdateOperationTests(appClient);
+                alertManagerTests(appClient);
                 setTimeout(function () {
                     teardown();
                     done();
