@@ -24,6 +24,9 @@ const HMICapabilities = SDL.rpc.structs.HMICapabilities;
 const WindowState = SDL.rpc.structs.WindowState;
 const Grid = SDL.rpc.structs.Grid;
 const WindowStatus = SDL.rpc.structs.WindowStatus;
+const ConfigurableKeyboards = SDL.rpc.structs.ConfigurableKeyboards;
+const DynamicUpdateCapabilities = SDL.rpc.structs.DynamicUpdateCapabilities;
+const KeyboardCapabilities = SDL.rpc.structs.KeyboardCapabilities;
 
 // enums
 const SpeechCapabilities = SDL.rpc.enums.SpeechCapabilities;
@@ -51,6 +54,10 @@ const CapacityUnit = SDL.rpc.enums.CapacityUnit;
 const ComponentVolumeStatus = SDL.rpc.enums.ComponentVolumeStatus;
 const FuelType = SDL.rpc.enums.FuelType;
 const RequestType = SDL.rpc.enums.RequestType;
+const KeyboardLayout = SDL.rpc.enums.KeyboardLayout;
+const KeypressMode = SDL.rpc.enums.KeypressMode;
+const KeyboardInputMask = SDL.rpc.enums.KeyboardInputMask;
+const MenuLayout = SDL.rpc.enums.MenuLayout;
 
 class Test {
     constructor () {
@@ -113,34 +120,43 @@ const GENERAL_CHARACTERSET = CharacterSet.CID1SET;
 
 const GENERAL_IMAGEFIELDNAME = ImageFieldName.graphic;
 
+const GENERAL_IMAGEFIELDNAME_LIST = Test.GENERAL_IMAGEFIELDNAME_LIST = [
+    GENERAL_IMAGEFIELDNAME,
+];
+
 const GENERAL_FILETYPE_LIST = [
     GENERAL_FILETYPE,
 ];
 
 
 
-const GENERAL_IMAGEFIELD = new ImageField();
+const GENERAL_IMAGEFIELD = Test.GENERAL_IMAGEFIELD = new ImageField();
 GENERAL_IMAGEFIELD.setImageResolution(GENERAL_IMAGERESOLUTION);
 GENERAL_IMAGEFIELD.setNameParam(GENERAL_IMAGEFIELDNAME);
 GENERAL_IMAGEFIELD.setImageTypeSupported(GENERAL_FILETYPE_LIST);
 
-const JSON_GENERAL_IMAGEFIELD = {
+const JSON_GENERAL_IMAGEFIELD = Test.JSON_GENERAL_IMAGEFIELD = {
     [ImageField.KEY_NAME]: GENERAL_IMAGEFIELDNAME,
     [ImageField.KEY_IMAGE_TYPE_SUPPORTED]: GENERAL_FILETYPE_LIST,
     [ImageField.KEY_IMAGE_RESOLUTION]: GENERAL_IMAGERESOLUTION.getParameters(),
 };
 
-const GENERAL_IMAGEFIELD_LIST = [
+const GENERAL_IMAGEFIELD_LIST = Test.GENERAL_IMAGEFIELD_LIST = [
     GENERAL_IMAGEFIELD,
 ];
 
-const JSON_GENERAL_IMAGEFIELD_LIST = [
+const JSON_GENERAL_IMAGEFIELD_LIST = Test.JSON_GENERAL_IMAGEFIELD_LIST = [
     JSON_GENERAL_IMAGEFIELD,
 ];
 
 
 
 const GENERAL_IMAGETYPE = Test.GENERAL_IMAGETYPE = ImageType.DYNAMIC;
+
+const GENERAL_IMAGETYPE_LIST = Test.GENERAL_IMAGETYPE_LIST = [
+    GENERAL_IMAGETYPE,
+];
+
 const GENERAL_LANGUAGE = Test.GENERAL_LANGUAGE = Language.EN_US;
 
 const GENERAL_TTSCHUNK_LIST = Test.GENERAL_TTSCHUNK_LIST = [];
@@ -224,15 +240,20 @@ const GENERAL_MEDIACLOCKFORMAT_LIST = [
 const GENERAL_TEXTFIELDNAME = TextFieldName.ETA;
 
 
-const GENERAL_TEXTFIELD = new TextField();
+const GENERAL_TEXTFIELD = Test.GENERAL_TEXTFIELD = new TextField();
 GENERAL_TEXTFIELD.setNameParam(GENERAL_TEXTFIELDNAME);
 GENERAL_TEXTFIELD.setRows(GENERAL_INT);
 GENERAL_TEXTFIELD.setWidth(GENERAL_INT);
 GENERAL_TEXTFIELD.setCharacterSet(GENERAL_CHARACTERSET);
 
+const JSON_TEXTFIELD = Test.JSON_TEXTFIELD = GENERAL_TEXTFIELD.getParameters();
 
-const GENERAL_TEXTFIELD_LIST = [
+const GENERAL_TEXTFIELD_LIST = Test.GENERAL_TEXTFIELD_LIST = [
     GENERAL_TEXTFIELD,
+];
+
+const JSON_TEXTFIELD_LIST = Test.JSON_TEXTFIELD_LIST = [
+    JSON_TEXTFIELD,
 ];
 
 const GENERAL_DISPLAYTYPE = DisplayType.CID;
@@ -416,6 +437,56 @@ const GENERAL_WINDOW_STATUS = Test.GENERAL_WINDOW_STATUS = new WindowStatus()
 const JSON_WINDOWSTATUS = Test.JSON_WINDOWSTATUS = {
     [WindowStatus.KEY_LOCATION]: Test.JSON_GRID,
     [WindowStatus.KEY_STATE]: Test.JSON_WINDOW_STATE,
+};
+
+const GENERAL_KEYBOARDLAYOUT = Test.GENERAL_KEYBOARDLAYOUT = KeyboardLayout.QWERTY;
+
+const GENERAL_KEYBOARDLAYOUT_LIST = Test.GENERAL_KEYBOARDLAYOUT_LIST = [
+    GENERAL_KEYBOARDLAYOUT,
+];
+
+const GENERAL_CONFIGURABLEKEYBOARDS = Test.GENERAL_CONFIGURABLEKEYBOARDS = new ConfigurableKeyboards()
+    .setKeyboardLayout(Test.GENERAL_KEYBOARDLAYOUT)
+    .setNumConfigurableKeys(Test.GENERAL_INTEGER);
+
+const GENERAL_CONFIGURABLEKEYBOARDS_LIST = Test.GENERAL_CONFIGURABLEKEYBOARDS_LIST = [
+    GENERAL_CONFIGURABLEKEYBOARDS,
+];
+
+const JSON_CONFIGURABLEKEYBOARDS = Test.JSON_CONFIGURABLEKEYBOARDS = {
+    [ConfigurableKeyboards.KEY_KEYBOARD_LAYOUT]: Test.GENERAL_KEYBOARDLAYOUT,
+    [ConfigurableKeyboards.KEY_NUM_CONFIGURABLE_KEYS]: Test.GENERAL_INTEGER,
+};
+
+const JSON_CONFIGURABLEKEYBOARDS_LIST = Test.JSON_CONFIGURABLEKEYBOARDS_LIST = [
+    JSON_CONFIGURABLEKEYBOARDS,
+];
+
+const GENERAL_KEYPRESSMODE = Test.GENERAL_KEYPRESSMODE = KeypressMode.SINGLE_KEYPRESS;
+
+const GENERAL_KEYBOARDINPUTMASK = Test.GENERAL_KEYBOARDINPUTMASK = KeyboardInputMask.ENABLE_INPUT_KEY_MASK;
+
+const GENERAL_MENULAYOUT = Test.GENERAL_MENULAYOUT = MenuLayout.LIST;
+
+const GENERAL_MENULAYOUT_LIST = Test.GENERAL_MENULAYOUT_LIST = [
+    GENERAL_MENULAYOUT,
+];
+
+const GENERAL_DYNAMICUPDATECAPABILITIES = Test.GENERAL_DYNAMICUPDATECAPABILITIES = new DynamicUpdateCapabilities()
+    .setSupportedDynamicImageFieldNames(GENERAL_IMAGEFIELDNAME_LIST)
+    .setSupportsDynamicSubMenus(GENERAL_BOOLEAN);
+
+const JSON_DYNAMICUPDATECAPABILITIES = Test.JSON_DYNAMICUPDATECAPABILITIES = GENERAL_DYNAMICUPDATECAPABILITIES.getParameters();
+
+const GENERAL_KEYBOARDCAPABILITIES = Test.GENERAL_KEYBOARDCAPABILITIES = new KeyboardCapabilities()
+    .setMaskInputCharactersSupported(GENERAL_BOOLEAN)
+    .setSupportedKeyboardLayouts(GENERAL_KEYBOARDLAYOUT_LIST)
+    .setConfigurableKeys(GENERAL_CONFIGURABLEKEYBOARDS_LIST);
+
+const JSON_KEYBOARDCAPABILITIES = Test.JSON_KEYBOARDCAPABILITIES = {
+    [KeyboardCapabilities.KEY_MASK_INPUT_CHARACTERS_SUPPORTED]: Test.GENERAL_BOOLEAN,
+    [KeyboardCapabilities.KEY_SUPPORTED_KEYBOARD_LAYOUTS]: Test.GENERAL_KEYBOARDLAYOUT_LIST,
+    [KeyboardCapabilities.KEY_CONFIGURABLE_KEYS]: Test.JSON_CONFIGURABLEKEYBOARDS_LIST,
 };
 
 module.exports = Test;
