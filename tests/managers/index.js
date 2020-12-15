@@ -35,7 +35,7 @@ describe('ManagerTests', function () {
                 setTimeout(function () {
                     teardown();
                     done();
-                }, 2000);
+                }, 5000);
             });
         });
     });
