@@ -28,8 +28,8 @@ describe('ManagerTests', function () {
                 fileManagerTests(appClient);
                 taskTests(appClient);
                 queueTests(appClient);
-                voiceCommandUpdateOperationTests(appClient);
                 voiceCommandManagerTests(appClient);
+                voiceCommandUpdateOperationTests(appClient);
                 // tests fail if setting the two voicecommand tests below the textandgraphic tests
                 textAndGraphicUpdateOperationTests(appClient);
                 setTimeout(function () {
