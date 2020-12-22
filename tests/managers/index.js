@@ -10,10 +10,13 @@ const queueTests = require('./QueueTests');
 const textAndGraphicManagerTests = require('./screen/TextAndGraphicManagerTests');
 const textAndGraphicUpdateOperationTests = require('./screen/TextAndGraphicUpdateOperationTests');
 const alertManagerTests = require('./screen/AlertManagerTests');
+const alertAudioDataTests = require('./screen/AlertAudioDataTests');
+const alertViewTests = require('./screen/AlertViewTests');
+const presentAlertOperationTests = require('./screen/PresentAlertOperationTests');
 
 // connect to core and select the app on the HMI to run the tests
 describe('ManagerTests', function () {
-    this.timeout(30000);
+    this.timeout(45000);
     it('StartManagerTests', function (done) {
         const appWebSocketServer = new WS.Server({ port: 3005 });
         appWebSocketServer.on('connection', function (connection) {
@@ -28,11 +31,14 @@ describe('ManagerTests', function () {
                 taskTests(appClient);
                 queueTests(appClient);
                 textAndGraphicUpdateOperationTests(appClient);
-                alertManagerTests(appClient);
+                await alertManagerTests(appClient);
+                alertAudioDataTests(appClient);
+                alertViewTests(appClient);
+                presentAlertOperationTests(appClient);
                 setTimeout(function () {
-                    teardown();
+                    //teardown();
                     done();
-                }, 2000);
+                }, 5000);
             });
         });
     });

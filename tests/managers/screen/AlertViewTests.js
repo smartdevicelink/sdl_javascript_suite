@@ -5,10 +5,10 @@ const Validator = require('../../Validator');
 module.exports = function (appClient) {
     describe('AlertViewTests', function () {
         it('testAlertView', function (done) {
-            const artwork1 = new SDL.manager.file.filetypes.SdlArtwork('./test_icon_1.png', SDL.rpc.enums.FileType.GRAPHIC_PNG, 1, true);
-            const artwork2 = new SDL.manager.file.filetypes.SdlArtwork('./test_icon_2.png', SDL.rpc.enums.FileType.GRAPHIC_PNG, 2, true);
+            const artwork1 = new SDL.manager.file.filetypes.SdlArtwork().setName('test1').setFilePath('./test_icon_1.png').setType(SDL.rpc.enums.FileType.GRAPHIC_PNG).setFileData(1).setPersistent(true);
+            const artwork2 = new SDL.manager.file.filetypes.SdlArtwork().setName('test2').setFilePath('./test_icon_2.png').setType(SDL.rpc.enums.FileType.GRAPHIC_PNG).setFileData(2).setPersistent(true);
 
-            const softButtonState1 = new SDL.manager.screen.utils.SoftButtonState('object1-state1', 'o1s1', new SDL.manager.file.filetypes.SdlArtwork('image1', SDL.rpc.enums.FileType.GRAPHIC_PNG, 3, true));
+            const softButtonState1 = new SDL.manager.screen.utils.SoftButtonState('object1-state1', 'o1s1', new SDL.manager.file.filetypes.SdlArtwork().setName('image1').setType(SDL.rpc.enums.FileType.GRAPHIC_PNG).setFileData(3).setPersistent(true));
             const softButtonObject1 = new SDL.manager.screen.utils.SoftButtonObject('object1', [softButtonState1], softButtonState1.getName(), null);
             const softButtonObject2 = new SDL.manager.screen.utils.SoftButtonObject('object2', [softButtonState1], softButtonState1.getName(), null);
 
@@ -20,7 +20,7 @@ module.exports = function (appClient) {
             alertView.setTimeout(1);
             alertView.setIcon(artwork1);
             alertView.setSoftButtons([softButtonObject1]);
-            alertView.setDefaultTimeOut(3);
+            alertView.setDefaultTimeout(3);
             alertView.setAudio(alertAudioData);
 
             Validator.assertEquals(alertView.getText(), 'Test');
@@ -30,7 +30,7 @@ module.exports = function (appClient) {
             Validator.assertEquals(alertView.getIcon().getName(), 'test1');
             Validator.assertEquals(alertView.getSoftButtons()[0].getName(), 'object1');
             Validator.assertEquals(alertView.getDefaultTimeout(), 3);
-            Validator.assertEquals(alertView.getTimeout().intValue(), 3);
+            Validator.assertEquals(alertView.getTimeout(), 3);
 
             alertView.setText('Test2');
             alertView.setTertiaryText('Test2');
@@ -48,7 +48,48 @@ module.exports = function (appClient) {
             Validator.assertEquals(alertView.getIcon().getName(), 'test2');
             Validator.assertEquals(alertView.getSoftButtons()[0].getName(), 'object2');
             Validator.assertEquals(alertView.getDefaultTimeout(), 6);
-            Validator.assertEquals(alertView.getTimeout().intValue(), 6);
+            Validator.assertEquals(alertView.getTimeout(), 6);
+
+            const alertView2 = alertView.clone();
+
+            // Validate that the clone method copies correctly
+            Validator.assertEquals(alertView2.getText(), alertView.getText());
+            Validator.assertEquals(alertView2.getSecondaryText(), alertView.getSecondaryText());
+            Validator.assertEquals(alertView2.getTertiaryText(), alertView.getTertiaryText());
+            Validator.assertEquals(alertView2.getAudio().getPrompts().length, alertView.getAudio().getPrompts().length);
+            Validator.assertEquals(alertView2.getIcon().getName(), alertView.getIcon().getName());
+            Validator.assertEquals(alertView2.getSoftButtons()[0].getName(), alertView.getSoftButtons()[0].getName());
+            Validator.assertEquals(alertView2.getDefaultTimeout(), alertView.getDefaultTimeout());
+            Validator.assertEquals(alertView2.getTimeout(), alertView.getTimeout());
+
+            alertView2.setText('Test');
+            alertView2.setTertiaryText('Test');
+            alertView2.setSecondaryText('Test');
+            alertView2.setTimeout(1);
+            alertView2.setIcon(artwork1);
+            alertView2.setSoftButtons([softButtonObject1]);
+            alertView2.setDefaultTimeout(3);
+            alertView2.setAudio(alertAudioData);
+
+            Validator.assertEquals(alertView2.getText(), 'Test');
+            Validator.assertEquals(alertView2.getSecondaryText(), 'Test');
+            Validator.assertEquals(alertView2.getTertiaryText(), 'Test');
+            Validator.assertTrue(alertView2.getAudio().getPrompts().length > 0);
+            Validator.assertEquals(alertView2.getIcon().getName(), 'test1');
+            Validator.assertEquals(alertView2.getSoftButtons()[0].getName(), 'object1');
+            Validator.assertEquals(alertView2.getDefaultTimeout(), 3);
+            Validator.assertEquals(alertView2.getTimeout(), 3);
+
+            // Validate that the clone is a deep copy and not a reference
+            Validator.assertTrue(alertView.getText() !== alertView2.getText());
+            Validator.assertTrue(alertView.getSecondaryText() !== alertView2.getSecondaryText());
+            Validator.assertTrue(alertView.getTertiaryText() !== alertView2.getTertiaryText());
+            Validator.assertTrue(alertView.getAudio().getPrompts() === alertView2.getAudio().getPrompts());
+            Validator.assertTrue(alertView.getIcon() !== alertView2.getIcon());
+            Validator.assertTrue(alertView.getSoftButtons() !== alertView2.getSoftButtons());
+            Validator.assertTrue(alertView.getDefaultTimeout() === alertView2.getDefaultTimeout());
+            Validator.assertTrue(alertView.getTimeout() !== alertView2.getTimeout());
+
             done();
         });
     });
