@@ -13,6 +13,8 @@ const alertManagerTests = require('./screen/AlertManagerTests');
 const alertAudioDataTests = require('./screen/AlertAudioDataTests');
 const alertViewTests = require('./screen/AlertViewTests');
 const presentAlertOperationTests = require('./screen/PresentAlertOperationTests');
+const voiceCommandManagerTests = require('./screen/VoiceCommandManagerTests');
+const voiceCommandUpdateOperationTests = require('./screen/VoiceCommandUpdateOperationTests');
 
 // connect to core and select the app on the HMI to run the tests
 describe('ManagerTests', function () {
@@ -30,6 +32,9 @@ describe('ManagerTests', function () {
                 fileManagerTests(appClient);
                 taskTests(appClient);
                 queueTests(appClient);
+                voiceCommandManagerTests(appClient);
+                voiceCommandUpdateOperationTests(appClient);
+                // tests fail if setting the two voicecommand tests below the textandgraphic tests
                 textAndGraphicUpdateOperationTests(appClient);
                 await alertManagerTests(appClient);
                 alertAudioDataTests(appClient);
