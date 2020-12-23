@@ -168,7 +168,10 @@ module.exports = function (appClient) {
                 .callsFake(onAlertSuccess);
             const versionStub = sinon.stub(lifecycleManager, 'getSdlMsgVersion')
                 .callsFake(function () {
-                    return new SDL.rpc.structs.SdlMsgVersion(6, 0);
+                    return new SDL.rpc.structs.SdlMsgVersion()
+                        .setMajorVersion(6)
+                        .setMinorVersion(0)
+                        .setPatchVersion(0);
                 });
             let windowCapability = getWindowCapability(1);
             let presentAlertOperation = new SDL.manager.screen._PresentAlertOperation(lifecycleManager, alertView, windowCapability, speechCapabilities, fileManager, 1, function () {});
@@ -188,7 +191,7 @@ module.exports = function (appClient) {
             done();
         });
 
-        it('testPresentAlertHappyPath', function (done) {
+        it('testPresentAlertHappyPath', async function () {
             const alertStub = sinon.stub(lifecycleManager, 'sendRpcResolve')
                 .callsFake(onAlertSuccess);
             const artStub = sinon.stub(fileManager, 'uploadArtworks')
@@ -197,11 +200,14 @@ module.exports = function (appClient) {
                 .callsFake(onArtworkUploadSuccess);
             const versionStub = sinon.stub(lifecycleManager, 'getSdlMsgVersion')
                 .callsFake(function () {
-                    return new SDL.rpc.structs.SdlMsgVersion(6, 0);
+                    return new SDL.rpc.structs.SdlMsgVersion()
+                        .setMajorVersion(6)
+                        .setMinorVersion(0)
+                        .setPatchVersion(0);
                 });
 
             // Test Images need to be uploaded, sending text and uploading images
-            presentAlertOperation.onExecute();
+            await presentAlertOperation._start();
 
             // Verifies that uploadArtworks gets called only with the fist presentAlertOperation.onExecute call
             Validator.assertTrue(artStub.calledOnce);
@@ -212,10 +218,9 @@ module.exports = function (appClient) {
             fileStub.restore();
             artStub.restore();
             alertStub.restore();
-            done();
         });
 
-        it('testPresentAlertNoAudioAndArtwork', function (done) {
+        it('testPresentAlertNoAudioAndArtwork', async function () {
             const alertStub = sinon.stub(lifecycleManager, 'sendRpcResolve')
                 .callsFake(onAlertSuccess);
             const artStub = sinon.stub(fileManager, 'uploadArtworks')
@@ -224,7 +229,10 @@ module.exports = function (appClient) {
                 .callsFake(onArtworkUploadSuccess);
             const versionStub = sinon.stub(lifecycleManager, 'getSdlMsgVersion')
                 .callsFake(function () {
-                    return new SDL.rpc.structs.SdlMsgVersion(6, 0);
+                    return new SDL.rpc.structs.SdlMsgVersion()
+                        .setMajorVersion(6)
+                        .setMinorVersion(0)
+                        .setPatchVersion(0);
                 });
 
             const alertView1 = new SDL.manager.screen._AlertView()
@@ -233,21 +241,20 @@ module.exports = function (appClient) {
             presentAlertOperation = new SDL.manager.screen._PresentAlertOperation(lifecycleManager, alertView1, defaultMainWindowCapability, speechCapabilities, fileManager, 2, alertCompletionListener);
 
             // Test Images need to be uploaded, sending text and uploading images
-            presentAlertOperation.onExecute();
+            await presentAlertOperation._start();
 
             // Verifies that uploadArtworks gets called only with the fist presentAlertOperation.onExecute call
             Validator.assertTrue(artStub.notCalled);
             Validator.assertTrue(fileStub.notCalled);
-            Validator.assertTrue(alertStub.CalledOnce);
+            Validator.assertTrue(alertStub.calledOnce);
 
             versionStub.restore();
             fileStub.restore();
             artStub.restore();
             alertStub.restore();
-            done();
         });
 
-        it('testPresentAlertNoImages', function (done) {
+        it('testPresentAlertNoImages', async function () {
             const alertStub = sinon.stub(lifecycleManager, 'sendRpcResolve')
                 .callsFake(onAlertSuccess);
             const artStub = sinon.stub(fileManager, 'uploadArtworks')
@@ -256,20 +263,22 @@ module.exports = function (appClient) {
                 .callsFake(onArtworkUploadSuccess);
             const versionStub = sinon.stub(lifecycleManager, 'getSdlMsgVersion')
                 .callsFake(function () {
-                    return new SDL.rpc.structs.SdlMsgVersion(6, 0);
+                    return new SDL.rpc.structs.SdlMsgVersion()
+                        .setMajorVersion(6)
+                        .setMinorVersion(0)
+                        .setPatchVersion(0);
                 });
             // Test Images need to be uploaded, sending text and uploading images
-            presentAlertOperation.onExecute();
+            await presentAlertOperation._start();
 
             // Verifies that uploadArtworks gets called only with the fist presentAlertOperation.onExecute call
-            Validator.assertTrue(artStub.notCalled);
-            Validator.assertTrue(alertStub.CalledOnce);
+            Validator.assertTrue(artStub.calledOnce);
+            Validator.assertTrue(alertStub.calledOnce);
 
             versionStub.restore();
             fileStub.restore();
             artStub.restore();
             alertStub.restore();
-            done();
         });
 
         it('testCancel', function (done) {
@@ -292,15 +301,14 @@ module.exports = function (appClient) {
             done();
         });
 
-        it('testCancelOperation', function (done) {
+        it('testCancelOperation', async function () {
             const callback = sinon.fake(() => {});
             const stub = sinon.stub(lifecycleManager, 'sendRpcResolve').callsFake(callback);
             // Cancel right away
-            presentAlertOperation.cancelTask();
-            presentAlertOperation.onExecute();
+            presentAlertOperation.switchStates(SDL.manager._Task.CANCELED);
+            await presentAlertOperation._start();
             Validator.assertTrue(callback.notCalled);
             stub.restore();
-            done();
         });
     });
 };

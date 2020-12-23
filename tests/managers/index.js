@@ -36,12 +36,12 @@ describe('ManagerTests', function () {
                 voiceCommandUpdateOperationTests(appClient);
                 // tests fail if setting the two voicecommand tests below the textandgraphic tests
                 textAndGraphicUpdateOperationTests(appClient);
+                presentAlertOperationTests(appClient);
                 await alertManagerTests(appClient);
                 alertAudioDataTests(appClient);
                 alertViewTests(appClient);
-                presentAlertOperationTests(appClient);
                 setTimeout(function () {
-                    //teardown();
+                    // teardown();
                     done();
                 }, 5000);
             });
