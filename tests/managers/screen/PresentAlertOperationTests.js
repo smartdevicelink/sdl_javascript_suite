@@ -140,7 +140,7 @@ module.exports = function (appClient) {
             const onEventListener = null;
             alertSoftButtonObject = new SDL.manager.screen.utils.SoftButtonObject('Soft button 1', [alertSoftButtonState], 'state1', onEventListener);
 
-            alertView = new SDL.manager.screen._AlertView();
+            alertView = new SDL.manager.screen.AlertView();
             alertView.setText('test');
             alertView.setSecondaryText('secondaryText');
             alertView.setTertiaryText('tertiaryText');
@@ -235,7 +235,7 @@ module.exports = function (appClient) {
                         .setPatchVersion(0);
                 });
 
-            const alertView1 = new SDL.manager.screen._AlertView()
+            const alertView1 = new SDL.manager.screen.AlertView()
                 .setText('Hi');
 
             presentAlertOperation = new SDL.manager.screen._PresentAlertOperation(lifecycleManager, alertView1, defaultMainWindowCapability, speechCapabilities, fileManager, 2, alertCompletionListener);
