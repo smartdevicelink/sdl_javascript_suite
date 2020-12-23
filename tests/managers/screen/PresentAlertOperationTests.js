@@ -132,7 +132,7 @@ module.exports = function (appClient) {
 
             testAudio = new SDL.manager.file.filetypes.SdlFile('TestAudioFile', SDL.rpc.enums.FileType.AUDIO_MP3, null, false);
 
-            alertAudioData = new SDL.manager.screen.AlertAudioData('Spoken Sting');
+            alertAudioData = new SDL.manager.screen.utils.AlertAudioData('Spoken Sting');
             alertAudioData.setPlayTone(true);
             alertAudioData.addAudioFiles([testAudio]);
 
@@ -140,7 +140,7 @@ module.exports = function (appClient) {
             const onEventListener = null;
             alertSoftButtonObject = new SDL.manager.screen.utils.SoftButtonObject('Soft button 1', [alertSoftButtonState], 'state1', onEventListener);
 
-            alertView = new SDL.manager.screen.AlertView();
+            alertView = new SDL.manager.screen.utils.AlertView();
             alertView.setText('test');
             alertView.setSecondaryText('secondaryText');
             alertView.setTertiaryText('tertiaryText');
@@ -155,7 +155,7 @@ module.exports = function (appClient) {
             speechCapabilities = [];
             speechCapabilities.push(SDL.rpc.enums.SpeechCapabilities.FILE);
             alertCompletionListener = async () => {};
-            presentAlertOperation = new SDL.manager.screen._PresentAlertOperation(lifecycleManager, alertView, defaultMainWindowCapability, speechCapabilities, fileManager, 1, alertCompletionListener);
+            presentAlertOperation = new SDL.manager.screen.utils._PresentAlertOperation(lifecycleManager, alertView, defaultMainWindowCapability, speechCapabilities, fileManager, 1, alertCompletionListener);
             done();
         });
 
@@ -174,14 +174,14 @@ module.exports = function (appClient) {
                         .setPatchVersion(0);
                 });
             let windowCapability = getWindowCapability(1);
-            let presentAlertOperation = new SDL.manager.screen._PresentAlertOperation(lifecycleManager, alertView, windowCapability, speechCapabilities, fileManager, 1, function () {});
+            let presentAlertOperation = new SDL.manager.screen.utils._PresentAlertOperation(lifecycleManager, alertView, windowCapability, speechCapabilities, fileManager, 1, function () {});
             let alert = presentAlertOperation.createAlert();
 
             Validator.assertEquals(alert.getAlertText1(), `${alertView.getText()} - ${alertView.getSecondaryText()} - ${alertView.getTertiaryText()}`);
 
             windowCapability = getWindowCapability(2);
 
-            presentAlertOperation = new SDL.manager.screen._PresentAlertOperation(lifecycleManager, alertView, windowCapability, speechCapabilities, fileManager, 1, function () {});
+            presentAlertOperation = new SDL.manager.screen.utils._PresentAlertOperation(lifecycleManager, alertView, windowCapability, speechCapabilities, fileManager, 1, function () {});
             alert = presentAlertOperation.createAlert();
             Validator.assertEquals(alert.getAlertText1(), alertView.getText());
             Validator.assertEquals(alert.getAlertText2(), `${alertView.getSecondaryText()} - ${alertView.getTertiaryText()}`);
@@ -235,10 +235,10 @@ module.exports = function (appClient) {
                         .setPatchVersion(0);
                 });
 
-            const alertView1 = new SDL.manager.screen.AlertView()
+            const alertView1 = new SDL.manager.screen.utils.AlertView()
                 .setText('Hi');
 
-            presentAlertOperation = new SDL.manager.screen._PresentAlertOperation(lifecycleManager, alertView1, defaultMainWindowCapability, speechCapabilities, fileManager, 2, alertCompletionListener);
+            presentAlertOperation = new SDL.manager.screen.utils._PresentAlertOperation(lifecycleManager, alertView1, defaultMainWindowCapability, speechCapabilities, fileManager, 2, alertCompletionListener);
 
             // Test Images need to be uploaded, sending text and uploading images
             await presentAlertOperation._start();
@@ -293,7 +293,7 @@ module.exports = function (appClient) {
             function alertCompletionListener1 (success, tryAgainTime) {
                 Validator.assertTrue(success);
             }
-            presentAlertOperation = new SDL.manager.screen._PresentAlertOperation(lifecycleManager, alertView, defaultMainWindowCapability, speechCapabilities, fileManager, 2, alertCompletionListener1);
+            presentAlertOperation = new SDL.manager.screen.utils._PresentAlertOperation(lifecycleManager, alertView, defaultMainWindowCapability, speechCapabilities, fileManager, 2, alertCompletionListener1);
             presentAlertOperation.cancelInteraction();
 
             Validator.assertTrue(cancelStub.calledOnce);

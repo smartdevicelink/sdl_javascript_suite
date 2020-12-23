@@ -12,8 +12,8 @@ module.exports = function (appClient) {
             const softButtonObject1 = new SDL.manager.screen.utils.SoftButtonObject('object1', [softButtonState1], softButtonState1.getName(), null);
             const softButtonObject2 = new SDL.manager.screen.utils.SoftButtonObject('object2', [softButtonState1], softButtonState1.getName(), null);
 
-            const alertAudioData = new SDL.manager.screen.AlertAudioData('hi');
-            const alertView = new SDL.manager.screen.AlertView();
+            const alertAudioData = new SDL.manager.screen.utils.AlertAudioData('hi');
+            const alertView = new SDL.manager.screen.utils.AlertView();
             alertView.setText('Test');
             alertView.setTertiaryText('Test');
             alertView.setSecondaryText('Test');

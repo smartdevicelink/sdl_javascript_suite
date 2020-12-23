@@ -18,7 +18,7 @@ module.exports = async function (appClient) {
         });
 
         it('testPresentAlert', async function () {
-            const alertView = new SDL.manager.screen.AlertView();
+            const alertView = new SDL.manager.screen.utils.AlertView();
             await alertManager.presentAlert(alertView);
             Validator.assertTrue(alertManager._getTasks().length === 0);
             return;
