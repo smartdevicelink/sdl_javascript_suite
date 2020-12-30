@@ -68,6 +68,9 @@
                     "key": "KEY_LEVEL_SPAN"
                 }
             }
+        },
+        "TemplateConfiguration": {
+            "script": "templates/scripts/TemplateConfiguration.js"
         }
     },
     "functions": {
