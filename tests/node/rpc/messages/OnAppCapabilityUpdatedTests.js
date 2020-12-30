@@ -1,4 +1,4 @@
-const SDL = require('./../../../../dist/js/SDL.min.js');
+const SDL = require('../../../config.js').node;
 const OnAppCapabilityUpdated = SDL.rpc.messages.OnAppCapabilityUpdated;
 const FunctionID = SDL.rpc.enums.FunctionID;
 const MessageType = SDL.rpc.enums.MessageType;

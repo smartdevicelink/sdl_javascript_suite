@@ -1,4 +1,4 @@
-const SDL = require('./../../../../dist/js/SDL.min.js');
+const SDL = require('../../../config.js').node;
 const VideoStreamingCapability = SDL.rpc.structs.VideoStreamingCapability;
 
 const Test = require('./../../../Test.js');

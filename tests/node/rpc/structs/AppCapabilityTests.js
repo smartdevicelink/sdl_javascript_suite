@@ -1,4 +1,4 @@
-const SDL = require('./../../../../dist/js/SDL.min.js');
+const SDL = require('../../../config.js').node;
 const AppCapability = SDL.rpc.structs.AppCapability;
 
 const Test = require('./../../../Test.js');
