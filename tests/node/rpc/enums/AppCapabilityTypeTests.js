@@ -1,4 +1,4 @@
-const SDL = require('./../../../../dist/js/SDL.min.js');
+const SDL = require('../../../config.js').node;
 
 const AppCapabilityType = SDL.rpc.enums.AppCapabilityType;
 const Validator = require('./../../../Validator.js');
