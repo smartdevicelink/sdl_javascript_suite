@@ -4,6 +4,7 @@ const SDL = require('./config.js').node;
 
 const SdlMsgVersion = SDL.rpc.structs.SdlMsgVersion;
 const TTSChunk = SDL.rpc.structs.TTSChunk;
+const SdlArtwork = SDL.manager.file.filetypes.SdlArtwork;
 
 // structs
 const DeviceInfo = SDL.rpc.structs.DeviceInfo;
@@ -417,5 +418,7 @@ const JSON_WINDOWSTATUS = Test.JSON_WINDOWSTATUS = {
     [WindowStatus.KEY_LOCATION]: Test.JSON_GRID,
     [WindowStatus.KEY_STATE]: Test.JSON_WINDOW_STATE,
 };
+
+const GENERAL_ARTWORK = Test.GENERAL_ARTWORK = new SdlArtwork('sdl', FileType.GRAPHIC_PNG, 'okay', false);
 
 module.exports = Test;
