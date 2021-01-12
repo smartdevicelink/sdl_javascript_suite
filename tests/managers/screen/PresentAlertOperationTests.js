@@ -150,6 +150,7 @@ module.exports = function (appClient) {
             alertView.setTimeout(5);
             alertView.setSoftButtons([alertSoftButtonObject]);
             alertView.setShowWaitIndicator(true);
+            alertView.canceledListener = () => {};
 
             defaultMainWindowCapability = getWindowCapability(3);
             speechCapabilities = [];
@@ -198,6 +199,10 @@ module.exports = function (appClient) {
                 .callsFake(onArtworkUploadSuccess);
             const fileStub = sinon.stub(fileManager, 'uploadFiles')
                 .callsFake(onArtworkUploadSuccess);
+            const stub = sinon.stub(fileManager, 'hasUploadedFile')
+                .callsFake(function () {
+                    return false;
+                });
             const versionStub = sinon.stub(lifecycleManager, 'getSdlMsgVersion')
                 .callsFake(function () {
                     return new SDL.rpc.structs.SdlMsgVersion()
@@ -215,6 +220,7 @@ module.exports = function (appClient) {
             Validator.assertTrue(alertStub.calledOnce);
 
             versionStub.restore();
+            stub.restore();
             fileStub.restore();
             artStub.restore();
             alertStub.restore();
