@@ -176,14 +176,14 @@ module.exports = function (appClient) {
                 });
             let windowCapability = getWindowCapability(1);
             let presentAlertOperation = new SDL.manager.screen.utils._PresentAlertOperation(lifecycleManager, alertView, windowCapability, speechCapabilities, fileManager, 1, function () {});
-            let alert = presentAlertOperation.createAlert();
+            let alert = presentAlertOperation.alertRpc();
 
             Validator.assertEquals(alert.getAlertText1(), `${alertView.getText()} - ${alertView.getSecondaryText()} - ${alertView.getTertiaryText()}`);
 
             windowCapability = getWindowCapability(2);
 
             presentAlertOperation = new SDL.manager.screen.utils._PresentAlertOperation(lifecycleManager, alertView, windowCapability, speechCapabilities, fileManager, 1, function () {});
-            alert = presentAlertOperation.createAlert();
+            alert = presentAlertOperation.alertRpc();
             Validator.assertEquals(alert.getAlertText1(), alertView.getText());
             Validator.assertEquals(alert.getAlertText2(), `${alertView.getSecondaryText()} - ${alertView.getTertiaryText()}`);
             versionStub.restore();
