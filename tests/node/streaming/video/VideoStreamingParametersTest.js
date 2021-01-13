@@ -94,6 +94,7 @@ describe('VideoStreamingParametersTest', function () {
         capability.setPreferredFPS(15);
         params.update(capability);
         Validator.assertEquals(params.getFormat(), format);
+        Validator.assertEquals(params.getFrameRate(), 15);
 
         done();
     });
