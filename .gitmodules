@@ -1,4 +1,3 @@
 [submodule "lib/rpc_spec"]
 	path = lib/rpc_spec
 	url = https://github.com/smartdevicelink/rpc_spec.git
-	branch = master
