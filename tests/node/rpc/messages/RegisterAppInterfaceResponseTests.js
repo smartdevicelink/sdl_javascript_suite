@@ -32,6 +32,7 @@ describe('RegisterAppInterfaceResponseTests', function () {
             // TODO sdlVersion https://github.com/smartdevicelink/rpc_spec/blob/version/6_0_0/MOBILE_API.xml#L4663 unused?
             msg.setSystemSoftwareVersion(Test.GENERAL_STRING);
             msg.setIconResumed(Test.GENERAL_BOOLEAN);
+            msg.setSystemHardwareVersion(Test.GENERAL_STRING);
 
             return msg;
         };
@@ -57,6 +58,7 @@ describe('RegisterAppInterfaceResponseTests', function () {
             expectedParameters[RegisterAppInterfaceResponse.KEY_HMI_CAPABILITIES] = Test.GENERAL_HMICAPABILITIES.getParameters();
             expectedParameters[RegisterAppInterfaceResponse.KEY_SYSTEM_SOFTWARE_VERSION] = Test.GENERAL_STRING;
             expectedParameters[RegisterAppInterfaceResponse.KEY_ICON_RESUMED] = Test.GENERAL_BOOLEAN;
+            expectedParameters[RegisterAppInterfaceResponse.KEY_SYSTEM_HARDWARE_VERSION] = Test.GENERAL_STRING;
 
             return expectedParameters;
         };
@@ -94,6 +96,7 @@ describe('RegisterAppInterfaceResponseTests', function () {
         const testHmiCapabilities =  msg.getHmiCapabilities();
         const testSystemSoftwareVersion =  msg.getSystemSoftwareVersion();
         const testIconResumed =  msg.getIconResumed();
+        const testSystemHardwareVersion =  msg.getSystemHardwareVersion();
 
         // Valid Tests
         Validator.validateSdlMsgVersion(Test.GENERAL_SDLMSGVERSION, testMsgVersion);
@@ -114,6 +117,7 @@ describe('RegisterAppInterfaceResponseTests', function () {
         Validator.validateHMICapabilities(Test.GENERAL_HMICAPABILITIES, testHmiCapabilities);
         Validator.assertEquals(Test.GENERAL_STRING, testSystemSoftwareVersion);
         Validator.assertEquals(Test.GENERAL_BOOLEAN, testIconResumed);
+        Validator.assertEquals(Test.GENERAL_STRING, testSystemHardwareVersion);
 
         // Invalid/Null Tests
         msg = new RegisterAppInterfaceResponse();
@@ -141,6 +145,7 @@ describe('RegisterAppInterfaceResponseTests', function () {
         Validator.assertNullOrUndefined(msg.getHmiCapabilities());
         Validator.assertNullOrUndefined(msg.getSystemSoftwareVersion());
         Validator.assertNullOrUndefined(msg.getIconResumed());
+        Validator.assertNullOrUndefined(msg.getSystemHardwareVersion());
 
 
         done();
