@@ -24,6 +24,9 @@ const HMICapabilities = SDL.rpc.structs.HMICapabilities;
 const WindowState = SDL.rpc.structs.WindowState;
 const Grid = SDL.rpc.structs.Grid;
 const WindowStatus = SDL.rpc.structs.WindowStatus;
+const SeatLocation = SDL.rpc.structs.SeatLocation;
+const SeatStatus = SDL.rpc.structs.SeatStatus;
+const SeatOccupancy = SDL.rpc.structs.SeatOccupancy;
 const AppCapability = SDL.rpc.structs.AppCapability;
 const VideoStreamingCapability = SDL.rpc.structs.VideoStreamingCapability;
 
@@ -419,6 +422,39 @@ const GENERAL_WINDOW_STATUS = Test.GENERAL_WINDOW_STATUS = new WindowStatus()
 const JSON_WINDOWSTATUS = Test.JSON_WINDOWSTATUS = {
     [WindowStatus.KEY_LOCATION]: Test.JSON_GRID,
     [WindowStatus.KEY_STATE]: Test.JSON_WINDOW_STATE,
+};
+
+const GENERAL_SEAT_LOCATION = Test.GENERAL_SEAT_LOCATION = new SeatLocation()
+    .setGrid(Test.GENERAL_GRID);
+
+const JSON_SEATLOCATION = Test.JSON_SEATLOCATION = {
+    [SeatLocation.KEY_GRID]: Test.JSON_GRID,
+};
+
+const GENERAL_SEAT_STATUS = Test.GENERAL_SEAT_STATUS = new SeatStatus()
+    .setSeatLocation(Test.GENERAL_SEAT_LOCATION)
+    .setConditionActive(Test.GENERAL_BOOLEAN);
+
+const GENERAL_SEAT_STATUS_LIST = Test.GENERAL_SEAT_STATUS_LIST = [
+    GENERAL_SEAT_STATUS,
+];
+
+const JSON_SEATSTATUS = Test.JSON_SEATSTATUS = {
+    [SeatStatus.KEY_SEAT_LOCATION]: Test.JSON_SEATLOCATION,
+    [SeatStatus.KEY_CONDITION_ACTIVE]: Test.GENERAL_BOOLEAN,
+};
+
+const JSON_SEATSTATUS_LIST = Test.JSON_SEATSTATUS_LIST = [
+    JSON_SEATSTATUS,
+];
+
+const GENERAL_SEAT_OCCUPANCY = Test.GENERAL_SEAT_OCCUPANCY = new SeatOccupancy()
+    .setSeatsOccupied(Test.GENERAL_SEAT_STATUS_LIST)
+    .setSeatsBelted(Test.GENERAL_SEAT_STATUS_LIST);
+
+const JSON_SEATOCCUPANCY = Test.JSON_SEATOCCUPANCY = {
+    [SeatOccupancy.KEY_SEATS_OCCUPIED]: Test.JSON_SEATSTATUS_LIST,
+    [SeatOccupancy.KEY_SEATS_BELTED]: Test.JSON_SEATSTATUS_LIST,
 };
 
 const GENERAL_VIDEO_STREAMING_CAPABILITY = Test.GENERAL_VIDEO_STREAMING_CAPABILITY = new VideoStreamingCapability()
