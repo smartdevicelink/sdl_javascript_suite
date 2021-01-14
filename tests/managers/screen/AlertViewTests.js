@@ -26,7 +26,7 @@ module.exports = function (appClient) {
             Validator.assertEquals(alertView.getText(), 'Test');
             Validator.assertEquals(alertView.getSecondaryText(), 'Test');
             Validator.assertEquals(alertView.getTertiaryText(), 'Test');
-            Validator.assertTrue(alertView.getAudio().getPrompts().length > 0);
+            Validator.assertTrue(alertView.getAudio().getAudioData().length > 0);
             Validator.assertEquals(alertView.getIcon().getName(), 'test1');
             Validator.assertEquals(alertView.getSoftButtons()[0].getName(), 'object1');
             Validator.assertEquals(alertView.getDefaultTimeout(), 3);
@@ -44,7 +44,7 @@ module.exports = function (appClient) {
             Validator.assertEquals(alertView.getText(), 'Test2');
             Validator.assertEquals(alertView.getSecondaryText(), 'Test2');
             Validator.assertEquals(alertView.getTertiaryText(), 'Test2');
-            Validator.assertTrue(alertView.getAudio().getPrompts().length > 0);
+            Validator.assertTrue(alertView.getAudio().getAudioData().length > 0);
             Validator.assertEquals(alertView.getIcon().getName(), 'test2');
             Validator.assertEquals(alertView.getSoftButtons()[0].getName(), 'object2');
             Validator.assertEquals(alertView.getDefaultTimeout(), 6);
@@ -56,7 +56,7 @@ module.exports = function (appClient) {
             Validator.assertEquals(alertView2.getText(), alertView.getText());
             Validator.assertEquals(alertView2.getSecondaryText(), alertView.getSecondaryText());
             Validator.assertEquals(alertView2.getTertiaryText(), alertView.getTertiaryText());
-            Validator.assertEquals(alertView2.getAudio().getPrompts().length, alertView.getAudio().getPrompts().length);
+            Validator.assertEquals(alertView2.getAudio().getAudioData().length, alertView.getAudio().getAudioData().length);
             Validator.assertEquals(alertView2.getIcon().getName(), alertView.getIcon().getName());
             Validator.assertEquals(alertView2.getSoftButtons()[0].getName(), alertView.getSoftButtons()[0].getName());
             Validator.assertEquals(alertView2.getDefaultTimeout(), alertView.getDefaultTimeout());
@@ -74,7 +74,7 @@ module.exports = function (appClient) {
             Validator.assertEquals(alertView2.getText(), 'Test');
             Validator.assertEquals(alertView2.getSecondaryText(), 'Test');
             Validator.assertEquals(alertView2.getTertiaryText(), 'Test');
-            Validator.assertTrue(alertView2.getAudio().getPrompts().length > 0);
+            Validator.assertTrue(alertView2.getAudio().getAudioData().length > 0);
             Validator.assertEquals(alertView2.getIcon().getName(), 'test1');
             Validator.assertEquals(alertView2.getSoftButtons()[0].getName(), 'object1');
             Validator.assertEquals(alertView2.getDefaultTimeout(), 3);
@@ -84,7 +84,7 @@ module.exports = function (appClient) {
             Validator.assertTrue(alertView.getText() !== alertView2.getText());
             Validator.assertTrue(alertView.getSecondaryText() !== alertView2.getSecondaryText());
             Validator.assertTrue(alertView.getTertiaryText() !== alertView2.getTertiaryText());
-            Validator.assertTrue(alertView.getAudio().getPrompts() === alertView2.getAudio().getPrompts());
+            Validator.assertTrue(alertView.getAudio().getAudioData() === alertView2.getAudio().getAudioData());
             Validator.assertTrue(alertView.getIcon() !== alertView2.getIcon());
             Validator.assertTrue(alertView.getSoftButtons() !== alertView2.getSoftButtons());
             Validator.assertTrue(alertView.getDefaultTimeout() === alertView2.getDefaultTimeout());

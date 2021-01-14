@@ -11,13 +11,13 @@ module.exports = function (appClient) {
             Validator.assertTrue(alertAudioData.isPlayTone());
 
             const alertAudioData1 = new SDL.manager.screen.utils.AlertAudioData('phoneticString', SDL.rpc.enums.SpeechCapabilities.SC_TEXT);
-            Validator.assertEquals('phoneticString', alertAudioData1.getPrompts()[0].getText());
+            Validator.assertEquals('phoneticString', alertAudioData1.getAudioData()[0].getText());
 
             const alertAudioData2 = new SDL.manager.screen.utils.AlertAudioData('spokenString');
-            Validator.assertEquals('spokenString', alertAudioData2.getPrompts()[0].getText());
+            Validator.assertEquals('spokenString', alertAudioData2.getAudioData()[0].getText());
 
             const alertAudioData3 = new SDL.manager.screen.utils.AlertAudioData(null, null, testAudio);
-            Validator.assertEquals(alertAudioData3.getAudioFiles()[0].getName(), testAudio.getName());
+            Validator.assertEquals(alertAudioData3.getAudioFiles().get(testAudio.getName()).getName(), testAudio.getName());
             done();
         });
 
@@ -27,10 +27,10 @@ module.exports = function (appClient) {
             alertAudioData1.addPhoneticSpeechSynthesizerStrings(['addition'], SDL.rpc.enums.SpeechCapabilities.SC_TEXT);
             alertAudioData1.addSpeechSynthesizerStrings(['addition2']);
             alertAudioData1.addAudioFiles([testAudio]);
-            Validator.assertEquals('phoneticString', alertAudioData1.getPrompts()[0].getText());
-            Validator.assertEquals('addition', alertAudioData1.getPrompts()[1].getText());
-            Validator.assertEquals('addition2', alertAudioData1.getPrompts()[2].getText());
-            Validator.assertEquals(testAudio.getName(), alertAudioData1.getAudioFiles()[0].getName());
+            Validator.assertEquals('phoneticString', alertAudioData1.getAudioData()[0].getText());
+            Validator.assertEquals('addition', alertAudioData1.getAudioData()[2].getText());
+            Validator.assertEquals('addition2', alertAudioData1.getAudioData()[3].getText());
+            Validator.assertEquals(testAudio.getName(), alertAudioData1.getAudioFiles().get(testAudio.getName()).getName());
             done();
         });
     });

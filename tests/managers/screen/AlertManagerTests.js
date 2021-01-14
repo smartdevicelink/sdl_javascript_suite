@@ -11,7 +11,7 @@ module.exports = async function (appClient) {
     const alertManager = screenManager._alertManager;
     describe('AlertManagerTests', function () {
         it('testInstantiation', async function () {
-            Validator.assertNotNullUndefined(alertManager._defaultMainWindowCapability);
+            Validator.assertNotNullUndefined(alertManager._currentWindowCapability);
             Validator.assertNotNullUndefined(alertManager._nextCancelId);
             Validator.assertTrue(!alertManager._currentAlertPermissionStatus);
             return;
