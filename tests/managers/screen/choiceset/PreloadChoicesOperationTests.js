@@ -63,11 +63,19 @@ module.exports = function (appClient) {
             Validator.assertTrue(!operation._shouldSendChoiceText());
         });
 
+        /**
+         * Creates a preload choices operation with no window capability
+         * @returns {_PreloadChoicesOperation} - An operation
+         */
         function setUpNullWindowCapability () {
             return new SDL.manager.screen.choiceset._PreloadChoicesOperation(appClient._sdlManager._lifecycleManager,
                 appClient._sdlManager._fileManager, null, null, true, [cell1, cell2]);
         }
 
+        /**
+         * Creates a preload choices operation with an empty window capability
+         * @returns {_PreloadChoicesOperation} - An operation
+         */
         function setUpEmptyWindowCapability () {
             const emptyImageField = new SDL.rpc.structs.ImageField()
                 .setNameParam(SDL.rpc.enums.ImageFieldName.alertIcon);

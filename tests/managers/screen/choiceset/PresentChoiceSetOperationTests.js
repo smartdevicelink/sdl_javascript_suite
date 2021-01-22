@@ -254,6 +254,11 @@ module.exports = function (appClient) {
             getVersionStub.restore();
         });
 
+        /**
+         * Responds to CancelInteraction requests
+         * @param {Boolean} success - Whether to respond positively
+         * @returns {CancelInteractionResponse} - Response
+         */
         function cancelInteractionResponse (success) {
             return function (req) {
                 Validator.assertEquals(req.getCancelID(), Test.GENERAL_INTEGER);
@@ -266,17 +271,30 @@ module.exports = function (appClient) {
             };
         }
 
-        function performInteractionResponse (req) {
+        /**
+         * Responds to PerformInteraction requests
+         * @returns {PerformInteractionResponse} - Response
+         */
+        function performInteractionResponse () {
             return new SDL.rpc.messages.PerformInteractionResponse({
                 functionName: SDL.rpc.enums.FunctionID.PerformInteraction,
             })
                 .setSuccess(true);
         }
 
+        /**
+         * Pauses execution
+         * @param {Number} timeout - How long in milliseconds to pause
+         * @returns {Promise} - Does not resolve to any value
+         */
         function sleep (timeout = 1000) {
             return new Promise(resolve => setTimeout(resolve, timeout));
         }
 
+        /**
+         * Creates a KeyboardProperties RPC
+         * @returns {KeyboardProperties} - A KeyboardProperties RPC
+         */
         function getKeyBoardProperties () {
             return new SDL.rpc.structs.KeyboardProperties()
                 .setLanguage(SDL.rpc.enums.Language.EN_US)

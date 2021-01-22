@@ -147,7 +147,7 @@ module.exports = function (appClient) {
 
         it('testDismissingQueuedKeyboard', function () {
             const testCancelId = 42;
-            
+
             // Currently executing operation
             const testKeyboardOp = new SDL.manager.screen.choiceset._PresentKeyboardOperation(sdlManager._lifecycleManager);
             testKeyboardOp._cancelId = 96;
