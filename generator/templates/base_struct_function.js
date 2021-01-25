@@ -76,8 +76,9 @@
 
     /**
      * Get the {{method.method_title}}
-     {% if deprecated is defined and deprecated is not none -%}
-     * @deprecated
+     {% if method.deprecated is defined and method.deprecated is not none -%}
+     * @since SmartDeviceLink {{method.history[0].since}}
+     * @deprecated in SmartDeviceLink {{method.since}}
      {% endif -%}
      * @returns {{'%s%s%s'|format('{', method.type, '}')}} - the {{method.key}} value
      */
