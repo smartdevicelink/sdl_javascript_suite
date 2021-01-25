@@ -9,8 +9,8 @@ module.exports = function (appClient) {
         const sdlManager = appClient._sdlManager;
         const cell1 = new SDL.manager.screen.choiceset.ChoiceCell('Cell1')
             ._setChoiceId(0);
-        const choiceSetSelectionListener = new SDL.manager.screen.choiceset._ChoiceSetSelectionListener();
-        const keyboardListener = new SDL.manager.screen.choiceset._KeyboardListener();
+        const choiceSetSelectionListener = new SDL.manager.screen.choiceset.ChoiceSetSelectionListener();
+        const keyboardListener = new SDL.manager.screen.choiceset.KeyboardListener();
         const choiceSet = new SDL.manager.screen.choiceset.ChoiceSet('Test', [cell1], choiceSetSelectionListener);
 
         const csm = new SDL.manager.screen.choiceset._ChoiceSetManagerBase(sdlManager._lifecycleManager, sdlManager._fileManager);

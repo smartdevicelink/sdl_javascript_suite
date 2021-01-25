@@ -7,7 +7,7 @@ const sinon = require('sinon');
 module.exports = function (appClient) {
     describe('PresentKeyboardOperationTests', function () {
         const sdlManager = appClient._sdlManager;
-        const keyboardListener = new SDL.manager.screen.choiceset._KeyboardListener();
+        const keyboardListener = new SDL.manager.screen.choiceset.KeyboardListener();
 
         const csm = new SDL.manager.screen.choiceset._ChoiceSetManagerBase(sdlManager._lifecycleManager, sdlManager._fileManager);
 

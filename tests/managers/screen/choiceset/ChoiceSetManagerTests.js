@@ -49,7 +49,7 @@ module.exports = function (appClient) {
         });
 
         it('testSetupChoiceSet', function () {
-            const choiceSetSelectionListener = new SDL.manager.screen.choiceset._ChoiceSetSelectionListener()
+            const choiceSetSelectionListener = new SDL.manager.screen.choiceset.ChoiceSetSelectionListener()
                 .setOnChoiceSelected(() => {})
                 .setOnError(() => {});
 
@@ -118,14 +118,14 @@ module.exports = function (appClient) {
         });
 
         it('testPresentingKeyboardShouldReturnCancelIDIfKeyboardCanBeSent', function () {
-            const cancelId = csm.presentKeyboard('initial text', null, new SDL.manager.screen.choiceset._KeyboardListener());
+            const cancelId = csm.presentKeyboard('initial text', null, new SDL.manager.screen.choiceset.KeyboardListener());
             Validator.assertNotNull(cancelId);
         });
 
         it('testPresentingKeyboardShouldNotReturnCancelIDIfKeyboardCannotBeSent', function () {
             const oldState = csm._state;
             csm._state = SDL.manager._SubManagerBase.ERROR;
-            const cancelId = csm.presentKeyboard('initial text', null, new SDL.manager.screen.choiceset._KeyboardListener());
+            const cancelId = csm.presentKeyboard('initial text', null, new SDL.manager.screen.choiceset.KeyboardListener());
             Validator.assertNull(cancelId);
             csm._state = oldState;
         });

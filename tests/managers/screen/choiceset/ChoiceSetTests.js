@@ -6,7 +6,7 @@ const Test = require('../../../Test.js');
 module.exports = function (appClient) {
     describe('ChoiceSetTests', function () {
         const defaultTimeout = 10;
-        const listener = new SDL.manager.screen.choiceset._ChoiceSetSelectionListener();
+        const listener = new SDL.manager.screen.choiceset.ChoiceSetSelectionListener();
         const layout = SDL.manager.screen.choiceset.enums.ChoiceSetLayout.CHOICE_SET_LAYOUT_LIST;
         const choices = [
             new SDL.manager.screen.choiceset.ChoiceCell(Test.GENERAL_STRING),
