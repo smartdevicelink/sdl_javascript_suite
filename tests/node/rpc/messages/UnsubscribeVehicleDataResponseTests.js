@@ -40,7 +40,7 @@ describe('UnsubscribeVehicleDataResponseTests', function () {
         const JSON_WINDOWSTATUS = this.windowStatus.getParameters();
 
         this.climateData = new VehicleDataResult()
-          .setDataType(VehicleDataType.VEHICLEDATA_CLIMATEDATA);
+            .setDataType(VehicleDataType.VEHICLEDATA_CLIMATEDATA);
         const JSON_CLIMATEDATA = this.climateData.getParameters();
 
         this.createMessage = function () {
