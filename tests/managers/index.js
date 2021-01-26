@@ -9,6 +9,8 @@ const taskTests = require('./TaskTests');
 const queueTests = require('./QueueTests');
 const textAndGraphicManagerTests = require('./screen/TextAndGraphicManagerTests');
 const textAndGraphicUpdateOperationTests = require('./screen/TextAndGraphicUpdateOperationTests');
+const voiceCommandManagerTests = require('./screen/VoiceCommandManagerTests');
+const voiceCommandUpdateOperationTests = require('./screen/VoiceCommandUpdateOperationTests');
 
 // connect to core and select the app on the HMI to run the tests
 describe('ManagerTests', function () {
@@ -26,11 +28,14 @@ describe('ManagerTests', function () {
                 fileManagerTests(appClient);
                 taskTests(appClient);
                 queueTests(appClient);
+                voiceCommandManagerTests(appClient);
+                voiceCommandUpdateOperationTests(appClient);
+                // tests fail if setting the two voicecommand tests below the textandgraphic tests
                 textAndGraphicUpdateOperationTests(appClient);
                 setTimeout(function () {
                     teardown();
                     done();
-                }, 2000);
+                }, 5000);
             });
         });
     });

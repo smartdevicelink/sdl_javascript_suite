@@ -31,6 +31,10 @@ describe('UnsubscribeVehicleDataResponseTests', function () {
             .setDataType(VehicleDataType.VEHICLEDATA_GEARSTATUS);
         const JSON_GEARSTATUS = this.gearStatus.getParameters();
 
+        this.seatOccupancy = new VehicleDataResult()
+            .setDataType(VehicleDataType.VEHICLEDATA_SEATOCCUPANCY);
+        const JSON_SEATOCCUPANCY = this.seatOccupancy.getParameters();
+
         this.windowStatus = new VehicleDataResult()
             .setDataType(VehicleDataType.VEHICLEDATA_WINDOWSTATUS);
         const JSON_WINDOWSTATUS = this.windowStatus.getParameters();
@@ -45,6 +49,7 @@ describe('UnsubscribeVehicleDataResponseTests', function () {
                 .setHandsOffSteering(this.vehicleDataResult)
                 .setWindowStatus(this.windowStatus)
                 .setGearStatus(this.gearStatus)
+                .setSeatOccupancy(this.seatOccupancy)
                 .setClimateData(this.climateData);
         };
 
@@ -54,6 +59,7 @@ describe('UnsubscribeVehicleDataResponseTests', function () {
                 [UnsubscribeVehicleDataResponse.KEY_HANDS_OFF_STEERING]: JSON_VEHICLEDATARESULT,
                 [UnsubscribeVehicleDataResponse.KEY_WINDOW_STATUS]: JSON_WINDOWSTATUS,
                 [UnsubscribeVehicleDataResponse.KEY_GEAR_STATUS]: JSON_GEARSTATUS,
+                [UnsubscribeVehicleDataResponse.KEY_SEAT_OCCUPANCY]: JSON_SEATOCCUPANCY,
                 [UnsubscribeVehicleDataResponse.KEY_CLIMATE_DATA]: JSON_CLIMATEDATA,
             };
         };
@@ -77,6 +83,7 @@ describe('UnsubscribeVehicleDataResponseTests', function () {
         const testHandsOffSteering = rpcMessage.getHandsOffSteering();
         const testWindowStatus = rpcMessage.getWindowStatus();
         const testGearStatus = rpcMessage.getGearStatus();
+        const testSeatOccupancy = rpcMessage.getSeatOccupancy();
         const testClimateData = rpcMessage.getClimateData();
 
         // Valid Tests
@@ -84,6 +91,7 @@ describe('UnsubscribeVehicleDataResponseTests', function () {
         Validator.validateVehicleDataResult(this.vehicleDataResult, testHandsOffSteering);
         Validator.validateVehicleDataResult(this.windowStatus, testWindowStatus);
         Validator.validateVehicleDataResult(this.gearStatus, testGearStatus);
+        Validator.validateVehicleDataResult(this.seatOccupancy, testSeatOccupancy);
         Validator.validateVehicleDataResult(this.climateData, testClimateData);
 
         // Invalid/Null Tests
@@ -98,6 +106,7 @@ describe('UnsubscribeVehicleDataResponseTests', function () {
         Validator.assertNullOrUndefined(rpcMessage.getHandsOffSteering());
         Validator.assertNullOrUndefined(rpcMessage.getWindowStatus());
         Validator.assertNullOrUndefined(rpcMessage.getGearStatus());
+        Validator.assertNullOrUndefined(rpcMessage.getSeatOccupancy());
         Validator.assertNullOrUndefined(rpcMessage.getClimateData());
 
         done();

@@ -15,6 +15,7 @@ describe('UnsubscribeVehicleDataTests', function () {
                 .setHandsOffSteering(Test.GENERAL_BOOLEAN)
                 .setWindowStatus(Test.GENERAL_BOOLEAN)
                 .setGearStatus(Test.GENERAL_BOOLEAN)
+                .setSeatOccupancy(Test.GENERAL_BOOLEAN)
                 .setClimateData(Test.GENERAL_BOOLEAN);
         };
 
@@ -24,6 +25,7 @@ describe('UnsubscribeVehicleDataTests', function () {
                 [UnsubscribeVehicleData.KEY_HANDS_OFF_STEERING]: Test.GENERAL_BOOLEAN,
                 [UnsubscribeVehicleData.KEY_WINDOW_STATUS]: Test.GENERAL_BOOLEAN,
                 [UnsubscribeVehicleData.KEY_GEAR_STATUS]: Test.GENERAL_BOOLEAN,
+                [UnsubscribeVehicleData.KEY_SEAT_OCCUPANCY]: Test.GENERAL_BOOLEAN,
                 [UnsubscribeVehicleData.KEY_CLIMATE_DATA]: Test.GENERAL_BOOLEAN,
             };
         };
@@ -46,6 +48,7 @@ describe('UnsubscribeVehicleDataTests', function () {
         const testHandsOffSteering = rpcMessage.getHandsOffSteering();
         const testWindowStatus = rpcMessage.getWindowStatus();
         const testGearStatus = rpcMessage.getGearStatus();
+        const testSeatOccupancy = rpcMessage.getSeatOccupancy();
         const testClimateData = rpcMessage.getClimateData();
 
         // Valid Tests
@@ -53,6 +56,7 @@ describe('UnsubscribeVehicleDataTests', function () {
         Validator.assertEquals(Test.GENERAL_BOOLEAN, testHandsOffSteering);
         Validator.assertEquals(Test.GENERAL_BOOLEAN, testWindowStatus);
         Validator.assertEquals(Test.GENERAL_BOOLEAN, testGearStatus);
+        Validator.assertEquals(Test.GENERAL_BOOLEAN, testSeatOccupancy);
         Validator.assertEquals(Test.GENERAL_BOOLEAN, testClimateData);
 
         // Invalid/Null Tests
@@ -66,6 +70,7 @@ describe('UnsubscribeVehicleDataTests', function () {
         Validator.assertNullOrUndefined(rpcMessage.getHandsOffSteering());
         Validator.assertNullOrUndefined(rpcMessage.getWindowStatus());
         Validator.assertNullOrUndefined(rpcMessage.getGearStatus());
+        Validator.assertNullOrUndefined(rpcMessage.getSeatOccupancy());
         Validator.assertNullOrUndefined(rpcMessage.getClimateData());
 
         done();
