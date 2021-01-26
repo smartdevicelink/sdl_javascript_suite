@@ -27,6 +27,9 @@ const WindowStatus = SDL.rpc.structs.WindowStatus;
 const SeatLocation = SDL.rpc.structs.SeatLocation;
 const SeatStatus = SDL.rpc.structs.SeatStatus;
 const SeatOccupancy = SDL.rpc.structs.SeatOccupancy;
+const DoorStatus = SDL.rpc.structs.DoorStatus;
+const GateStatus = SDL.rpc.structs.GateStatus;
+const RoofStatus = SDL.rpc.structs.RoofStatus;
 
 // enums
 const SpeechCapabilities = SDL.rpc.enums.SpeechCapabilities;
@@ -54,6 +57,9 @@ const CapacityUnit = SDL.rpc.enums.CapacityUnit;
 const ComponentVolumeStatus = SDL.rpc.enums.ComponentVolumeStatus;
 const FuelType = SDL.rpc.enums.FuelType;
 const RequestType = SDL.rpc.enums.RequestType;
+const DoorStatusType = SDL.rpc.enums.DoorStatusType;
+const IgnitionStableStatus = SDL.rpc.enums.IgnitionStableStatus;
+const IgnitionStatus = SDL.rpc.enums.IgnitionStatus;
 
 class Test {
     constructor () {
@@ -453,5 +459,64 @@ const JSON_SEATOCCUPANCY = Test.JSON_SEATOCCUPANCY = {
     [SeatOccupancy.KEY_SEATS_OCCUPIED]: Test.JSON_SEATSTATUS_LIST,
     [SeatOccupancy.KEY_SEATS_BELTED]: Test.JSON_SEATSTATUS_LIST,
 };
+
+const GENERAL_DOORSTATUSTYPE = Test.GENERAL_DOORSTATUSTYPE = DoorStatusType.CLOSED;
+
+const GENERAL_IGNITIONSTABLESTATUS = Test.GENERAL_IGNITIONSTABLESTATUS = IgnitionStableStatus.IGNITION_SWITCH_STABLE;
+
+const GENERAL_IGNITIONSTATUS = Test.GENERAL_IGNITIONSTATUS = IgnitionStatus.IS_UNKNOWN;
+
+const GENERAL_DOORSTATUS = Test.GENERAL_DOORSTATUS = new DoorStatus()
+    .setLocation(Test.GENERAL_GRID)
+    .setStatus(Test.GENERAL_DOORSTATUSTYPE);
+
+const GENERAL_DOORSTATUS_LIST = Test.GENERAL_DOORSTATUS_LIST = [
+    GENERAL_DOORSTATUS,
+];
+
+const JSON_DOORSTATUS = Test.JSON_DOORSTATUS = {
+    [DoorStatus.KEY_LOCATION]: Test.JSON_GRID,
+    [DoorStatus.KEY_STATUS]: Test.GENERAL_DOORSTATUSTYPE,
+};
+
+const JSON_DOORSTATUS_LIST = Test.JSON_DOORSTATUS_LIST = [
+    JSON_DOORSTATUS,
+];
+
+const GENERAL_GATESTATUS = Test.GENERAL_GATESTATUS = new GateStatus()
+    .setLocation(Test.GENERAL_GRID)
+    .setStatus(Test.GENERAL_DOORSTATUSTYPE);
+
+const GENERAL_GATESTATUS_LIST = Test.GENERAL_GATESTATUS_LIST = [
+    GENERAL_GATESTATUS,
+];
+
+const JSON_GATESTATUS = Test.JSON_GATESTATUS = {
+    [GateStatus.KEY_LOCATION]: Test.JSON_GRID,
+    [GateStatus.KEY_STATUS]: Test.GENERAL_DOORSTATUSTYPE,
+};
+
+const JSON_GATESTATUS_LIST = Test.JSON_GATESTATUS_LIST = [
+    JSON_GATESTATUS,
+];
+
+const GENERAL_ROOFSTATUS = Test.GENERAL_ROOFSTATUS = new RoofStatus()
+    .setLocation(Test.GENERAL_GRID)
+    .setStatus(Test.GENERAL_DOORSTATUSTYPE)
+    .setState(Test.GENERAL_WINDOW_STATE);
+
+const GENERAL_ROOFSTATUS_LIST = Test.GENERAL_ROOFSTATUS_LIST = [
+    GENERAL_ROOFSTATUS,
+];
+
+const JSON_ROOFSTATUS = Test.JSON_ROOFSTATUS = {
+    [RoofStatus.KEY_LOCATION]: Test.JSON_GRID,
+    [RoofStatus.KEY_STATUS]: Test.GENERAL_DOORSTATUSTYPE,
+    [RoofStatus.KEY_STATE]: Test.JSON_WINDOW_STATE,
+};
+
+const JSON_ROOFSTATUS_LIST = Test.JSON_ROOFSTATUS_LIST = [
+    JSON_ROOFSTATUS,
+];
 
 module.exports = Test;
