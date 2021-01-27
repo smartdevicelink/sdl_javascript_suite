@@ -28,6 +28,8 @@ describe('ManagerTests', function () {
         appWebSocketServer.on('connection', function (connection) {
             console.log('Connection');
             const appClient = new AppClient(connection, async (teardown) => {
+                voiceCommandManagerTests(appClient);
+                voiceCommandUpdateOperationTests(appClient);
                 textAndGraphicManagerTests(appClient);
                 permissionManagerTests(appClient);
                 softButtonManagerTests(appClient);
@@ -36,8 +38,6 @@ describe('ManagerTests', function () {
                 fileManagerTests(appClient);
                 taskTests(appClient);
                 queueTests(appClient);
-                voiceCommandManagerTests(appClient);
-                voiceCommandUpdateOperationTests(appClient);
                 // tests fail if setting the two voicecommand tests below the textandgraphic tests
                 textAndGraphicUpdateOperationTests(appClient);
                 checkChoiceVROptionalOperationTests(appClient);
