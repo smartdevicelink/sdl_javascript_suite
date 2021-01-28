@@ -55,15 +55,15 @@ module.exports = function (appClient) {
         it('testOnVehicleTypeReceived', function (done) {
             const mockVehicleType = {};
             const defaultResult = true;
-            let actualResult = sdlManager.getFileManager()._lifecycleManager.onVehicleTypeReceived(mockVehicleType);
+            let actualResult = sdlManager._lifecycleManager.onVehicleTypeReceived(mockVehicleType);
             Validator.assertEquals(actualResult, defaultResult);
 
             const testResult = false;
             const testListener = function (vehicleType) {
                 return testResult;
             };
-            sdlManager.getFileManager()._lifecycleManager.setOnVehicleTypeReceived(testListener);
-            actualResult = sdlManager.getFileManager()._lifecycleManager.onVehicleTypeReceived(mockVehicleType);
+            sdlManager._lifecycleManager.setOnVehicleTypeReceived(testListener);
+            actualResult = sdlManager._lifecycleManager.onVehicleTypeReceived(mockVehicleType);
             Validator.assertEquals(actualResult, testResult);
 
             done();
