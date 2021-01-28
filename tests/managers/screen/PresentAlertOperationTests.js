@@ -155,7 +155,7 @@ module.exports = function (appClient) {
             defaultMainWindowCapability = getWindowCapability(3);
             speechCapabilities = [];
             speechCapabilities.push(SDL.rpc.enums.SpeechCapabilities.FILE);
-            alertCompletionListener = async () => {};
+            alertCompletionListener = new SDL.manager.screen.utils._AlertCompletionListener().setOnComplete((success, tryAgainTime) => {});
             presentAlertOperation = new SDL.manager.screen.utils._PresentAlertOperation(lifecycleManager, alertView, defaultMainWindowCapability, speechCapabilities, fileManager, 1, alertCompletionListener);
             done();
         });

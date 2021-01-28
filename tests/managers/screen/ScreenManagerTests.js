@@ -112,11 +112,11 @@ module.exports = function (appClient) {
             sbo4 = new SDL.manager.screen.utils.SoftButtonObject(null, [state1, state2, state3], state1.getName(), null);
             sbo5 = new SDL.manager.screen.utils.SoftButtonObject(null, [state1, state2, state3], state1.getName(), null);
             _ScreenManagerBase._checkAndAssignButtonIds([sbo1, sbo2, sbo3, sbo4, sbo5]);
-            Validator.assertEquals(0, sbo1.getButtonId());
-            Validator.assertEquals(1, sbo2.getButtonId());
-            Validator.assertEquals(2, sbo3.getButtonId());
-            Validator.assertEquals(3, sbo4.getButtonId());
-            Validator.assertEquals(4, sbo5.getButtonId());
+            Validator.assertEquals(1, sbo1.getButtonId());
+            Validator.assertEquals(2, sbo2.getButtonId());
+            Validator.assertEquals(3, sbo3.getButtonId());
+            Validator.assertEquals(4, sbo4.getButtonId());
+            Validator.assertEquals(5, sbo5.getButtonId());
 
             // sbo1 = new SDL.manager.screen.utils.SoftButtonObject(null, [], null, null);
             sbo1 = new SDL.manager.screen.utils.SoftButtonObject(null, [state1, state2, state3], state1.getName(), null);
