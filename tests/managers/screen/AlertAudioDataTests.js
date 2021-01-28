@@ -17,7 +17,7 @@ module.exports = function (appClient) {
             Validator.assertEquals('spokenString', alertAudioData2.getAudioData()[0].getText());
 
             const alertAudioData3 = new SDL.manager.screen.utils.AlertAudioData(null, null, testAudio);
-            Validator.assertEquals(alertAudioData3.getAudioFiles().get(testAudio.getName()).getName(), testAudio.getName());
+            Validator.assertEquals(alertAudioData3._getAudioFiles().get(testAudio.getName()).getName(), testAudio.getName());
             done();
         });
 
@@ -30,7 +30,7 @@ module.exports = function (appClient) {
             Validator.assertEquals('phoneticString', alertAudioData1.getAudioData()[0].getText());
             Validator.assertEquals('addition', alertAudioData1.getAudioData()[2].getText());
             Validator.assertEquals('addition2', alertAudioData1.getAudioData()[3].getText());
-            Validator.assertEquals(testAudio.getName(), alertAudioData1.getAudioFiles().get(testAudio.getName()).getName());
+            Validator.assertEquals(testAudio.getName(), alertAudioData1._getAudioFiles().get(testAudio.getName()).getName());
             done();
         });
     });
