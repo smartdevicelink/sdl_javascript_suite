@@ -52,18 +52,18 @@ module.exports = function (appClient) {
             Validator.assertNotNullUndefined(version.getPatchVersion());
             done();
         });
-        it('testOnVehicleTypeReceived', function (done) {
-            const mockVehicleType = {};
+        it('testOnSystemInfoReceived', function (done) {
+            const mockSystemInfo = {};
             const defaultResult = true;
-            let actualResult = sdlManager._lifecycleManager.onVehicleTypeReceived(mockVehicleType);
+            let actualResult = sdlManager._lifecycleManager.onSystemInfoReceived(mockSystemInfo);
             Validator.assertEquals(actualResult, defaultResult);
 
             const testResult = false;
-            const testListener = function (vehicleType) {
+            const testListener = function (mockSystemInfo) {
                 return testResult;
             };
-            sdlManager._lifecycleManager.setOnVehicleTypeReceived(testListener);
-            actualResult = sdlManager._lifecycleManager.onVehicleTypeReceived(mockVehicleType);
+            sdlManager._lifecycleManager.setInSystemInfoReceived(testListener);
+            actualResult = sdlManager._lifecycleManager.onSystemInfoReceived(mockSystemInfo);
             Validator.assertEquals(actualResult, testResult);
 
             done();
