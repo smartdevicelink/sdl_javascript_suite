@@ -9,7 +9,6 @@ const Validator = require('../../Validator');
 module.exports = function (appClient) {
     describe('VoiceCommandUpdateOperationTests', function () {
         const sdlManager = appClient._sdlManager;
-        const voiceCommandManager = sdlManager.getScreenManager()._voiceCommandManager;
         const lifecycleManager = sdlManager._lifecycleManager;
 
         const voiceCommand1 = new SDL.manager.screen.utils.VoiceCommand(['Command 1'], () => {});
@@ -103,6 +102,11 @@ module.exports = function (appClient) {
             stub.restore();
         });
 
+        /**
+         * Will always resolve successfully
+         * @param {AddCommand|DeleteCommand} req - The RPC to send out as a request
+         * @returns {AddCommandResponse|DeleteCommandResponse} - The rpc returned depends on the request
+         */
         function onDeleteOrAddCommandSuccess (req) {
             const functionId = req.getFunctionId();
 
@@ -120,6 +124,11 @@ module.exports = function (appClient) {
             }
         }
 
+        /**
+         * Will always resolve unsuccessfully
+         * @param {AddCommand|DeleteCommand} req - The RPC to send out as a request
+         * @returns {AddCommandResponse|DeleteCommandResponse} - The rpc returned depends on the request
+         */
         function onDeleteOrAddCommandFails (req) {
             const functionId = req.getFunctionId();
 

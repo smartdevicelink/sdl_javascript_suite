@@ -42,12 +42,12 @@ module.exports = async function (appClient) {
             Validator.assertEquals(voiceCommandManager.getVoiceCommands().length, 2);
             Validator.assertEquals(voiceCommandManager._currentVoiceCommands.length, 0);
             Validator.assertEquals(voiceCommandManager._currentHmiLevel, SDL.rpc.enums.HMILevel.HMI_NONE);
-            
+
             voiceCommandManager.setVoiceCommands([]); // don't operate on the voice commands when the manager gets an HMI_FULL
             // The VCM should send the pending voice commands once HMI full occurs
             // fake sending an OnHMILevel update
             voiceCommandManager._hmiListener(new SDL.rpc.messages.OnHMIStatus()
-                .setHmiLevel(SDL.rpc.enums.HMILevel.HMI_FULL))
+                .setHmiLevel(SDL.rpc.enums.HMILevel.HMI_FULL));
 
             Validator.assertEquals(voiceCommandManager._currentHmiLevel, SDL.rpc.enums.HMILevel.HMI_FULL);
         });
@@ -62,8 +62,8 @@ module.exports = async function (appClient) {
             // Fake onCommand - we want to make sure that we can pass back onCommand events to our VoiceCommand Objects
             voiceCommandManager._commandListener(new SDL.rpc.messages.OnCommand()
                 .setCmdID(voiceCommand3._getCommandId())
-                .setTriggerSource(SDL.rpc.enums.TriggerSource.TS_VR)) // these are voice commands
-        
+                .setTriggerSource(SDL.rpc.enums.TriggerSource.TS_VR)); // these are voice commands
+
             // verify the mock listener has been hit once
             Validator.assertEquals(callback.calledOnce, true);
         });
