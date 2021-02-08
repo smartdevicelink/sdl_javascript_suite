@@ -16,7 +16,7 @@ describe('KeyboardPropertiesTests', function () {
                 .setAutoCompleteText(Test.GENERAL_STRING)
                 .setAutoCompleteList(Test.GENERAL_STRING_LIST)
                 .setMaskInputCharacters(Test.GENERAL_KEYBOARDINPUTMASK)
-                .setCustomizeKeys(Test.GENERAL_STRING_LIST);
+                .setCustomKeys(Test.GENERAL_STRING_LIST);
         };
 
         this.getExpectedParameters = function (sdlVersion) {
@@ -28,7 +28,7 @@ describe('KeyboardPropertiesTests', function () {
                 [KeyboardProperties.KEY_AUTO_COMPLETE_TEXT]: Test.GENERAL_STRING,
                 [KeyboardProperties.KEY_AUTO_COMPLETE_LIST]: Test.GENERAL_STRING_LIST,
                 [KeyboardProperties.KEY_MASK_INPUT_CHARACTERS]: Test.GENERAL_KEYBOARDINPUTMASK,
-                [KeyboardProperties.KEY_CUSTOMIZE_KEYS]: Test.GENERAL_STRING_LIST,
+                [KeyboardProperties.KEY_CUSTOM_KEYS]: Test.GENERAL_STRING_LIST,
             };
         };
     });
@@ -45,7 +45,7 @@ describe('KeyboardPropertiesTests', function () {
         Validator.assertEquals(Test.GENERAL_STRING, msg.getAutoCompleteText());
         Validator.assertEquals(Test.GENERAL_STRING_LIST, msg.getAutoCompleteList());
         Validator.assertEquals(Test.GENERAL_KEYBOARDINPUTMASK, msg.getMaskInputCharacters());
-        Validator.assertEquals(Test.GENERAL_STRING_LIST, msg.getCustomizeKeys());
+        Validator.assertEquals(Test.GENERAL_STRING_LIST, msg.getCustomKeys());
 
         // Invalid/Null Tests
         msg = new KeyboardProperties();
@@ -57,7 +57,7 @@ describe('KeyboardPropertiesTests', function () {
         Validator.assertNullOrUndefined(msg.getAutoCompleteText());
         Validator.assertNullOrUndefined(msg.getAutoCompleteList());
         Validator.assertNullOrUndefined(msg.getMaskInputCharacters());
-        Validator.assertNullOrUndefined(msg.getCustomizeKeys());
+        Validator.assertNullOrUndefined(msg.getCustomKeys());
         done();
     });
 });
