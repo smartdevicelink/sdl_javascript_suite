@@ -103,9 +103,9 @@ module.exports = function (appClient) {
         });
 
         /**
-         * Sends a response for the RPC.
-         * @param {FunctionID} req - The request's FunctionID.
-         * @returns {RpcResponse} - A successful response.
+         * Will always resolve successfully
+         * @param {AddCommand|DeleteCommand} req - The RPC to send out as a request
+         * @returns {AddCommandResponse|DeleteCommandResponse} - The rpc returned depends on the request
          */
         function onDeleteOrAddCommandSuccess (req) {
             const functionId = req.getFunctionId();
@@ -125,9 +125,9 @@ module.exports = function (appClient) {
         }
 
         /**
-         * Sends a response for the RPC.
-         * @param {FunctionID} req - The request's FunctionID.
-         * @returns {RpcResponse} - A failed response.
+         * Will always resolve unsuccessfully
+         * @param {AddCommand|DeleteCommand} req - The RPC to send out as a request
+         * @returns {AddCommandResponse|DeleteCommandResponse} - The rpc returned depends on the request
          */
         function onDeleteOrAddCommandFails (req) {
             const functionId = req.getFunctionId();

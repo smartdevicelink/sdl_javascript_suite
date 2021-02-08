@@ -4,6 +4,7 @@ const SDL = require('./config.js').node;
 
 const SdlMsgVersion = SDL.rpc.structs.SdlMsgVersion;
 const TTSChunk = SDL.rpc.structs.TTSChunk;
+const SdlArtwork = SDL.manager.file.filetypes.SdlArtwork;
 
 // structs
 const DeviceInfo = SDL.rpc.structs.DeviceInfo;
@@ -24,6 +25,12 @@ const HMICapabilities = SDL.rpc.structs.HMICapabilities;
 const WindowState = SDL.rpc.structs.WindowState;
 const Grid = SDL.rpc.structs.Grid;
 const WindowStatus = SDL.rpc.structs.WindowStatus;
+const SeatLocation = SDL.rpc.structs.SeatLocation;
+const SeatStatus = SDL.rpc.structs.SeatStatus;
+const SeatOccupancy = SDL.rpc.structs.SeatOccupancy;
+const DoorStatus = SDL.rpc.structs.DoorStatus;
+const GateStatus = SDL.rpc.structs.GateStatus;
+const RoofStatus = SDL.rpc.structs.RoofStatus;
 
 // enums
 const SpeechCapabilities = SDL.rpc.enums.SpeechCapabilities;
@@ -51,6 +58,9 @@ const CapacityUnit = SDL.rpc.enums.CapacityUnit;
 const ComponentVolumeStatus = SDL.rpc.enums.ComponentVolumeStatus;
 const FuelType = SDL.rpc.enums.FuelType;
 const RequestType = SDL.rpc.enums.RequestType;
+const DoorStatusType = SDL.rpc.enums.DoorStatusType;
+const IgnitionStableStatus = SDL.rpc.enums.IgnitionStableStatus;
+const IgnitionStatus = SDL.rpc.enums.IgnitionStatus;
 
 class Test {
     constructor () {
@@ -417,5 +427,99 @@ const JSON_WINDOWSTATUS = Test.JSON_WINDOWSTATUS = {
     [WindowStatus.KEY_LOCATION]: Test.JSON_GRID,
     [WindowStatus.KEY_STATE]: Test.JSON_WINDOW_STATE,
 };
+
+const GENERAL_SEAT_LOCATION = Test.GENERAL_SEAT_LOCATION = new SeatLocation()
+    .setGrid(Test.GENERAL_GRID);
+
+const JSON_SEATLOCATION = Test.JSON_SEATLOCATION = {
+    [SeatLocation.KEY_GRID]: Test.JSON_GRID,
+};
+
+const GENERAL_SEAT_STATUS = Test.GENERAL_SEAT_STATUS = new SeatStatus()
+    .setSeatLocation(Test.GENERAL_SEAT_LOCATION)
+    .setConditionActive(Test.GENERAL_BOOLEAN);
+
+const GENERAL_SEAT_STATUS_LIST = Test.GENERAL_SEAT_STATUS_LIST = [
+    GENERAL_SEAT_STATUS,
+];
+
+const JSON_SEATSTATUS = Test.JSON_SEATSTATUS = {
+    [SeatStatus.KEY_SEAT_LOCATION]: Test.JSON_SEATLOCATION,
+    [SeatStatus.KEY_CONDITION_ACTIVE]: Test.GENERAL_BOOLEAN,
+};
+
+const JSON_SEATSTATUS_LIST = Test.JSON_SEATSTATUS_LIST = [
+    JSON_SEATSTATUS,
+];
+
+const GENERAL_SEAT_OCCUPANCY = Test.GENERAL_SEAT_OCCUPANCY = new SeatOccupancy()
+    .setSeatsOccupied(Test.GENERAL_SEAT_STATUS_LIST)
+    .setSeatsBelted(Test.GENERAL_SEAT_STATUS_LIST);
+
+const JSON_SEATOCCUPANCY = Test.JSON_SEATOCCUPANCY = {
+    [SeatOccupancy.KEY_SEATS_OCCUPIED]: Test.JSON_SEATSTATUS_LIST,
+    [SeatOccupancy.KEY_SEATS_BELTED]: Test.JSON_SEATSTATUS_LIST,
+};
+
+const GENERAL_DOORSTATUSTYPE = Test.GENERAL_DOORSTATUSTYPE = DoorStatusType.CLOSED;
+
+const GENERAL_IGNITIONSTABLESTATUS = Test.GENERAL_IGNITIONSTABLESTATUS = IgnitionStableStatus.IGNITION_SWITCH_STABLE;
+
+const GENERAL_IGNITIONSTATUS = Test.GENERAL_IGNITIONSTATUS = IgnitionStatus.IS_UNKNOWN;
+
+const GENERAL_DOORSTATUS = Test.GENERAL_DOORSTATUS = new DoorStatus()
+    .setLocation(Test.GENERAL_GRID)
+    .setStatus(Test.GENERAL_DOORSTATUSTYPE);
+
+const GENERAL_DOORSTATUS_LIST = Test.GENERAL_DOORSTATUS_LIST = [
+    GENERAL_DOORSTATUS,
+];
+
+const JSON_DOORSTATUS = Test.JSON_DOORSTATUS = {
+    [DoorStatus.KEY_LOCATION]: Test.JSON_GRID,
+    [DoorStatus.KEY_STATUS]: Test.GENERAL_DOORSTATUSTYPE,
+};
+
+const JSON_DOORSTATUS_LIST = Test.JSON_DOORSTATUS_LIST = [
+    JSON_DOORSTATUS,
+];
+
+const GENERAL_GATESTATUS = Test.GENERAL_GATESTATUS = new GateStatus()
+    .setLocation(Test.GENERAL_GRID)
+    .setStatus(Test.GENERAL_DOORSTATUSTYPE);
+
+const GENERAL_GATESTATUS_LIST = Test.GENERAL_GATESTATUS_LIST = [
+    GENERAL_GATESTATUS,
+];
+
+const JSON_GATESTATUS = Test.JSON_GATESTATUS = {
+    [GateStatus.KEY_LOCATION]: Test.JSON_GRID,
+    [GateStatus.KEY_STATUS]: Test.GENERAL_DOORSTATUSTYPE,
+};
+
+const JSON_GATESTATUS_LIST = Test.JSON_GATESTATUS_LIST = [
+    JSON_GATESTATUS,
+];
+
+const GENERAL_ROOFSTATUS = Test.GENERAL_ROOFSTATUS = new RoofStatus()
+    .setLocation(Test.GENERAL_GRID)
+    .setStatus(Test.GENERAL_DOORSTATUSTYPE)
+    .setState(Test.GENERAL_WINDOW_STATE);
+
+const GENERAL_ROOFSTATUS_LIST = Test.GENERAL_ROOFSTATUS_LIST = [
+    GENERAL_ROOFSTATUS,
+];
+
+const JSON_ROOFSTATUS = Test.JSON_ROOFSTATUS = {
+    [RoofStatus.KEY_LOCATION]: Test.JSON_GRID,
+    [RoofStatus.KEY_STATUS]: Test.GENERAL_DOORSTATUSTYPE,
+    [RoofStatus.KEY_STATE]: Test.JSON_WINDOW_STATE,
+};
+
+const JSON_ROOFSTATUS_LIST = Test.JSON_ROOFSTATUS_LIST = [
+    JSON_ROOFSTATUS,
+];
+
+const GENERAL_ARTWORK = Test.GENERAL_ARTWORK = new SdlArtwork('sdl', FileType.GRAPHIC_PNG, 'okay', false);
 
 module.exports = Test;
