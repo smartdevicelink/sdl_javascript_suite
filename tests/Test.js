@@ -4,6 +4,7 @@ const SDL = require('./config.js').node;
 
 const SdlMsgVersion = SDL.rpc.structs.SdlMsgVersion;
 const TTSChunk = SDL.rpc.structs.TTSChunk;
+const SdlArtwork = SDL.manager.file.filetypes.SdlArtwork;
 
 // structs
 const DeviceInfo = SDL.rpc.structs.DeviceInfo;
@@ -521,6 +522,8 @@ const JSON_ROOFSTATUS = Test.JSON_ROOFSTATUS = {
 const JSON_ROOFSTATUS_LIST = Test.JSON_ROOFSTATUS_LIST = [
     JSON_ROOFSTATUS,
 ];
+
+const GENERAL_ARTWORK = Test.GENERAL_ARTWORK = new SdlArtwork('sdl', FileType.GRAPHIC_PNG, 'okay', false);
 
 const GENERAL_TEMPERATURE_UNIT = Test.GENERAL_TEMPERATURE_UNIT = TemperatureUnit.CELSIUS;
 const GENERAL_TEMPERATURE = Test.GENERAL_TEMPERATURE = new Temperature()
