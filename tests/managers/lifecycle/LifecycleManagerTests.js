@@ -52,6 +52,7 @@ module.exports = function (appClient) {
             Validator.assertNotNullUndefined(version.getPatchVersion());
             done();
         });
+
         it('testOnSystemInfoReceived', function (done) {
             const mockSystemInfo = {};
             const defaultResult = true;
@@ -62,7 +63,7 @@ module.exports = function (appClient) {
             const testListener = function (mockSystemInfo) {
                 return testResult;
             };
-            sdlManager._lifecycleManager.setInSystemInfoReceived(testListener);
+            sdlManager._lifecycleManager.setOnSystemInfoReceived(testListener);
             actualResult = sdlManager._lifecycleManager.onSystemInfoReceived(mockSystemInfo);
             Validator.assertEquals(actualResult, testResult);
 
