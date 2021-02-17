@@ -31,6 +31,8 @@ const SeatOccupancy = SDL.rpc.structs.SeatOccupancy;
 const DoorStatus = SDL.rpc.structs.DoorStatus;
 const GateStatus = SDL.rpc.structs.GateStatus;
 const RoofStatus = SDL.rpc.structs.RoofStatus;
+const Temperature = SDL.rpc.structs.Temperature;
+const ClimateData = SDL.rpc.structs.ClimateData;
 const KeyboardLayoutCapability = SDL.rpc.structs.KeyboardLayoutCapability;
 const DynamicUpdateCapabilities = SDL.rpc.structs.DynamicUpdateCapabilities;
 const KeyboardCapabilities = SDL.rpc.structs.KeyboardCapabilities;
@@ -64,6 +66,7 @@ const RequestType = SDL.rpc.enums.RequestType;
 const DoorStatusType = SDL.rpc.enums.DoorStatusType;
 const IgnitionStableStatus = SDL.rpc.enums.IgnitionStableStatus;
 const IgnitionStatus = SDL.rpc.enums.IgnitionStatus;
+const TemperatureUnit = SDL.rpc.enums.TemperatureUnit;
 const KeyboardLayout = SDL.rpc.enums.KeyboardLayout;
 const KeypressMode = SDL.rpc.enums.KeypressMode;
 const KeyboardInputMask = SDL.rpc.enums.KeyboardInputMask;
@@ -542,6 +545,24 @@ const JSON_ROOFSTATUS_LIST = Test.JSON_ROOFSTATUS_LIST = [
 ];
 
 const GENERAL_ARTWORK = Test.GENERAL_ARTWORK = new SdlArtwork('sdl', FileType.GRAPHIC_PNG, 'okay', false);
+
+const GENERAL_TEMPERATURE_UNIT = Test.GENERAL_TEMPERATURE_UNIT = TemperatureUnit.CELSIUS;
+const GENERAL_TEMPERATURE = Test.GENERAL_TEMPERATURE = new Temperature()
+    .setUnit(Test.GENERAL_TEMPERATURE_UNIT)
+    .setValueParam(Test.GENERAL_NUMBER);
+
+const JSON_TEMPERATURE = Test.JSON_TEMPERATURE = GENERAL_TEMPERATURE.getParameters();
+
+const GENERAL_CLIMATE_DATA = Test.GENERAL_CLIMATE_DATA = new ClimateData()
+    .setAtmosphericPressure(Test.GENERAL_NUMBER)
+    .setCabinTemperature(Test.GENERAL_TEMPERATURE)
+    .setExternalTemperature(Test.GENERAL_TEMPERATURE);
+
+const JSON_CLIMATE_DATA = Test.JSON_CLIMATE_DATA = {
+    [ClimateData.KEY_ATMOSPHERIC_PRESSURE]: Test.GENERAL_NUMBER,
+    [ClimateData.KEY_CABIN_TEMPERATURE]: Test.JSON_TEMPERATURE,
+    [ClimateData.KEY_EXTERNAL_TEMPERATURE]: Test.JSON_TEMPERATURE,
+};
 
 const GENERAL_KEYBOARDLAYOUT = Test.GENERAL_KEYBOARDLAYOUT = KeyboardLayout.QWERTY;
 
