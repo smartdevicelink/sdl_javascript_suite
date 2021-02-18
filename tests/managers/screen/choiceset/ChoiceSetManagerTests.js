@@ -173,5 +173,105 @@ module.exports = function (appClient) {
             stub.restore();
             stub2.restore();
         });
+
+        it('testValidateCustomConfigurationCalls', function () {
+            const processSpy = sinon.spy(csm, '_createValidKeyboardConfigurationBasedOnKeyboardCapabilitiesFromConfiguration');
+            const newProperties = new SDL.rpc.structs.KeyboardProperties().setKeyboardLayout(SDL.rpc.enums.KeyboardLayout.NUMERIC);
+            const defaultProperties = csm._defaultKeyboardConfiguration();
+            // Test setKeyboardConfiguration call
+            csm.setKeyboardConfiguration(newProperties);
+            Validator.assertEquals(processSpy.calledWith(newProperties), true);
+            csm.setKeyboardConfiguration(defaultProperties);
+            Validator.assertEquals(processSpy.calledWith(defaultProperties), true);
+            // Test presentKeyboard call
+            csm.presentKeyboard('qwerty', newProperties, null);
+            Validator.assertEquals(processSpy.calledWith(newProperties), true);
+            // restore state
+            processSpy.restore();
+        });
+
+        it('testValidateCustomConfigurationPassBack', function () {
+            const originCapability = csm._defaultMainWindowCapability;
+            csm._defaultMainWindowCapability = new SDL.rpc.structs.WindowCapability().setKeyboardCapabilities(null);
+
+            let newProperties = new SDL.rpc.structs.KeyboardProperties()
+                .setKeyboardLayout(SDL.rpc.enums.KeyboardLayout.NUMERIC)
+                .setMaskInputCharacters(SDL.rpc.enums.KeyboardInputMask.ENABLE_INPUT_KEY_MASK)
+                .setCustomKeys(['1', '2', '3']);
+
+            // should pass back if there are no keyboard capabilities
+            Validator.assertEquals(
+                csm._createValidKeyboardConfigurationBasedOnKeyboardCapabilitiesFromConfiguration(newProperties),
+                newProperties
+            );
+            // should pass back if there is no passed keyboard configuration
+            Validator.assertNull(csm._createValidKeyboardConfigurationBasedOnKeyboardCapabilitiesFromConfiguration(null));
+            // should pass back if there is no layout to the passed keyboard configuration
+            newProperties = new SDL.rpc.structs.KeyboardProperties()
+                .setMaskInputCharacters(SDL.rpc.enums.KeyboardInputMask.ENABLE_INPUT_KEY_MASK)
+                .setCustomKeys(['1', '2', '3']);
+            csm._defaultMainWindowCapability = new SDL.rpc.structs.WindowCapability().setKeyboardCapabilities(
+                new SDL.rpc.structs.KeyboardCapabilities()
+            );
+            Validator.assertEquals(
+                csm._createValidKeyboardConfigurationBasedOnKeyboardCapabilitiesFromConfiguration(newProperties),
+                newProperties
+            );
+            // restore state
+            csm._defaultMainWindowCapability = originCapability;
+        });
+
+        it('testValidateCustomConfigurationCapabilityChecks', function () {
+            const originCapability = csm._defaultMainWindowCapability;
+
+            // should return null if no supported layout in capabilities
+            const keyboardCapabilities = new SDL.rpc.structs.KeyboardCapabilities()
+                .setSupportedKeyboards([]);
+
+            csm._defaultMainWindowCapability = new SDL.rpc.structs.WindowCapability()
+                .setKeyboardCapabilities(keyboardCapabilities);
+
+            const newProperties = new SDL.rpc.structs.KeyboardProperties()
+                .setKeyboardLayout(SDL.rpc.enums.KeyboardLayout.NUMERIC)
+                .setMaskInputCharacters(SDL.rpc.enums.KeyboardInputMask.ENABLE_INPUT_KEY_MASK)
+                .setCustomKeys(['1', '2', '3']);
+
+            Validator.assertNull(csm._createValidKeyboardConfigurationBasedOnKeyboardCapabilitiesFromConfiguration(newProperties));
+
+            // should shrink custom keys to 1 element
+            keyboardCapabilities
+                .setSupportedKeyboards([
+                    new SDL.rpc.structs.KeyboardLayoutCapability()
+                        .setKeyboardLayout(SDL.rpc.enums.KeyboardLayout.NUMERIC)
+                        .setNumConfigurableKeys(1),
+                ])
+                .setMaskInputCharactersSupported(true);
+            csm._defaultMainWindowCapability = new SDL.rpc.structs.WindowCapability()
+                .setKeyboardCapabilities(keyboardCapabilities);
+            let expectedProperties = new SDL.rpc.structs.KeyboardProperties()
+                .setKeyboardLayout(SDL.rpc.enums.KeyboardLayout.NUMERIC)
+                .setMaskInputCharacters(SDL.rpc.enums.KeyboardInputMask.ENABLE_INPUT_KEY_MASK)
+                .setCustomKeys(['1']);
+            Validator.assertEquals(csm._createValidKeyboardConfigurationBasedOnKeyboardCapabilitiesFromConfiguration(newProperties), expectedProperties);
+
+            // should remove MaskInputCharacters if capabilities do not support it
+            keyboardCapabilities
+                .setSupportedKeyboards([
+                    new SDL.rpc.structs.KeyboardLayoutCapability()
+                        .setKeyboardLayout(SDL.rpc.enums.KeyboardLayout.NUMERIC)
+                        .setNumConfigurableKeys(3),
+                ])
+                .setMaskInputCharactersSupported(false);
+            csm._defaultMainWindowCapability = new SDL.rpc.structs.WindowCapability()
+                .setKeyboardCapabilities(keyboardCapabilities);
+            expectedProperties = new SDL.rpc.structs.KeyboardProperties()
+                .setKeyboardLayout(SDL.rpc.enums.KeyboardLayout.NUMERIC)
+                .setCustomKeys(['1', '2', '3']);
+            // TODO: this fails due to https://github.com/smartdevicelink/sdl_javascript_suite/issues/385
+            // Validator.assertEquals(csm._createValidKeyboardConfigurationBasedOnKeyboardCapabilitiesFromConfiguration(newProperties), expectedProperties);
+
+            // restore state
+            csm._defaultMainWindowCapability = originCapability;
+        });
     });
 };
