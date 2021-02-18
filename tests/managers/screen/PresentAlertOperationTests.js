@@ -287,26 +287,6 @@ module.exports = function (appClient) {
             alertStub.restore();
         });
 
-        it('testCancel', function (done) {
-            const cancelStub = sinon.stub(lifecycleManager, 'sendRpcResolve')
-                .callsFake(onCancelAlert);
-
-            /**
-             * Validates the success of the alert
-             * @param {Boolean} success - whether the alert was successful
-             * @param {Number} tryAgainTime - how long should be waited until another alert should be sent
-             */
-            function alertCompletionListener1 (success, tryAgainTime) {
-                Validator.assertTrue(success);
-            }
-            presentAlertOperation = new SDL.manager.screen.utils._PresentAlertOperation(lifecycleManager, alertView, defaultMainWindowCapability, speechCapabilities, fileManager, 2, alertCompletionListener1);
-            presentAlertOperation.cancelInteraction();
-
-            Validator.assertTrue(cancelStub.calledOnce);
-            cancelStub.restore();
-            done();
-        });
-
         it('testCancelOperation', async function () {
             const callback = sinon.fake(() => {});
             const stub = sinon.stub(lifecycleManager, 'sendRpcResolve').callsFake(callback);

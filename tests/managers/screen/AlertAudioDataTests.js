@@ -6,12 +6,10 @@ module.exports = function (appClient) {
     describe('AlertAudioDataTests', function () {
         const testAudio = new SDL.manager.file.filetypes.SdlFile('TestAudioFile', SDL.rpc.enums.FileType.AUDIO_MP3);
         it('testConstructors', function (done) {
-            const alertAudioData = new SDL.manager.screen.utils.AlertAudioData();
-            alertAudioData.setPlayTone(true);
-            Validator.assertTrue(alertAudioData.isPlayTone());
-
             const alertAudioData1 = new SDL.manager.screen.utils.AlertAudioData('phoneticString', SDL.rpc.enums.SpeechCapabilities.SC_TEXT);
+            alertAudioData1.setPlayTone(true);
             Validator.assertEquals('phoneticString', alertAudioData1.getAudioData()[0].getText());
+            Validator.assertTrue(alertAudioData1.isPlayTone());
 
             const alertAudioData2 = new SDL.manager.screen.utils.AlertAudioData('spokenString');
             Validator.assertEquals('spokenString', alertAudioData2.getAudioData()[0].getText());
