@@ -22,6 +22,7 @@ module.exports = function (appClient) {
             alertView.setSoftButtons([softButtonObject1]);
             alertView.setDefaultTimeout(3);
             alertView.setAudio(alertAudioData);
+            alertView.setShowWaitIndicator(true);
 
             Validator.assertEquals(alertView.getText(), 'Test');
             Validator.assertEquals(alertView.getSecondaryText(), 'Test');
@@ -31,6 +32,7 @@ module.exports = function (appClient) {
             Validator.assertEquals(alertView.getSoftButtons()[0].getName(), 'object1');
             Validator.assertEquals(alertView.getDefaultTimeout(), 3);
             Validator.assertEquals(alertView.getTimeout(), 3);
+            Validator.assertTrue(alertView.isShowWaitIndicator());
 
             alertView.setText('Test2');
             alertView.setTertiaryText('Test2');
@@ -40,6 +42,7 @@ module.exports = function (appClient) {
             alertView.setAudio(alertAudioData);
             alertView.setIcon(artwork2);
             alertView.setSoftButtons([softButtonObject2]);
+            alertView.setShowWaitIndicator(false);
 
             Validator.assertEquals(alertView.getText(), 'Test2');
             Validator.assertEquals(alertView.getSecondaryText(), 'Test2');
@@ -49,6 +52,7 @@ module.exports = function (appClient) {
             Validator.assertEquals(alertView.getSoftButtons()[0].getName(), 'object2');
             Validator.assertEquals(alertView.getDefaultTimeout(), 6);
             Validator.assertEquals(alertView.getTimeout(), 6);
+            Validator.assertTrue(!alertView.isShowWaitIndicator());
 
             const alertView2 = alertView.clone();
 
