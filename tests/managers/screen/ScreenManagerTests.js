@@ -11,7 +11,6 @@ module.exports = function (appClient) {
         const state1 = new SDL.manager.screen.utils.SoftButtonState('ROCK', 'rock', testArtwork);
         const state2 = new SDL.manager.screen.utils.SoftButtonState('PAPER', 'paper', testArtwork);
         const state3 = new SDL.manager.screen.utils.SoftButtonState('SCISSORS', 'scissors', testArtwork);
-        let sbo1, sbo2, sbo3, sbo4, sbo5;
         it('testInstantiation', function (done) {
             Validator.assertNull(screenManager.getTextField1());
             Validator.assertNull(screenManager.getTextField1());
@@ -97,7 +96,41 @@ module.exports = function (appClient) {
             done();
         });
 
+        it('testSettingSoftButtonId', function (done) {
+            // Create softButtonObject1
+            const softButtonState1 = new SDL.manager.screen.utils.SoftButtonState('object1-state1', 'it is', testArtwork);
+            const softButtonState2 = new SDL.manager.screen.utils.SoftButtonState('object1-state2', 'Wed', testArtwork);
+            const softButtonObject1 = new SDL.manager.screen.utils.SoftButtonObject('object1', [softButtonState1, softButtonState2], softButtonState1.getName(), null);
+            softButtonObject1._setButtonId(100);
+
+            // Create softButtonObject2
+            const softButtonState3 = new SDL.manager.screen.utils.SoftButtonState('object2-state1', 'my', testArtwork);
+            const softButtonState4 = new SDL.manager.screen.utils.SoftButtonState('object2-state2', 'dudes!', null);
+            const softButtonObject2 = new SDL.manager.screen.utils.SoftButtonObject('object2', [softButtonState3, softButtonState4], softButtonState3.getName(), null);
+            softButtonObject2._setButtonId(200);
+
+            const softButtonObjects = [softButtonObject1, softButtonObject2];
+            Validator.assertTrue(_ScreenManagerBase._checkAndAssignButtonIds(softButtonObjects, _ScreenManagerBase._ManagerLocation.SOFTBUTTON_MANAGER));
+            _ScreenManagerBase._softButtonIDBySoftButtonManager.add(200);
+            Validator.assertTrue(!_ScreenManagerBase._checkAndAssignButtonIds(softButtonObjects, _ScreenManagerBase._ManagerLocation.ALERT_MANAGER));
+            _ScreenManagerBase._softButtonIDByAlertManager.add(100);
+            Validator.assertTrue(!_ScreenManagerBase._checkAndAssignButtonIds(softButtonObjects, _ScreenManagerBase._ManagerLocation.SOFTBUTTON_MANAGER));
+            _ScreenManagerBase._softButtonIDByAlertManager.clear();
+            _ScreenManagerBase._softButtonIDBySoftButtonManager.clear();
+            Validator.assertTrue(_ScreenManagerBase._checkAndAssignButtonIds(softButtonObjects, _ScreenManagerBase._ManagerLocation.ALERT_MANAGER));
+            softButtonObject1._setButtonId(400);
+            softButtonObject2._setButtonId(500);
+            Validator.assertTrue(_ScreenManagerBase._checkAndAssignButtonIds(softButtonObjects, _ScreenManagerBase._ManagerLocation.SOFTBUTTON_MANAGER));
+            const softButtonObject3 = new SDL.manager.screen.utils.SoftButtonObject('object1', [softButtonState1, softButtonState2], softButtonState1.getName(), null);
+            const softButtonObject4 = new SDL.manager.screen.utils.SoftButtonObject('object2', [softButtonState3, softButtonState4], softButtonState3.getName(), null);
+            softButtonObjects.push(softButtonObject3);
+            softButtonObjects.push(softButtonObject4);
+            Validator.assertTrue(_ScreenManagerBase._checkAndAssignButtonIds(softButtonObjects, _ScreenManagerBase._ManagerLocation.SOFTBUTTON_MANAGER));
+            done();
+        });
+
         it('testAssigningIdsToSoftButtonObjects', function (done) {
+            let sbo1, sbo2, sbo3, sbo4, sbo5;
             // FIXME: SoftButtonObject null constructor values do not work despite using the default values
             // If this is intended, remove these commented lines, else replace existing lines with these and do the same in the tests below
             /* sbo1 = new SDL.manager.screen.utils.SoftButtonObject(null, [], null, null);
