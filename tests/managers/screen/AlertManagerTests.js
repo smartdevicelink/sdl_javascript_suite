@@ -12,7 +12,7 @@ module.exports = async function (appClient) {
     describe('AlertManagerTests', function () {
         it('testInstantiation', async function () {
             Validator.assertNotNullUndefined(alertManager._currentWindowCapability);
-            Validator.assertNotNullUndefined(alertManager._nextCancelId);
+            Validator.assertNotNullUndefined(alertManager.nextCancelId);
             Validator.assertTrue(!alertManager._currentAlertPermissionStatus);
             return;
         });

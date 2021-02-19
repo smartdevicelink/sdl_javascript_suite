@@ -92,24 +92,6 @@ module.exports = function (appClient) {
         }
 
         /**
-         * Handle cancel alerts.
-         * @returns {Promise} - A promise.
-         */
-        function onCancelAlert () {
-            const cancelResponse = new SDL.rpc.messages.CancelInteractionResponse({
-                functionName: SDL.rpc.enums.FunctionID.CancelInteractionResponse,
-            })
-                .setSuccess(true);
-
-            // _handleRpc triggers the listener
-            sdlManager._lifecycleManager._handleRpc(cancelResponse);
-
-            return new Promise((resolve, reject) => {
-                resolve(cancelResponse);
-            });
-        }
-
-        /**
          * Sends successes when an artwork would be uploaded.
          * @param {SdlArtwork} artworks - A list of artworks to be uploaded
          * @returns {Promise} - Resolves to an array of booleans
