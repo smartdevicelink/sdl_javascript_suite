@@ -18,6 +18,8 @@ describe('VehicleDataTypeTests', function () {
         const enumVehicledataFuellevelState = VehicleDataType.valueForKey(example);
         example = 'VEHICLEDATA_FUELCONSUMPTION';
         const enumVehicledataFuelconsumption = VehicleDataType.valueForKey(example);
+        example = 'VEHICLEDATA_CLIMATEDATA';
+        const enumVehicledataClimatedata = VehicleDataType.valueForKey(example);
         example = 'VEHICLEDATA_EXTERNTEMP';
         const enumVehicledataExterntemp = VehicleDataType.valueForKey(example);
         example = 'VEHICLEDATA_VIN';
@@ -87,6 +89,7 @@ describe('VehicleDataTypeTests', function () {
         Validator.assertNotNullUndefined(enumVehicledataFuellevel, 'VEHICLEDATA_FUELLEVEL returned null.');
         Validator.assertNotNullUndefined(enumVehicledataFuellevelState, 'VEHICLEDATA_FUELLEVEL_STATE returned null.');
         Validator.assertNotNullUndefined(enumVehicledataFuelconsumption, 'VEHICLEDATA_FUELCONSUMPTION returned null.');
+        Validator.assertNotNullUndefined(enumVehicledataClimatedata, 'VEHICLEDATA_CLIMATEDATA returned null.');
         Validator.assertNotNullUndefined(enumVehicledataExterntemp, 'VEHICLEDATA_EXTERNTEMP returned null.');
         Validator.assertNotNullUndefined(enumVehicledataVin, 'VEHICLEDATA_VIN returned null.');
         Validator.assertNotNullUndefined(enumVehicledataPrndl, 'VEHICLEDATA_PRNDL returned null.');
