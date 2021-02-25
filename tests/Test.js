@@ -33,6 +33,9 @@ const GateStatus = SDL.rpc.structs.GateStatus;
 const RoofStatus = SDL.rpc.structs.RoofStatus;
 const Temperature = SDL.rpc.structs.Temperature;
 const ClimateData = SDL.rpc.structs.ClimateData;
+const KeyboardLayoutCapability = SDL.rpc.structs.KeyboardLayoutCapability;
+const DynamicUpdateCapabilities = SDL.rpc.structs.DynamicUpdateCapabilities;
+const KeyboardCapabilities = SDL.rpc.structs.KeyboardCapabilities;
 const AppCapability = SDL.rpc.structs.AppCapability;
 const VideoStreamingCapability = SDL.rpc.structs.VideoStreamingCapability;
 
@@ -66,6 +69,10 @@ const DoorStatusType = SDL.rpc.enums.DoorStatusType;
 const IgnitionStableStatus = SDL.rpc.enums.IgnitionStableStatus;
 const IgnitionStatus = SDL.rpc.enums.IgnitionStatus;
 const TemperatureUnit = SDL.rpc.enums.TemperatureUnit;
+const KeyboardLayout = SDL.rpc.enums.KeyboardLayout;
+const KeypressMode = SDL.rpc.enums.KeypressMode;
+const KeyboardInputMask = SDL.rpc.enums.KeyboardInputMask;
+const MenuLayout = SDL.rpc.enums.MenuLayout;
 const AppCapabilityType = SDL.rpc.enums.AppCapabilityType;
 
 class Test {
@@ -129,34 +136,43 @@ const GENERAL_CHARACTERSET = CharacterSet.CID1SET;
 
 const GENERAL_IMAGEFIELDNAME = ImageFieldName.graphic;
 
+const GENERAL_IMAGEFIELDNAME_LIST = Test.GENERAL_IMAGEFIELDNAME_LIST = [
+    GENERAL_IMAGEFIELDNAME,
+];
+
 const GENERAL_FILETYPE_LIST = [
     GENERAL_FILETYPE,
 ];
 
 
 
-const GENERAL_IMAGEFIELD = new ImageField();
+const GENERAL_IMAGEFIELD = Test.GENERAL_IMAGEFIELD = new ImageField();
 GENERAL_IMAGEFIELD.setImageResolution(GENERAL_IMAGERESOLUTION);
 GENERAL_IMAGEFIELD.setNameParam(GENERAL_IMAGEFIELDNAME);
 GENERAL_IMAGEFIELD.setImageTypeSupported(GENERAL_FILETYPE_LIST);
 
-const JSON_GENERAL_IMAGEFIELD = {
+const JSON_GENERAL_IMAGEFIELD = Test.JSON_GENERAL_IMAGEFIELD = {
     [ImageField.KEY_NAME]: GENERAL_IMAGEFIELDNAME,
     [ImageField.KEY_IMAGE_TYPE_SUPPORTED]: GENERAL_FILETYPE_LIST,
     [ImageField.KEY_IMAGE_RESOLUTION]: GENERAL_IMAGERESOLUTION.getParameters(),
 };
 
-const GENERAL_IMAGEFIELD_LIST = [
+const GENERAL_IMAGEFIELD_LIST = Test.GENERAL_IMAGEFIELD_LIST = [
     GENERAL_IMAGEFIELD,
 ];
 
-const JSON_GENERAL_IMAGEFIELD_LIST = [
+const JSON_GENERAL_IMAGEFIELD_LIST = Test.JSON_GENERAL_IMAGEFIELD_LIST = [
     JSON_GENERAL_IMAGEFIELD,
 ];
 
 
 
 const GENERAL_IMAGETYPE = Test.GENERAL_IMAGETYPE = ImageType.DYNAMIC;
+
+const GENERAL_IMAGETYPE_LIST = Test.GENERAL_IMAGETYPE_LIST = [
+    GENERAL_IMAGETYPE,
+];
+
 const GENERAL_LANGUAGE = Test.GENERAL_LANGUAGE = Language.EN_US;
 
 const GENERAL_TTSCHUNK_LIST = Test.GENERAL_TTSCHUNK_LIST = [];
@@ -240,15 +256,20 @@ const GENERAL_MEDIACLOCKFORMAT_LIST = [
 const GENERAL_TEXTFIELDNAME = TextFieldName.ETA;
 
 
-const GENERAL_TEXTFIELD = new TextField();
+const GENERAL_TEXTFIELD = Test.GENERAL_TEXTFIELD = new TextField();
 GENERAL_TEXTFIELD.setNameParam(GENERAL_TEXTFIELDNAME);
 GENERAL_TEXTFIELD.setRows(GENERAL_INT);
 GENERAL_TEXTFIELD.setWidth(GENERAL_INT);
 GENERAL_TEXTFIELD.setCharacterSet(GENERAL_CHARACTERSET);
 
+const JSON_TEXTFIELD = Test.JSON_TEXTFIELD = GENERAL_TEXTFIELD.getParameters();
 
-const GENERAL_TEXTFIELD_LIST = [
+const GENERAL_TEXTFIELD_LIST = Test.GENERAL_TEXTFIELD_LIST = [
     GENERAL_TEXTFIELD,
+];
+
+const JSON_TEXTFIELD_LIST = Test.JSON_TEXTFIELD_LIST = [
+    JSON_TEXTFIELD,
 ];
 
 const GENERAL_DISPLAYTYPE = DisplayType.CID;
@@ -544,6 +565,54 @@ const JSON_CLIMATE_DATA = Test.JSON_CLIMATE_DATA = {
     [ClimateData.KEY_ATMOSPHERIC_PRESSURE]: Test.GENERAL_NUMBER,
     [ClimateData.KEY_CABIN_TEMPERATURE]: Test.JSON_TEMPERATURE,
     [ClimateData.KEY_EXTERNAL_TEMPERATURE]: Test.JSON_TEMPERATURE,
+};
+
+const GENERAL_KEYBOARDLAYOUT = Test.GENERAL_KEYBOARDLAYOUT = KeyboardLayout.QWERTY;
+
+const GENERAL_KEYBOARDLAYOUT_LIST = Test.GENERAL_KEYBOARDLAYOUT_LIST = [
+    GENERAL_KEYBOARDLAYOUT,
+];
+
+const GENERAL_KEYBOARDLAYOUTCAPABILITY = Test.GENERAL_KEYBOARDLAYOUTCAPABILITY = new KeyboardLayoutCapability()
+    .setKeyboardLayout(Test.GENERAL_KEYBOARDLAYOUT)
+    .setNumConfigurableKeys(Test.GENERAL_INTEGER);
+
+const GENERAL_KEYBOARDLAYOUTCAPABILITY_LIST = Test.GENERAL_KEYBOARDLAYOUTCAPABILITY_LIST = [
+    GENERAL_KEYBOARDLAYOUTCAPABILITY,
+];
+
+const JSON_KEYBOARDLAYOUTCAPABILITY = Test.JSON_KEYBOARDLAYOUTCAPABILITY = {
+    [KeyboardLayoutCapability.KEY_KEYBOARD_LAYOUT]: Test.GENERAL_KEYBOARDLAYOUT,
+    [KeyboardLayoutCapability.KEY_NUM_CONFIGURABLE_KEYS]: Test.GENERAL_INTEGER,
+};
+
+const JSON_KEYBOARDLAYOUTCAPABILITY_LIST = Test.JSON_KEYBOARDLAYOUTCAPABILITY_LIST = [
+    JSON_KEYBOARDLAYOUTCAPABILITY,
+];
+
+const GENERAL_KEYPRESSMODE = Test.GENERAL_KEYPRESSMODE = KeypressMode.SINGLE_KEYPRESS;
+
+const GENERAL_KEYBOARDINPUTMASK = Test.GENERAL_KEYBOARDINPUTMASK = KeyboardInputMask.ENABLE_INPUT_KEY_MASK;
+
+const GENERAL_MENULAYOUT = Test.GENERAL_MENULAYOUT = MenuLayout.LIST;
+
+const GENERAL_MENULAYOUT_LIST = Test.GENERAL_MENULAYOUT_LIST = [
+    GENERAL_MENULAYOUT,
+];
+
+const GENERAL_DYNAMICUPDATECAPABILITIES = Test.GENERAL_DYNAMICUPDATECAPABILITIES = new DynamicUpdateCapabilities()
+    .setSupportedDynamicImageFieldNames(GENERAL_IMAGEFIELDNAME_LIST)
+    .setSupportsDynamicSubMenus(GENERAL_BOOLEAN);
+
+const JSON_DYNAMICUPDATECAPABILITIES = Test.JSON_DYNAMICUPDATECAPABILITIES = GENERAL_DYNAMICUPDATECAPABILITIES.getParameters();
+
+const GENERAL_KEYBOARDCAPABILITIES = Test.GENERAL_KEYBOARDCAPABILITIES = new KeyboardCapabilities()
+    .setMaskInputCharactersSupported(GENERAL_BOOLEAN)
+    .setSupportedKeyboards(GENERAL_KEYBOARDLAYOUTCAPABILITY_LIST);
+
+const JSON_KEYBOARDCAPABILITIES = Test.JSON_KEYBOARDCAPABILITIES = {
+    [KeyboardCapabilities.KEY_MASK_INPUT_CHARACTERS_SUPPORTED]: Test.GENERAL_BOOLEAN,
+    [KeyboardCapabilities.KEY_SUPPORTED_KEYBOARDS]: Test.JSON_KEYBOARDLAYOUTCAPABILITY_LIST,
 };
 
 const GENERAL_VIDEO_STREAMING_CAPABILITY = Test.GENERAL_VIDEO_STREAMING_CAPABILITY = new VideoStreamingCapability()
