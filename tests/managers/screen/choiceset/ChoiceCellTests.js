@@ -17,6 +17,7 @@ module.exports = function (appClient) {
             Validator.assertNull(choiceCell.getTertiaryText());
             Validator.assertNull(choiceCell.getArtwork());
             Validator.assertNull(choiceCell.getSecondaryArtwork());
+            Validator.assertNull(choiceCell._getUniqueText());
         });
 
         it('testSettersAndGetters', function () {
