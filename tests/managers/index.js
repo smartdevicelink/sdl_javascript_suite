@@ -12,6 +12,16 @@ const textAndGraphicUpdateOperationTests = require('./screen/TextAndGraphicUpdat
 const voiceCommandManagerTests = require('./screen/VoiceCommandManagerTests');
 const voiceCommandUpdateOperationTests = require('./screen/VoiceCommandUpdateOperationTests');
 const choiceCellTests = require('./screen/choiceset/ChoiceCellTests');
+/*
+const dynamicMenuUpdateRunScoreTests = require('./screen/menu/DynamicMenuUpdateRunScoreTests');
+const dynamicMenuUpdatesModeTests = require('./screen/menu/DynamicMenuUpdatesModeTests');
+const menuCellTests = require('./screen/menu/MenuCellTests');
+const menuConfigurationTests = require('./screen/menu/MenuConfigurationTests');
+const menuConfigurationUpdateOperationTests = require('./screen/menu/MenuConfigurationUpdateOperationTests');
+const menuManagerTests = require('./screen/menu/MenuManagerTests');
+const menuReplaceOperationTests = require('./screen/menu/MenuReplaceOperationTests');
+const menuReplaceUtilitiesTests = require('./screen/menu/MenuReplaceUtilitiesTests');
+*/
 const checkChoiceVROptionalOperationTests = require('./screen/choiceset/CheckChoiceVROptionalOperationTests');
 const choiceSetLayoutTests = require('./screen/choiceset/ChoiceSetLayoutTests');
 const choiceSetManagerTests = require('./screen/choiceset/ChoiceSetManagerTests');

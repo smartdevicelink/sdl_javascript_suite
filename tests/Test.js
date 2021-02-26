@@ -61,6 +61,7 @@ const RequestType = SDL.rpc.enums.RequestType;
 const DoorStatusType = SDL.rpc.enums.DoorStatusType;
 const IgnitionStableStatus = SDL.rpc.enums.IgnitionStableStatus;
 const IgnitionStatus = SDL.rpc.enums.IgnitionStatus;
+const MenuLayout = SDL.rpc.enums.MenuLayout;
 
 class Test {
     constructor () {
@@ -521,5 +522,9 @@ const JSON_ROOFSTATUS_LIST = Test.JSON_ROOFSTATUS_LIST = [
 ];
 
 const GENERAL_ARTWORK = Test.GENERAL_ARTWORK = new SdlArtwork('sdl', FileType.GRAPHIC_PNG, 'okay', false);
+
+const GENERAL_MENU_MAX_ID = Test.GENERAL_MENU_MAX_ID = 2000000000;
+
+const GENERAL_MENU_LAYOUT = Test.GENERAL_MENU_LAYOUT = MenuLayout.LIST;
 
 module.exports = Test;
