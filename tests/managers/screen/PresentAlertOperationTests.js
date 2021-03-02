@@ -21,7 +21,8 @@ module.exports = function (appClient) {
             alertSoftButtonObject,
             defaultMainWindowCapability,
             speechCapabilities,
-            alertCompletionListener;
+            alertCompletionListener,
+            alertSoftButtonClearListener;
         /**
          * Gets the windowCapability
          * @param {Number} numberOfAlertFields - number of lines
@@ -138,7 +139,8 @@ module.exports = function (appClient) {
             speechCapabilities = [];
             speechCapabilities.push(SDL.rpc.enums.SpeechCapabilities.FILE);
             alertCompletionListener = new SDL.manager.screen.utils.AlertCompletionListener().setOnComplete((success, tryAgainTime) => {});
-            presentAlertOperation = new SDL.manager.screen.utils._PresentAlertOperation(lifecycleManager, alertView, defaultMainWindowCapability, speechCapabilities, fileManager, 1, alertCompletionListener);
+            alertSoftButtonClearListener = new SDL.manager.screen._AlertManagerBase._AlertSoftButtonClearListener().setOnButtonClear((softButtonObjectsList) => {});
+            presentAlertOperation = new SDL.manager.screen.utils._PresentAlertOperation(lifecycleManager, alertView, defaultMainWindowCapability, speechCapabilities, fileManager, 1, alertCompletionListener, alertSoftButtonClearListener);
             done();
         });
 
@@ -157,14 +159,14 @@ module.exports = function (appClient) {
                         .setPatchVersion(0);
                 });
             let windowCapability = getWindowCapability(1);
-            let presentAlertOperation = new SDL.manager.screen.utils._PresentAlertOperation(lifecycleManager, alertView, windowCapability, speechCapabilities, fileManager, 1, function () {});
+            let presentAlertOperation = new SDL.manager.screen.utils._PresentAlertOperation(lifecycleManager, alertView, windowCapability, speechCapabilities, fileManager, 1, () => {}, () => {});
             let alert = presentAlertOperation.alertRpc();
 
             Validator.assertEquals(alert.getAlertText1(), `${alertView.getText()} - ${alertView.getSecondaryText()} - ${alertView.getTertiaryText()}`);
 
             windowCapability = getWindowCapability(2);
 
-            presentAlertOperation = new SDL.manager.screen.utils._PresentAlertOperation(lifecycleManager, alertView, windowCapability, speechCapabilities, fileManager, 1, function () {});
+            presentAlertOperation = new SDL.manager.screen.utils._PresentAlertOperation(lifecycleManager, alertView, windowCapability, speechCapabilities, fileManager, 1, () => {}, () => {});
             alert = presentAlertOperation.alertRpc();
             Validator.assertEquals(alert.getAlertText1(), alertView.getText());
             Validator.assertEquals(alert.getAlertText2(), `${alertView.getSecondaryText()} - ${alertView.getTertiaryText()}`);
@@ -175,6 +177,7 @@ module.exports = function (appClient) {
         });
 
         it('testPresentAlertHappyPath', async function () {
+            this.timeout(15000);
             const alertStub = sinon.stub(lifecycleManager, 'sendRpcResolve')
                 .callsFake(onAlertSuccess);
             const artStub = sinon.stub(fileManager, 'uploadArtworks')
@@ -194,7 +197,7 @@ module.exports = function (appClient) {
                 });
 
             // Test Images need to be uploaded, sending text and uploading images
-            await presentAlertOperation._start();
+            await presentAlertOperation.onExecute();
 
             // Verifies that uploadArtworks gets called only with the fist presentAlertOperation.onExecute call
             Validator.assertTrue(artStub.calledOnce);
@@ -226,7 +229,7 @@ module.exports = function (appClient) {
             const alertView1 = new SDL.manager.screen.utils.AlertView()
                 .setText('Hi');
 
-            presentAlertOperation = new SDL.manager.screen.utils._PresentAlertOperation(lifecycleManager, alertView1, defaultMainWindowCapability, speechCapabilities, fileManager, 2, alertCompletionListener);
+            presentAlertOperation = new SDL.manager.screen.utils._PresentAlertOperation(lifecycleManager, alertView1, defaultMainWindowCapability, speechCapabilities, fileManager, 2, alertCompletionListener, alertSoftButtonClearListener);
 
             // Test Images need to be uploaded, sending text and uploading images
             await presentAlertOperation._start();
