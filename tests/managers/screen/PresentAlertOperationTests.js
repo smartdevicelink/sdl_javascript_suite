@@ -159,14 +159,14 @@ module.exports = function (appClient) {
                         .setPatchVersion(0);
                 });
             let windowCapability = getWindowCapability(1);
-            let presentAlertOperation = new SDL.manager.screen.utils._PresentAlertOperation(lifecycleManager, alertView, windowCapability, speechCapabilities, fileManager, 1, () => {}, () => {});
+            let presentAlertOperation = new SDL.manager.screen.utils._PresentAlertOperation(lifecycleManager, alertView, windowCapability, speechCapabilities, fileManager, 1, () => {}, new SDL.manager.screen._AlertManagerBase._AlertSoftButtonClearListener().setOnButtonClear(() => {}));
             let alert = presentAlertOperation.alertRpc();
 
             Validator.assertEquals(alert.getAlertText1(), `${alertView.getText()} - ${alertView.getSecondaryText()} - ${alertView.getTertiaryText()}`);
 
             windowCapability = getWindowCapability(2);
 
-            presentAlertOperation = new SDL.manager.screen.utils._PresentAlertOperation(lifecycleManager, alertView, windowCapability, speechCapabilities, fileManager, 1, () => {}, () => {});
+            presentAlertOperation = new SDL.manager.screen.utils._PresentAlertOperation(lifecycleManager, alertView, windowCapability, speechCapabilities, fileManager, 1, () => {}, new SDL.manager.screen._AlertManagerBase._AlertSoftButtonClearListener().setOnButtonClear(() => {}));
             alert = presentAlertOperation.alertRpc();
             Validator.assertEquals(alert.getAlertText1(), alertView.getText());
             Validator.assertEquals(alert.getAlertText2(), `${alertView.getSecondaryText()} - ${alertView.getTertiaryText()}`);
