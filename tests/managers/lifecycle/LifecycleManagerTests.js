@@ -52,5 +52,22 @@ module.exports = function (appClient) {
             Validator.assertNotNullUndefined(version.getPatchVersion());
             done();
         });
+
+        it('testOnSystemInfoReceived', function (done) {
+            const mockSystemInfo = {};
+            const defaultResult = true;
+            let actualResult = sdlManager._lifecycleManager.onSystemInfoReceived(mockSystemInfo);
+            Validator.assertEquals(actualResult, defaultResult);
+
+            const testResult = false;
+            const testListener = function (mockSystemInfo) {
+                return testResult;
+            };
+            sdlManager._lifecycleManager.setOnSystemInfoReceived(testListener);
+            actualResult = sdlManager._lifecycleManager.onSystemInfoReceived(mockSystemInfo);
+            Validator.assertEquals(actualResult, testResult);
+
+            done();
+        });
     });
 };
