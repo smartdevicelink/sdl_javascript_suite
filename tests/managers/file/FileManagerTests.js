@@ -468,5 +468,58 @@ module.exports = function (appClient) {
             Validator.assertTrue(fileManager.hasUploadedFile(file));
             sdlManager.removeRpcListener(SDL.rpc.enums.FunctionID.ListFiles, expectSuccess);
         });
+
+        it('testCrcUndefinedVersion4', async function () {
+            const stub = sinon.stub(lifecycleManager, 'getSdlMsgVersion')
+                .callsFake(() => {
+                    return new SDL.rpc.structs.SdlMsgVersion()
+                        .setMajorVersion(4)
+                        .setMinorVersion(5);
+                });
+
+            const file = new SDL.manager.file.filetypes.SdlFile()
+                .setName('hello')
+                .setFilePath('./test_icon_1.png')
+                .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG)
+                .setPersistent(true);
+
+            const putFile = await fileManager._createPutFile(file);
+
+            Validator.assertNull(putFile.getCrc());
+            stub.restore();
+        });
+
+        it('testCrcAssignmentFilePath', async function () {
+            const file = new SDL.manager.file.filetypes.SdlFile()
+                .setName('hello')
+                .setFilePath('./test_icon_1.png')
+                .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG)
+                .setPersistent(true);
+
+            const putFile = await fileManager._createPutFile(file);
+
+            Validator.assertNotNullUndefined(putFile.getCrc());
+        });
+
+        it('testCorrectCrcValue', async function () {
+            // set the file data to an input with an output that we expect to know
+            const file1 = new SDL.manager.file.filetypes.SdlFile()
+                .setName('hello')
+                .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG)
+                .setFileData(SDL.util._JsonRpcMarshaller._encode('abcde'))
+                .setPersistent(true);
+
+            const putFile1 = await fileManager._createPutFile(file1);
+            Validator.assertEquals(putFile1.getCrc(), 2240272485);
+
+            const file2 = new SDL.manager.file.filetypes.SdlFile()
+                .setName('hello')
+                .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG)
+                .setFileData(SDL.util._JsonRpcMarshaller._encode('it is Wednesday my dudes'))
+                .setPersistent(true);
+
+            const putFile2 = await fileManager._createPutFile(file2);
+            Validator.assertEquals(putFile2.getCrc(), 801050498);
+        });
     });
 };
