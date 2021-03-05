@@ -49,6 +49,12 @@ module.exports = function (appClient) {
         });
 
         it('testSetupChoiceSet', function () {
+            const stub = sinon.stub(sdlManager._lifecycleManager, 'getSdlMsgVersion')
+                .returns(new SDL.rpc.structs.SdlMsgVersion()
+                    .setMajorVersion(7)
+                    .setMinorVersion(0)
+                    .setPatchVersion(0));
+
             const choiceSetSelectionListener = new SDL.manager.screen.choiceset.ChoiceSetSelectionListener()
                 .setOnChoiceSelected(() => {})
                 .setOnError(() => {});
@@ -57,34 +63,45 @@ module.exports = function (appClient) {
             const choiceSet1 = new SDL.manager.screen.choiceset.ChoiceSet('test', [], choiceSetSelectionListener);
             Validator.assertTrue(!csm._setUpChoiceSet(choiceSet1));
 
-            // cells cant have duplicate text
+            // Identical cells will not be allowed
             const cell1 = new SDL.manager.screen.choiceset.ChoiceCell('test');
             const cell2 = new SDL.manager.screen.choiceset.ChoiceCell('test');
             const choiceSet2 = new SDL.manager.screen.choiceset.ChoiceSet('test', [cell1, cell2], choiceSetSelectionListener);
             Validator.assertTrue(!csm._setUpChoiceSet(choiceSet2));
 
-            // cells cannot mix and match VR / non-VR
+            // cells that have duplicate text will be allowed if there is another property to make them unique
+            // because a unique name will be assigned and used
             const cell3 = new SDL.manager.screen.choiceset.ChoiceCell('test')
-                .setVoiceCommands(['Test']);
-            const cell4 = new SDL.manager.screen.choiceset.ChoiceCell('test2');
+                .setSecondaryText('text 1');
+            const cell4 = new SDL.manager.screen.choiceset.ChoiceCell('test')
+                .setSecondaryText('text 2');
             const choiceSet3 = new SDL.manager.screen.choiceset.ChoiceSet('test', [cell3, cell4], choiceSetSelectionListener);
-            Validator.assertTrue(!csm._setUpChoiceSet(choiceSet3));
+            Validator.assertTrue(csm._setUpChoiceSet(choiceSet3));
 
-            // VR Commands must be unique
+            // cells cannot mix and match VR / non-VR
             const cell5 = new SDL.manager.screen.choiceset.ChoiceCell('test')
                 .setVoiceCommands(['Test']);
-            const cell6 = new SDL.manager.screen.choiceset.ChoiceCell('test2')
-                .setVoiceCommands(['Test']);
+            const cell6 = new SDL.manager.screen.choiceset.ChoiceCell('test2');
             const choiceSet4 = new SDL.manager.screen.choiceset.ChoiceSet('test', [cell5, cell6], choiceSetSelectionListener);
             Validator.assertTrue(!csm._setUpChoiceSet(choiceSet4));
 
-            // Passing Case
+            // VR Commands must be unique
             const cell7 = new SDL.manager.screen.choiceset.ChoiceCell('test')
                 .setVoiceCommands(['Test']);
             const cell8 = new SDL.manager.screen.choiceset.ChoiceCell('test2')
-                .setVoiceCommands(['Test2']);
+                .setVoiceCommands(['Test']);
             const choiceSet5 = new SDL.manager.screen.choiceset.ChoiceSet('test', [cell7, cell8], choiceSetSelectionListener);
-            Validator.assertTrue(csm._setUpChoiceSet(choiceSet5));
+            Validator.assertTrue(!csm._setUpChoiceSet(choiceSet5));
+
+            // Passing Case
+            const cell9 = new SDL.manager.screen.choiceset.ChoiceCell('test')
+                .setVoiceCommands(['Test']);
+            const cell10 = new SDL.manager.screen.choiceset.ChoiceCell('test2')
+                .setVoiceCommands(['Test2']);
+            const choiceSet6 = new SDL.manager.screen.choiceset.ChoiceSet('test', [cell9, cell10], choiceSetSelectionListener);
+            Validator.assertTrue(csm._setUpChoiceSet(choiceSet6));
+
+            stub.restore();
         });
 
         it('testUpdateIdsOnChoices', function () {
@@ -272,6 +289,30 @@ module.exports = function (appClient) {
 
             // restore state
             csm._defaultMainWindowCapability = originCapability;
+        });
+
+        it('testAddUniqueNamesToCells', function () {
+            const cell1 = new SDL.manager.screen.choiceset.ChoiceCell('McDonalds')
+                .setSecondaryText('1 mile away');
+            const cell2 = new SDL.manager.screen.choiceset.ChoiceCell('McDonalds')
+                .setSecondaryText('2 miles away');
+            const cell3 = new SDL.manager.screen.choiceset.ChoiceCell('Starbucks')
+                .setSecondaryText('3 miles away');
+            const cell4 = new SDL.manager.screen.choiceset.ChoiceCell('McDonalds')
+                .setSecondaryText('4 miles away');
+            const cell5 = new SDL.manager.screen.choiceset.ChoiceCell('Starbucks')
+                .setSecondaryText('5 miles away');
+            const cell6 = new SDL.manager.screen.choiceset.ChoiceCell('Meijer')
+                .setSecondaryText('6 miles away');
+
+            csm._addUniqueNamesToCells([cell1, cell2, cell3, cell4, cell5, cell6]);
+
+            Validator.assertEquals(cell1._getUniqueText(), 'McDonalds');
+            Validator.assertEquals(cell2._getUniqueText(), 'McDonalds (2)');
+            Validator.assertEquals(cell3._getUniqueText(), 'Starbucks');
+            Validator.assertEquals(cell4._getUniqueText(), 'McDonalds (3)');
+            Validator.assertEquals(cell5._getUniqueText(), 'Starbucks (2)');
+            Validator.assertEquals(cell6._getUniqueText(), 'Meijer');
         });
     });
 };
