@@ -18,7 +18,7 @@
 {%- endblock %}
 {% block body %}
     /**
-     * Initalizes an instance of {{name}}.
+     * Initializes an instance of {{name}}.
      * @class
      * @param {object} parameters - An object map of parameters.
      {%- if since is defined and since is not none %}
