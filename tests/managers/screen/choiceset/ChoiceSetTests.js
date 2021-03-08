@@ -31,5 +31,90 @@ module.exports = function (appClient) {
             choiceSet.cancel();
             Validator.assertTrue(canceledHandlerCalled);
         });
+
+        it('testReturnDefaultTimeoutForUnsetTimeout', function () {
+            const choiceSet = new SDL.manager.screen.choiceset.ChoiceSet(Test.GENERAL_STRING, choices, listener);
+            const testDefaultTimeout = 6;
+            choiceSet.setDefaultTimeout(testDefaultTimeout);
+
+            Validator.assertEquals(choiceSet.getDefaultTimeout(), testDefaultTimeout);
+            Validator.assertEquals(choiceSet.getTimeout(), testDefaultTimeout);
+        });
+
+        it('testReturnDefaultTimeoutForSetTimeout', function () {
+            const choiceSet = new SDL.manager.screen.choiceset.ChoiceSet(Test.GENERAL_STRING, choices, listener);
+            const testTimeout = 7;
+            const testDefaultTimeout = 9;
+            choiceSet.setDefaultTimeout(testDefaultTimeout);
+            choiceSet.setTimeout(testTimeout);
+
+            Validator.assertEquals(choiceSet.getDefaultTimeout(), testDefaultTimeout);
+            Validator.assertEquals(choiceSet.getTimeout(), testTimeout);
+        });
+
+        it('testReturnDefaultMaxTimeout', function () {
+            const choiceSet = new SDL.manager.screen.choiceset.ChoiceSet(Test.GENERAL_STRING, choices, listener);
+            const testDefaultTimeout = 155;
+            choiceSet.setDefaultTimeout(testDefaultTimeout);
+
+            Validator.assertEquals(choiceSet.getDefaultTimeout(), 100);
+            Validator.assertEquals(choiceSet.getTimeout(), 100);
+        });
+
+        it('testReturnDefaultMinTimeout', function () {
+            const choiceSet = new SDL.manager.screen.choiceset.ChoiceSet(Test.GENERAL_STRING, choices, listener);
+            const testDefaultTimeout = -3;
+            choiceSet.setDefaultTimeout(testDefaultTimeout);
+
+            Validator.assertEquals(choiceSet.getDefaultTimeout(), 5);
+            Validator.assertEquals(choiceSet.getTimeout(), 5);
+        });
+
+        it('testReturnTimeoutUnset', function () {
+            const choiceSet = new SDL.manager.screen.choiceset.ChoiceSet(Test.GENERAL_STRING, choices, listener);
+            const testDefaultTimeout = 7;
+            choiceSet.setDefaultTimeout(testDefaultTimeout);
+
+            Validator.assertEquals(choiceSet.getTimeout(), testDefaultTimeout);
+        });
+
+        it('testReturnTimeoutZero', function () {
+            const choiceSet = new SDL.manager.screen.choiceset.ChoiceSet(Test.GENERAL_STRING, choices, listener);
+            const testDefaultTimeout = 7;
+            choiceSet.setDefaultTimeout(testDefaultTimeout);
+            choiceSet.setTimeout(0);
+
+            Validator.assertEquals(choiceSet.getTimeout(), testDefaultTimeout);
+        });
+
+        it('testReturnTimeout', function () {
+            const choiceSet = new SDL.manager.screen.choiceset.ChoiceSet(Test.GENERAL_STRING, choices, listener);
+            const testDefaultTimeout = 7;
+            const testTimeout = 9;
+            choiceSet.setDefaultTimeout(testDefaultTimeout);
+            choiceSet.setTimeout(testTimeout);
+
+            Validator.assertEquals(choiceSet.getTimeout(), testTimeout);
+        });
+
+        it('testReturnMaxTimeout', function () {
+            const choiceSet = new SDL.manager.screen.choiceset.ChoiceSet(Test.GENERAL_STRING, choices, listener);
+            const testDefaultTimeout = 7;
+            const testTimeout = 214;
+            choiceSet.setDefaultTimeout(testDefaultTimeout);
+            choiceSet.setTimeout(testTimeout);
+
+            Validator.assertEquals(choiceSet.getTimeout(), 100);
+        });
+
+        it('testReturnMinTimeout', function () {
+            const choiceSet = new SDL.manager.screen.choiceset.ChoiceSet(Test.GENERAL_STRING, choices, listener);
+            const testDefaultTimeout = 7;
+            const testTimeout = 2.25;
+            choiceSet.setDefaultTimeout(testDefaultTimeout);
+            choiceSet.setTimeout(testTimeout);
+
+            Validator.assertEquals(choiceSet.getTimeout(), 5);
+        });
     });
 };
