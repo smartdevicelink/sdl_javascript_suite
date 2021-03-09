@@ -36,6 +36,8 @@ const ClimateData = SDL.rpc.structs.ClimateData;
 const KeyboardLayoutCapability = SDL.rpc.structs.KeyboardLayoutCapability;
 const DynamicUpdateCapabilities = SDL.rpc.structs.DynamicUpdateCapabilities;
 const KeyboardCapabilities = SDL.rpc.structs.KeyboardCapabilities;
+const AppCapability = SDL.rpc.structs.AppCapability;
+const VideoStreamingCapability = SDL.rpc.structs.VideoStreamingCapability;
 
 // enums
 const SpeechCapabilities = SDL.rpc.enums.SpeechCapabilities;
@@ -71,6 +73,7 @@ const KeyboardLayout = SDL.rpc.enums.KeyboardLayout;
 const KeypressMode = SDL.rpc.enums.KeypressMode;
 const KeyboardInputMask = SDL.rpc.enums.KeyboardInputMask;
 const MenuLayout = SDL.rpc.enums.MenuLayout;
+const AppCapabilityType = SDL.rpc.enums.AppCapabilityType;
 
 class Test {
     constructor () {
@@ -610,6 +613,23 @@ const GENERAL_KEYBOARDCAPABILITIES = Test.GENERAL_KEYBOARDCAPABILITIES = new Key
 const JSON_KEYBOARDCAPABILITIES = Test.JSON_KEYBOARDCAPABILITIES = {
     [KeyboardCapabilities.KEY_MASK_INPUT_CHARACTERS_SUPPORTED]: Test.GENERAL_BOOLEAN,
     [KeyboardCapabilities.KEY_SUPPORTED_KEYBOARDS]: Test.JSON_KEYBOARDLAYOUTCAPABILITY_LIST,
+};
+
+const GENERAL_VIDEO_STREAMING_CAPABILITY = Test.GENERAL_VIDEO_STREAMING_CAPABILITY = new VideoStreamingCapability()
+    .setAdditionalVideoStreamingCapabilities([new VideoStreamingCapability()]);
+
+const JSON_VIDEO_STREAMING_CAPABILITY = Test.JSON_VIDEO_STREAMING_CAPABILITY = {
+    [VideoStreamingCapability.KEY_ADDITIONAL_VIDEO_STREAMING_CAPABILITIES]: [new VideoStreamingCapability().getParameters()],
+};
+
+const GENERAL_APP_CAPABILITY_TYPE = Test.GENERAL_APP_CAPABILITY_TYPE = AppCapabilityType.VIDEO_STREAMING;
+const GENERAL_APP_CAPABILITY = Test.GENERAL_APP_CAPABILITY = new AppCapability()
+    .setAppCapabilityType(Test.GENERAL_APP_CAPABILITY_TYPE)
+    .setVideoStreamingCapability(Test.GENERAL_VIDEO_STREAMING_CAPABILITY);
+
+const JSON_APP_CAPABILITY = Test.JSON_APP_CAPABILITY = {
+    [AppCapability.KEY_APP_CAPABILITY_TYPE]: Test.GENERAL_APP_CAPABILITY_TYPE,
+    [AppCapability.KEY_VIDEO_STREAMING_CAPABILITY]: Test.JSON_VIDEO_STREAMING_CAPABILITY,
 };
 
 module.exports = Test;
