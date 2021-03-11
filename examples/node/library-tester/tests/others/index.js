@@ -142,6 +142,39 @@ module.exports = async function (catalogRpc) {
         ]);
     });
 
+    // set video options test
+    const scm = sdlManager.getSystemCapabilityManager();
+    const capabilities = await scm.updateCapability(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING);
+    const streamOptions = capabilities.getAdditionalVideoStreamingCapabilities();
+    streamOptions.push(capabilities); // push the original capability too
+    streamOptions.push(new SDL.rpc.structs.VideoStreamingCapability()
+        .setPreferredResolution(new SDL.rpc.structs.ImageResolution()
+            .setResolutionWidth(777)
+            .setResolutionHeight(888)
+        )
+        .setScale(4)
+    );
+
+    const appUpdated = new SDL.rpc.messages.OnAppCapabilityUpdated()
+        .setAppCapability(new SDL.rpc.structs.AppCapability()
+            .setAppCapabilityType(SDL.rpc.enums.AppCapabilityType.VIDEO_STREAMING)
+            .setVideoStreamingCapability(new SDL.rpc.structs.VideoStreamingCapability()
+                .setAdditionalVideoStreamingCapabilities(streamOptions)));
+
+    await sdlManager.sendRpcResolve(appUpdated);
+
+    sdlManager.getScreenManager()
+        .setTextField1('Check the video resolution options for a new resolution - 777x888')
+        .setTextField2('Find and click on the voice command to continue!');
+
+    await new Promise((resolve, reject) => {
+        sdlManager.getScreenManager().setVoiceCommands([
+            new SDL.manager.screen.utils.VoiceCommand(['Click on me.. again!'], () => {
+                resolve();
+            }),
+        ]);
+    });
+
     // send a alert that gets cancelled
     const alert2 = new SDL.rpc.messages.Alert()
         .setAlertText1('This alert should be cancelled in 2 seconds');
