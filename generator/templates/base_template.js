@@ -32,7 +32,9 @@
 */
 {% block imports -%}
 {% for _import in imports|sort %}
+{%- if _import.what != name %}
 import {{'%s %s %s'|format('{', _import.what, '}')}} from '{{_import.wherefrom}}';
+{%- endif -%}
 {%- endfor %}
 {% endblock -%}
 {% block typedef -%}{%- endblock %}

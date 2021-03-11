@@ -18,7 +18,7 @@
 {%- endblock %}
 {% block body %}
     /**
-     * Initalizes an instance of {{name}}.
+     * Initializes an instance of {{name}}.
      * @class
      * @param {object} parameters - An object map of parameters.
      {%- if since is defined and since is not none %}
@@ -76,8 +76,9 @@
 
     /**
      * Get the {{method.method_title}}
-     {% if deprecated is defined and deprecated is not none -%}
-     * @deprecated
+     {% if method.deprecated is defined and method.deprecated is not none -%}
+     * @since SmartDeviceLink {{method.history[0].since}}
+     * @deprecated in SmartDeviceLink {{method.since}}
      {% endif -%}
      * @returns {{'%s%s%s'|format('{', method.type, '}')}} - the {{method.key}} value
      */

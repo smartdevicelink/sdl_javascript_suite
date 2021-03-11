@@ -337,7 +337,7 @@ class Validator {
      * @returns {Boolean} - Whether or not they're equal.
      */
     static validateSoftButton (button1, button2) {
-        return button1.getCurrentState().getSoftButton().getImage() === button2.getCurrentState().getSoftButton().getImage()
+        return button1.getCurrentState().getSoftButton().getImage().getParameters() === button2.getCurrentState().getSoftButton().getImage().getParameters()
             && button1.getCurrentState().getHighlighted() === button2.getCurrentState().getHighlighted()
             && ((button1.getButtonId() === null && button2.getButtonId() === null) || button1.getButtonId() === button2.getButtonId())
             && button1.getCurrentState().getSystemAction() === button2.getCurrentState().getSystemAction()
