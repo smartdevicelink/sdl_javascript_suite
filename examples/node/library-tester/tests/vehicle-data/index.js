@@ -88,6 +88,8 @@ module.exports = async function (catalogRpc) {
         'setMyKey',
         'setWindowStatus',
         'setHandsOffSteering',
+        'setSeatOccupancy',
+        'setClimateData',
     ];
     let result;
 
@@ -146,6 +148,8 @@ module.exports = async function (catalogRpc) {
         'setMyKey',
         'setWindowStatus',
         'setHandsOffSteering',
+        'setSeatOccupancy',
+        'setClimateData',
     ];
  
     for (let i = 0; i < methods.length; i++) {

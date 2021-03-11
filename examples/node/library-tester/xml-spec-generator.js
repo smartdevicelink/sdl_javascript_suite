@@ -1,7 +1,7 @@
 const parseXml = require('xml2js').parseString;
 const needle = require('needle');
 const promisify = require('util').promisify;
-const URL = "https://raw.githubusercontent.com/smartdevicelink/rpc_spec/master/MOBILE_API.xml";
+const URL = "https://raw.githubusercontent.com/smartdevicelink/rpc_spec/develop/MOBILE_API.xml";
 const fs = require('fs');    
 const USE_INTERNAL_NAMES = false;
 const ARRAYS_HAVE_AT_LEAST_ONE_ELEMENT = true;
@@ -81,7 +81,12 @@ function generateRpcObj (spec, propChain, excludeOptional) {
     });
     for (let key in targetObj) {
         if (!excludeOptional || targetObj[key].mandatory !== "false") {
-            finalObj[key] = evaluateParam(spec, targetObj[key], excludeOptional);
+            // do not allow immediate recursive structures to destroy our call stack!
+            if (propChain[propChain.length - 1] !== targetObj[key].type) {
+                finalObj[key] = evaluateParam(spec, targetObj[key], excludeOptional);
+            } else {
+                finalObj[key] = {}
+            }
         }
     }
     return finalObj;
