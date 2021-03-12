@@ -96,5 +96,90 @@ module.exports = function (appClient) {
 
             done();
         });
+
+        it('testReturnDefaultTimeoutForUnsetTimeout', function () {
+            const alertView = new SDL.manager.screen.utils.AlertView();
+            const testDefaultTimeout = 6;
+            alertView.setDefaultTimeout(testDefaultTimeout);
+
+            Validator.assertEquals(alertView.getDefaultTimeout(), testDefaultTimeout);
+            Validator.assertEquals(alertView.getTimeout(), testDefaultTimeout);
+        });
+
+        it('testReturnDefaultTimeoutForSetTimeout', function () {
+            const alertView = new SDL.manager.screen.utils.AlertView();
+            const testTimeout = 7;
+            const testDefaultTimeout = 9;
+            alertView.setDefaultTimeout(testDefaultTimeout);
+            alertView.setTimeout(testTimeout);
+
+            Validator.assertEquals(alertView.getDefaultTimeout(), testDefaultTimeout);
+            Validator.assertEquals(alertView.getTimeout(), testTimeout);
+        });
+
+        it('testReturnDefaultMaxTimeout', function () {
+            const alertView = new SDL.manager.screen.utils.AlertView();
+            const testDefaultTimeout = 155;
+            alertView.setDefaultTimeout(testDefaultTimeout);
+
+            Validator.assertEquals(alertView.getDefaultTimeout(), SDL.manager.screen.utils.AlertView._TIMEOUT_MAX);
+            Validator.assertEquals(alertView.getTimeout(), SDL.manager.screen.utils.AlertView._TIMEOUT_MAX);
+        });
+
+        it('testReturnDefaultMinTimeout', function () {
+            const alertView = new SDL.manager.screen.utils.AlertView();
+            const testDefaultTimeout = -3;
+            alertView.setDefaultTimeout(testDefaultTimeout);
+
+            Validator.assertEquals(alertView.getDefaultTimeout(), SDL.manager.screen.utils.AlertView._TIMEOUT_MIN);
+            Validator.assertEquals(alertView.getTimeout(), SDL.manager.screen.utils.AlertView._TIMEOUT_MIN);
+        });
+
+        it('testReturnTimeoutUnset', function () {
+            const alertView = new SDL.manager.screen.utils.AlertView();
+            const testDefaultTimeout = 7;
+            alertView.setDefaultTimeout(testDefaultTimeout);
+
+            Validator.assertEquals(alertView.getTimeout(), testDefaultTimeout);
+        });
+
+        it('testReturnTimeoutZero', function () {
+            const alertView = new SDL.manager.screen.utils.AlertView();
+            const testDefaultTimeout = 7;
+            alertView.setDefaultTimeout(testDefaultTimeout);
+            alertView.setTimeout(0);
+
+            Validator.assertEquals(alertView.getTimeout(), testDefaultTimeout);
+        });
+
+        it('testReturnTimeout', function () {
+            const alertView = new SDL.manager.screen.utils.AlertView();
+            const testDefaultTimeout = 7;
+            const testTimeout = 9;
+            alertView.setDefaultTimeout(testDefaultTimeout);
+            alertView.setTimeout(testTimeout);
+
+            Validator.assertEquals(alertView.getTimeout(), testTimeout);
+        });
+
+        it('testReturnMaxTimeout', function () {
+            const alertView = new SDL.manager.screen.utils.AlertView();
+            const testDefaultTimeout = 7;
+            const testTimeout = 214;
+            alertView.setDefaultTimeout(testDefaultTimeout);
+            alertView.setTimeout(testTimeout);
+
+            Validator.assertEquals(alertView.getTimeout(), SDL.manager.screen.utils.AlertView._TIMEOUT_MAX);
+        });
+
+        it('testReturnMinTimeout', function () {
+            const alertView = new SDL.manager.screen.utils.AlertView();
+            const testDefaultTimeout = 7;
+            const testTimeout = 2.25;
+            alertView.setDefaultTimeout(testDefaultTimeout);
+            alertView.setTimeout(testTimeout);
+
+            Validator.assertEquals(alertView.getTimeout(), SDL.manager.screen.utils.AlertView._TIMEOUT_MIN);
+        });
     });
 };
