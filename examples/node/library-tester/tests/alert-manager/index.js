@@ -31,7 +31,7 @@
 */
 
 const SDL = require('../../SDL.min.js');
-const AppHelper = require('../../AppHelper.js')
+const AppHelper = require('../../AppHelper.js');
 
 module.exports = async function (catalogRpc) {
     const appId = 'alert-manager';
@@ -52,35 +52,8 @@ module.exports = async function (catalogRpc) {
     // this will get invoked once the app loses Show permissions at the end!
     let permissionListener;
 
-    let permissionChanges = 0;
-    const permissionPromise = new Promise((resolve, reject) => {
-        permissionListener = (allowedPermissions, permissionGroupStatus) => {
-            // should be unknown first, then allowed later
-            if (permissionChanges === 0) {
-                const unknownEnum = SDL.manager.permission.enums.PermissionGroupStatus.UNKNOWN;
-                if (permissionGroupStatus === unknownEnum) {
-                    permissionChanges = 1;
-                } else {
-                    reject(new Error(`Expected permission change for Show to ${unknownEnum}. Got ${permissionGroupStatus}`));
-                }
-            }
-            else if (permissionChanges === 1) {
-                const allowedEnum = SDL.manager.permission.enums.PermissionGroupStatus.ALLOWED;
-                if (permissionGroupStatus === allowedEnum) {
-                    resolve(); // done
-                } else {
-                    reject(new Error(`Expected permission change for Show to ${allowedEnum}. Got ${permissionGroupStatus}`));
-                }
-            }
-        }
-    });
-    let lifecycleUpdateHappened = false;
-    let hashResumeId = null;
-
     // check for life cycle updates due to the HMI not expecting the ES_MX language
     await app.start(permissionListener, language => {
-        lifecycleUpdateHappened = true;
-
         return new SDL.manager.lifecycle.LifecycleConfigurationUpdate()
             .setAppName(appId)
             .setShortAppName('Hello');
@@ -209,4 +182,4 @@ module.exports = async function (catalogRpc) {
     // tear down the app
     await sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
     sdlManager.dispose();
-}
+};
