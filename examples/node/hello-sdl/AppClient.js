@@ -115,11 +115,12 @@ class AppClient {
         this._logPermissions();
 
         // wait for the FULL state for more functionality
-        if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL && this._prevHmiLevel !== SDL.rpc.enums.HMILevel.HMI_FULL) {
+        const prevHmiFull = this._prevHmiLevel !== SDL.rpc.enums.HMILevel.HMI_FULL;
+        this._prevHmiLevel = hmiLevel;
+        if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL && prevHmiFull) {
             this._hmiFull = true;
             this._checkReadyState();
         }
-        this._prevHmiLevel = hmiLevel;
     }
 
     async _checkReadyState () {

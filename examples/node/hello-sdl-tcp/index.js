@@ -128,7 +128,9 @@ class AppClient {
         this._logPermissions();
 
         // wait for the FULL state for more functionality
-        if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL && this._prevHmiLevel !== SDL.rpc.enums.HMILevel.HMI_FULL) {
+        const prevHmiFull = this._prevHmiLevel !== SDL.rpc.enums.HMILevel.HMI_FULL;
+        this._prevHmiLevel = hmiLevel;
+        if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL && prevHmiFull) {
             const screenManager = this._sdlManager.getScreenManager();
             const isRpcAllowed = (rpc) => {
                 if (!this._permissionManager) {
@@ -252,7 +254,6 @@ class AppClient {
 
             screenManager.presentAlert(alertView, alertCompletionListener);
         }
-        this._prevHmiLevel = hmiLevel;
     }
 
     _onButtonListener (buttonName, onButton) {
