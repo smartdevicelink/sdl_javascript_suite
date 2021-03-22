@@ -115,16 +115,20 @@ class AppClient {
         this._logPermissions();
 
         // wait for the FULL state for more functionality
-        if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
+        if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL && this._prevHmiLevel !== SDL.rpc.enums.HMILevel.HMI_FULL) {
             this._hmiFull = true;
             this._checkReadyState();
         }
+        this._prevHmiLevel = hmiLevel;
     }
 
     async _checkReadyState () {
         if (this._managersReady && this._hmiFull) {
             const screenManager = this._sdlManager.getScreenManager();
             const isRpcAllowed = (rpc) => {
+                if (!this._permissionManager) {
+                    this._permissionManager = this._sdlManager.getPermissionManager();
+                }
                 return this._permissionManager &&
                     this._permissionManager.isRpcAllowed(rpc);
             };
@@ -180,6 +184,25 @@ class AppClient {
             screenManager.changeLayout(new SDL.rpc.structs.TemplateConfiguration()
                 .setTemplate(SDL.rpc.enums.PredefinedLayout.NON_MEDIA));
 
+            const choices = [
+                new SDL.manager.screen.choiceset.ChoiceCell('First Choice Cell'),
+                new SDL.manager.screen.choiceset.ChoiceCell('Second Choice Cell'),
+            ];
+            await screenManager.preloadChoices(choices);
+
+            await new Promise ((resolve) => {
+                const choiceSet = new SDL.manager.screen.choiceset.ChoiceSet('choice', choices, new SDL.manager.screen.choiceset.ChoiceSetSelectionListener()
+                    .setOnChoiceSelected((choiceCell, triggerSource, rowIndex) => {
+                        console.log(choiceCell, triggerSource, rowIndex);
+                        resolve();
+                    })
+                    .setOnError((error) => {
+                        resolve();
+                    }));
+
+                screenManager.presentChoiceSet(choiceSet);
+            });
+
             const art1 = new SDL.manager.file.filetypes.SdlArtwork('logo', SDL.rpc.enums.FileType.GRAPHIC_PNG)
                 .setFilePath(this._filePath);
 
@@ -209,6 +232,35 @@ class AppClient {
             await this._sleep(2000);
             softButtonObjects[0].transitionToNextState();
             await this._sleep(2000);
+
+            const alertState = new SDL.manager.screen.utils.SoftButtonState('EXIT', 'exit app', null);
+            const alertState2 = new SDL.manager.screen.utils.SoftButtonState('DISMISS', 'dismiss alert', null);
+
+            const alertView = new SDL.manager.screen.utils.AlertView()
+                .setText('Exit the Application?')
+                .setTimeout(3000)
+                .setSoftButtons([
+                    new SDL.manager.screen.utils.SoftButtonObject('Exit', [alertState], 'EXIT', async (id, rpc) => {
+                        if (rpc instanceof SDL.rpc.messages.OnButtonPress) {
+                            // tear down the app
+                            await this._sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
+
+                            this._sdlManager.dispose();
+                        }
+                    }),
+                    new SDL.manager.screen.utils.SoftButtonObject('Dismiss', [alertState2], 'DISMISS', (id, rpc) => {
+                        if (rpc instanceof SDL.rpc.messages.OnButtonPress) {
+                            console.log('Alert button pressed!');
+                        }
+                    }),
+                ]);
+
+            const alertCompletionListener = new SDL.manager.screen.utils.AlertCompletionListener()
+                .setOnComplete((success, tryAgainTime) => {
+                    console.log(`Alert presented ${(success) ? 'successfully' : 'unsuccessfully'}`);
+                });
+
+            screenManager.presentAlert(alertView, alertCompletionListener);
         }
     }
 
