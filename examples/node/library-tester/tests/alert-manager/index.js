@@ -157,6 +157,7 @@ module.exports = async function (catalogRpc) {
         ]);
 
     await promisifyPresentAlert(softButtOnAlert);
+    await promisifyPresentAlert(softButtOnAlert);
 
     // this should fail since the soft button has more than one state
     new Promise ((resolve, reject) => {
@@ -178,6 +179,79 @@ module.exports = async function (catalogRpc) {
 
     const emptyAlert = new SDL.manager.screen.utils.AlertView();
     await promisifyPresentAlert(emptyAlert);
+
+    // force the RPC version to change temporarily
+    const oldVersion = sdlManager._lifecycleManager._rpcSpecVersion.getMajor();
+    sdlManager._lifecycleManager._rpcSpecVersion.setMajor(4);
+
+    const audioFileOnlyVersionLessThanFiveAlert = new SDL.manager.screen.utils.AlertView()
+        .setAudio(new SDL.manager.screen.utils.AlertAudioData(null, null,
+            new SDL.manager.file.filetypes.SdlFile()
+                .setName('sound-file')
+                .setFilePath('./tests/alert-manager/sound-file.mp3')
+                .setType(SDL.rpc.enums.FileType.AUDIO_MP3)
+        ));
+
+    await promisifyPresentAlert(audioFileOnlyVersionLessThanFiveAlert);
+
+    sdlManager._lifecycleManager._rpcSpecVersion.setMajor(oldVersion);
+
+
+    const manySoftButtonsAlert = new SDL.manager.screen.utils.AlertView()
+        .setText('text1')
+        .setSoftButtons([
+            new SDL.manager.screen.utils.SoftButtonObject('only', [new SDL.manager.screen.utils.SoftButtonState('ONLY', 'only')], 'ONLY', (id, rpc) => {
+                if (rpc instanceof SDL.rpc.messages.OnButtonPress) {
+                    console.log('First button pressed!');
+                }
+            }),
+            new SDL.manager.screen.utils.SoftButtonObject('four', [new SDL.manager.screen.utils.SoftButtonState('FOUR', 'four')], 'FOUR', (id, rpc) => {
+                if (rpc instanceof SDL.rpc.messages.OnButtonPress) {
+                    console.log('Second button pressed!');
+                }
+            }),
+            new SDL.manager.screen.utils.SoftButtonObject('buttons', [new SDL.manager.screen.utils.SoftButtonState('BUTTONS', 'buttons')], 'BUTTONS', (id, rpc) => {
+                if (rpc instanceof SDL.rpc.messages.OnButtonPress) {
+                    console.log('Third button pressed!');
+                }
+            }),
+            new SDL.manager.screen.utils.SoftButtonObject('shown', [new SDL.manager.screen.utils.SoftButtonState('SHOWN', 'shown')], 'SHOWN', (id, rpc) => {
+                if (rpc instanceof SDL.rpc.messages.OnButtonPress) {
+                    console.log('Fourth button pressed!');
+                }
+            }),
+            new SDL.manager.screen.utils.SoftButtonObject('unviewable', [new SDL.manager.screen.utils.SoftButtonState('UNVIEWABLE', 'unviewable')], 'UNVIEWABLE', (id, rpc) => {
+                if (rpc instanceof SDL.rpc.messages.OnButtonPress) {
+                    console.log('Fifth button pressed!');
+                }
+            }),
+            new SDL.manager.screen.utils.SoftButtonObject('invisible', [new SDL.manager.screen.utils.SoftButtonState('INVISIBLE', 'invisible')], 'INVISIBLE', (id, rpc) => {
+                if (rpc instanceof SDL.rpc.messages.OnButtonPress) {
+                    console.log('Sixth button pressed!');
+                }
+            }),
+        ]);
+    await promisifyPresentAlert(manySoftButtonsAlert);
+
+
+    const allPropsAlert = new SDL.manager.screen.utils.AlertView()
+        .setText('everything!')
+        .setSecondaryText('text2')
+        .setTertiaryText('text3')
+        .setTimeout(8000)
+        .setShowWaitIndicator(true)
+        .setAudio(new SDL.manager.screen.utils.AlertAudioData('speech synth'))
+        .setIcon(new SDL.manager.file.filetypes.SdlArtwork('hello', SDL.rpc.enums.FileType.GRAPHIC_PNG)
+            .setFilePath('./tests/alert-manager/test_icon_1.png'))
+        .setDefaultTimeout(8000)
+        .setSoftButtons([
+            new SDL.manager.screen.utils.SoftButtonObject('game', [state1], 'ROCK', (id, rpc) => {
+                if (rpc instanceof SDL.rpc.messages.OnButtonPress) {
+                    console.log('First button pressed!');
+                }
+            })
+        ]);
+    await promisifyPresentAlert(allPropsAlert);
 
     // tear down the app
     await sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());

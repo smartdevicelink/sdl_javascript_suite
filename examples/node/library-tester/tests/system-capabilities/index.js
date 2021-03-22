@@ -98,6 +98,32 @@ module.exports = async function (catalogRpc) {
     // read the display capabilities object returned
     // const displayCapabilities = await scm.updateCapability(SDL.rpc.enums.SystemCapabilityType.DISPLAYS);
 
+    // subscribe to DISPLAYS test
+    let listenerCalled = false;
+
+    const listener = (displayCapabilities) => {
+        listenerCalled = true;
+    }
+
+    await new Promise((resolve, reject) => {
+        scm.addOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.DISPLAYS, (cap) => {
+            listener(cap);
+            resolve();
+        });
+    });
+
+    listenerCalled = false;
+
+    await sleep(500);
+    sdlManager.getScreenManager().changeLayout(new SDL.rpc.structs.TemplateConfiguration()
+        .setTemplate(SDL.rpc.enums.PredefinedLayout.GRAPHIC_WITH_TEXT_AND_SOFTBUTTONS));
+    await sleep(500);
+
+    // check if the listener was invoked again because the layout is changed
+    if (!listenerCalled) {
+        console.error("DISPLAYS SCM listener not invoked as a result of changing the layout!")
+    }
+
     // tear down the app
     await sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
     sdlManager.dispose();

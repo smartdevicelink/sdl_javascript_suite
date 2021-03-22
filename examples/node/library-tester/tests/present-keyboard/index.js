@@ -73,6 +73,7 @@ module.exports = async function (catalogRpc) {
         .setOnKeyboardDidSendEvent(() => {})
         .setOnKeyboardInputMaskHasChanged(() => {});
     const cancelId = screenManager.presentKeyboard('should dismiss', keyboardProperties, keyboardListener);
+    await new Promise(r => setTimeout(r, 1000))
     screenManager.dismissKeyboard(cancelId);
 
     sdlManager.getSystemCapabilityManager().getDefaultMainWindowCapability().getKeyboardCapabilities();

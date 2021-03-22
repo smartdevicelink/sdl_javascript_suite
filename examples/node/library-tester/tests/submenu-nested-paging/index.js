@@ -92,14 +92,17 @@ module.exports = async function (catalogRpc) {
 
     const addMenu2 = new SDL.rpc.messages.AddSubMenu()
         .setMenuID(2)
-        .setMenuName('Getting closer... is there an image here?')
+        .setMenuName('Getting closer. Are there two images here?')
         .setParentID(1)
         .setMenuIcon(new SDL.rpc.structs.Image().setValueParam(fileName).setImageType(SDL.rpc.enums.ImageType.DYNAMIC))
+        .setSecondaryImage(new SDL.rpc.structs.Image().setValueParam(fileName).setImageType(SDL.rpc.enums.ImageType.DYNAMIC))
     await sdlManager.sendRpcResolve(addMenu2);
 
     const addMenu3 = new SDL.rpc.messages.AddSubMenu()
         .setMenuID(3)
-        .setMenuName('Almost there...')
+        .setMenuName('Almost there. Do you see two smaller texts?')
+        .setSecondaryText('I am what you are looking for!')
+        .setTertiaryText('Me too!')
         .setParentID(2)
     await sdlManager.sendRpcResolve(addMenu3);
 

@@ -105,6 +105,13 @@ module.exports = async function (catalogRpc) {
         await screenManager.removeButtonListener(buttonName, listener2)
     }
 
+    // check removal of button listeners
+    screenManager._subscribeButtonManager._onButtonListeners.forEach((listeners, key) => {
+        if (listeners.length !== 0) {
+            console.error("Not all listeners removed for button: " + key);
+        }
+    })
+
     // tear down the app
     await sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
     sdlManager.dispose();

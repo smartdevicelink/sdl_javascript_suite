@@ -56,16 +56,8 @@ module.exports = async function (catalogRpc) {
     let permissionChanges = 0;
     const permissionPromise = new Promise((resolve, reject) => {
         permissionListener = (allowedPermissions, permissionGroupStatus) => {
-            // should be unknown first, then allowed later
+            // should be allowed
             if (permissionChanges === 0) {
-                const unknownEnum = SDL.manager.permission.enums.PermissionGroupStatus.UNKNOWN;
-                if (permissionGroupStatus === unknownEnum) {
-                    permissionChanges = 1;
-                } else {
-                    reject(new Error(`Expected permission change for Show to ${unknownEnum}. Got ${permissionGroupStatus}`));
-                }
-            }
-            else if (permissionChanges === 1) {
                 const allowedEnum = SDL.manager.permission.enums.PermissionGroupStatus.ALLOWED;
                 if (permissionGroupStatus === allowedEnum) {
                     resolve(); // done
@@ -231,14 +223,12 @@ module.exports = async function (catalogRpc) {
         .setCmdID(removeMeIndex)
         .setVrCommands(['Activate the app after clicking the voice command below']));
 
-    await new Promise((resolve, reject) => {
         sdlManager.getScreenManager().setVoiceCommands([
             new SDL.manager.screen.utils.VoiceCommand(['Click on me to continue the test!'], () => {
-                resolve();
             }),
         ]);
-    });
-    
+
+await sleep(4000)    
     await sdlManager.sendRpcResolve(new SDL.rpc.messages.CloseApplication());
     // wait for the permission change of Show to complete the test
     await permissionPromise;
