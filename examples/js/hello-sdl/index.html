@@ -178,16 +178,18 @@
                     ];
                     await screenManager.preloadChoices(choices);
 
-                    const choiceSet = new SDL.manager.screen.choiceset.ChoiceSet('choice', screenManager.getPreloadedChoices(), new SDL.manager.screen.choiceset.ChoiceSetSelectionListener()
-                        .setOnChoiceSelected((choiceCell, triggerSource, rowIndex) => {
-                            console.log(choiceCell, triggerSource, rowIndex);
-                            resolve();
-                        })
-                        .setOnError((error) => {
-                            resolve();
-                        }));
+                    await new Promise((resolve) => {
+                        const choiceSet = new SDL.manager.screen.choiceset.ChoiceSet('choice', screenManager.getPreloadedChoices(), new SDL.manager.screen.choiceset.ChoiceSetSelectionListener()
+                            .setOnChoiceSelected((choiceCell, triggerSource, rowIndex) => {
+                                console.log(choiceCell, triggerSource, rowIndex);
+                                resolve();
+                            })
+                            .setOnError((error) => {
+                                resolve();
+                            }));
 
-                    screenManager.presentChoiceSet(choiceSet);
+                        screenManager.presentChoiceSet(choiceSet);
+                    });
 
                     const art1 = new SDL.manager.file.filetypes.SdlArtwork('logo', SDL.rpc.enums.FileType.GRAPHIC_PNG)
                         .setFilePath(this._filePath);
