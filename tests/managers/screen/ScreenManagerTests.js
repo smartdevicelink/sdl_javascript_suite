@@ -123,9 +123,7 @@ module.exports = function (appClient) {
             Validator.assertTrue(_ScreenManagerBase._checkAndAssignButtonIds(softButtonObjects, _ScreenManagerBase._ManagerLocation.SOFTBUTTON_MANAGER));
             const softButtonObject3 = new SDL.manager.screen.utils.SoftButtonObject('object1', [softButtonState1, softButtonState2], softButtonState1.getName(), null);
             const softButtonObject4 = new SDL.manager.screen.utils.SoftButtonObject('object2', [softButtonState3, softButtonState4], softButtonState3.getName(), null);
-            softButtonObjects.push(softButtonObject3);
-            softButtonObjects.push(softButtonObject4);
-            Validator.assertTrue(_ScreenManagerBase._checkAndAssignButtonIds(softButtonObjects, _ScreenManagerBase._ManagerLocation.SOFTBUTTON_MANAGER));
+            Validator.assertTrue(_ScreenManagerBase._checkAndAssignButtonIds([softButtonObject3, softButtonObject4], _ScreenManagerBase._ManagerLocation.SOFTBUTTON_MANAGER));
             done();
         });
 
