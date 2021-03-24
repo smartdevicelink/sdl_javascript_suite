@@ -34,214 +34,176 @@
 
 <head>
     <script src='./SDL.min.js'></script>
-
     <script>
         class HelloSdl {
-            constructor () {
-                const appId = 'hello-js';
-                const fileName = `${appId}_icon`;
-                this._filePath = './test_icon_1.png';
-                const file = new SDL.manager.file.filetypes.SdlFile()
-                    .setName(fileName)
-                    .setFilePath(this._filePath)
-                    .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG)
-                    .setPersistent(true);
-
-                this._lifecycleConfig = new SDL.manager.LifecycleConfig()
-                    .setAppId(appId)
-                    .setAppName('Hello JS')
-                    .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
-                    .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
-                    .setAppTypes([
-                        SDL.rpc.enums.AppHMIType.MEDIA,
-                    ])
-                    .setTransportConfig(new SDL.transport.WebSocketClientConfig('ws://localhost', 5050))
-                    .setAppIcon(file)
-                    .setRpcNotificationListeners({
-                        [SDL.rpc.enums.FunctionID.OnHMIStatus]: this._onHmiStatusListener.bind(this),
-                    });
-
-                this._appConfig = new SDL.manager.AppConfig()
-                    .setLifecycleConfig(this._lifecycleConfig);
-
-                const managerListener = new SDL.manager.SdlManagerListener();
-                managerListener
-                    .setOnStart((sdlManager) => {
-                        this._permissionManager = this._sdlManager.getPermissionManager();
-                        this._logPermissions();
-                        this._permissionManager.addListener(
-                            [
-                                new SDL.manager.permission.PermissionElement(
-                                    SDL.rpc.enums.FunctionID.SubscribeVehicleData,
-                                    [
-                                        'accPedalPosition',
-                                        'gps',
-                                        'fuelLevel',
-                                        'odometer',
-                                        'prndl',
-                                    ]
-                                ),
-                            ],
-                            SDL.manager.permission.enums.PermissionGroupType.ANY,
-                            (allowedPermissions, permissionGroupStatus) => {
-                                console.log('SubscribeVehicleData permissions changed!');
-                                console.log('Allowed Permissions: ', allowedPermissions);
-                                console.log('Permission Group Status: ', permissionGroupStatus);
-                                this._logPermissions();
-                            }
-                        );
-                        this._onConnected();
-                    })
-                    .setOnError((sdlManager, info) => {
-                        console.error('Error from SdlManagerListener: ', info);
-                    });
-
-                this._sdlManager = new SDL.manager.SdlManager(this._appConfig, managerListener);
-                this._sdlManager.start();
-                this._isButtonSubscriptionRequested = false;
+            constructor (catalogRpc) {
+                this._lifecycleConfig = {};
+                this._sdlManager;
+                this._hmiReady = false;
+                this._managerReady = false;
+                this._catalogRpc = catalogRpc;
+                this._connected = false;
             }
 
-            async _onConnected () {
-                // add voice commands for when the managers are ready
-                const screenManager = this._sdlManager.getScreenManager();
-                screenManager.setVoiceCommands([
-                    new SDL.manager.screen.utils.VoiceCommand(['Option 1'], () => {
-                        console.log('Option one selected!');
-                    }),
-                    new SDL.manager.screen.utils.VoiceCommand(['Option 2'], () => {
-                        console.log('Option two selected!');
-                    }),
-                    new SDL.manager.screen.utils.VoiceCommand(['Option 3'], () => {
-                        console.log('Option three selected!');
-                    }),
-                ]);
-
-                // set up the presentation for the manager when its ready
-                screenManager.setTextField1('Hello SDL!');
-                screenManager.setTextField2('こんにちは');
-                screenManager.setTextField3('你好');
-                screenManager.setTitle('JavaScript Library');
-                screenManager.setTextAlignment(SDL.rpc.enums.TextAlignment.RIGHT_ALIGNED);
-                screenManager.setPrimaryGraphic(new SDL.manager.file.filetypes.SdlArtwork('sdl-logo', SDL.rpc.enums.FileType.GRAPHIC_PNG)
-                    .setFilePath(this._filePath));
-                screenManager.changeLayout(new SDL.rpc.structs.TemplateConfiguration()
-                    .setTemplate(SDL.rpc.enums.PredefinedLayout.NON_MEDIA));
+            getManager () {
+                return this._sdlManager;
             }
 
-            async _onHmiStatusListener (onHmiStatus) {
-                const hmiLevel = onHmiStatus.getHmiLevel();
-                this._logPermissions();
+            setLifecycleConfig (lifecycleConfig) {
+                this._lifecycleConfig = lifecycleConfig;
+                return this;
+            }
 
-                // wait for the FULL state for more functionality
-                if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
-                    const screenManager = this._sdlManager.getScreenManager();
-                    const isRpcAllowed = (rpc) => {
-                        return this._permissionManager &&
-                            this._permissionManager.isRpcAllowed(rpc);
-                    };
-
-                    if (!this._isButtonSubscriptionRequested && isRpcAllowed(SDL.rpc.enums.FunctionID.SubscribeButton)) {
-                        const availableButtons = this._sdlManager.getRegisterAppInterfaceResponse().getButtonCapabilities().map(function (capability) {
-                            return capability.getNameParam();
+            async start () {
+                console.log(`Waiting for app activation for ${this._lifecycleConfig.getAppId()}`);
+                return new Promise((resolve, reject) => {
+                    const managerListener = new SDL.manager.SdlManagerListener();
+                    managerListener
+                        .setOnStart((sdlManager) => {
+                            this._managerReady = true;
+                            this._checkState(resolve);
+                        })
+                        .setOnError((sdlManager, info) => {
+                            console.error('Error from SdlManagerListener: ', info);
                         });
 
-                        // add button listeners
-                        const ButtonName = SDL.rpc.enums.ButtonName;
-                        const buttonNames = [ButtonName.PRESET_0, ButtonName.PRESET_1, ButtonName.PRESET_2, ButtonName.PRESET_3,
-                                    ButtonName.PRESET_4, ButtonName.PRESET_5, ButtonName.PRESET_6, ButtonName.PRESET_7, ButtonName.PRESET_8,
-                                    ButtonName.PRESET_9, ButtonName.PLAY_PAUSE, ButtonName.OK, ButtonName.SEEKLEFT, ButtonName.SEEKRIGHT,
-                                    ButtonName.TUNEUP, ButtonName.TUNEDOWN];
-
-
-                        for (const buttonName of buttonNames) {
-                            if (availableButtons.indexOf(buttonName) !== -1) {
-                                console.log('Subscribing to', buttonName);
-                                await screenManager.addButtonListener(buttonName, this._onButtonListener.bind(this)).catch(function (err) {
-                                    console.error(err);
-                                });
-                            } else {
-                                console.log('No capability found for button', buttonName);
+                    // use the lifecycleConfig setRpcNotificationListeners method for listening for OnHMIStatus notifications
+                    this._lifecycleConfig.setRpcNotificationListeners({
+                        [SDL.rpc.enums.FunctionID.OnHMIStatus]: (onHmiStatus) => {
+                            const hmiLevel = onHmiStatus.getHmiLevel();
+                            // wait for the FULL state for more functionality
+                            if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
+                                this._hmiReady = true;
+                                this._checkState(resolve);
                             }
+                        },
+                        [SDL.rpc.enums.FunctionID.OnSystemCapabilityUpdated]: () => {
+                            this._gotNotif = true;
+                        },
+                    });
+
+                    this._appConfig = new SDL.manager.AppConfig()
+                        .setLifecycleConfig(this._lifecycleConfig);
+
+                    this._sdlManager = new SDL.manager.SdlManager(this._appConfig, managerListener);
+                    this._sdlManager
+                        .start()
+                        .addRpcListener(SDL.rpc.enums.FunctionID.OnHMIStatus, (onHmiStatus) => {
+                            const hmiLevel = onHmiStatus.getHmiLevel();
+                            // wait for the FULL state for more functionality
+                            if (hmiLevel === SDL.rpc.enums.HMILevel.HMI_FULL) {
+                                this._hmiReady = true;
+                                this._checkState(resolve);
+                            }
+                        });
+                    const sendFunc = this._sdlManager._lifecycleManager.sendRpcResolve;
+                    // override the send rpc message to intercept requests
+                    this._sdlManager._lifecycleManager.sendRpcResolve = async (message) => {
+                        if (typeof this._catalogRpc === 'function') {
+                            this._catalogRpc(message); // log the request
                         }
-
-                        this._isButtonSubscriptionRequested = true;
-                    }
-
-                    const art1 = new SDL.manager.file.filetypes.SdlArtwork('logo', SDL.rpc.enums.FileType.GRAPHIC_PNG)
-                        .setFilePath(this._filePath);
-
-                    let state1 = new SDL.manager.screen.utils.SoftButtonState('ROCK', 'rock', art1);
-                    let state2 = new SDL.manager.screen.utils.SoftButtonState('PAPER', 'paper', art1);
-                    let state3 = new SDL.manager.screen.utils.SoftButtonState('SCISSORS', 'scissors', art1);
-                    let state4 = new SDL.manager.screen.utils.SoftButtonState('BUTTON', 'button');
-
-                    let softButtonObjects = [
-                        new SDL.manager.screen.utils.SoftButtonObject('game', [state1, state2, state3], 'ROCK', (id, rpc) => {
-                            if (rpc instanceof SDL.rpc.messages.OnButtonPress) {
-                                console.log('First button pressed!');
-                            }
-                        }),
-                        new SDL.manager.screen.utils.SoftButtonObject('button', [state4], 'BUTTON', (id, rpc) => {
-                            if (rpc instanceof SDL.rpc.messages.OnButtonPress) {
-                                console.log('Second button pressed!');
-                            }
-                        }),
-                    ];
-
-                    // set the softbuttons now and rotate through the states of the first softbutton
-                    await screenManager.setSoftButtonObjects(softButtonObjects);
-
-                    await this._sleep(2000);
-                    softButtonObjects[0].transitionToNextState();
-                    await this._sleep(2000);
-                    softButtonObjects[0].transitionToNextState();
-                    await this._sleep(2000);
-
-                    const count = 3;
-                    for (let i = 0; i < count; i++) {
-                        screenManager.setTextField1(`Exiting in ${(count - i).toString()}`)
-                            .setTextField2('')
-                            .setTextField3('');
-
-                        await this._sleep();
-                    }
-
-                    // tear down the app
-                    await this._sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
-
-                    this._sdlManager.dispose();
-                }
-            }
-
-            async _sleep (timeout = 1000) {
-                return new Promise((resolve) => {
-                    setTimeout(resolve, timeout);
+                        const response = await sendFunc.call(this._sdlManager._lifecycleManager, message);
+                        if (typeof this._catalogRpc === 'function' && response !== null) { // check if it's actually a response by checking for null
+                            this._catalogRpc(response); // log the response
+                        }
+                        return response;
+                    };
                 });
             }
 
-            _onButtonListener (buttonName, onButton) {
-                if (onButton instanceof SDL.rpc.messages.OnButtonPress) {
-                    this._sdlManager.getScreenManager().setTextField1(`${buttonName} pressed`);
-                } else if (onButton instanceof SDL.rpc.messages.OnButtonEvent) {
-                    this._sdlManager.getScreenManager().setTextField2(`${buttonName} ${onButton.getButtonEventMode()}`);
-                }
-            }
-
-            _logPermissions () {
-                if (this._permissionManager) {
-                    console.log(`Show RPC allowed: ${this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.Show)}`);
-                    console.log(`PutFile RPC allowed: ${this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.PutFile)}`);
-                    console.log(`GetVehicleData RPC allowed: ${this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.GetVehicleData)}`);
-                    console.log(`SubscribeVehicleData RPC allowed: ${this._permissionManager.isRpcAllowed(SDL.rpc.enums.FunctionID.SubscribeVehicleData)}`);
+            _checkState (resolve) {
+                if (this._hmiReady && this._managerReady && !this._connected) {
+                    console.log(`Activated ${this._lifecycleConfig.getAppId()}`);
+                    this._connected = true;
+                    resolve();
                 }
             }
         }
     </script>
-
     <script>
-        console.log('start app');
-        const app = new HelloSdl();
+        function catalogRpc (coverage) {
+            return function log (rpc) {
+                const rpcTypeValue = rpc.getMessageType();
+                let rpcTypeName;
+                if (rpcTypeValue === 0) {
+                    rpcTypeName = 'request';
+                } else if (rpcTypeValue === 1) {
+                    rpcTypeName = 'response';
+                } else if (rpcTypeValue === 2) {
+                    rpcTypeName = 'notification';
+                } else {
+                    console.error('No rpc type found');
+                    console.error(rpc);
+                    return;
+                }
+                const parameters = rpc.getParameters();
+
+                const rpcInSpec = spec.functions[rpc.getFunctionId()][rpcTypeName];
+                const rpcInCoverage = coverage.functions[rpcTypeName][rpc.getFunctionId()];
+
+                rpcInCoverage._isUsed = true;
+
+                // add coverage to the RPC message
+                for (const prop in parameters) {
+                    rpcInCoverage[prop] = true;
+                }
+
+                // add coverage to the structs and enums
+                analyzeStruct(coverage, parameters, rpcInSpec, null);
+            };
+        }
     </script>
+
+    <script src='./all-rpcs/index.js'></script>
+    <script src='./alert-manager/index.js'></script>
+    <script src='./buttons-media/index.js'></script>
+    <script src='./buttons-navigation/index.js'></script>
+    <script src='./close-app/index.js'></script>
+    <script src='./managers/index.js'></script>
+    <script src='./managers/AppHelper.js'></script>
+    <script src='./media-clock/index.js'></script>
+    <script src='./others/index.js'></script>
+    <script src='./present-keyboard/index.js'></script>
+    <script src='./remote-control/index.js'></script>
+    <script src='./screen-choices/index.js'></script>
+    <script src='./screen-graphics/index.js'></script>
+    <script src='./sub-button-manager/index.js'></script>
+    <script src='./submenu-nested-paging/index.js'></script>
+    <script src='./system-capabilities/index.js'></script>
+    <script src='./templates/index.js'></script>
+    <script src='./vehicle-data/index.js'></script>
+    <script src='./voice-command-manager/index.js'></script>
+    <script src='./widgets/index.js'></script>
+    <script>
+        /**
+         * Tests with a '*' do not work with Manticore running Core 7.0
+        */
+        async function runTests () {
+            await alertManagerTests();
+            await allRpcs();
+            await buttonsMediaTests(catalogRpc);
+            await buttonsNavigationTests(catalogRpc);
+            await closeAppTests(catalogRpc);// *
+            await mediaClockTests(catalogRpc);
+            await managers(catalogRpc);// *
+            await otherTests(catalogRpc);
+            await presentKeyboardTests(catalogRpc);// *
+            await remoteControlTests(catalogRpc);
+            await screenChoicesTests(catalogRpc);
+            await screenGraphicsTests(catalogRpc);// *
+            await subButtonManagerTests(catalogRpc);
+            await subMenuNestedPagingTests(catalogRpc);// *
+            await systemCapabilitiesTests(catalogRpc);
+            await templatesTests(catalogRpc);
+            await vehicleDataTests(catalogRpc);
+            await voiceCommandManagerTests(catalogRpc);
+            await widgetsTests(catalogRpc);
+        }
+    </script>
+    <script>
+        runTests();
+    </script>
+
 </head>
 
 
