@@ -195,9 +195,9 @@ module.exports = async function (catalogRpc) {
     await screenManager.preloadChoices([choiceCell11]);
     screenManager.setTitle('Preload a choice cell with duplicate voice commands (Check logs)');
     if (screenManager.getPreloadedChoices().findIndex(choice => choice.getText() === 'hello 11') !== -1) {
-        console.error("ERROR: Found the choice cell with the duplicate voice command (hello 11)")
+        console.error("SUCCESS: Found the choice cell with the duplicate voice command (hello 11)")
     } else {
-        console.log("SUCCESS! No choice cell found with the duplicate voice command (hello 11)")
+        console.log("ERROR: No choice cell found with the duplicate voice command (hello 11)")
     }
     await sleep(4000);
     choiceSet.cancel();
