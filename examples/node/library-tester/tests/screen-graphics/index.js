@@ -229,8 +229,8 @@ function setupScreenState (screenManager, message) {
     screenManager.setTextField3(null);
     screenManager.setTextField4(null);
     screenManager.setMediaTrackTextField(null);
-    //screenManager.setPrimaryGraphic(null);
-    //screenManager.setSecondaryGraphic(null);
+    screenManager.setPrimaryGraphic(null);
+    screenManager.setSecondaryGraphic(null);
     screenManager.setTextAlignment(null);
     screenManager.setTextField1Type(null);
     screenManager.setTextField2Type(null);
