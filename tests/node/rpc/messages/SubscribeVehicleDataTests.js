@@ -14,7 +14,9 @@ describe('SubscribeVehicleDataTests', function () {
                 .setStabilityControlsStatus(Test.GENERAL_BOOLEAN)
                 .setHandsOffSteering(Test.GENERAL_BOOLEAN)
                 .setWindowStatus(Test.GENERAL_BOOLEAN)
-                .setGearStatus(Test.GENERAL_BOOLEAN);
+                .setGearStatus(Test.GENERAL_BOOLEAN)
+                .setSeatOccupancy(Test.GENERAL_BOOLEAN)
+                .setClimateData(Test.GENERAL_BOOLEAN);
         };
 
         this.getExpectedParameters = function (sdlVersion) {
@@ -23,6 +25,8 @@ describe('SubscribeVehicleDataTests', function () {
                 [SubscribeVehicleData.KEY_HANDS_OFF_STEERING]: Test.GENERAL_BOOLEAN,
                 [SubscribeVehicleData.KEY_WINDOW_STATUS]: Test.GENERAL_BOOLEAN,
                 [SubscribeVehicleData.KEY_GEAR_STATUS]: Test.GENERAL_BOOLEAN,
+                [SubscribeVehicleData.KEY_SEAT_OCCUPANCY]: Test.GENERAL_BOOLEAN,
+                [SubscribeVehicleData.KEY_CLIMATE_DATA]: Test.GENERAL_BOOLEAN,
             };
         };
 
@@ -44,12 +48,16 @@ describe('SubscribeVehicleDataTests', function () {
         const testHandsOffSteering = rpcMessage.getHandsOffSteering();
         const testWindowStatus = rpcMessage.getWindowStatus();
         const testGearStatus = rpcMessage.getGearStatus();
+        const testSeatOccupancy = rpcMessage.getSeatOccupancy();
+        const testClimateData = rpcMessage.getClimateData();
 
         // Valid Tests
         Validator.assertEquals(Test.GENERAL_BOOLEAN, testStabilityControlsStatus);
         Validator.assertEquals(Test.GENERAL_BOOLEAN, testHandsOffSteering);
         Validator.assertEquals(Test.GENERAL_BOOLEAN, testWindowStatus);
         Validator.assertEquals(Test.GENERAL_BOOLEAN, testGearStatus);
+        Validator.assertEquals(Test.GENERAL_BOOLEAN, testSeatOccupancy);
+        Validator.assertEquals(Test.GENERAL_BOOLEAN, testClimateData);
 
         // Invalid/Null Tests
         rpcMessage = new SubscribeVehicleData();
@@ -62,6 +70,8 @@ describe('SubscribeVehicleDataTests', function () {
         Validator.assertNullOrUndefined(rpcMessage.getHandsOffSteering());
         Validator.assertNullOrUndefined(rpcMessage.getWindowStatus());
         Validator.assertNullOrUndefined(rpcMessage.getGearStatus());
+        Validator.assertNullOrUndefined(rpcMessage.getSeatOccupancy());
+        Validator.assertNullOrUndefined(rpcMessage.getClimateData());
 
         done();
     });

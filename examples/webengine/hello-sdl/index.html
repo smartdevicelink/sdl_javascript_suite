@@ -358,25 +358,33 @@
         });
 
         document.getElementById("alertButton").addEventListener("click", function(){
-            const alert = new SDL.rpc.messages.Alert();
-            alert.setAlertText1("Test Alert")
-                 .setDuration(5000);
+            const alertView = new SDL.manager.screen.utils.AlertView();
+            alertView.setText("Test Alert")
+                 .setTimeout(5000);
 
-            const btn1 = new SDL.rpc.structs.SoftButton();
-            btn1.setSystemAction(SDL.rpc.enums.SystemAction.DEFAULT_ACTION)
-                .setType(SDL.rpc.enums.SoftButtonType.SBT_TEXT)
-                .setText("ReRoute")
-                .setSoftButtonID(5502);
+            const alertState = new SDL.manager.screen.utils.SoftButtonState('REROUTE', 'reroute', null)
+                .setSystemAction(SDL.rpc.enums.SystemAction.DEFAULT_ACTION);
+            const btn1 = new SDL.manager.screen.utils.SoftButtonObject('ReRoute', [alertState], 'REROUTE', async (id, rpc) => {
+                if (rpc instanceof SDL.rpc.messages.OnButtonPress) {
+                    // Handle OnButtonPress
+                }
+            });
 
-            const btn2 = new SDL.rpc.structs.SoftButton();
-            btn2.setSystemAction(SDL.rpc.enums.SystemAction.DEFAULT_ACTION)
-                .setType(SDL.rpc.enums.SoftButtonType.SBT_TEXT)
-                .setText("Close")
-                .setSoftButtonID(5503);
+            const alertState2 = new SDL.manager.screen.utils.SoftButtonState('CLOSE', 'close', null)
+                .setSystemAction(SDL.rpc.enums.SystemAction.DEFAULT_ACTION);
+            const btn2 = new SDL.manager.screen.utils.SoftButtonObject('Close', [alertState2], 'CLOSE', async (id, rpc) => {
+                if (rpc instanceof SDL.rpc.messages.OnButtonPress) {
+                    // Handle OnButtonPress
+                }
+            });
 
-            alert.setSoftButtons([btn1, btn2])
+            alertView.setSoftButtons([btn1, btn2])
 
-            app.sendRpcRequest(alert);
+            const alertCompletionListener = new SDL.manager.screen.utils.AlertCompletionListener()
+                .setOnComplete((success, tryAgainTime) => {
+                    // Handle Alert presented
+                })
+            app._sdlManager.getScreenManager().presentAlert(alertView, alertCompletionListener);
         });
 
         document.getElementById("unregButton").addEventListener("click", async function(){

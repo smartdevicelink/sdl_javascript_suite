@@ -142,12 +142,9 @@ class InterfaceProducerCommon(ABC):
 
         if getattr(item, 'description', None):
             render['description'] = self.extract_description(item.description)
-        if item.deprecated:
-            render['deprecated'] = item.deprecated
-        if item.history:
-            render['history'] = item.history
-        if item.since:
-            render['since'] = item.since
+        render['since'] = item.since
+        render['history'] = item.history
+        render['deprecated'] = item.deprecated
 
         self.custom_mapping(render, item)
 
