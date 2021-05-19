@@ -15,10 +15,19 @@ module.exports = async function (appClient) {
         const voiceCommand2 = new SDL.manager.screen.utils.VoiceCommand(['Command 3', 'Command 4'], () => {});
 
         const voiceCommands = [voiceCommand1, voiceCommand2];
+        const voiceCommands2 = ['Test 1', 'Test 1', 'Test 1'];
 
         beforeEach(function (done) {
             voiceCommandManager._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_FULL;
             voiceCommandManager._voiceCommands = [];
+            done();
+        });
+
+        it('should initialize properly if it has multiple of the same command string', function (done) {
+            const testCommand2 = new SDL.manager.screen.utils.VoiceCommand(voiceCommands2);
+
+            Validator.assertTrue(testCommand2.getVoiceCommands() !== voiceCommands2);
+            Validator.assertEquals(testCommand2.getVoiceCommands().length, 1);
             done();
         });
 
