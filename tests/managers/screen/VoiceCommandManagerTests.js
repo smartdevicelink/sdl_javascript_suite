@@ -13,6 +13,10 @@ module.exports = async function (appClient) {
 
         const voiceCommand1 = new SDL.manager.screen.utils.VoiceCommand(['Command 1', 'Command 2'], () => {});
         const voiceCommand2 = new SDL.manager.screen.utils.VoiceCommand(['Command 3', 'Command 4'], () => {});
+        const voiceCommand3 = new SDL.manager.screen.utils.VoiceCommand(['Command 5', ' ', 'Command 6', '\t'], () => {});
+        const voiceCommand4 = new SDL.manager.screen.utils.VoiceCommand(['\t'], () => {});
+        const voiceCommand5 = new SDL.manager.screen.utils.VoiceCommand([''], () => {});
+        const voiceCommand6 = new SDL.manager.screen.utils.VoiceCommand([], () => {});
 
         const voiceCommands = [voiceCommand1, voiceCommand2];
 
@@ -66,6 +70,26 @@ module.exports = async function (appClient) {
 
             // verify the mock listener has been hit once
             Validator.assertEquals(callback.calledOnce, true);
+        });
+
+        describe('if any of the voice commands contains an empty string', function () {
+            it('should remove the empty strings and queue another operation', async function () {
+                await voiceCommandManager.setVoiceCommands([voiceCommand2, voiceCommand3, voiceCommand4, voiceCommand5, voiceCommand6]);
+                Validator.assertEquals(voiceCommandManager.getVoiceCommands().length, 2);
+                Validator.assertEquals(voiceCommandManager.getVoiceCommands()[0].getVoiceCommands().length, 2);
+                Validator.assertEquals(voiceCommandManager.getVoiceCommands()[0].getVoiceCommands(), ['Command 3', 'Command 4']);
+                Validator.assertEquals(voiceCommandManager.getVoiceCommands()[1].getVoiceCommands().length, 2);
+                Validator.assertEquals(voiceCommandManager.getVoiceCommands()[1].getVoiceCommands(), ['Command 5', 'Command 6']);
+            });
+
+            it('should not queue another operation if all the voice command strings are empty strings', async function () {
+                await voiceCommandManager.setVoiceCommands([voiceCommand1]);
+                // these commands are empty and should be ignored entirely
+                await voiceCommandManager.setVoiceCommands([voiceCommand4, voiceCommand5]);
+                Validator.assertEquals(voiceCommandManager.getVoiceCommands().length, 1);
+                Validator.assertEquals(voiceCommandManager.getVoiceCommands()[0].getVoiceCommands().length, 2);
+                Validator.assertEquals(voiceCommandManager.getVoiceCommands()[0].getVoiceCommands(), ['Command 1', 'Command 2']);
+            });
         });
 
         after(function () {
