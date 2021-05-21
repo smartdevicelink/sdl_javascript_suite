@@ -152,7 +152,8 @@ module.exports = function (appClient) {
             let testOp;
             beforeEach(function () {
                 testOp = new SDL.manager.screen.utils._VoiceCommandUpdateOperation();
-                testOp._setOldVoiceCommands([voiceCommand5]);
+                testOp._oldVoiceCommands = [voiceCommand5];
+                testOp._currentVoiceCommands = Array.from([voiceCommand5]);
             });
 
             // should update both oldVoiceCommands and currentVoiceCommands
