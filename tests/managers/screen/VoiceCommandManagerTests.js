@@ -13,14 +13,11 @@ module.exports = async function (appClient) {
 
         const voiceCommand1 = new SDL.manager.screen.utils.VoiceCommand(['Command 1', 'Command 2'], () => {});
         const voiceCommand2 = new SDL.manager.screen.utils.VoiceCommand(['Command 3', 'Command 4'], () => {});
-<<<<<<< HEAD
         const voiceCommand3 = new SDL.manager.screen.utils.VoiceCommand(['Command 5', ' ', 'Command 6', '\t'], () => {});
         const voiceCommand4 = new SDL.manager.screen.utils.VoiceCommand(['\t'], () => {});
         const voiceCommand5 = new SDL.manager.screen.utils.VoiceCommand([''], () => {});
         const voiceCommand6 = new SDL.manager.screen.utils.VoiceCommand([], () => {});
-=======
-        const voiceCommand3 = new SDL.manager.screen.utils.VoiceCommand(['Command 1', 'Command 2', 'Command 3', 'Command 4'], () => {});
->>>>>>> develop
+        const voiceCommand7 = new SDL.manager.screen.utils.VoiceCommand(['Command 1', 'Command 2', 'Command 3', 'Command 4'], () => {});
 
         const voiceCommands = [voiceCommand1, voiceCommand2];
         const voiceCommands2 = ['Test 1', 'Test 1', 'Test 1'];
@@ -102,14 +99,19 @@ module.exports = async function (appClient) {
                 Validator.assertEquals(voiceCommandManager.getVoiceCommands().length, 1);
                 Validator.assertEquals(voiceCommandManager.getVoiceCommands()[0].getVoiceCommands().length, 2);
                 Validator.assertEquals(voiceCommandManager.getVoiceCommands()[0].getVoiceCommands(), ['Command 1', 'Command 2']);
+            });
+        });
+
         describe('when new voice commands are set and have duplicate strings in different voice commands', function () {
             beforeEach(function () {
+                // clear task queue
+                voiceCommandManager._taskQueue = [];
                 voiceCommandManager.setVoiceCommands([voiceCommand2, voiceCommand3]);
             });
 
             it('should only have one operation', function () {
                 Validator.assertEquals(voiceCommandManager._getTasks().length, 1);
-                Validator.assertTrue(!voiceCommandManager._arePendingVoiceCommandsUnique([voiceCommand2, voiceCommand3]));
+                Validator.assertTrue(!voiceCommandManager._arePendingVoiceCommandsUnique([voiceCommand2, voiceCommand7]));
             });
         });
 
