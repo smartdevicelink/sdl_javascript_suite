@@ -77,6 +77,16 @@ module.exports = async function (appClient) {
             Validator.assertEquals(callback.calledOnce, true);
         });
 
+        it('testEmptyVoiceCommandsShouldAddTask', async function () {
+            const callback = sinon.fake(() => {});
+            const stub = sinon.stub(voiceCommandManager, '_addTask')
+                .callsFake(callback);
+            await voiceCommandManager.setVoiceCommands([]);
+
+            Validator.assertTrue(callback.called);
+            stub.restore();
+        });
+
         after(function () {
             voiceCommandManager.dispose();
 
