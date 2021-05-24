@@ -13,6 +13,7 @@ module.exports = async function (appClient) {
 
         const voiceCommand1 = new SDL.manager.screen.utils.VoiceCommand(['Command 1', 'Command 2'], () => {});
         const voiceCommand2 = new SDL.manager.screen.utils.VoiceCommand(['Command 3', 'Command 4'], () => {});
+        const voiceCommand3 = new SDL.manager.screen.utils.VoiceCommand(['Command 1', 'Command 2', 'Command 3', 'Command 4'], () => {});
 
         const voiceCommands = [voiceCommand1, voiceCommand2];
         const voiceCommands2 = ['Test 1', 'Test 1', 'Test 1'];
@@ -75,6 +76,17 @@ module.exports = async function (appClient) {
 
             // verify the mock listener has been hit once
             Validator.assertEquals(callback.calledOnce, true);
+        });
+
+        describe('when new voice commands are set and have duplicate strings in different voice commands', function () {
+            beforeEach(function () {
+                voiceCommandManager.setVoiceCommands([voiceCommand2, voiceCommand3]);
+            });
+
+            it('should only have one operation', function () {
+                Validator.assertEquals(voiceCommandManager._getTasks().length, 1);
+                Validator.assertTrue(!voiceCommandManager._arePendingVoiceCommandsUnique([voiceCommand2, voiceCommand3]));
+            });
         });
 
         after(function () {
