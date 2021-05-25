@@ -82,6 +82,16 @@ module.exports = async function (appClient) {
             Validator.assertEquals(callback.calledOnce, true);
         });
 
+<<<<<<< HEAD
+        it('testEmptyVoiceCommandsShouldAddTask', async function () {
+            const callback = sinon.fake(() => {});
+            const stub = sinon.stub(voiceCommandManager, '_addTask')
+                .callsFake(callback);
+            await voiceCommandManager.setVoiceCommands([]);
+
+            Validator.assertTrue(callback.called);
+            stub.restore();
+=======
         describe('if any of the voice commands contains an empty string', function () {
             it('should remove the empty strings and queue another operation', async function () {
                 await voiceCommandManager.setVoiceCommands([voiceCommand2, voiceCommand3, voiceCommand4, voiceCommand5, voiceCommand6]);
@@ -113,6 +123,7 @@ module.exports = async function (appClient) {
                 Validator.assertEquals(voiceCommandManager._getTasks().length, 1);
                 Validator.assertTrue(!voiceCommandManager._arePendingVoiceCommandsUnique([voiceCommand2, voiceCommand7]));
             });
+>>>>>>> develop
         });
 
         after(function () {
