@@ -2,6 +2,7 @@ const SDL = require('../../../config.js').node;
 
 const Validator = require('../../../Validator');
 const sinon = require('sinon');
+const Test = require('../../../Test.js');
 
 module.exports = function (appClient) {
     describe('ChoiceSetManagerTests', function () {
@@ -313,6 +314,75 @@ module.exports = function (appClient) {
             Validator.assertEquals(cell4._getUniqueText(), 'McDonalds (3)');
             Validator.assertEquals(cell5._getUniqueText(), 'Starbucks (2)');
             Validator.assertEquals(cell6._getUniqueText(), 'Meijer');
+        });
+
+        it('testUniquenessForAvailableFields', function () {
+            const windowCapability = new SDL.rpc.structs.WindowCapability();
+            const secondaryText = new SDL.rpc.structs.TextField()
+                .setNameParam(SDL.rpc.enums.TextFieldName.secondaryText);
+            const tertiaryText = new SDL.rpc.structs.TextField()
+                .setNameParam(SDL.rpc.enums.TextFieldName.tertiaryText);
+
+            const textFields = [
+                secondaryText,
+                tertiaryText,
+            ];
+            windowCapability.setTextFields(textFields);
+
+            const choiceImage = new SDL.rpc.structs.ImageField()
+                .setNameParam(SDL.rpc.enums.ImageFieldName.choiceImage);
+            const choiceSecondaryImage = new SDL.rpc.structs.ImageField()
+                .setNameParam(SDL.rpc.enums.ImageFieldName.choiceSecondaryImage);
+
+            const imageFieldList = [
+                choiceImage,
+                choiceSecondaryImage,
+            ];
+            windowCapability.setImageFields(imageFieldList);
+
+            csm._defaultMainWindowCapability = windowCapability;
+
+            const cell1 = new SDL.manager.screen.choiceset.ChoiceCell('Item 1')
+                .setSecondaryText('null')
+                .setTertiaryText('tertiaryText')
+                .setVoiceCommands(null)
+                .setArtwork(Test.GENERAL_ARTWORK)
+                .setSecondaryArtwork(Test.GENERAL_ARTWORK);
+            const cell2 = new SDL.manager.screen.choiceset.ChoiceCell('Item 2')
+                .setSecondaryText('null')
+                .setTertiaryText('tertiaryText')
+                .setVoiceCommands(null)
+                .setArtwork(Test.GENERAL_ARTWORK)
+                .setSecondaryArtwork(Test.GENERAL_ARTWORK);
+
+            const choiceCellList = [
+                cell1,
+                cell2,
+            ];
+            const choiceSet = new SDL.manager.screen.choiceset.ChoiceSet('choiceSet', choiceCellList, null);
+            Validator.assertTrue(csm._setUpChoiceSet(choiceSet));
+            // Identical cells
+            cell2.setText('Item 1');
+            Validator.assertTrue(!csm._setUpChoiceSet(choiceSet));
+            // Changing secondary text on cell 2 to be different
+            cell2.setSecondaryText('changed text');
+            Validator.assertTrue(csm._setUpChoiceSet(choiceSet));
+            // Removing secondaryText as a supported TextField in the WindowCapability
+            textFields.splice(0, 1);
+            // Test that it does not take into account secondaryText as a unique factor
+            Validator.assertTrue(!csm._setUpChoiceSet(choiceSet));
+            cell2.setTertiaryText('changed text');
+            Validator.assertTrue(csm._setUpChoiceSet(choiceSet));
+            textFields.splice(0, 1); // remove tertiaryTexts
+            Validator.assertTrue(!csm._setUpChoiceSet(choiceSet));
+            cell2.setArtwork(null);
+            Validator.assertTrue(csm._setUpChoiceSet(choiceSet));
+            imageFieldList.splice(0, 1); // remove choiceImage
+            Validator.assertTrue(!csm._setUpChoiceSet(choiceSet));
+            cell2.setSecondaryArtwork(null);
+            Validator.assertTrue(csm._setUpChoiceSet(choiceSet));
+            imageFieldList.splice(0, 1); // remove choiceSecondaryImage
+            Validator.assertTrue(!csm._setUpChoiceSet(choiceSet));
         });
     });
 };
