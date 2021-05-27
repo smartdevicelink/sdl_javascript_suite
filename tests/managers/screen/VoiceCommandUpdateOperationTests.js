@@ -176,7 +176,6 @@ module.exports = function (appClient) {
             });
             it('Should not delete or upload the voiceCommands', function (done) {
                 Validator.assertEquals(callbackCurrentVoiceCommands.length, 2);
-                console.log(callbackError);
                 Validator.assertEquals(callbackError.length, 0);
                 done();
             });

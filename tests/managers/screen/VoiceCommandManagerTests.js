@@ -135,6 +135,15 @@ module.exports = async function (appClient) {
             });
         });
 
+        it('clone should not keep reference', function (done) {
+            const voiceCommand = new SDL.manager.screen.utils.VoiceCommand(['Command 1', 'Command 2'], () => {});
+            const clone = voiceCommand.clone();
+            Validator.assertTrue(clone.equals(voiceCommand));
+            clone.setVoiceCommands(['Command 3']);
+            Validator.assertTrue(!clone.equals(voiceCommand));
+            done();
+        });
+
         after(function () {
             voiceCommandManager.dispose();
 
