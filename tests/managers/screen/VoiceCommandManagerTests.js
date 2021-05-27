@@ -66,23 +66,34 @@ module.exports = async function (appClient) {
             Validator.assertEquals(voiceCommandManager._currentHmiLevel, SDL.rpc.enums.HMILevel.HMI_FULL);
         });
 
-        it('testUpdatingCommands', function () {
-            const callback = sinon.fake(() => {});
+        it('testUpdatingCommands', async function () {
+            let timesCallbackWasCalled = 0;
+            const callback = () => {
+                timesCallbackWasCalled++;
+            };
             const voiceCommand3 = new SDL.manager.screen.utils.VoiceCommand(['Command 5', 'Command 6'], callback);
 
             voiceCommandManager._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_NONE; // don't act on processing voice commands
-            voiceCommandManager.setVoiceCommands([voiceCommand3]);
+            await voiceCommandManager.setVoiceCommands([voiceCommand3]);
 
-            // Fake onCommand - we want to make sure that we can pass back onCommand events to our VoiceCommand Objects
-            voiceCommandManager._commandListener(new SDL.rpc.messages.OnCommand()
-                .setCmdID(voiceCommand3._getCommandId())
-                .setTriggerSource(SDL.rpc.enums.TriggerSource.TS_VR)); // these are voice commands
+            // there's only one voice command at the moment
+            const commandId = voiceCommandManager.getVoiceCommands()[0]._getCommandId();
 
-            // verify the mock listener has been hit once
-            Validator.assertEquals(callback.calledOnce, true);
+            // the commands take time to set
+            await new Promise ((resolve) => {
+                setTimeout(() => {
+                    // Fake onCommand - we want to make sure that we can pass back onCommand events to our VoiceCommand Objects
+                    voiceCommandManager._commandListener(new SDL.rpc.messages.OnCommand()
+                        .setCmdID(commandId)
+                        .setTriggerSource(SDL.rpc.enums.TriggerSource.TS_VR)); // these are voice commands
+
+                    // verify the mock listener has been hit once
+                    Validator.assertEquals(timesCallbackWasCalled, 1);
+                    resolve();
+                }, 1000);
+            });
         });
 
-<<<<<<< HEAD
         it('testEmptyVoiceCommandsShouldAddTask', async function () {
             const callback = sinon.fake(() => {});
             const stub = sinon.stub(voiceCommandManager, '_addTask')
@@ -91,7 +102,8 @@ module.exports = async function (appClient) {
 
             Validator.assertTrue(callback.called);
             stub.restore();
-=======
+        });
+
         describe('if any of the voice commands contains an empty string', function () {
             it('should remove the empty strings and queue another operation', async function () {
                 await voiceCommandManager.setVoiceCommands([voiceCommand2, voiceCommand3, voiceCommand4, voiceCommand5, voiceCommand6]);
@@ -106,9 +118,7 @@ module.exports = async function (appClient) {
                 await voiceCommandManager.setVoiceCommands([voiceCommand1]);
                 // these commands are empty and should be ignored entirely
                 await voiceCommandManager.setVoiceCommands([voiceCommand4, voiceCommand5]);
-                Validator.assertEquals(voiceCommandManager.getVoiceCommands().length, 1);
-                Validator.assertEquals(voiceCommandManager.getVoiceCommands()[0].getVoiceCommands().length, 2);
-                Validator.assertEquals(voiceCommandManager.getVoiceCommands()[0].getVoiceCommands(), ['Command 1', 'Command 2']);
+                Validator.assertNull(voiceCommandManager.getVoiceCommands());
             });
         });
 
@@ -123,7 +133,6 @@ module.exports = async function (appClient) {
                 Validator.assertEquals(voiceCommandManager._getTasks().length, 1);
                 Validator.assertTrue(!voiceCommandManager._arePendingVoiceCommandsUnique([voiceCommand2, voiceCommand7]));
             });
->>>>>>> develop
         });
 
         after(function () {
