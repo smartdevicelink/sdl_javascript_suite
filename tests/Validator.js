@@ -331,7 +331,7 @@ class Validator {
     }
 
     /**
-     * SoftButton equals validation
+     * SoftButtonObject equals validation
      * @param {SoftButtonObject} button1 - A SoftButtonObject.
      * @param {SoftButtonObject} button2 - A SoftButtonObject.
      * @returns {Boolean} - Whether or not they're equal.
@@ -342,6 +342,45 @@ class Validator {
             && ((button1.getButtonId() === null && button2.getButtonId() === null) || button1.getButtonId() === button2.getButtonId())
             && button1.getCurrentState().getSystemAction() === button2.getCurrentState().getSystemAction()
             && button1.getCurrentState().getSoftButton().getType() === button2.getCurrentState().getSoftButton().getType();
+    }
+
+    /**
+     * SoftButton equals validation
+     * @param {SoftButton} button1 - A SoftButton.
+     * @param {SoftButton} button2 - A SoftButton.
+     * @returns {Boolean} - Whether or not they're equal.
+     */
+    static validateSoftButtonStruct (button1, button2) {
+        expect(button1.getType()).to.be.equal(button2.getType());
+        expect(button1.getText()).to.be.equal(button2.getText());
+        expect(button1.getIsHighlighted()).to.be.equal(button2.getIsHighlighted());
+        expect(button1.getSoftButtonID()).to.be.equal(button2.getSoftButtonID());
+        expect(button1.getSystemAction()).to.be.equal(button2.getSystemAction());
+        expect(Validator.validateImage(button1.getImage(), button2.getImage())).to.be.true;
+        
+        return true;
+    }
+
+    /**
+     * Image equals validation
+     * @param {Image} button1 - An Image.
+     * @param {Image} button2 - An Image.
+     * @returns {Boolean} - Whether or not they're equal.
+     */
+    static validateImage (item1, item2) {
+        if (item1 === null || item2 === null) {
+            expect(item1).to.be.equal(item2);
+            return true;
+        }
+
+        expect(item1).to.exist;
+        expect(item2).to.exist;
+
+        expect(item1.getValueParam()).to.be.equal(item2.getValueParam());
+        expect(item1.getImageType()).to.be.equal(item2.getImageType());
+        expect(item1.getIsTemplate()).to.be.equal(item2.getIsTemplate());
+
+        return true;
     }
 
     /**
