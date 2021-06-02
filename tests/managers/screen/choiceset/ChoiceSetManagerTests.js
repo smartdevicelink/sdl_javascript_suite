@@ -348,41 +348,27 @@ module.exports = function (appClient) {
                 .setVoiceCommands(null)
                 .setArtwork(Test.GENERAL_ARTWORK)
                 .setSecondaryArtwork(Test.GENERAL_ARTWORK);
-            const cell2 = new SDL.manager.screen.choiceset.ChoiceCell('Item 2')
-                .setSecondaryText('null')
-                .setTertiaryText('tertiaryText')
+            const cell2 = new SDL.manager.screen.choiceset.ChoiceCell('Item 1')
+                .setSecondaryText('null2')
+                .setTertiaryText('tertiaryText2')
                 .setVoiceCommands(null)
-                .setArtwork(Test.GENERAL_ARTWORK)
-                .setSecondaryArtwork(Test.GENERAL_ARTWORK);
+                .setArtwork(null)
+                .setSecondaryArtwork(null);
 
             const choiceCellList = [
                 cell1,
                 cell2,
             ];
-            const choiceSet = new SDL.manager.screen.choiceset.ChoiceSet('choiceSet', choiceCellList, null);
-            Validator.assertTrue(csm._setUpChoiceSet(choiceSet));
-            // Identical cells
-            cell2.setText('Item 1');
-            Validator.assertTrue(!csm._setUpChoiceSet(choiceSet));
-            // Changing secondary text on cell 2 to be different
-            cell2.setSecondaryText('changed text');
-            Validator.assertTrue(csm._setUpChoiceSet(choiceSet));
-            // Removing secondaryText as a supported TextField in the WindowCapability
-            textFields.splice(0, 1);
-            // Test that it does not take into account secondaryText as a unique factor
-            Validator.assertTrue(!csm._setUpChoiceSet(choiceSet));
-            cell2.setTertiaryText('changed text');
-            Validator.assertTrue(csm._setUpChoiceSet(choiceSet));
-            textFields.splice(0, 1); // remove tertiaryTexts
-            Validator.assertTrue(!csm._setUpChoiceSet(choiceSet));
-            cell2.setArtwork(null);
-            Validator.assertTrue(csm._setUpChoiceSet(choiceSet));
-            imageFieldList.splice(0, 1); // remove choiceImage
-            Validator.assertTrue(!csm._setUpChoiceSet(choiceSet));
-            cell2.setSecondaryArtwork(null);
-            Validator.assertTrue(csm._setUpChoiceSet(choiceSet));
-            imageFieldList.splice(0, 1); // remove choiceSecondaryImage
-            Validator.assertTrue(!csm._setUpChoiceSet(choiceSet));
+
+            let removedProperties = csm._removeUnusedProperties(choiceCellList);
+            Validator.assertNotNullUndefined(removedProperties[0].getSecondaryText());
+
+            csm._defaultMainWindowCapability.setTextFields([]);
+            csm._defaultMainWindowCapability.setImageFields([]);
+
+            removedProperties = csm._removeUnusedProperties(choiceCellList);
+            csm._addUniqueNamesBasedOnStrippedCells(removedProperties, choiceCellList);
+            Validator.assertEquals(choiceCellList[1]._getUniqueText(), 'Item 1 (2)');
         });
     });
 };
