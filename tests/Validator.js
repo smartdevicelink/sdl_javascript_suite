@@ -357,14 +357,14 @@ class Validator {
         expect(button1.getSoftButtonID()).to.be.equal(button2.getSoftButtonID());
         expect(button1.getSystemAction()).to.be.equal(button2.getSystemAction());
         expect(Validator.validateImage(button1.getImage(), button2.getImage())).to.be.true;
-        
+
         return true;
     }
 
     /**
      * Image equals validation
-     * @param {Image} button1 - An Image.
-     * @param {Image} button2 - An Image.
+     * @param {Image} item1 - An Image.
+     * @param {Image} item2 - An Image.
      * @returns {Boolean} - Whether or not they're equal.
      */
     static validateImage (item1, item2) {
@@ -504,6 +504,18 @@ class Validator {
      */
     static assertEquals (val1, val2, msg) {
         expect(val1, msg).to.be.deep.equal(val2);
+    }
+
+    /**
+     * Assert values are not equal. Defaults to deeply equal which means
+     * objects like [1,2] or {'x': 1} will be compared based on values and not
+     * by reference.
+     * @param {*} val1 - First value to compare.
+     * @param {*} val2 - Second value to compare.
+     * @param {String} msg - Message to display on failure.
+     */
+    static assertNotEquals (val1, val2, msg) {
+        expect(val1, msg).to.not.deep.equal(val2);
     }
 
     /**
