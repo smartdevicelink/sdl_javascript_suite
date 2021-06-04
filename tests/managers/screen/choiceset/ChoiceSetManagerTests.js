@@ -370,5 +370,35 @@ module.exports = function (appClient) {
             csm._addUniqueNamesBasedOnStrippedCells(removedProperties, choiceCellList);
             Validator.assertEquals(choiceCellList[1]._getUniqueText(), 'Item 1 (2)');
         });
+
+        it('testChoicesToBeUploaded', function () {
+            const cell1 = new SDL.manager.screen.choiceset.ChoiceCell('Item 1')
+                .setSecondaryText('null')
+                .setTertiaryText('tertiaryText')
+                .setVoiceCommands(null)
+                .setArtwork(Test.GENERAL_ARTWORK)
+                .setSecondaryArtwork(Test.GENERAL_ARTWORK);
+            const cell2 = new SDL.manager.screen.choiceset.ChoiceCell('Item 2')
+                .setSecondaryText('null2')
+                .setTertiaryText('tertiaryText2')
+                .setVoiceCommands(null)
+                .setArtwork(null)
+                .setSecondaryArtwork(null);
+
+            const choiceCellList = [
+                cell1,
+                cell2,
+            ];
+
+            csm._preloadedChoices = choiceCellList;
+            Validator.assertEquals(csm._getChoicesToBeUploadedWithArray(choiceCellList), []);
+            const cell3 = new SDL.manager.screen.choiceset.ChoiceCell('Item 3')
+                .setSecondaryText('null3')
+                .setTertiaryText('tertiaryText3')
+                .setVoiceCommands(null)
+                .setArtwork(null)
+                .setSecondaryArtwork(null);
+            Validator.assertEquals(csm._getChoicesToBeUploadedWithArray([cell1, cell2, cell3]), [cell3]);
+        });
     });
 };
