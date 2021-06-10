@@ -259,6 +259,40 @@ module.exports = function (appClient) {
             sdlManager.removeRpcListener(SDL.rpc.enums.FunctionID.ListFiles, expectSuccess);
         });
 
+        it('testNonPersistentFilesOnOlderVersions', async function () {
+            const stub = sinon.stub(lifecycleManager, 'getSdlMsgVersion')
+                .callsFake(() => {
+                    return new SDL.rpc.structs.SdlMsgVersion()
+                        .setMajorVersion(4)
+                        .setMinorVersion(3);
+                });
+
+            fileManager._remoteFiles.splice(0, fileManager._remoteFiles.length);
+            fileManager._uploadedEphemeralFileNames.splice(0, fileManager._uploadedEphemeralFileNames.length);
+            fileManager._remoteFiles.push(validFile.getName());
+            const hasUploadedResult = fileManager.hasUploadedFile(validFile);
+            stub.restore();
+
+            Validator.assertTrue(!hasUploadedResult);
+        });
+
+        it('testNonPersistentFilesOnNewerVersions', async function () {
+            const stub = sinon.stub(lifecycleManager, 'getSdlMsgVersion')
+                .callsFake(() => {
+                    return new SDL.rpc.structs.SdlMsgVersion()
+                        .setMajorVersion(5)
+                        .setMinorVersion(0);
+                });
+
+            fileManager._remoteFiles.splice(0, fileManager._remoteFiles.length);
+            fileManager._uploadedEphemeralFileNames.splice(0, fileManager._uploadedEphemeralFileNames.length);
+            fileManager._remoteFiles.push(validFile.getName());
+            const hasUploadedResult = fileManager.hasUploadedFile(validFile);
+            stub.restore();
+
+            Validator.assertTrue(hasUploadedResult);
+        });
+
         it('testInvalidSdlFileInput', async function () {
             const expectSuccess = function (response) {
                 Validator.assertTrue(response.getSuccess());

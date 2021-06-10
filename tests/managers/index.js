@@ -36,7 +36,6 @@ describe('ManagerTests', function () {
                 voiceCommandUpdateOperationTests(appClient);
                 textAndGraphicManagerTests(appClient);
                 permissionManagerTests(appClient);
-                softButtonManagerTests(appClient);
                 screenManagerTests(appClient);
                 lifecycleManagerTests(appClient);
                 fileManagerTests(appClient);
@@ -56,6 +55,7 @@ describe('ManagerTests', function () {
                 preloadChoicesOperationTests(appClient);
                 presentChoiceSetOperationTests(appClient);
                 presentKeyboardOperationTests(appClient);
+                softButtonManagerTests(appClient);
 
                 setTimeout(function () {
                     // teardown();
