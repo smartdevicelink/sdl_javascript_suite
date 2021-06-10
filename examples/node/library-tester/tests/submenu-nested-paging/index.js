@@ -82,12 +82,42 @@ module.exports = async function (catalogRpc) {
         console.log("The HMI does not support dynamic submenus!");
     }
 
-    screenManager.setTextField1(`Go into the menu to find the item to end the test!`)
+    screenManager.setTextField1(`Go into the menu to find the item to end the test!`);
 
+    sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.OnUpdateFile, rpc => {
+        // upload a file when requested
+        const fileName = rpc.getFileName();
+        if (!fileName.startsWith('filetest')) return;
+        const file = new SDL.manager.file.filetypes.SdlFile()
+            .setName(fileName)
+            .setFilePath('./tests/submenu-nested-paging/test_icon_1.png')
+            .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG)
+            .setPersistent(true);
+        sdlManager.getFileManager().uploadFile(file);
+    });
+
+    sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.OnUpdateSubMenu, rpc => {
+        const id = rpc.getMenuID();
+        if (id <= 1000) return;
+
+        const childMenu = new SDL.rpc.messages.AddSubMenu()
+        .setMenuID(id + 1)
+        .setParentID(id)
+        .setMenuName('You are ' + (id - 1000) + ' levels deep!')
+        sdlManager.sendRpcResolve(childMenu);
+    });
+
+    const menuBranch1 = new SDL.rpc.messages.AddSubMenu()
+        .setMenuID(1001)
+        .setMenuIcon(new SDL.rpc.structs.Image().setValueParam('does_not_exist').setImageType(SDL.rpc.enums.ImageType.DYNAMIC))
+        .setMenuName('Click on me first to test dynamically added menus')
+    await sdlManager.sendRpcResolve(menuBranch1);
+    
     const addMenu1 = new SDL.rpc.messages.AddSubMenu()
         .setMenuID(1)
         .setMenuIcon(new SDL.rpc.structs.Image().setValueParam('does_not_exist').setImageType(SDL.rpc.enums.ImageType.DYNAMIC))
-        .setMenuName('Not deep enough. Click again.');
+        .setMenuName('Not deep enough. Click again.')
+        .setSecondaryText('Disallowed to continue if driver distraction is ON');
     await sdlManager.sendRpcResolve(addMenu1);
 
     const addMenu2 = new SDL.rpc.messages.AddSubMenu()
@@ -97,6 +127,16 @@ module.exports = async function (catalogRpc) {
         .setMenuIcon(new SDL.rpc.structs.Image().setValueParam(fileName).setImageType(SDL.rpc.enums.ImageType.DYNAMIC))
         .setSecondaryImage(new SDL.rpc.structs.Image().setValueParam(fileName).setImageType(SDL.rpc.enums.ImageType.DYNAMIC))
     await sdlManager.sendRpcResolve(addMenu2);
+
+    const addCommandSwarm = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50]
+        .map(number => {
+            const rpc = new SDL.rpc.messages.AddCommand()
+                .setCmdID(100 + number)
+                .setMenuParams(new SDL.rpc.structs.MenuParams().setParentID(1).setMenuName('<- image dynamically loaded? ' + (100 + number)))
+                .setCmdIcon(new SDL.rpc.structs.Image().setValueParam('filetest' + number).setImageType(SDL.rpc.enums.ImageType.DYNAMIC));
+            return sdlManager.sendRpcResolve(rpc);
+        });
+    await Promise.all(addCommandSwarm);
 
     const addMenu3 = new SDL.rpc.messages.AddSubMenu()
         .setMenuID(3)
