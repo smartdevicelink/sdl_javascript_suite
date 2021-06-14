@@ -1,6 +1,6 @@
 {
   "name": "sdl_javascript_suite",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "The official JavaScript SDK for SmartDeviceLink.",
   "main": "/lib/js/dist/SDL.js",
   "engines": {
