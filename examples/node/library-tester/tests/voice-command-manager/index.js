@@ -62,6 +62,9 @@ module.exports = async function (catalogRpc) {
     const sdlManager = app.getManager();
     const screenManager = sdlManager.getScreenManager();
 
+    sdlManager.getScreenManager()
+        .setTextField1('Click on any voice command to continue!');
+
     await new Promise ((resolve) => {
         screenManager.setVoiceCommands([
             new SDL.manager.screen.utils.VoiceCommand(['Option 1'], () => {
@@ -75,34 +78,46 @@ module.exports = async function (catalogRpc) {
             }),
         ]);
     });
+    // should succeed
+    if (getCommandCount(screenManager) !== 3) {
+        console.error(`Expected 3 voice commands set! Got ${getCommandCount(screenManager)}`);
+    }
 
-    await new Promise ((resolve) => {
-        screenManager.setVoiceCommands([
-            new SDL.manager.screen.utils.VoiceCommand(['Option 1'], () => {
-                resolve();
-            }),
-            new SDL.manager.screen.utils.VoiceCommand(['Option 1'], () => {
-                resolve();
-            }),
-            new SDL.manager.screen.utils.VoiceCommand(['Option 3'], () => {
-                resolve();
-            }),
-        ]);
-    }).catch(() => {});
+    screenManager.setVoiceCommands([
+        new SDL.manager.screen.utils.VoiceCommand(['Option 1'], () => {
+            resolve();
+        }),
+        new SDL.manager.screen.utils.VoiceCommand(['Option 1'], () => {
+            resolve();
+        }),
+        new SDL.manager.screen.utils.VoiceCommand(['Option 3'], () => {
+            resolve();
+        }),
+    ]);
+    // should fail
+    if (screenManager._voiceCommandManager._voiceCommands !== null) {
+        console.error(`Expected no voice commands set! Got ${screenManager._voiceCommandManager._voiceCommands}`);
+    }
+    
 
-    await new Promise ((resolve) => {
-        screenManager.setVoiceCommands([
-            new SDL.manager.screen.utils.VoiceCommand(['Option 1', 'Option 2'], () => {
-                resolve();
-            }),
-            new SDL.manager.screen.utils.VoiceCommand(['Option 2', 'Option 3'], () => {
-                resolve();
-            }),
-            new SDL.manager.screen.utils.VoiceCommand(['Option 4', 'Option 5'], () => {
-                resolve();
-            }),
-        ]);
-    }).catch(() => {});
+    screenManager.setVoiceCommands([
+        new SDL.manager.screen.utils.VoiceCommand(['Option 1', 'Option 2'], () => {
+            resolve();
+        }),
+        new SDL.manager.screen.utils.VoiceCommand(['Option 2', 'Option 3'], () => {
+            resolve();
+        }),
+        new SDL.manager.screen.utils.VoiceCommand(['Option 4', 'Option 5'], () => {
+            resolve();
+        }),
+    ]);
+    // should fail
+    if (screenManager._voiceCommandManager._voiceCommands !== null) {
+        console.error(`Expected no voice commands set! Got ${screenManager._voiceCommandManager._voiceCommands}`);
+    }
+
+    sdlManager.getScreenManager()
+        .setTextField1('Click on any voice command to continue except Option 1');
 
     await new Promise ((resolve) => {
         screenManager.setVoiceCommands([
@@ -117,6 +132,22 @@ module.exports = async function (catalogRpc) {
             }),
         ]);
     }).catch(() => {});
+    // should succeed
+    if (getCommandCount(screenManager) !== 5) {
+        console.error(`Expected 5 voice commands set! Got ${getCommandCount(screenManager)}`);
+    }
 
     await screenManager.setVoiceCommands([]);
+    // should succeed
+    if (getCommandCount(screenManager) !== 0) {
+        console.error(`Expected 0 voice commands set! Got ${getCommandCount(screenManager)}`);
+    }
+
+    // tear down the app
+    await sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
+    sdlManager.dispose();
 };
+
+function getCommandCount (screenManager) {
+    return screenManager._voiceCommandManager._voiceCommands.map(voiceCommand => voiceCommand.getVoiceCommands()).flat().length;
+}

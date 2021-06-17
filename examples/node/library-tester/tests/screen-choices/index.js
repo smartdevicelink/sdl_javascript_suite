@@ -223,7 +223,7 @@ module.exports = async function (catalogRpc) {
         .setOnKeyboardDidSendEvent(() => {
             console.log("Keyboard Event - OnKeyboardDidSendEvent")
         })
-        .setOnKeyboardInputMaskHasChanged(() => {
+        .setOnKeyboardDidUpdateInputMask(() => {
             console.log("Keyboard Event - OnKeyboardInputMaskHasChanged")
         })
 

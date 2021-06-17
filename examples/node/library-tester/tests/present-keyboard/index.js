@@ -71,7 +71,8 @@ module.exports = async function (catalogRpc) {
         .setUpdateAutocompleteWithInput(() => {})
         .setUpdateCharacterSetWithInput(() => {})
         .setOnKeyboardDidSendEvent(() => {})
-        .setOnKeyboardInputMaskHasChanged(() => {});
+        .setOnKeyboardDidUpdateInputMask(() => {});
+
     const cancelId = screenManager.presentKeyboard('should dismiss', keyboardProperties, keyboardListener);
     await new Promise(r => setTimeout(r, 1000))
     screenManager.dismissKeyboard(cancelId);
@@ -89,7 +90,7 @@ module.exports = async function (catalogRpc) {
     keyboardProperties.setMaskInputCharacters(SDL.rpc.enums.KeyboardInputMask.USER_CHOICE_INPUT_KEY_MASK);
     screenManager.setKeyboardConfiguration(keyboardProperties);
     await new Promise((resolve) => {
-        keyboardListener.setOnKeyboardInputMaskHasChanged((keyboardEvent) => {
+        keyboardListener.setOnKeyboardDidUpdateInputMask((keyboardEvent) => {
             resolve();
         });
         screenManager.presentKeyboard('change the input mask', null, keyboardListener);

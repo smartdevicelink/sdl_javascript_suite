@@ -66,7 +66,7 @@ module.exports = async function (catalogRpc) {
     // wait for the user to click on a voice command to continue
     sdlManager.getScreenManager()
         .setTextField1('Media should play at ten times speed!')
-        .setTextField2('Seek button icons should update every second (they do not work!)')
+        .setTextField2('Seek button icons should update every second')
         .setTextField3('Find and click on the voice command to finish!');
 
     let count = 0;

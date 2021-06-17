@@ -145,7 +145,10 @@ module.exports = async function (catalogRpc) {
     // set video options test
     const scm = sdlManager.getSystemCapabilityManager();
     const capabilities = await scm.updateCapability(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING);
-    const streamOptions = capabilities.getAdditionalVideoStreamingCapabilities();
+    let streamOptions = capabilities.getAdditionalVideoStreamingCapabilities();
+    if (streamOptions === null) {
+        streamOptions = [];
+    }
     streamOptions.push(capabilities); // push the original capability too
     streamOptions.push(new SDL.rpc.structs.VideoStreamingCapability()
         .setPreferredResolution(new SDL.rpc.structs.ImageResolution()

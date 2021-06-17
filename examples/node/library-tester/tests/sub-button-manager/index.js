@@ -56,7 +56,7 @@ module.exports = async function (catalogRpc) {
     // add button listeners for both regular and RC buttons
     const ButtonName = SDL.rpc.enums.ButtonName;
     const buttonNames = [ButtonName.OK, ButtonName.PLAY_PAUSE, ButtonName.SEEKLEFT, ButtonName.SEEKRIGHT, ButtonName.TEMP_UP, ButtonName.TEMP_DOWN,
-        ButtonName.VOLUME_UP, ButtonName.VOLUME_DOWN];
+        ButtonName.VOLUME_UP, ButtonName.VOLUME_DOWN, ButtonName.TUNEUP, ButtonName.TUNEDOWN];
 
     screenManager.setTextField1(`Click the voice command to end the test. Try the buttons below:`)
         .setTextField2(`OK, SEEKLEFT, SEEKRIGHT, TEMP_UP, TEMP_DOWN, VOLUME_UP, VOLUME_DOWN`);

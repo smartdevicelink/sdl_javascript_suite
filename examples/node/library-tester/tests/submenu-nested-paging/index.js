@@ -67,7 +67,7 @@ module.exports = async function (catalogRpc) {
 
     // check for dynamic submenu support
     const windowCapability = sdlManager.getSystemCapabilityManager().getDefaultMainWindowCapability();
-    if (windowCapability.getDynamicUpdateCapabilities().getSupportsDynamicSubMenus()) {
+    if (windowCapability.getDynamicUpdateCapabilities() && windowCapability.getDynamicUpdateCapabilities().getSupportsDynamicSubMenus()) {
         console.log("The HMI supports dynamic submenus!");
         supportsDynamicSubmenus = true;
 
@@ -80,6 +80,10 @@ module.exports = async function (catalogRpc) {
 
     } else {
         console.log("The HMI does not support dynamic submenus!");
+        // tear down the app
+        await sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
+        sdlManager.dispose();
+        return;
     }
 
     screenManager.setTextField1(`Go into the menu to find the item to end the test!`);
