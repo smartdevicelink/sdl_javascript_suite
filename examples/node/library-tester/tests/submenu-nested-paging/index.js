@@ -120,13 +120,13 @@ module.exports = async function (catalogRpc) {
     const addMenu1 = new SDL.rpc.messages.AddSubMenu()
         .setMenuID(1)
         .setMenuIcon(new SDL.rpc.structs.Image().setValueParam('does_not_exist').setImageType(SDL.rpc.enums.ImageType.DYNAMIC))
-        .setMenuName('Not deep enough. Click again.')
-        .setSecondaryText('Disallowed to continue if driver distraction is ON');
+        .setMenuName('Not deep enough. Click again.');
     await sdlManager.sendRpcResolve(addMenu1);
 
     const addMenu2 = new SDL.rpc.messages.AddSubMenu()
         .setMenuID(2)
         .setMenuName('Getting closer. Are there two images here?')
+        .setSecondaryText('Disallowed to continue if driver distraction is ON')
         .setParentID(1)
         .setMenuIcon(new SDL.rpc.structs.Image().setValueParam(fileName).setImageType(SDL.rpc.enums.ImageType.DYNAMIC))
         .setSecondaryImage(new SDL.rpc.structs.Image().setValueParam(fileName).setImageType(SDL.rpc.enums.ImageType.DYNAMIC))

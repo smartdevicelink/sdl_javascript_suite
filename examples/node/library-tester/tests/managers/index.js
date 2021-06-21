@@ -223,12 +223,14 @@ module.exports = async function (catalogRpc) {
         .setCmdID(removeMeIndex)
         .setVrCommands(['Activate the app after clicking the voice command below']));
 
+    await new Promise((resolve, reject) => {
         sdlManager.getScreenManager().setVoiceCommands([
             new SDL.manager.screen.utils.VoiceCommand(['Click on me to continue the test!'], () => {
+                resolve();
             }),
         ]);
-
-await sleep(4000)    
+    });
+     
     await sdlManager.sendRpcResolve(new SDL.rpc.messages.CloseApplication());
     // wait for the permission change of Show to complete the test
     await permissionPromise;

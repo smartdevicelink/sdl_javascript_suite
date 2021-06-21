@@ -101,15 +101,12 @@ module.exports = async function (catalogRpc) {
     // subscribe to DISPLAYS test
     let listenerCalled = false;
 
-    const listener = (displayCapabilities) => {
+    const listener = (displayCapabilitiesx) => {
         listenerCalled = true;
     }
 
-    await new Promise((resolve, reject) => {
-        scm.addOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.DISPLAYS, (cap) => {
-            listener(cap);
-            resolve();
-        });
+    scm.addOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.DISPLAYS, (cap) => {
+        listener(cap);
     });
 
     listenerCalled = false;
