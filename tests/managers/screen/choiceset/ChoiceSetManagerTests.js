@@ -2,6 +2,7 @@ const SDL = require('../../../config.js').node;
 
 const Validator = require('../../../Validator');
 const sinon = require('sinon');
+const Test = require('../../../Test.js');
 
 module.exports = function (appClient) {
     describe('ChoiceSetManagerTests', function () {
@@ -313,6 +314,91 @@ module.exports = function (appClient) {
             Validator.assertEquals(cell4._getUniqueText(), 'McDonalds (3)');
             Validator.assertEquals(cell5._getUniqueText(), 'Starbucks (2)');
             Validator.assertEquals(cell6._getUniqueText(), 'Meijer');
+        });
+
+        it('testUniquenessForAvailableFields', function () {
+            const windowCapability = new SDL.rpc.structs.WindowCapability();
+            const secondaryText = new SDL.rpc.structs.TextField()
+                .setNameParam(SDL.rpc.enums.TextFieldName.secondaryText);
+            const tertiaryText = new SDL.rpc.structs.TextField()
+                .setNameParam(SDL.rpc.enums.TextFieldName.tertiaryText);
+
+            const textFields = [
+                secondaryText,
+                tertiaryText,
+            ];
+            windowCapability.setTextFields(textFields);
+
+            const choiceImage = new SDL.rpc.structs.ImageField()
+                .setNameParam(SDL.rpc.enums.ImageFieldName.choiceImage);
+            const choiceSecondaryImage = new SDL.rpc.structs.ImageField()
+                .setNameParam(SDL.rpc.enums.ImageFieldName.choiceSecondaryImage);
+
+            const imageFieldList = [
+                choiceImage,
+                choiceSecondaryImage,
+            ];
+            windowCapability.setImageFields(imageFieldList);
+
+            csm._defaultMainWindowCapability = windowCapability;
+
+            const cell1 = new SDL.manager.screen.choiceset.ChoiceCell('Item 1')
+                .setSecondaryText('null')
+                .setTertiaryText('tertiaryText')
+                .setVoiceCommands(null)
+                .setArtwork(Test.GENERAL_ARTWORK)
+                .setSecondaryArtwork(Test.GENERAL_ARTWORK);
+            const cell2 = new SDL.manager.screen.choiceset.ChoiceCell('Item 1')
+                .setSecondaryText('null2')
+                .setTertiaryText('tertiaryText2')
+                .setVoiceCommands(null)
+                .setArtwork(null)
+                .setSecondaryArtwork(null);
+
+            const choiceCellList = [
+                cell1,
+                cell2,
+            ];
+
+            let removedProperties = csm._removeUnusedProperties(choiceCellList);
+            Validator.assertNotNullUndefined(removedProperties[0].getSecondaryText());
+
+            csm._defaultMainWindowCapability.setTextFields([]);
+            csm._defaultMainWindowCapability.setImageFields([]);
+
+            removedProperties = csm._removeUnusedProperties(choiceCellList);
+            csm._addUniqueNamesBasedOnStrippedCells(removedProperties, choiceCellList);
+            Validator.assertEquals(choiceCellList[1]._getUniqueText(), 'Item 1 (2)');
+        });
+
+        it('testChoicesToBeUploaded', function () {
+            const cell1 = new SDL.manager.screen.choiceset.ChoiceCell('Item 1')
+                .setSecondaryText('null')
+                .setTertiaryText('tertiaryText')
+                .setVoiceCommands(null)
+                .setArtwork(Test.GENERAL_ARTWORK)
+                .setSecondaryArtwork(Test.GENERAL_ARTWORK);
+            const cell2 = new SDL.manager.screen.choiceset.ChoiceCell('Item 2')
+                .setSecondaryText('null2')
+                .setTertiaryText('tertiaryText2')
+                .setVoiceCommands(null)
+                .setArtwork(null)
+                .setSecondaryArtwork(null);
+
+            const choiceCellList = [
+                cell1,
+                cell2,
+            ];
+
+            csm._preloadedChoices = choiceCellList;
+            Validator.assertEquals(csm._getChoicesToBeUploadedWithArray(choiceCellList), []);
+            const cell3 = new SDL.manager.screen.choiceset.ChoiceCell('Item 3')
+                .setSecondaryText('null3')
+                .setTertiaryText('tertiaryText3')
+                .setVoiceCommands(null)
+                .setArtwork(null)
+                .setSecondaryArtwork(null);
+            Validator.assertEquals(csm._getChoicesToBeUploadedWithArray([cell1, cell2, cell3]), [cell3]);
         });
     });
 };
