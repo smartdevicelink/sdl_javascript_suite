@@ -1,5 +1,9 @@
 const SDL = require('../../../config.js').node;
 
+// Mocking framework
+// Used to stub an RPC call so that it isn't actually sent to Core
+const sinon = require('sinon');
+
 const Validator = require('../../../Validator');
 const Test = require('../../../Test.js');
 
@@ -61,6 +65,58 @@ module.exports = function (appClient) {
             Validator.assertTrue(!operation._checkCapability('hasTextFieldOfName', SDL.rpc.enums.TextFieldName.secondaryText));
             Validator.assertTrue(!operation._checkCapability('hasTextFieldOfName', SDL.rpc.enums.TextFieldName.tertiaryText));
             Validator.assertTrue(!operation._shouldSendChoiceText());
+        });
+
+        describe('when a bad response comes back', function () {
+            it('should add the choiceID of the failed choice item to the failedChoiceUploadIDs array', async function () {
+                const rpcStub = sinon.stub(appClient._sdlManager._lifecycleManager, 'sendRpcResolve')
+                    .callsFake(function () {
+                        const cicsResponse = new SDL.rpc.messages.CreateInteractionChoiceSetResponse({
+                            functionName: SDL.rpc.enums.FunctionID.CreateInteractionChoiceSetResponse,
+                        })
+                            .setSuccess(false);
+
+                        appClient._sdlManager._lifecycleManager._handleRpc(cicsResponse);
+
+                        return new Promise((resolve, reject) => {
+                            resolve(cicsResponse);
+                        });
+                    });
+                appClient._sdlManager.getScreenManager()._choiceSetManagerBase._updateIdsOnChoices([cell1, cell2]);
+                const operation = new SDL.manager.screen.choiceset._PreloadChoicesOperation(appClient._sdlManager._lifecycleManager,
+                    appClient._sdlManager._fileManager, null, null, true, [cell1, cell2], (success, failedChoiceCells) => {});
+                await operation._preloadCells();
+                Validator.assertEquals(operation._failedChoiceCells.length, 2);
+                Validator.assertEquals([cell1, cell2], operation._failedChoiceCells);
+
+                rpcStub.restore();
+            });
+        });
+
+        describe('when only good responses come back', function () {
+            it('should leave the failedChoiceUploadIds empty', async function () {
+                const rpcStub = sinon.stub(appClient._sdlManager._lifecycleManager, 'sendRpcResolve')
+                    .callsFake(function () {
+                        const cicsResponse = new SDL.rpc.messages.CreateInteractionChoiceSetResponse({
+                            functionName: SDL.rpc.enums.FunctionID.CreateInteractionChoiceSetResponse,
+                        })
+                            .setSuccess(true);
+
+                        appClient._sdlManager._lifecycleManager._handleRpc(cicsResponse);
+
+                        return new Promise((resolve, reject) => {
+                            resolve(cicsResponse);
+                        });
+                    });
+                appClient._sdlManager.getScreenManager()._choiceSetManagerBase._updateIdsOnChoices([cell1, cell2]);
+                const operation = new SDL.manager.screen.choiceset._PreloadChoicesOperation(appClient._sdlManager._lifecycleManager,
+                    appClient._sdlManager._fileManager, null, null, true, [cell1, cell2], (success, failedChoiceCells) => {});
+                await operation._preloadCells();
+                Validator.assertEquals(operation._failedChoiceCells.length, 0);
+                Validator.assertEquals([], operation._failedChoiceCells);
+
+                rpcStub.restore();
+            });
         });
 
         /**
