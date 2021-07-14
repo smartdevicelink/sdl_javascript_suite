@@ -52,5 +52,50 @@ module.exports = function (appClient) {
             Validator.assertNotNullUndefined(version.getPatchVersion());
             done();
         });
+
+        it('testOnSystemInfoReceived', function (done) {
+            const mockSystemInfo = {};
+            const defaultResult = true;
+            let actualResult = sdlManager._lifecycleManager.onSystemInfoReceived(mockSystemInfo);
+            Validator.assertEquals(actualResult, defaultResult);
+
+            const testResult = false;
+            const testListener = function (mockSystemInfo) {
+                return testResult;
+            };
+            sdlManager._lifecycleManager.setOnSystemInfoReceived(testListener);
+            actualResult = sdlManager._lifecycleManager.onSystemInfoReceived(mockSystemInfo);
+            Validator.assertEquals(actualResult, testResult);
+
+            done();
+        });
+
+        it('testFixingIncorrectCapabilities', function (done) {
+            let setDisplayLayoutResponse;
+
+            const registerAppInterFaceCapabilities = new SDL.rpc.structs.DisplayCapabilities()
+                .setImageFields([new SDL.rpc.structs.ImageField(SDL.rpc.enums.ImageFieldName.graphic, [SDL.rpc.enums.FileType.GRAPHIC_PNG])]);
+
+            const setDisplayLayoutCapabilities = new SDL.rpc.structs.DisplayCapabilities()
+                .setImageFields([]);
+
+            sdlManager._lifecycleManager._initialMediaCapabilities = registerAppInterFaceCapabilities;
+
+
+            // Test switching to MEDIA template - Capabilities in setDisplayLayoutResponse should be replaced with the ones from RAIR
+            sdlManager._lifecycleManager._lastDisplayLayoutRequestTemplate = SDL.rpc.enums.PredefinedLayout.MEDIA;
+            setDisplayLayoutResponse = new SDL.rpc.messages.SetDisplayLayoutResponse()
+                .setDisplayCapabilities(setDisplayLayoutCapabilities);
+            sdlManager._lifecycleManager.fixIncorrectDisplayCapabilities(setDisplayLayoutResponse);
+            Validator.assertEquals(registerAppInterFaceCapabilities, setDisplayLayoutResponse.getDisplayCapabilities());
+
+            // Test switching to non-MEDIA template - Capabilities in setDisplayLayoutResponse should not be altered
+            sdlManager._lifecycleManager._lastDisplayLayoutRequestTemplate = SDL.rpc.enums.PredefinedLayout.TEXT_WITH_GRAPHIC;
+            setDisplayLayoutResponse = new SDL.rpc.messages.SetDisplayLayoutResponse()
+                .setDisplayCapabilities(setDisplayLayoutCapabilities);
+            sdlManager._lifecycleManager.fixIncorrectDisplayCapabilities(setDisplayLayoutResponse);
+            Validator.assertEquals(setDisplayLayoutCapabilities, setDisplayLayoutResponse.getDisplayCapabilities());
+            done();
+        });
     });
 };

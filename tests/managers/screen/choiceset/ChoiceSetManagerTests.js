@@ -2,6 +2,7 @@ const SDL = require('../../../config.js').node;
 
 const Validator = require('../../../Validator');
 const sinon = require('sinon');
+const Test = require('../../../Test.js');
 
 module.exports = function (appClient) {
     describe('ChoiceSetManagerTests', function () {
@@ -49,6 +50,12 @@ module.exports = function (appClient) {
         });
 
         it('testSetupChoiceSet', function () {
+            const stub = sinon.stub(sdlManager._lifecycleManager, 'getSdlMsgVersion')
+                .returns(new SDL.rpc.structs.SdlMsgVersion()
+                    .setMajorVersion(7)
+                    .setMinorVersion(0)
+                    .setPatchVersion(0));
+
             const choiceSetSelectionListener = new SDL.manager.screen.choiceset.ChoiceSetSelectionListener()
                 .setOnChoiceSelected(() => {})
                 .setOnError(() => {});
@@ -57,34 +64,45 @@ module.exports = function (appClient) {
             const choiceSet1 = new SDL.manager.screen.choiceset.ChoiceSet('test', [], choiceSetSelectionListener);
             Validator.assertTrue(!csm._setUpChoiceSet(choiceSet1));
 
-            // cells cant have duplicate text
+            // Identical cells will not be allowed
             const cell1 = new SDL.manager.screen.choiceset.ChoiceCell('test');
             const cell2 = new SDL.manager.screen.choiceset.ChoiceCell('test');
             const choiceSet2 = new SDL.manager.screen.choiceset.ChoiceSet('test', [cell1, cell2], choiceSetSelectionListener);
             Validator.assertTrue(!csm._setUpChoiceSet(choiceSet2));
 
-            // cells cannot mix and match VR / non-VR
+            // cells that have duplicate text will be allowed if there is another property to make them unique
+            // because a unique name will be assigned and used
             const cell3 = new SDL.manager.screen.choiceset.ChoiceCell('test')
-                .setVoiceCommands(['Test']);
-            const cell4 = new SDL.manager.screen.choiceset.ChoiceCell('test2');
+                .setSecondaryText('text 1');
+            const cell4 = new SDL.manager.screen.choiceset.ChoiceCell('test')
+                .setSecondaryText('text 2');
             const choiceSet3 = new SDL.manager.screen.choiceset.ChoiceSet('test', [cell3, cell4], choiceSetSelectionListener);
-            Validator.assertTrue(!csm._setUpChoiceSet(choiceSet3));
+            Validator.assertTrue(csm._setUpChoiceSet(choiceSet3));
 
-            // VR Commands must be unique
+            // cells cannot mix and match VR / non-VR
             const cell5 = new SDL.manager.screen.choiceset.ChoiceCell('test')
                 .setVoiceCommands(['Test']);
-            const cell6 = new SDL.manager.screen.choiceset.ChoiceCell('test2')
-                .setVoiceCommands(['Test']);
+            const cell6 = new SDL.manager.screen.choiceset.ChoiceCell('test2');
             const choiceSet4 = new SDL.manager.screen.choiceset.ChoiceSet('test', [cell5, cell6], choiceSetSelectionListener);
             Validator.assertTrue(!csm._setUpChoiceSet(choiceSet4));
 
-            // Passing Case
+            // VR Commands must be unique
             const cell7 = new SDL.manager.screen.choiceset.ChoiceCell('test')
                 .setVoiceCommands(['Test']);
             const cell8 = new SDL.manager.screen.choiceset.ChoiceCell('test2')
-                .setVoiceCommands(['Test2']);
+                .setVoiceCommands(['Test']);
             const choiceSet5 = new SDL.manager.screen.choiceset.ChoiceSet('test', [cell7, cell8], choiceSetSelectionListener);
-            Validator.assertTrue(csm._setUpChoiceSet(choiceSet5));
+            Validator.assertTrue(!csm._setUpChoiceSet(choiceSet5));
+
+            // Passing Case
+            const cell9 = new SDL.manager.screen.choiceset.ChoiceCell('test')
+                .setVoiceCommands(['Test']);
+            const cell10 = new SDL.manager.screen.choiceset.ChoiceCell('test2')
+                .setVoiceCommands(['Test2']);
+            const choiceSet6 = new SDL.manager.screen.choiceset.ChoiceSet('test', [cell9, cell10], choiceSetSelectionListener);
+            Validator.assertTrue(csm._setUpChoiceSet(choiceSet6));
+
+            stub.restore();
         });
 
         it('testUpdateIdsOnChoices', function () {
@@ -172,6 +190,215 @@ module.exports = function (appClient) {
             Validator.assertEquals(callback2.called, true);
             stub.restore();
             stub2.restore();
+        });
+
+        it('testValidateCustomConfigurationCalls', function () {
+            const processSpy = sinon.spy(csm, '_createValidKeyboardConfigurationBasedOnKeyboardCapabilitiesFromConfiguration');
+            const newProperties = new SDL.rpc.structs.KeyboardProperties().setKeyboardLayout(SDL.rpc.enums.KeyboardLayout.NUMERIC);
+            const defaultProperties = csm._defaultKeyboardConfiguration();
+            // Test setKeyboardConfiguration call
+            csm.setKeyboardConfiguration(newProperties);
+            Validator.assertEquals(processSpy.calledWith(newProperties), true);
+            csm.setKeyboardConfiguration(defaultProperties);
+            Validator.assertEquals(processSpy.calledWith(defaultProperties), true);
+            // Test presentKeyboard call
+            csm.presentKeyboard('qwerty', newProperties, null);
+            Validator.assertEquals(processSpy.calledWith(newProperties), true);
+            // restore state
+            processSpy.restore();
+        });
+
+        it('testValidateCustomConfigurationPassBack', function () {
+            const originCapability = csm._defaultMainWindowCapability;
+            csm._defaultMainWindowCapability = new SDL.rpc.structs.WindowCapability().setKeyboardCapabilities(null);
+
+            let newProperties = new SDL.rpc.structs.KeyboardProperties()
+                .setKeyboardLayout(SDL.rpc.enums.KeyboardLayout.NUMERIC)
+                .setMaskInputCharacters(SDL.rpc.enums.KeyboardInputMask.ENABLE_INPUT_KEY_MASK)
+                .setCustomKeys(['1', '2', '3']);
+
+            // should pass back if there are no keyboard capabilities
+            Validator.assertEquals(
+                csm._createValidKeyboardConfigurationBasedOnKeyboardCapabilitiesFromConfiguration(newProperties),
+                newProperties
+            );
+            // should pass back if there is no passed keyboard configuration
+            Validator.assertNull(csm._createValidKeyboardConfigurationBasedOnKeyboardCapabilitiesFromConfiguration(null));
+            // should pass back if there is no layout to the passed keyboard configuration
+            newProperties = new SDL.rpc.structs.KeyboardProperties()
+                .setMaskInputCharacters(SDL.rpc.enums.KeyboardInputMask.ENABLE_INPUT_KEY_MASK)
+                .setCustomKeys(['1', '2', '3']);
+            csm._defaultMainWindowCapability = new SDL.rpc.structs.WindowCapability().setKeyboardCapabilities(
+                new SDL.rpc.structs.KeyboardCapabilities()
+            );
+            Validator.assertEquals(
+                csm._createValidKeyboardConfigurationBasedOnKeyboardCapabilitiesFromConfiguration(newProperties),
+                newProperties
+            );
+            // restore state
+            csm._defaultMainWindowCapability = originCapability;
+        });
+
+        it('testValidateCustomConfigurationCapabilityChecks', function () {
+            const originCapability = csm._defaultMainWindowCapability;
+
+            // should return null if no supported layout in capabilities
+            const keyboardCapabilities = new SDL.rpc.structs.KeyboardCapabilities()
+                .setSupportedKeyboards([]);
+
+            csm._defaultMainWindowCapability = new SDL.rpc.structs.WindowCapability()
+                .setKeyboardCapabilities(keyboardCapabilities);
+
+            const newProperties = new SDL.rpc.structs.KeyboardProperties()
+                .setKeyboardLayout(SDL.rpc.enums.KeyboardLayout.NUMERIC)
+                .setMaskInputCharacters(SDL.rpc.enums.KeyboardInputMask.ENABLE_INPUT_KEY_MASK)
+                .setCustomKeys(['1', '2', '3']);
+
+            Validator.assertNull(csm._createValidKeyboardConfigurationBasedOnKeyboardCapabilitiesFromConfiguration(newProperties));
+
+            // should shrink custom keys to 1 element
+            keyboardCapabilities
+                .setSupportedKeyboards([
+                    new SDL.rpc.structs.KeyboardLayoutCapability()
+                        .setKeyboardLayout(SDL.rpc.enums.KeyboardLayout.NUMERIC)
+                        .setNumConfigurableKeys(1),
+                ])
+                .setMaskInputCharactersSupported(true);
+            csm._defaultMainWindowCapability = new SDL.rpc.structs.WindowCapability()
+                .setKeyboardCapabilities(keyboardCapabilities);
+            let expectedProperties = new SDL.rpc.structs.KeyboardProperties()
+                .setKeyboardLayout(SDL.rpc.enums.KeyboardLayout.NUMERIC)
+                .setMaskInputCharacters(SDL.rpc.enums.KeyboardInputMask.ENABLE_INPUT_KEY_MASK)
+                .setCustomKeys(['1']);
+            Validator.assertEquals(csm._createValidKeyboardConfigurationBasedOnKeyboardCapabilitiesFromConfiguration(newProperties), expectedProperties);
+
+            // should remove MaskInputCharacters if capabilities do not support it
+            keyboardCapabilities
+                .setSupportedKeyboards([
+                    new SDL.rpc.structs.KeyboardLayoutCapability()
+                        .setKeyboardLayout(SDL.rpc.enums.KeyboardLayout.NUMERIC)
+                        .setNumConfigurableKeys(3),
+                ])
+                .setMaskInputCharactersSupported(false);
+            csm._defaultMainWindowCapability = new SDL.rpc.structs.WindowCapability()
+                .setKeyboardCapabilities(keyboardCapabilities);
+            expectedProperties = new SDL.rpc.structs.KeyboardProperties()
+                .setKeyboardLayout(SDL.rpc.enums.KeyboardLayout.NUMERIC)
+                .setCustomKeys(['1', '2', '3']);
+            // TODO: this fails due to https://github.com/smartdevicelink/sdl_javascript_suite/issues/385
+            // Validator.assertEquals(csm._createValidKeyboardConfigurationBasedOnKeyboardCapabilitiesFromConfiguration(newProperties), expectedProperties);
+
+            // restore state
+            csm._defaultMainWindowCapability = originCapability;
+        });
+
+        it('testAddUniqueNamesToCells', function () {
+            const cell1 = new SDL.manager.screen.choiceset.ChoiceCell('McDonalds')
+                .setSecondaryText('1 mile away');
+            const cell2 = new SDL.manager.screen.choiceset.ChoiceCell('McDonalds')
+                .setSecondaryText('2 miles away');
+            const cell3 = new SDL.manager.screen.choiceset.ChoiceCell('Starbucks')
+                .setSecondaryText('3 miles away');
+            const cell4 = new SDL.manager.screen.choiceset.ChoiceCell('McDonalds')
+                .setSecondaryText('4 miles away');
+            const cell5 = new SDL.manager.screen.choiceset.ChoiceCell('Starbucks')
+                .setSecondaryText('5 miles away');
+            const cell6 = new SDL.manager.screen.choiceset.ChoiceCell('Meijer')
+                .setSecondaryText('6 miles away');
+
+            csm._addUniqueNamesToCells([cell1, cell2, cell3, cell4, cell5, cell6]);
+
+            Validator.assertEquals(cell1._getUniqueText(), 'McDonalds');
+            Validator.assertEquals(cell2._getUniqueText(), 'McDonalds (2)');
+            Validator.assertEquals(cell3._getUniqueText(), 'Starbucks');
+            Validator.assertEquals(cell4._getUniqueText(), 'McDonalds (3)');
+            Validator.assertEquals(cell5._getUniqueText(), 'Starbucks (2)');
+            Validator.assertEquals(cell6._getUniqueText(), 'Meijer');
+        });
+
+        it('testUniquenessForAvailableFields', function () {
+            const windowCapability = new SDL.rpc.structs.WindowCapability();
+            const secondaryText = new SDL.rpc.structs.TextField()
+                .setNameParam(SDL.rpc.enums.TextFieldName.secondaryText);
+            const tertiaryText = new SDL.rpc.structs.TextField()
+                .setNameParam(SDL.rpc.enums.TextFieldName.tertiaryText);
+
+            const textFields = [
+                secondaryText,
+                tertiaryText,
+            ];
+            windowCapability.setTextFields(textFields);
+
+            const choiceImage = new SDL.rpc.structs.ImageField()
+                .setNameParam(SDL.rpc.enums.ImageFieldName.choiceImage);
+            const choiceSecondaryImage = new SDL.rpc.structs.ImageField()
+                .setNameParam(SDL.rpc.enums.ImageFieldName.choiceSecondaryImage);
+
+            const imageFieldList = [
+                choiceImage,
+                choiceSecondaryImage,
+            ];
+            windowCapability.setImageFields(imageFieldList);
+
+            csm._defaultMainWindowCapability = windowCapability;
+
+            const cell1 = new SDL.manager.screen.choiceset.ChoiceCell('Item 1')
+                .setSecondaryText('null')
+                .setTertiaryText('tertiaryText')
+                .setVoiceCommands(null)
+                .setArtwork(Test.GENERAL_ARTWORK)
+                .setSecondaryArtwork(Test.GENERAL_ARTWORK);
+            const cell2 = new SDL.manager.screen.choiceset.ChoiceCell('Item 1')
+                .setSecondaryText('null2')
+                .setTertiaryText('tertiaryText2')
+                .setVoiceCommands(null)
+                .setArtwork(null)
+                .setSecondaryArtwork(null);
+
+            const choiceCellList = [
+                cell1,
+                cell2,
+            ];
+
+            let removedProperties = csm._removeUnusedProperties(choiceCellList);
+            Validator.assertNotNullUndefined(removedProperties[0].getSecondaryText());
+
+            csm._defaultMainWindowCapability.setTextFields([]);
+            csm._defaultMainWindowCapability.setImageFields([]);
+
+            removedProperties = csm._removeUnusedProperties(choiceCellList);
+            csm._addUniqueNamesBasedOnStrippedCells(removedProperties, choiceCellList);
+            Validator.assertEquals(choiceCellList[1]._getUniqueText(), 'Item 1 (2)');
+        });
+
+        it('testChoicesToBeUploaded', function () {
+            const cell1 = new SDL.manager.screen.choiceset.ChoiceCell('Item 1')
+                .setSecondaryText('null')
+                .setTertiaryText('tertiaryText')
+                .setVoiceCommands(null)
+                .setArtwork(Test.GENERAL_ARTWORK)
+                .setSecondaryArtwork(Test.GENERAL_ARTWORK);
+            const cell2 = new SDL.manager.screen.choiceset.ChoiceCell('Item 2')
+                .setSecondaryText('null2')
+                .setTertiaryText('tertiaryText2')
+                .setVoiceCommands(null)
+                .setArtwork(null)
+                .setSecondaryArtwork(null);
+
+            const choiceCellList = [
+                cell1,
+                cell2,
+            ];
+
+            csm._preloadedChoices = choiceCellList;
+            Validator.assertEquals(csm._getChoicesToBeUploadedWithArray(choiceCellList), []);
+            const cell3 = new SDL.manager.screen.choiceset.ChoiceCell('Item 3')
+                .setSecondaryText('null3')
+                .setTertiaryText('tertiaryText3')
+                .setVoiceCommands(null)
+                .setArtwork(null)
+                .setSecondaryArtwork(null);
+            Validator.assertEquals(csm._getChoicesToBeUploadedWithArray([cell1, cell2, cell3]), [cell3]);
         });
     });
 };

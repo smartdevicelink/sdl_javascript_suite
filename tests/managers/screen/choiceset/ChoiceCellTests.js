@@ -17,6 +17,7 @@ module.exports = function (appClient) {
             Validator.assertNull(choiceCell.getTertiaryText());
             Validator.assertNull(choiceCell.getArtwork());
             Validator.assertNull(choiceCell.getSecondaryArtwork());
+            Validator.assertNull(choiceCell._getUniqueText());
         });
 
         it('testSettersAndGetters', function () {
@@ -36,6 +37,11 @@ module.exports = function (appClient) {
             Validator.assertEquals(choiceCell.getArtwork(), artwork);
             Validator.assertEquals(choiceCell.getSecondaryArtwork(), artwork);
             Validator.assertEquals(choiceCell._getChoiceId(), MAX_ID);
+
+            Validator.assertEquals(choiceCell._getUniqueText(), choiceCell.getText());
+
+            choiceCell._setUniqueText('hi');
+            Validator.assertEquals(choiceCell._getUniqueText(), 'hi');
 
             choiceCell.setText('hello');
             Validator.assertEquals(choiceCell.getText(), 'hello');
@@ -61,6 +67,11 @@ module.exports = function (appClient) {
                 .setArtwork(artwork)
                 .setSecondaryText(Test.GENERAL_STRING)
                 .setTertiaryText(Test.GENERAL_STRING);
+
+            // UniqueText should not be taken into consideration when checking equality
+            choiceCell._setUniqueText('1');
+            choiceCell2._setUniqueText('2');
+            choiceCell3._setUniqueText('3');
 
             Validator.assertTrue(choiceCell.equals(choiceCell2));
             Validator.assertTrue(!choiceCell.equals(choiceCell3));
