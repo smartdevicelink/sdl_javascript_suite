@@ -1,7 +1,6 @@
 const SDL = require('../../../config.js').node;
 
 const Validator = require('../../../Validator');
-const Test = require('../../../Test.js');
 const sinon = require('sinon');
 
 module.exports = function (appClient) {
@@ -24,7 +23,7 @@ module.exports = function (appClient) {
             const windowCapability = createWindowCapability(true, true);
             const menuConfiguration = new SDL.manager.screen.menu.MenuConfiguration()
                 .setMenuLayout(SDL.rpc.enums.MenuLayout.LIST)
-                .setSubMenuLayout(SDL.rpc.enums.MenuLayout.TILES);
+                .setSubMenuLayout(SDL.rpc.enums.MenuLayout.LIST);
 
             const operation = new SDL.manager.screen.menu._MenuConfigurationUpdateOperation(sdlManager._lifecycleManager, windowCapability, menuConfiguration, success => {
                 Validator.assertTrue(success);
@@ -53,7 +52,7 @@ module.exports = function (appClient) {
             const windowCapability = createWindowCapability(true, true);
             const menuConfiguration = new SDL.manager.screen.menu.MenuConfiguration()
                 .setMenuLayout(SDL.rpc.enums.MenuLayout.LIST)
-                .setSubMenuLayout(SDL.rpc.enums.MenuLayout.TILES);
+                .setSubMenuLayout(SDL.rpc.enums.MenuLayout.LIST);
 
             const operation = new SDL.manager.screen.menu._MenuConfigurationUpdateOperation(sdlManager._lifecycleManager, windowCapability, menuConfiguration, success => {
                 Validator.assertTrue(!success);
@@ -81,7 +80,7 @@ module.exports = function (appClient) {
 
             const windowCapability = createWindowCapability(true, true);
             const menuConfiguration = new SDL.manager.screen.menu.MenuConfiguration()
-                .setSubMenuLayout(SDL.rpc.enums.MenuLayout.TILES);
+                .setSubMenuLayout(SDL.rpc.enums.MenuLayout.LIST);
 
             const operation = new SDL.manager.screen.menu._MenuConfigurationUpdateOperation(sdlManager._lifecycleManager, windowCapability, menuConfiguration, success => {
                 Validator.assertTrue(!success);
@@ -137,7 +136,7 @@ module.exports = function (appClient) {
             const windowCapability = createWindowCapability(true, true);
             const menuConfiguration = new SDL.manager.screen.menu.MenuConfiguration()
                 .setMenuLayout(SDL.rpc.enums.MenuLayout.LIST)
-                .setSubMenuLayout(SDL.rpc.enums.MenuLayout.TILES);
+                .setSubMenuLayout(SDL.rpc.enums.MenuLayout.LIST);
 
             const operation = new SDL.manager.screen.menu._MenuConfigurationUpdateOperation(sdlManager._lifecycleManager, windowCapability, menuConfiguration, success => {
                 Validator.assertTrue(!success);

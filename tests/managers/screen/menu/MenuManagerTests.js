@@ -7,7 +7,6 @@ module.exports = function (appClient) {
     describe('MenuManagerTests', function () {
         const sdlManager = appClient._sdlManager;
 
-        const menuManager = null;
         let cells = null;
         let mainCell1 = null;
         let mainCell4 = null;
@@ -100,7 +99,7 @@ module.exports = function (appClient) {
                     mm._commandListener(onCommand);
 
                     // verify the mock listener has only been hit once for a root cell
-                    // cell.getMenuSelectionListener().onTriggered(SDL.rpc.enums.TriggerSource.TS_MENU)
+                    // cell.getMenuSelectionListener().onTriggered(SDL.rpc.enums.TriggerSource.TS_MENU);
                     Validator.assertEquals(callback.calledOnce, true);
                 }
 
@@ -109,10 +108,10 @@ module.exports = function (appClient) {
                     const onCommand2 = new SDL.rpc.messages.OnCommand()
                         .setCmdID(cell._getCellId())
                         .setTriggerSource(SDL.rpc.enums.TriggerSource.TS_MENU); // these are menu commands
-                    mm._commandListener(onCommand);
+                    mm._commandListener(onCommand2);
 
                     // verify the mock listener has only been hit once for a sub cell
-                    // cell.getMenuSelectionListener().onTriggered(SDL.rpc.enums.TriggerSource.TS_MENU)
+                    // cell.getMenuSelectionListener().onTriggered(SDL.rpc.enums.TriggerSource.TS_MENU);
                     Validator.assertEquals(callback.calledOnce, true);
                 }
                 stub.restore();

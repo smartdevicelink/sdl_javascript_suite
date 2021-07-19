@@ -16,7 +16,8 @@ module.exports = function (appClient) {
                 .setSubMenuLayout(Test.GENERAL_MENU_LAYOUT)
                 .setSecondaryText(Test.GENERAL_STRING)
                 .setTertiaryText(Test.GENERAL_STRING)
-                .setSecondaryArtwork(Test.GENERAL_ARTWORK);
+                .setSecondaryArtwork(Test.GENERAL_ARTWORK)
+                ._setUniqueTitle(Test.GENERAL_STRING);
 
             Validator.assertEquals(menuCell.getTitle(), Test.GENERAL_STRING);
             Validator.assertEquals(menuCell.getIcon(), Test.GENERAL_ARTWORK);
@@ -28,6 +29,7 @@ module.exports = function (appClient) {
             Validator.assertEquals(menuCell.getSecondaryText(), Test.GENERAL_STRING);
             Validator.assertEquals(menuCell.getTertiaryText(), Test.GENERAL_STRING);
             Validator.assertEquals(menuCell.getSecondaryArtwork(), Test.GENERAL_ARTWORK);
+            Validator.assertEquals(menuCell._getUniqueTitle(), Test.GENERAL_STRING);
         });
 
         it('testConstructors', function () {
@@ -86,7 +88,14 @@ module.exports = function (appClient) {
             Validator.assertEquals(original.getTitle(), clone.getTitle());
             Validator.assertEquals(original._getCellId(), clone._getCellId());
             Validator.assertEquals(original._getParentCellId(), clone._getParentCellId());
+            Validator.assertEquals(original._getUniqueTitle(), clone._getUniqueTitle());
+            Validator.assertEquals(original.getSecondaryText(), clone.getSecondaryText());
+            Validator.assertEquals(original.getTertiaryText(), clone.getTertiaryText());
             Validator.assertTrue(original.getIcon().equals(clone.getIcon()));
+
+            if (original.getSecondaryArtwork() !== null) {
+                Validator.assertTrue(original.getSecondaryArtwork().equals(clone.getSecondaryArtwork()));
+            }
 
             // test subcells
             const subcells = [original.clone(), clone.clone()];

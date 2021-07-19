@@ -5,6 +5,6 @@ const Test = require('../../../Test.js');
 
 module.exports = function (appClient) {
     describe('MenuReplaceUtilitiesTests', function () {
-    	
+        
     });
 };
