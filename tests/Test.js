@@ -548,6 +548,8 @@ const JSON_ROOFSTATUS_LIST = Test.JSON_ROOFSTATUS_LIST = [
 ];
 
 const GENERAL_ARTWORK = Test.GENERAL_ARTWORK = new SdlArtwork('sdl', FileType.GRAPHIC_PNG, 'okay', false);
+const GENERAL_ARTWORK_STATIC = Test.GENERAL_ARTWORK_STATIC = new SdlArtwork(SDL.manager.file.enums.StaticIconName.BACK)
+    .setStaticIcon(true);
 
 const GENERAL_TEMPERATURE_UNIT = Test.GENERAL_TEMPERATURE_UNIT = TemperatureUnit.CELSIUS;
 const GENERAL_TEMPERATURE = Test.GENERAL_TEMPERATURE = new Temperature()

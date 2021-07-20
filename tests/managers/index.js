@@ -16,7 +16,6 @@ const presentAlertOperationTests = require('./screen/PresentAlertOperationTests'
 const voiceCommandManagerTests = require('./screen/VoiceCommandManagerTests');
 const voiceCommandUpdateOperationTests = require('./screen/VoiceCommandUpdateOperationTests');
 const choiceCellTests = require('./screen/choiceset/ChoiceCellTests');
-/*
 const dynamicMenuUpdateRunScoreTests = require('./screen/menu/DynamicMenuUpdateRunScoreTests');
 const dynamicMenuUpdatesModeTests = require('./screen/menu/DynamicMenuUpdatesModeTests');
 const menuCellTests = require('./screen/menu/MenuCellTests');
@@ -25,7 +24,7 @@ const menuConfigurationUpdateOperationTests = require('./screen/menu/MenuConfigu
 const menuManagerTests = require('./screen/menu/MenuManagerTests');
 const menuReplaceOperationTests = require('./screen/menu/MenuReplaceOperationTests');
 const menuReplaceUtilitiesTests = require('./screen/menu/MenuReplaceUtilitiesTests');
-*/
+const menuShowOperationTests = require('./screen/menu/MenuShowOperationTests');
 const checkChoiceVROptionalOperationTests = require('./screen/choiceset/CheckChoiceVROptionalOperationTests');
 const choiceSetLayoutTests = require('./screen/choiceset/ChoiceSetLayoutTests');
 const choiceSetManagerTests = require('./screen/choiceset/ChoiceSetManagerTests');
@@ -66,11 +65,20 @@ describe('ManagerTests', function () {
                 presentChoiceSetOperationTests(appClient);
                 presentKeyboardOperationTests(appClient);
                 softButtonManagerTests(appClient);
+                dynamicMenuUpdateRunScoreTests(appClient);
+                dynamicMenuUpdatesModeTests(appClient);
+                menuCellTests(appClient);
+                menuConfigurationTests(appClient);
+                menuConfigurationUpdateOperationTests(appClient);
+                menuManagerTests(appClient);
+                menuReplaceOperationTests(appClient);
+                menuReplaceUtilitiesTests(appClient);
+                menuShowOperationTests(appClient);
 
                 setTimeout(function () {
                     // teardown();
                     done();
-                }, 25000);
+                }, 30000);
             });
         });
     });
