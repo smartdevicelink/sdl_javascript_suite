@@ -31,7 +31,6 @@ module.exports = function (appClient) {
             Validator.assertEquals(csm._currentHmiLevel, SDL.rpc.enums.HMILevel.HMI_NONE);
             Validator.assertNull(csm._currentSystemContext);
             Validator.assertNull(csm._defaultMainWindowCapability);
-            Validator.assertNull(csm._pendingPresentationSet);
             Validator.assertNull(csm._pendingPresentOperation);
 
             Validator.assertEquals(csm._taskQueue.length, 0);

@@ -22,6 +22,7 @@ const choiceSetManagerTests = require('./screen/choiceset/ChoiceSetManagerTests'
 const choiceSetTests = require('./screen/choiceset/ChoiceSetTests');
 const preloadChoicesOperationTests = require('./screen/choiceset/PreloadChoicesOperationTests');
 const presentChoiceSetOperationTests = require('./screen/choiceset/PresentChoiceSetOperationTests');
+const preloadAndPresentChoicesOperationTests = require('./screen/choiceset/PreloadAndPresentChoicesOperationTests');
 const presentKeyboardOperationTests = require('./screen/choiceset/PresentKeyboardOperationTests');
 
 // connect to core and select the app on the HMI to run the tests
@@ -54,6 +55,7 @@ describe('ManagerTests', function () {
                 choiceSetTests(appClient);
                 preloadChoicesOperationTests(appClient);
                 presentChoiceSetOperationTests(appClient);
+                preloadAndPresentChoicesOperationTests(appClient);
                 presentKeyboardOperationTests(appClient);
                 softButtonManagerTests(appClient);
 
