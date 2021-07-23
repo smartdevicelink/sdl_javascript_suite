@@ -19,7 +19,6 @@ module.exports = function (appClient) {
             Validator.assertTrue(!csm._isVrOptional);
             Validator.assertNotNullUndefined(csm._fileManager);
             Validator.assertNotNullUndefined(csm._preloadedChoices);
-            Validator.assertNotNullUndefined(csm._pendingPreloadChoices);
             Validator.assertNotNullUndefined(csm._hmiListener);
             Validator.assertNotNullUndefined(csm._onDisplayCapabilityListener);
             Validator.assertNull(csm._pendingPresentOperation);

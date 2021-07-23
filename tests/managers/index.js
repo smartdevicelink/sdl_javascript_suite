@@ -20,8 +20,6 @@ const checkChoiceVROptionalOperationTests = require('./screen/choiceset/CheckCho
 const choiceSetLayoutTests = require('./screen/choiceset/ChoiceSetLayoutTests');
 const choiceSetManagerTests = require('./screen/choiceset/ChoiceSetManagerTests');
 const choiceSetTests = require('./screen/choiceset/ChoiceSetTests');
-const preloadChoicesOperationTests = require('./screen/choiceset/PreloadChoicesOperationTests');
-const presentChoiceSetOperationTests = require('./screen/choiceset/PresentChoiceSetOperationTests');
 const preloadAndPresentChoicesOperationTests = require('./screen/choiceset/PreloadAndPresentChoicesOperationTests');
 const presentKeyboardOperationTests = require('./screen/choiceset/PresentKeyboardOperationTests');
 
@@ -53,8 +51,6 @@ describe('ManagerTests', function () {
                 choiceSetLayoutTests(appClient);
                 choiceSetManagerTests(appClient);
                 choiceSetTests(appClient);
-                preloadChoicesOperationTests(appClient);
-                presentChoiceSetOperationTests(appClient);
                 preloadAndPresentChoicesOperationTests(appClient);
                 presentKeyboardOperationTests(appClient);
                 softButtonManagerTests(appClient);
