@@ -5,7 +5,7 @@ const Test = require('../../../Test.js');
 const sinon = require('sinon');
 
 module.exports = function (appClient) {
-    describe('PreloadAndPresentChoicesOperationTests', function () {
+    describe('PreloadPresentChoicesOperationTests', function () {
         const cell1 = new SDL.manager.screen.choiceset.ChoiceCell('cell 1')
             ._setChoiceId(0);
         const cell2 = new SDL.manager.screen.choiceset.ChoiceCell('cell 2')
@@ -32,7 +32,7 @@ module.exports = function (appClient) {
             .setImageTypeSupported([SDL.rpc.enums.ImageType.STATIC, SDL.rpc.enums.ImageType.DYNAMIC])
             .setTextFields([textField, textField2, textField3]);
 
-        const preloadChoicesOperation = new SDL.manager.screen.choiceset._PreloadAndPresentChoicesOperation(appClient._sdlManager._lifecycleManager,
+        const preloadChoicesOperation = new SDL.manager.screen.choiceset._PreloadPresentChoicesOperation(appClient._sdlManager._lifecycleManager,
             appClient._sdlManager._fileManager, null, windowCapability, true, [cell1, cell2]);
 
         it('testArtworksToUpload', function () {
@@ -70,7 +70,7 @@ module.exports = function (appClient) {
          * @returns {_PreloadChoicesOperation} - An operation
          */
         function setUpNullWindowCapability () {
-            return new SDL.manager.screen.choiceset._PreloadAndPresentChoicesOperation(appClient._sdlManager._lifecycleManager,
+            return new SDL.manager.screen.choiceset._PreloadPresentChoicesOperation(appClient._sdlManager._lifecycleManager,
                 appClient._sdlManager._fileManager, null, null, true, [cell1, cell2]);
         }
 
@@ -88,7 +88,7 @@ module.exports = function (appClient) {
                 .setImageFields([emptyImageField])
                 .setTextFields([emptyTextField]);
 
-            return new SDL.manager.screen.choiceset._PreloadAndPresentChoicesOperation(appClient._sdlManager._lifecycleManager,
+            return new SDL.manager.screen.choiceset._PreloadPresentChoicesOperation(appClient._sdlManager._lifecycleManager,
                 appClient._sdlManager._fileManager, null, emptyWindowCapability, true, [cell1, cell2]);
         }
 
@@ -103,7 +103,7 @@ module.exports = function (appClient) {
 
         it('testGetLayoutMode', function () {
             // First we will check knowing our keyboard listener is NOT NULL
-            const presentChoiceSetOperation = new SDL.manager.screen.choiceset._PreloadAndPresentChoicesOperation(sdlManager._lifecycleManager, sdlManager._fileManager,
+            const presentChoiceSetOperation = new SDL.manager.screen.choiceset._PreloadPresentChoicesOperation(sdlManager._lifecycleManager, sdlManager._fileManager,
                 null, windowCapability, true, choiceSet.getChoices(), testLoadedChoices, true, (loadedCells, success) => {}, choiceSet, SDL.rpc.enums.InteractionMode.MANUAL_ONLY, getKeyBoardProperties(), keyboardListener, choiceSetSelectionListener, Test.GENERAL_INTEGER);
 
             Validator.assertEquals(presentChoiceSetOperation._getLayoutMode(), SDL.rpc.enums.LayoutMode.LIST_WITH_SEARCH);
@@ -112,7 +112,7 @@ module.exports = function (appClient) {
         });
 
         it('testGetPerformInteraction', function () {
-            const presentChoiceSetOperation = new SDL.manager.screen.choiceset._PreloadAndPresentChoicesOperation(sdlManager._lifecycleManager, sdlManager._fileManager,
+            const presentChoiceSetOperation = new SDL.manager.screen.choiceset._PreloadPresentChoicesOperation(sdlManager._lifecycleManager, sdlManager._fileManager,
                 null, windowCapability, true, choiceSet.getChoices(), testLoadedChoices, true, (loadedCells, success) => {}, choiceSet, SDL.rpc.enums.InteractionMode.MANUAL_ONLY, getKeyBoardProperties(), keyboardListener, choiceSetSelectionListener, Test.GENERAL_INTEGER);
 
             const pi = presentChoiceSetOperation._getPerformInteraction();
@@ -127,7 +127,7 @@ module.exports = function (appClient) {
         });
 
         it('testSetSelectedCellWithId', function () {
-            const presentChoiceSetOperation = new SDL.manager.screen.choiceset._PreloadAndPresentChoicesOperation(sdlManager._lifecycleManager, sdlManager._fileManager,
+            const presentChoiceSetOperation = new SDL.manager.screen.choiceset._PreloadPresentChoicesOperation(sdlManager._lifecycleManager, sdlManager._fileManager,
                 null, windowCapability, true, choiceSet.getChoices(), testLoadedChoices, true, (loadedCells, success) => {}, choiceSet, SDL.rpc.enums.InteractionMode.MANUAL_ONLY, getKeyBoardProperties(), keyboardListener, choiceSetSelectionListener, Test.GENERAL_INTEGER);
 
             Validator.assertNull(presentChoiceSetOperation._selectedCellRow);
@@ -142,7 +142,7 @@ module.exports = function (appClient) {
                     .setMinorVersion(0)
                     .setPatchVersion(0));
 
-            const presentChoiceSetOperation = new SDL.manager.screen.choiceset._PreloadAndPresentChoicesOperation(sdlManager._lifecycleManager, sdlManager._fileManager,
+            const presentChoiceSetOperation = new SDL.manager.screen.choiceset._PreloadPresentChoicesOperation(sdlManager._lifecycleManager, sdlManager._fileManager,
                 null, windowCapability, true, choiceSet.getChoices(), [], true, (loadedCells, success) => {}, choiceSet, SDL.rpc.enums.InteractionMode.MANUAL_ONLY, null, null, choiceSetSelectionListener, Test.GENERAL_INTEGER);
 
             csm._canRunTasks = true;
@@ -181,7 +181,7 @@ module.exports = function (appClient) {
                     .setMinorVersion(0)
                     .setPatchVersion(0));
 
-            const presentChoiceSetOperation = new SDL.manager.screen.choiceset._PreloadAndPresentChoicesOperation(sdlManager._lifecycleManager, sdlManager._fileManager,
+            const presentChoiceSetOperation = new SDL.manager.screen.choiceset._PreloadPresentChoicesOperation(sdlManager._lifecycleManager, sdlManager._fileManager,
                 null, windowCapability, true, choiceSet.getChoices(), testLoadedChoices, true, (loadedCells, success) => {}, choiceSet, SDL.rpc.enums.InteractionMode.MANUAL_ONLY, null, null, choiceSetSelectionListener, Test.GENERAL_INTEGER);
 
             csm._canRunTasks = true;
@@ -225,7 +225,7 @@ module.exports = function (appClient) {
                 functionName: SDL.rpc.enums.FunctionID.SetGlobalProperties,
             }).setSuccess(true));
 
-            const presentChoiceSetOperation = new SDL.manager.screen.choiceset._PreloadAndPresentChoicesOperation(sdlManager._lifecycleManager, sdlManager._fileManager,
+            const presentChoiceSetOperation = new SDL.manager.screen.choiceset._PreloadPresentChoicesOperation(sdlManager._lifecycleManager, sdlManager._fileManager,
                 null, windowCapability, true, choiceSet.getChoices(), testLoadedChoices, true, (loadedCells, success) => {}, choiceSet, SDL.rpc.enums.InteractionMode.MANUAL_ONLY, null, null, choiceSetSelectionListener, Test.GENERAL_INTEGER);
             await presentChoiceSetOperation._finishOperation();
 
@@ -257,7 +257,7 @@ module.exports = function (appClient) {
                 functionName: SDL.rpc.enums.FunctionID.SetGlobalProperties,
             }).setSuccess(true));
 
-            const presentChoiceSetOperation = new SDL.manager.screen.choiceset._PreloadAndPresentChoicesOperation(sdlManager._lifecycleManager, sdlManager._fileManager,
+            const presentChoiceSetOperation = new SDL.manager.screen.choiceset._PreloadPresentChoicesOperation(sdlManager._lifecycleManager, sdlManager._fileManager,
                 null, windowCapability, true, choiceSet.getChoices(), testLoadedChoices, true, (loadedCells, success) => {}, choiceSet, SDL.rpc.enums.InteractionMode.MANUAL_ONLY, null, null, choiceSetSelectionListener, Test.GENERAL_INTEGER);
 
             Validator.assertEquals(presentChoiceSetOperation.getState(), SDL.manager._Task.READY);
@@ -281,7 +281,7 @@ module.exports = function (appClient) {
                     .setMinorVersion(3)
                     .setPatchVersion(0));
 
-            const presentChoiceSetOperation = new SDL.manager.screen.choiceset._PreloadAndPresentChoicesOperation(sdlManager._lifecycleManager, sdlManager._fileManager,
+            const presentChoiceSetOperation = new SDL.manager.screen.choiceset._PreloadPresentChoicesOperation(sdlManager._lifecycleManager, sdlManager._fileManager,
                 null, windowCapability, true, choiceSet.getChoices(), testLoadedChoices, true, (loadedCells, success) => {}, choiceSet, SDL.rpc.enums.InteractionMode.MANUAL_ONLY, null, null, choiceSetSelectionListener, Test.GENERAL_INTEGER);
 
             csm._canRunTasks = true;
@@ -327,7 +327,7 @@ module.exports = function (appClient) {
                 functionName: SDL.rpc.enums.FunctionID.SetGlobalProperties,
             }).setSuccess(true));
 
-            const presentChoiceSetOperation = new SDL.manager.screen.choiceset._PreloadAndPresentChoicesOperation(sdlManager._lifecycleManager, sdlManager._fileManager,
+            const presentChoiceSetOperation = new SDL.manager.screen.choiceset._PreloadPresentChoicesOperation(sdlManager._lifecycleManager, sdlManager._fileManager,
                 null, windowCapability, true, choiceSet.getChoices(), testLoadedChoices, true, (loadedCells, success) => {}, choiceSet, SDL.rpc.enums.InteractionMode.MANUAL_ONLY, null, null, choiceSetSelectionListener, Test.GENERAL_INTEGER);
 
             Validator.assertEquals(presentChoiceSetOperation.getState(), SDL.manager._Task.READY);
