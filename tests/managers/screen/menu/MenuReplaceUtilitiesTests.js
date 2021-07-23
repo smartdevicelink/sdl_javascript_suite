@@ -205,7 +205,11 @@ module.exports = function (appClient) {
          * @returns {MenuCell} - The trimmed menu cell clone
          */
         function cloneMenuCellAndRemoveSubCells (menuCell) {
-            return menuCell.clone().setSubCells([]);
+            const clonedCell = menuCell.clone();
+            if (clonedCell.getSubCells() !== null) {
+                clonedCell.setSubCells([]);
+            }
+            return clonedCell;
         }
 
         /**

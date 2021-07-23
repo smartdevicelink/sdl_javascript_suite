@@ -5,7 +5,7 @@ const Test = require('../../../Test.js');
 
 module.exports = function (appClient) {
     describe('MenuCellTests', function () {
-        const menuSelectionListener = new SDL.manager.screen.menu._MenuSelectionListener()
+        const menuSelectionListener = new SDL.manager.screen.menu.MenuSelectionListener()
             .setOnTriggered(trigger => {});
 
         it('testSettersAndGetters', function () {

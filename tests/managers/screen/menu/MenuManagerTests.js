@@ -12,7 +12,12 @@ module.exports = function (appClient) {
         let mainCell4 = null;
         let getVersionStub = null;
         let rpcResolveStub = null;
-        const mockMenuListener = new SDL.manager.screen.menu._MenuSelectionListener();
+        const mockMenuListenerA = new SDL.manager.screen.menu.MenuSelectionListener();
+        const mockMenuListenerB = new SDL.manager.screen.menu.MenuSelectionListener();
+        const mockMenuListenerC = new SDL.manager.screen.menu.MenuSelectionListener();
+        const mockMenuListenerD = new SDL.manager.screen.menu.MenuSelectionListener();
+        const mockMenuListenerE = new SDL.manager.screen.menu.MenuSelectionListener();
+        const mockMenuListenerF = new SDL.manager.screen.menu.MenuSelectionListener();
 
         const mm = new SDL.manager.screen.menu._MenuManagerBase(sdlManager._lifecycleManager, sdlManager._fileManager);
 
@@ -486,22 +491,22 @@ module.exports = function (appClient) {
             const voice2 = ['Cell two'];
             mainCell1 = new SDL.manager.screen.menu.MenuCell('Test Cell 1')
                 .setIcon(livio)
-                .setMenuSelectionListener(new SDL.manager.screen.menu._MenuSelectionListener());
+                .setMenuSelectionListener(new SDL.manager.screen.menu.MenuSelectionListener());
 
             const mainCell2 = new SDL.manager.screen.menu.MenuCell('Test Cell 2')
                 .setIcon(livio)
                 .setVoiceCommands(voice2)
-                .setMenuSelectionListener(new SDL.manager.screen.menu._MenuSelectionListener());
+                .setMenuSelectionListener(new SDL.manager.screen.menu.MenuSelectionListener());
 
             const mainCell3 = new SDL.manager.screen.menu.MenuCell('Test Cell 3')
-                .setMenuSelectionListener(new SDL.manager.screen.menu._MenuSelectionListener());
+                .setMenuSelectionListener(new SDL.manager.screen.menu.MenuSelectionListener());
 
             // submenu cells
             const subCell1 = new SDL.manager.screen.menu.MenuCell('SubCell 1')
-                .setMenuSelectionListener(new SDL.manager.screen.menu._MenuSelectionListener());
+                .setMenuSelectionListener(new SDL.manager.screen.menu.MenuSelectionListener());
 
             const subCell2 = new SDL.manager.screen.menu.MenuCell('SubCell 2')
-                .setMenuSelectionListener(new SDL.manager.screen.menu._MenuSelectionListener());
+                .setMenuSelectionListener(new SDL.manager.screen.menu.MenuSelectionListener());
 
             mainCell4 = new SDL.manager.screen.menu.MenuCell('Test Cell 4')
                 .setIcon(livio)
@@ -517,10 +522,10 @@ module.exports = function (appClient) {
          */
         function createDynamicMenu1 () {
             return [
-                new SDL.manager.screen.menu.MenuCell('A').setMenuSelectionListener(mockMenuListener),
-                new SDL.manager.screen.menu.MenuCell('B').setMenuSelectionListener(mockMenuListener),
-                new SDL.manager.screen.menu.MenuCell('C').setMenuSelectionListener(mockMenuListener),
-                new SDL.manager.screen.menu.MenuCell('D').setMenuSelectionListener(mockMenuListener),
+                new SDL.manager.screen.menu.MenuCell('A').setMenuSelectionListener(mockMenuListenerA),
+                new SDL.manager.screen.menu.MenuCell('B').setMenuSelectionListener(mockMenuListenerB),
+                new SDL.manager.screen.menu.MenuCell('C').setMenuSelectionListener(mockMenuListenerC),
+                new SDL.manager.screen.menu.MenuCell('D').setMenuSelectionListener(mockMenuListenerD),
             ];
         }
 
@@ -530,11 +535,11 @@ module.exports = function (appClient) {
          */
         function createDynamicMenu1New () {
             return [
-                new SDL.manager.screen.menu.MenuCell('A').setMenuSelectionListener(mockMenuListener),
-                new SDL.manager.screen.menu.MenuCell('B').setMenuSelectionListener(mockMenuListener),
-                new SDL.manager.screen.menu.MenuCell('C').setMenuSelectionListener(mockMenuListener),
-                new SDL.manager.screen.menu.MenuCell('D').setMenuSelectionListener(mockMenuListener),
-                new SDL.manager.screen.menu.MenuCell('E').setMenuSelectionListener(mockMenuListener),
+                new SDL.manager.screen.menu.MenuCell('A').setMenuSelectionListener(mockMenuListenerA),
+                new SDL.manager.screen.menu.MenuCell('B').setMenuSelectionListener(mockMenuListenerB),
+                new SDL.manager.screen.menu.MenuCell('C').setMenuSelectionListener(mockMenuListenerC),
+                new SDL.manager.screen.menu.MenuCell('D').setMenuSelectionListener(mockMenuListenerD),
+                new SDL.manager.screen.menu.MenuCell('E').setMenuSelectionListener(mockMenuListenerE),
             ];
         }
 
@@ -544,10 +549,10 @@ module.exports = function (appClient) {
          */
         function createDynamicMenu2 () {
             return [
-                new SDL.manager.screen.menu.MenuCell('A').setMenuSelectionListener(mockMenuListener),
-                new SDL.manager.screen.menu.MenuCell('B').setMenuSelectionListener(mockMenuListener),
-                new SDL.manager.screen.menu.MenuCell('C').setMenuSelectionListener(mockMenuListener),
-                new SDL.manager.screen.menu.MenuCell('D').setMenuSelectionListener(mockMenuListener),
+                new SDL.manager.screen.menu.MenuCell('A').setMenuSelectionListener(mockMenuListenerA),
+                new SDL.manager.screen.menu.MenuCell('B').setMenuSelectionListener(mockMenuListenerB),
+                new SDL.manager.screen.menu.MenuCell('C').setMenuSelectionListener(mockMenuListenerC),
+                new SDL.manager.screen.menu.MenuCell('D').setMenuSelectionListener(mockMenuListenerD),
             ];
         }
 
@@ -557,9 +562,9 @@ module.exports = function (appClient) {
          */
         function createDynamicMenu2New () {
             return [
-                new SDL.manager.screen.menu.MenuCell('A').setMenuSelectionListener(mockMenuListener),
-                new SDL.manager.screen.menu.MenuCell('B').setMenuSelectionListener(mockMenuListener),
-                new SDL.manager.screen.menu.MenuCell('C').setMenuSelectionListener(mockMenuListener),
+                new SDL.manager.screen.menu.MenuCell('A').setMenuSelectionListener(mockMenuListenerA),
+                new SDL.manager.screen.menu.MenuCell('B').setMenuSelectionListener(mockMenuListenerB),
+                new SDL.manager.screen.menu.MenuCell('C').setMenuSelectionListener(mockMenuListenerC),
             ];
         }
 
@@ -569,9 +574,9 @@ module.exports = function (appClient) {
          */
         function createDynamicMenu3 () {
             return [
-                new SDL.manager.screen.menu.MenuCell('A').setMenuSelectionListener(mockMenuListener),
-                new SDL.manager.screen.menu.MenuCell('B').setMenuSelectionListener(mockMenuListener),
-                new SDL.manager.screen.menu.MenuCell('C').setMenuSelectionListener(mockMenuListener),
+                new SDL.manager.screen.menu.MenuCell('A').setMenuSelectionListener(mockMenuListenerA),
+                new SDL.manager.screen.menu.MenuCell('B').setMenuSelectionListener(mockMenuListenerB),
+                new SDL.manager.screen.menu.MenuCell('C').setMenuSelectionListener(mockMenuListenerC),
             ];
         }
 
@@ -581,9 +586,9 @@ module.exports = function (appClient) {
          */
         function createDynamicMenu3New () {
             return [
-                new SDL.manager.screen.menu.MenuCell('D').setMenuSelectionListener(mockMenuListener),
-                new SDL.manager.screen.menu.MenuCell('E').setMenuSelectionListener(mockMenuListener),
-                new SDL.manager.screen.menu.MenuCell('F').setMenuSelectionListener(mockMenuListener),
+                new SDL.manager.screen.menu.MenuCell('D').setMenuSelectionListener(mockMenuListenerD),
+                new SDL.manager.screen.menu.MenuCell('E').setMenuSelectionListener(mockMenuListenerE),
+                new SDL.manager.screen.menu.MenuCell('F').setMenuSelectionListener(mockMenuListenerF),
             ];
         }
 
@@ -593,10 +598,10 @@ module.exports = function (appClient) {
          */
         function createDynamicMenu4 () {
             return [
-                new SDL.manager.screen.menu.MenuCell('A').setMenuSelectionListener(mockMenuListener),
-                new SDL.manager.screen.menu.MenuCell('B').setMenuSelectionListener(mockMenuListener),
-                new SDL.manager.screen.menu.MenuCell('C').setMenuSelectionListener(mockMenuListener),
-                new SDL.manager.screen.menu.MenuCell('D').setMenuSelectionListener(mockMenuListener),
+                new SDL.manager.screen.menu.MenuCell('A').setMenuSelectionListener(mockMenuListenerA),
+                new SDL.manager.screen.menu.MenuCell('B').setMenuSelectionListener(mockMenuListenerB),
+                new SDL.manager.screen.menu.MenuCell('C').setMenuSelectionListener(mockMenuListenerC),
+                new SDL.manager.screen.menu.MenuCell('D').setMenuSelectionListener(mockMenuListenerD),
             ];
         }
 
@@ -606,10 +611,10 @@ module.exports = function (appClient) {
          */
         function createDynamicMenu4New () {
             return [
-                new SDL.manager.screen.menu.MenuCell('B').setMenuSelectionListener(mockMenuListener),
-                new SDL.manager.screen.menu.MenuCell('A').setMenuSelectionListener(mockMenuListener),
-                new SDL.manager.screen.menu.MenuCell('D').setMenuSelectionListener(mockMenuListener),
-                new SDL.manager.screen.menu.MenuCell('C').setMenuSelectionListener(mockMenuListener),
+                new SDL.manager.screen.menu.MenuCell('B').setMenuSelectionListener(mockMenuListenerB),
+                new SDL.manager.screen.menu.MenuCell('A').setMenuSelectionListener(mockMenuListenerA),
+                new SDL.manager.screen.menu.MenuCell('D').setMenuSelectionListener(mockMenuListenerD),
+                new SDL.manager.screen.menu.MenuCell('C').setMenuSelectionListener(mockMenuListenerC),
             ];
         }
 
@@ -619,10 +624,10 @@ module.exports = function (appClient) {
          */
         function createDynamicMenu5 () {
             return [
-                new SDL.manager.screen.menu.MenuCell('A').setMenuSelectionListener(mockMenuListener),
-                new SDL.manager.screen.menu.MenuCell('B').setMenuSelectionListener(mockMenuListener),
-                new SDL.manager.screen.menu.MenuCell('C').setMenuSelectionListener(mockMenuListener),
-                new SDL.manager.screen.menu.MenuCell('D').setMenuSelectionListener(mockMenuListener),
+                new SDL.manager.screen.menu.MenuCell('A').setMenuSelectionListener(mockMenuListenerA),
+                new SDL.manager.screen.menu.MenuCell('B').setMenuSelectionListener(mockMenuListenerB),
+                new SDL.manager.screen.menu.MenuCell('C').setMenuSelectionListener(mockMenuListenerC),
+                new SDL.manager.screen.menu.MenuCell('D').setMenuSelectionListener(mockMenuListenerD),
             ];
         }
 
@@ -632,10 +637,10 @@ module.exports = function (appClient) {
          */
         function createDynamicMenu5New () {
             return [
-                new SDL.manager.screen.menu.MenuCell('B').setMenuSelectionListener(mockMenuListener),
-                new SDL.manager.screen.menu.MenuCell('C').setMenuSelectionListener(mockMenuListener),
-                new SDL.manager.screen.menu.MenuCell('D').setMenuSelectionListener(mockMenuListener),
-                new SDL.manager.screen.menu.MenuCell('A').setMenuSelectionListener(mockMenuListener),
+                new SDL.manager.screen.menu.MenuCell('B').setMenuSelectionListener(mockMenuListenerB),
+                new SDL.manager.screen.menu.MenuCell('C').setMenuSelectionListener(mockMenuListenerC),
+                new SDL.manager.screen.menu.MenuCell('D').setMenuSelectionListener(mockMenuListenerD),
+                new SDL.manager.screen.menu.MenuCell('A').setMenuSelectionListener(mockMenuListenerA),
             ];
         }
     });
