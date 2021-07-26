@@ -104,7 +104,7 @@ module.exports = function (appClient) {
         it('testGetLayoutMode', function () {
             // First we will check knowing our keyboard listener is NOT NULL
             const presentChoiceSetOperation = new SDL.manager.screen.choiceset._PreloadPresentChoicesOperation(sdlManager._lifecycleManager, sdlManager._fileManager,
-                null, windowCapability, true, choiceSet.getChoices(), testLoadedChoices, true, (loadedCells, success) => {}, choiceSet, SDL.rpc.enums.InteractionMode.MANUAL_ONLY, getKeyBoardProperties(), keyboardListener, choiceSetSelectionListener, Test.GENERAL_INTEGER);
+                null, windowCapability, true, choiceSet.getChoices(), testLoadedChoices, (loadedCells, success) => {}, choiceSet, SDL.rpc.enums.InteractionMode.MANUAL_ONLY, getKeyBoardProperties(), keyboardListener, choiceSetSelectionListener, Test.GENERAL_INTEGER);
 
             Validator.assertEquals(presentChoiceSetOperation._getLayoutMode(), SDL.rpc.enums.LayoutMode.LIST_WITH_SEARCH);
             presentChoiceSetOperation._keyboardListener = null;
@@ -113,7 +113,7 @@ module.exports = function (appClient) {
 
         it('testGetPerformInteraction', function () {
             const presentChoiceSetOperation = new SDL.manager.screen.choiceset._PreloadPresentChoicesOperation(sdlManager._lifecycleManager, sdlManager._fileManager,
-                null, windowCapability, true, choiceSet.getChoices(), testLoadedChoices, true, (loadedCells, success) => {}, choiceSet, SDL.rpc.enums.InteractionMode.MANUAL_ONLY, getKeyBoardProperties(), keyboardListener, choiceSetSelectionListener, Test.GENERAL_INTEGER);
+                null, windowCapability, true, choiceSet.getChoices(), testLoadedChoices, (loadedCells, success) => {}, choiceSet, SDL.rpc.enums.InteractionMode.MANUAL_ONLY, getKeyBoardProperties(), keyboardListener, choiceSetSelectionListener, Test.GENERAL_INTEGER);
 
             const pi = presentChoiceSetOperation._getPerformInteraction();
 
@@ -128,7 +128,7 @@ module.exports = function (appClient) {
 
         it('testSetSelectedCellWithId', function () {
             const presentChoiceSetOperation = new SDL.manager.screen.choiceset._PreloadPresentChoicesOperation(sdlManager._lifecycleManager, sdlManager._fileManager,
-                null, windowCapability, true, choiceSet.getChoices(), testLoadedChoices, true, (loadedCells, success) => {}, choiceSet, SDL.rpc.enums.InteractionMode.MANUAL_ONLY, getKeyBoardProperties(), keyboardListener, choiceSetSelectionListener, Test.GENERAL_INTEGER);
+                null, windowCapability, true, choiceSet.getChoices(), testLoadedChoices, (loadedCells, success) => {}, choiceSet, SDL.rpc.enums.InteractionMode.MANUAL_ONLY, getKeyBoardProperties(), keyboardListener, choiceSetSelectionListener, Test.GENERAL_INTEGER);
 
             Validator.assertNull(presentChoiceSetOperation._selectedCellRow);
             presentChoiceSetOperation._setSelectedCellWithId(0);
@@ -143,7 +143,7 @@ module.exports = function (appClient) {
                     .setPatchVersion(0));
 
             const presentChoiceSetOperation = new SDL.manager.screen.choiceset._PreloadPresentChoicesOperation(sdlManager._lifecycleManager, sdlManager._fileManager,
-                null, windowCapability, true, choiceSet.getChoices(), [], true, (loadedCells, success) => {}, choiceSet, SDL.rpc.enums.InteractionMode.MANUAL_ONLY, null, null, choiceSetSelectionListener, Test.GENERAL_INTEGER);
+                null, windowCapability, true, choiceSet.getChoices(), [], (loadedCells, success) => {}, choiceSet, SDL.rpc.enums.InteractionMode.MANUAL_ONLY, null, null, choiceSetSelectionListener, Test.GENERAL_INTEGER);
 
             csm._canRunTasks = true;
             csm._addTask(presentChoiceSetOperation);
@@ -182,7 +182,7 @@ module.exports = function (appClient) {
                     .setPatchVersion(0));
 
             const presentChoiceSetOperation = new SDL.manager.screen.choiceset._PreloadPresentChoicesOperation(sdlManager._lifecycleManager, sdlManager._fileManager,
-                null, windowCapability, true, choiceSet.getChoices(), testLoadedChoices, true, (loadedCells, success) => {}, choiceSet, SDL.rpc.enums.InteractionMode.MANUAL_ONLY, null, null, choiceSetSelectionListener, Test.GENERAL_INTEGER);
+                null, windowCapability, true, choiceSet.getChoices(), testLoadedChoices, (loadedCells, success) => {}, choiceSet, SDL.rpc.enums.InteractionMode.MANUAL_ONLY, null, null, choiceSetSelectionListener, Test.GENERAL_INTEGER);
 
             csm._canRunTasks = true;
             csm._addTask(presentChoiceSetOperation);
@@ -226,7 +226,7 @@ module.exports = function (appClient) {
             }).setSuccess(true));
 
             const presentChoiceSetOperation = new SDL.manager.screen.choiceset._PreloadPresentChoicesOperation(sdlManager._lifecycleManager, sdlManager._fileManager,
-                null, windowCapability, true, choiceSet.getChoices(), testLoadedChoices, true, (loadedCells, success) => {}, choiceSet, SDL.rpc.enums.InteractionMode.MANUAL_ONLY, null, null, choiceSetSelectionListener, Test.GENERAL_INTEGER);
+                null, windowCapability, true, choiceSet.getChoices(), testLoadedChoices, (loadedCells, success) => {}, choiceSet, SDL.rpc.enums.InteractionMode.MANUAL_ONLY, null, null, choiceSetSelectionListener, Test.GENERAL_INTEGER);
             await presentChoiceSetOperation._finishOperation();
 
             Validator.assertEquals(presentChoiceSetOperation.getState(), SDL.manager._Task.FINISHED);
@@ -258,7 +258,7 @@ module.exports = function (appClient) {
             }).setSuccess(true));
 
             const presentChoiceSetOperation = new SDL.manager.screen.choiceset._PreloadPresentChoicesOperation(sdlManager._lifecycleManager, sdlManager._fileManager,
-                null, windowCapability, true, choiceSet.getChoices(), testLoadedChoices, true, (loadedCells, success) => {}, choiceSet, SDL.rpc.enums.InteractionMode.MANUAL_ONLY, null, null, choiceSetSelectionListener, Test.GENERAL_INTEGER);
+                null, windowCapability, true, choiceSet.getChoices(), testLoadedChoices, (loadedCells, success) => {}, choiceSet, SDL.rpc.enums.InteractionMode.MANUAL_ONLY, null, null, choiceSetSelectionListener, Test.GENERAL_INTEGER);
 
             Validator.assertEquals(presentChoiceSetOperation.getState(), SDL.manager._Task.READY);
 
@@ -282,7 +282,7 @@ module.exports = function (appClient) {
                     .setPatchVersion(0));
 
             const presentChoiceSetOperation = new SDL.manager.screen.choiceset._PreloadPresentChoicesOperation(sdlManager._lifecycleManager, sdlManager._fileManager,
-                null, windowCapability, true, choiceSet.getChoices(), testLoadedChoices, true, (loadedCells, success) => {}, choiceSet, SDL.rpc.enums.InteractionMode.MANUAL_ONLY, null, null, choiceSetSelectionListener, Test.GENERAL_INTEGER);
+                null, windowCapability, true, choiceSet.getChoices(), testLoadedChoices, (loadedCells, success) => {}, choiceSet, SDL.rpc.enums.InteractionMode.MANUAL_ONLY, null, null, choiceSetSelectionListener, Test.GENERAL_INTEGER);
 
             csm._canRunTasks = true;
             csm._addTask(presentChoiceSetOperation);
@@ -328,7 +328,7 @@ module.exports = function (appClient) {
             }).setSuccess(true));
 
             const presentChoiceSetOperation = new SDL.manager.screen.choiceset._PreloadPresentChoicesOperation(sdlManager._lifecycleManager, sdlManager._fileManager,
-                null, windowCapability, true, choiceSet.getChoices(), testLoadedChoices, true, (loadedCells, success) => {}, choiceSet, SDL.rpc.enums.InteractionMode.MANUAL_ONLY, null, null, choiceSetSelectionListener, Test.GENERAL_INTEGER);
+                null, windowCapability, true, choiceSet.getChoices(), testLoadedChoices, (loadedCells, success) => {}, choiceSet, SDL.rpc.enums.InteractionMode.MANUAL_ONLY, null, null, choiceSetSelectionListener, Test.GENERAL_INTEGER);
 
             Validator.assertEquals(presentChoiceSetOperation.getState(), SDL.manager._Task.READY);
 
