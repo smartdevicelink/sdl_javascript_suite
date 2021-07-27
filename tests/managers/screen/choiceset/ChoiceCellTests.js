@@ -68,9 +68,8 @@ module.exports = function (appClient) {
                 .setSecondaryText(Test.GENERAL_STRING)
                 .setTertiaryText(Test.GENERAL_STRING);
 
-            // UniqueText should not be taken into consideration when checking equality
             choiceCell._setUniqueText('1');
-            choiceCell2._setUniqueText('2');
+            choiceCell2._setUniqueText('1');
             choiceCell3._setUniqueText('3');
 
             Validator.assertTrue(choiceCell.equals(choiceCell2));
