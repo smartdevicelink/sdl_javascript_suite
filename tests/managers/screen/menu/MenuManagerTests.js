@@ -144,6 +144,11 @@ module.exports = function (appClient) {
 
             Validator.assertEquals(mm._currentMenuCells.length, 4);
 
+            mm._setMenuCells(newMenu);
+
+            // Sleep to give time to Taskmaster to run the operations
+            await sleep(500);
+
             // this happens in the menu manager but lets make sure its behaving
             const runScore = SDL.manager.screen.menu._DynamicMenuUpdateAlgorithm.compareOldMenuCells(oldMenu, newMenu);
 
@@ -154,11 +159,6 @@ module.exports = function (appClient) {
             Validator.assertEquals(runScore.getScore(), 1);
             Validator.assertEquals(runScore.getOldStatus(), oldMenuStatus);
             Validator.assertEquals(runScore.getUpdatedStatus(), newMenuStatus);
-
-            mm._setMenuCells(newMenu);
-
-            // Sleep to give time to Taskmaster to run the operations
-            await sleep(500);
 
             Validator.assertEquals(mm._currentMenuCells.length, 5);
             const oldKeeps = filterMenuCellsWithStatusList(mm._currentMenuCells, runScore.getOldStatus(), MenuCellState.KEEP);
@@ -188,6 +188,11 @@ module.exports = function (appClient) {
 
             Validator.assertEquals(mm._currentMenuCells.length, 4);
 
+            mm._setMenuCells(newMenu);
+
+            // Sleep to give time to Taskmaster to run the operations
+            await sleep(500);
+
             // this happens in the menu manager but lets make sure its behaving
             const runScore = SDL.manager.screen.menu._DynamicMenuUpdateAlgorithm.compareOldMenuCells(oldMenu, newMenu);
 
@@ -198,11 +203,6 @@ module.exports = function (appClient) {
             Validator.assertEquals(runScore.getScore(), 0);
             Validator.assertEquals(runScore.getOldStatus(), oldMenuStatus);
             Validator.assertEquals(runScore.getUpdatedStatus(), newMenuStatus);
-
-            mm._setMenuCells(newMenu);
-
-            // Sleep to give time to Taskmaster to run the operations
-            await sleep(500);
 
             Validator.assertEquals(mm._currentMenuCells.length, 3);
             const oldKeeps = filterMenuCellsWithStatusList(mm._currentMenuCells, runScore.getOldStatus(), MenuCellState.KEEP);
@@ -232,6 +232,11 @@ module.exports = function (appClient) {
 
             Validator.assertEquals(mm._currentMenuCells.length, 3);
 
+            mm._setMenuCells(newMenu);
+
+            // Sleep to give time to Taskmaster to run the operations
+            await sleep(500);
+
             // this happens in the menu manager but lets make sure its behaving
             const runScore = SDL.manager.screen.menu._DynamicMenuUpdateAlgorithm.compareOldMenuCells(oldMenu, newMenu);
 
@@ -242,11 +247,6 @@ module.exports = function (appClient) {
             Validator.assertEquals(runScore.getScore(), 3);
             Validator.assertEquals(runScore.getOldStatus(), oldMenuStatus);
             Validator.assertEquals(runScore.getUpdatedStatus(), newMenuStatus);
-
-            mm._setMenuCells(newMenu);
-
-            // Sleep to give time to Taskmaster to run the operations
-            await sleep(500);
 
             Validator.assertEquals(mm._currentMenuCells.length, 3);
             const oldKeeps = filterMenuCellsWithStatusList(mm._currentMenuCells, runScore.getOldStatus(), MenuCellState.KEEP);
@@ -276,6 +276,11 @@ module.exports = function (appClient) {
 
             Validator.assertEquals(mm._currentMenuCells.length, 4);
 
+            mm._setMenuCells(newMenu);
+
+            // Sleep to give time to Taskmaster to run the operations
+            await sleep(500);
+
             // this happens in the menu manager but lets make sure its behaving
             const runScore = SDL.manager.screen.menu._DynamicMenuUpdateAlgorithm.compareOldMenuCells(oldMenu, newMenu);
 
@@ -286,11 +291,6 @@ module.exports = function (appClient) {
             Validator.assertEquals(runScore.getScore(), 2);
             Validator.assertEquals(runScore.getOldStatus(), oldMenuStatus);
             Validator.assertEquals(runScore.getUpdatedStatus(), newMenuStatus);
-
-            mm._setMenuCells(newMenu);
-
-            // Sleep to give time to Taskmaster to run the operations
-            await sleep(500);
 
             Validator.assertEquals(mm._currentMenuCells.length, 4);
             const oldKeeps = filterMenuCellsWithStatusList(mm._currentMenuCells, runScore.getOldStatus(), MenuCellState.KEEP);
@@ -320,6 +320,11 @@ module.exports = function (appClient) {
 
             Validator.assertEquals(mm._currentMenuCells.length, 4);
 
+            mm._setMenuCells(newMenu);
+
+            // Sleep to give time to Taskmaster to run the operations
+            await sleep(500);
+
             // this happens in the menu manager but lets make sure its behaving
             const runScore = SDL.manager.screen.menu._DynamicMenuUpdateAlgorithm.compareOldMenuCells(oldMenu, newMenu);
 
@@ -330,11 +335,6 @@ module.exports = function (appClient) {
             Validator.assertEquals(runScore.getScore(), 1);
             Validator.assertEquals(runScore.getOldStatus(), oldMenuStatus);
             Validator.assertEquals(runScore.getUpdatedStatus(), newMenuStatus);
-
-            mm._setMenuCells(newMenu);
-
-            // Sleep to give time to Taskmaster to run the operations
-            await sleep(500);
 
             Validator.assertEquals(mm._currentMenuCells.length, 4);
             const oldKeeps = filterMenuCellsWithStatusList(mm._currentMenuCells, runScore.getOldStatus(), MenuCellState.KEEP);
