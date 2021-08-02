@@ -191,5 +191,3 @@ getInnerRightRear () {
     }
     return tireStatus;
 }
-
-// ----------------- END -----------------------
