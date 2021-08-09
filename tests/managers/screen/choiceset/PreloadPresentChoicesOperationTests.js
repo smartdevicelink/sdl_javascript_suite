@@ -436,14 +436,17 @@ module.exports = function (appClient) {
             taskInstance._loadedCells = choiceCellList;
             taskInstance._lifecycleManager = appClient._sdlManager._lifecycleManager;
 
-            Validator.assertEquals(taskInstance._updateCellsBasedOnLoadedChoices(choiceCellList), []);
+            taskInstance._updateCellsBasedOnLoadedChoices(choiceCellList);
+            Validator.assertEquals(taskInstance._cellsToPreload, []);
             const cell3 = new SDL.manager.screen.choiceset.ChoiceCell('Item 3')
                 .setSecondaryText('null3')
                 .setTertiaryText('tertiaryText3')
                 .setVoiceCommands(null)
                 .setArtwork(null)
                 .setSecondaryArtwork(null);
-            Validator.assertEquals(taskInstance._updateCellsBasedOnLoadedChoices([cell1, cell2, cell3]), [cell3]);
+
+            taskInstance._updateCellsBasedOnLoadedChoices([cell1, cell2, cell3]);
+            Validator.assertEquals(taskInstance._cellsToPreload, [cell3]);
         });
 
         it('testAddUniqueNamesToCells', function () {
