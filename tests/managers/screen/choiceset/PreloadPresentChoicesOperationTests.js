@@ -436,7 +436,8 @@ module.exports = function (appClient) {
             taskInstance._loadedCells = choiceCellList;
             taskInstance._lifecycleManager = appClient._sdlManager._lifecycleManager;
 
-            taskInstance._updateCellsBasedOnLoadedChoices(choiceCellList);
+            taskInstance._cellsToPreload = choiceCellList;
+            taskInstance._updateCellsBasedOnLoadedChoices();
             Validator.assertEquals(taskInstance._cellsToPreload, []);
             const cell3 = new SDL.manager.screen.choiceset.ChoiceCell('Item 3')
                 .setSecondaryText('null3')
@@ -445,7 +446,8 @@ module.exports = function (appClient) {
                 .setArtwork(null)
                 .setSecondaryArtwork(null);
 
-            taskInstance._updateCellsBasedOnLoadedChoices([cell1, cell2, cell3]);
+            taskInstance._cellsToPreload = [cell1, cell2, cell3];
+            taskInstance._updateCellsBasedOnLoadedChoices();
             Validator.assertEquals(taskInstance._cellsToPreload, [cell3]);
         });
 
