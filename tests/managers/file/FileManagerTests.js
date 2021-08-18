@@ -1,5 +1,4 @@
 const chai = require('chai');
-const expect = chai.expect;
 chai.use(require('chai-as-promised'));
 const SDL = require('../../config.js').node;
 
@@ -212,7 +211,7 @@ module.exports = function (appClient) {
 
         it('testFileUploadFailure', async function () {
             await new Promise (async resolve => {
-                let stub;
+                let stub = {};
                 const expectSuccess = function (response) {
                     Validator.assertTrue(response.getSuccess());
                 };
@@ -243,7 +242,6 @@ module.exports = function (appClient) {
 
         it('testFileUploadSuccess', async function () {
             await new Promise (async resolve => {
-                let stub;
                 const expectSuccess = function (response) {
                     Validator.assertTrue(response.getSuccess());
                 };
@@ -261,7 +259,7 @@ module.exports = function (appClient) {
                 sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.ListFiles, expectSuccess);
                 sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.PutFile, expectPutFileSuccess);
 
-                stub = sinon.stub(lifecycleManager, 'sendRpcResolve');
+                const stub = sinon.stub(lifecycleManager, 'sendRpcResolve');
                 stub.withArgs(sinon.match.instanceOf(SDL.rpc.messages.ListFiles))
                     .callsFake(onListFilesSuccess);
                 stub.withArgs(sinon.match.instanceOf(SDL.rpc.messages.PutFile))
@@ -355,7 +353,6 @@ module.exports = function (appClient) {
 
         it('testMultipleFileUploadThenDeleteSuccess', async function () {
             return new Promise (async resolve => {
-                let stub;
                 const expectSuccess = function (response) {
                     Validator.assertTrue(response.getSuccess());
                 };
@@ -368,18 +365,18 @@ module.exports = function (appClient) {
                 sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.PutFile, expectSuccess);
                 sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.DeleteFile, expectDeleteSuccess);
 
-                stub = sinon.stub(lifecycleManager, 'sendRpcResolve');
+                const stub = sinon.stub(lifecycleManager, 'sendRpcResolve');
                 stub.withArgs(sinon.match.instanceOf(SDL.rpc.messages.ListFiles))
                     .callsFake(onListFilesSuccess);
                 stub.withArgs(sinon.match.instanceOf(SDL.rpc.messages.PutFile))
                     .callsFake(onPutFileSuccess);
                 stub.withArgs(sinon.match.instanceOf(SDL.rpc.messages.DeleteFile))
                     .callsFake(onDeleteFileSuccess);
-                await new Promise (async innerResolve => {
+                await new Promise (innerResolve => {
                     const listOperation = new SDL.manager.file._ListFilesOperation(sdlManager._lifecycleManager, (success, bytesAvailable, fileNames, errorMessage) => {
                         innerResolve();
                     });
-                    await listOperation.onExecute();
+                    listOperation.onExecute();
                 });
 
                 const baseFileName = 'file';
@@ -398,11 +395,11 @@ module.exports = function (appClient) {
                 filesToUpload.push(sdlFile);
 
                 await fileManager.uploadFiles(filesToUpload);
-                
+
                 const uploadedFileNames = fileManager.getRemoteFileNames();
 
                 Validator.assertNull(await fileManager.deleteRemoteFilesWithNames([uploadedFileNames[0], uploadedFileNames[1]]));
-                await new Promise (async innerResolve => {
+                await new Promise (innerResolve => {
                     const deleteOperation = new SDL.manager.file._DeleteFileOperation(sdlManager._lifecycleManager, uploadedFileNames[2], (success, bytesAvailable, fileNames, errorMessage) => {
                         Validator.assertTrue(success);
                         Validator.assertNull(errorMessage);
@@ -437,17 +434,17 @@ module.exports = function (appClient) {
             sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.ListFiles, expectSuccess);
             sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.PutFile, expectSuccessThenFail);
 
-            let stub = sinon.stub(lifecycleManager, 'sendRpcResolve');
+            const stub = sinon.stub(lifecycleManager, 'sendRpcResolve');
             stub.withArgs(sinon.match.instanceOf(SDL.rpc.messages.ListFiles))
                 .callsFake(onListFilesSuccess);
             stub.withArgs(sinon.match.instanceOf(SDL.rpc.messages.PutFile))
                 .callsFake(onMultiplePutFileSuccess);
 
-            await new Promise (async resolve => {
+            await new Promise (resolve => {
                 const listOperation = new SDL.manager.file._ListFilesOperation(sdlManager._lifecycleManager, (success, bytesAvailable, fileNames, errorMessage) => {
                     resolve();
                 });
-                await listOperation.onExecute();
+                listOperation.onExecute();
             });
 
             const baseFileName = 'file';
@@ -467,7 +464,7 @@ module.exports = function (appClient) {
             let uploadedFileNames = fileManager.getRemoteFileNames();
 
             await fileManager.uploadFiles(filesToUpload[0]);
-            await new Promise (async resolve => {
+            await new Promise (resolve => {
                 // this task will run after the previous
                 const uploadOperation = new SDL.manager.file._UploadFileOperation(sdlManager._lifecycleManager, sdlManager._fileManager, new SDL.manager.file._SdlFileWrapper(filesToUpload[1], (success, bytesAvailable, fileNames, errorMessage) => {
                     resolve();
@@ -494,11 +491,11 @@ module.exports = function (appClient) {
 
             let stub = sinon.stub(lifecycleManager, 'sendRpcResolve')
                 .callsFake(onMultipleListFilesSuccess);
-            await new Promise (async resolve => {
+            await new Promise (resolve => {
                 const listOperation = new SDL.manager.file._ListFilesOperation(sdlManager._lifecycleManager, (success, bytesAvailable, fileNames, errorMessage) => {
                     resolve();
                 });
-                await listOperation.onExecute();
+                listOperation.onExecute();
             });
             stub.restore();
 
@@ -519,7 +516,7 @@ module.exports = function (appClient) {
             stub = sinon.stub(lifecycleManager, 'sendRpcResolve')
                 .callsFake(onPutFileSuccess);
             await fileManager.uploadFile(artworkToUpload[0]);
-            await new Promise (async resolve => {
+            await new Promise (resolve => {
                 // this task will run after the previous
                 const uploadOperation = new SDL.manager.file._UploadFileOperation(sdlManager._lifecycleManager, sdlManager._fileManager, new SDL.manager.file._SdlFileWrapper(artworkToUpload[1], (success, bytesAvailable, fileNames, errorMessage) => {
                     Validator.assertTrue(success);
@@ -548,12 +545,12 @@ module.exports = function (appClient) {
 
             const stub = sinon.stub(lifecycleManager, 'sendRpcResolve')
                 .callsFake(onListFilesSuccess);
-            await new Promise (async resolve => {
+            await new Promise (resolve => {
                 const listOperation = new SDL.manager.file._ListFilesOperation(sdlManager._lifecycleManager, (success, bytesAvailable, fileNames, errorMessage) => {
                     sdlManager._fileManager._remoteFiles = fileNames;
                     resolve();
                 });
-                await listOperation.onExecute();
+                listOperation.onExecute();
             });
             stub.restore();
 
