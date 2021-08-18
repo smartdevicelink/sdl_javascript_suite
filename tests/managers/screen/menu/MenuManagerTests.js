@@ -44,7 +44,6 @@ module.exports = function (appClient) {
             Validator.assertEquals(mm._currentSystemContext, SDL.rpc.enums.SystemContext.SYSCTXT_MAIN);
             Validator.assertEquals(mm._currentHmiLevel, SDL.rpc.enums.HMILevel.HMI_NONE);
             Validator.assertEquals(mm._dynamicMenuUpdatesMode, SDL.manager.screen.menu.enums.DynamicMenuUpdatesMode.ON_WITH_COMPAT_MODE);
-            Validator.assertEquals(mm._lastMenuId, SDL.manager.screen.menu._MenuManagerBase.MENU_CELL_ID_MIN);
             Validator.assertTrue(mm._menuCells.length === 0);
             Validator.assertTrue(mm._currentMenuCells.length === 0);
             Validator.assertNull(mm._menuConfiguration.getMenuLayout());
@@ -150,7 +149,7 @@ module.exports = function (appClient) {
             await sleep(500);
 
             // this happens in the menu manager but lets make sure its behaving
-            const runScore = SDL.manager.screen.menu._DynamicMenuUpdateAlgorithm.compareOldMenuCells(oldMenu, newMenu);
+            const runScore = SDL.manager.screen.menu._DynamicMenuUpdateAlgorithm.dynamicRunScoreOldMenuCells(oldMenu, newMenu);
 
             const MenuCellState = SDL.manager.screen.menu.enums._MenuCellState;
             const oldMenuStatus = [MenuCellState.KEEP, MenuCellState.KEEP, MenuCellState.KEEP, MenuCellState.KEEP];
@@ -194,7 +193,7 @@ module.exports = function (appClient) {
             await sleep(500);
 
             // this happens in the menu manager but lets make sure its behaving
-            const runScore = SDL.manager.screen.menu._DynamicMenuUpdateAlgorithm.compareOldMenuCells(oldMenu, newMenu);
+            const runScore = SDL.manager.screen.menu._DynamicMenuUpdateAlgorithm.dynamicRunScoreOldMenuCells(oldMenu, newMenu);
 
             const MenuCellState = SDL.manager.screen.menu.enums._MenuCellState;
             const oldMenuStatus = [MenuCellState.KEEP, MenuCellState.KEEP, MenuCellState.KEEP, MenuCellState.DELETE];
@@ -238,7 +237,7 @@ module.exports = function (appClient) {
             await sleep(500);
 
             // this happens in the menu manager but lets make sure its behaving
-            const runScore = SDL.manager.screen.menu._DynamicMenuUpdateAlgorithm.compareOldMenuCells(oldMenu, newMenu);
+            const runScore = SDL.manager.screen.menu._DynamicMenuUpdateAlgorithm.dynamicRunScoreOldMenuCells(oldMenu, newMenu);
 
             const MenuCellState = SDL.manager.screen.menu.enums._MenuCellState;
             const oldMenuStatus = [MenuCellState.DELETE, MenuCellState.DELETE, MenuCellState.DELETE];
@@ -282,7 +281,7 @@ module.exports = function (appClient) {
             await sleep(500);
 
             // this happens in the menu manager but lets make sure its behaving
-            const runScore = SDL.manager.screen.menu._DynamicMenuUpdateAlgorithm.compareOldMenuCells(oldMenu, newMenu);
+            const runScore = SDL.manager.screen.menu._DynamicMenuUpdateAlgorithm.dynamicRunScoreOldMenuCells(oldMenu, newMenu);
 
             const MenuCellState = SDL.manager.screen.menu.enums._MenuCellState;
             const oldMenuStatus = [MenuCellState.KEEP, MenuCellState.DELETE, MenuCellState.KEEP, MenuCellState.DELETE];
@@ -326,7 +325,7 @@ module.exports = function (appClient) {
             await sleep(500);
 
             // this happens in the menu manager but lets make sure its behaving
-            const runScore = SDL.manager.screen.menu._DynamicMenuUpdateAlgorithm.compareOldMenuCells(oldMenu, newMenu);
+            const runScore = SDL.manager.screen.menu._DynamicMenuUpdateAlgorithm.dynamicRunScoreOldMenuCells(oldMenu, newMenu);
 
             const MenuCellState = SDL.manager.screen.menu.enums._MenuCellState;
             const oldMenuStatus = [MenuCellState.DELETE, MenuCellState.KEEP, MenuCellState.KEEP, MenuCellState.KEEP];
@@ -341,32 +340,6 @@ module.exports = function (appClient) {
             const newKeeps = filterMenuCellsWithStatusList(mm._currentMenuCells, runScore.getUpdatedStatus(), MenuCellState.KEEP);
             Validator.assertEquals(oldKeeps.length, 3);
             Validator.assertEquals(newKeeps.length, 3);
-        });
-
-        it('testSettingNullMenu', async function () {
-            // Make sure we can send an empty menu with no issues
-            // start fresh
-            mm._currentMenuCells = [];
-            mm._menuCells = [];
-
-            sendFakeCoreOnHmiFullNotifications();
-
-            // send new cells. They should set the old way
-            const oldMenu = createDynamicMenu1();
-            const newMenu = null;
-            mm._setMenuCells(oldMenu);
-
-            // Sleep to give time to Taskmaster to run the operations
-            await sleep(500);
-
-            Validator.assertEquals(mm._currentMenuCells.length, 4);
-
-            mm._setMenuCells(newMenu);
-
-            // Sleep to give time to Taskmaster to run the operations
-            await sleep(500);
-
-            Validator.assertEquals(mm._currentMenuCells.length, 0);
         });
 
         it('testClearingMenu', async function () {

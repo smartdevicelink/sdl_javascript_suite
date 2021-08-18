@@ -5,8 +5,6 @@ const Test = require('../../../Test.js');
 
 module.exports = function (appClient) {
     describe('MenuReplaceUtilitiesTests', function () {
-        let lastMenuId = SDL.manager.screen.menu._MenuManagerBase.MENU_CELL_ID_MIN;
-
         it('testRemoveMenuCellFromList', async function () {
             let menuCellToDelete;
             let cellRemoved;
@@ -15,7 +13,7 @@ module.exports = function (appClient) {
 
             // Delete cell c4
             menuCellToDelete = actualMenuCellList[3];
-            cellRemoved = SDL.manager.screen.menu._MenuReplaceUtilities.removeMenuCellFromList(actualMenuCellList, menuCellToDelete._getCellId());
+            cellRemoved = SDL.manager.screen.menu._MenuReplaceUtilities.removeCellFromList(actualMenuCellList, menuCellToDelete._getCellId());
             Validator.assertTrue(cellRemoved);
             expectedMenuCellList.splice(3, 1);
 
@@ -23,14 +21,14 @@ module.exports = function (appClient) {
             Validator.assertEquals(3, actualMenuCellList.length);
 
             // Delete cell c4 again - removal should fail and list should not change
-            cellRemoved = SDL.manager.screen.menu._MenuReplaceUtilities.removeMenuCellFromList(actualMenuCellList, menuCellToDelete._getCellId());
+            cellRemoved = SDL.manager.screen.menu._MenuReplaceUtilities.removeCellFromList(actualMenuCellList, menuCellToDelete._getCellId());
             Validator.assertTrue(!cellRemoved);
             Validator.assertTrue(!expectedMenuCellList.map((menuCell, index) => menuCell.equals(actualMenuCellList[index])).includes(false));
             Validator.assertEquals(3, actualMenuCellList.length);
 
             // Delete cell c3
             menuCellToDelete = actualMenuCellList[2];
-            cellRemoved = SDL.manager.screen.menu._MenuReplaceUtilities.removeMenuCellFromList(actualMenuCellList, menuCellToDelete._getCellId());
+            cellRemoved = SDL.manager.screen.menu._MenuReplaceUtilities.removeCellFromList(actualMenuCellList, menuCellToDelete._getCellId());
             Validator.assertTrue(cellRemoved);
             expectedMenuCellList.splice(2, 1);
             Validator.assertTrue(!expectedMenuCellList.map((menuCell, index) => menuCell.equals(actualMenuCellList[index])).includes(false));
@@ -38,7 +36,7 @@ module.exports = function (appClient) {
 
             // Delete cell c2-2-2
             menuCellToDelete = actualMenuCellList[1].getSubCells()[1].getSubCells()[1];
-            cellRemoved = SDL.manager.screen.menu._MenuReplaceUtilities.removeMenuCellFromList(actualMenuCellList, menuCellToDelete._getCellId());
+            cellRemoved = SDL.manager.screen.menu._MenuReplaceUtilities.removeCellFromList(actualMenuCellList, menuCellToDelete._getCellId());
             Validator.assertTrue(cellRemoved);
             expectedMenuCellList[1].getSubCells()[1].getSubCells().splice(1, 1);
             Validator.assertTrue(!expectedMenuCellList.map((menuCell, index) => menuCell.equals(actualMenuCellList[index])).includes(false));
@@ -47,7 +45,7 @@ module.exports = function (appClient) {
 
             // Delete cell c2-2-1
             menuCellToDelete = actualMenuCellList[1].getSubCells()[1].getSubCells()[0];
-            cellRemoved = SDL.manager.screen.menu._MenuReplaceUtilities.removeMenuCellFromList(actualMenuCellList, menuCellToDelete._getCellId());
+            cellRemoved = SDL.manager.screen.menu._MenuReplaceUtilities.removeCellFromList(actualMenuCellList, menuCellToDelete._getCellId());
             Validator.assertTrue(cellRemoved);
             expectedMenuCellList[1].getSubCells()[1].getSubCells().splice(0, 1);
             Validator.assertTrue(!expectedMenuCellList.map((menuCell, index) => menuCell.equals(actualMenuCellList[index])).includes(false));
@@ -56,7 +54,7 @@ module.exports = function (appClient) {
 
             // Delete cell c2-2
             menuCellToDelete = actualMenuCellList[1].getSubCells()[1];
-            cellRemoved = SDL.manager.screen.menu._MenuReplaceUtilities.removeMenuCellFromList(actualMenuCellList, menuCellToDelete._getCellId());
+            cellRemoved = SDL.manager.screen.menu._MenuReplaceUtilities.removeCellFromList(actualMenuCellList, menuCellToDelete._getCellId());
             Validator.assertTrue(cellRemoved);
             expectedMenuCellList[1].getSubCells().splice(1, 1);
             Validator.assertTrue(!expectedMenuCellList.map((menuCell, index) => menuCell.equals(actualMenuCellList[index])).includes(false));
@@ -65,7 +63,7 @@ module.exports = function (appClient) {
 
             // Delete cell c2-1
             menuCellToDelete = actualMenuCellList[1].getSubCells()[0];
-            cellRemoved = SDL.manager.screen.menu._MenuReplaceUtilities.removeMenuCellFromList(actualMenuCellList, menuCellToDelete._getCellId());
+            cellRemoved = SDL.manager.screen.menu._MenuReplaceUtilities.removeCellFromList(actualMenuCellList, menuCellToDelete._getCellId());
             Validator.assertTrue(cellRemoved);
             expectedMenuCellList[1].getSubCells().splice(0, 1);
             Validator.assertTrue(!expectedMenuCellList.map((menuCell, index) => menuCell.equals(actualMenuCellList[index])).includes(false));
@@ -74,7 +72,7 @@ module.exports = function (appClient) {
 
             // Delete cell c2
             menuCellToDelete = actualMenuCellList[1];
-            cellRemoved = SDL.manager.screen.menu._MenuReplaceUtilities.removeMenuCellFromList(actualMenuCellList, menuCellToDelete._getCellId());
+            cellRemoved = SDL.manager.screen.menu._MenuReplaceUtilities.removeCellFromList(actualMenuCellList, menuCellToDelete._getCellId());
             Validator.assertTrue(cellRemoved);
             expectedMenuCellList.splice(1, 1);
             Validator.assertTrue(!expectedMenuCellList.map((menuCell, index) => menuCell.equals(actualMenuCellList[index])).includes(false));
@@ -82,7 +80,7 @@ module.exports = function (appClient) {
 
             // Delete cell c1
             menuCellToDelete = actualMenuCellList[0];
-            cellRemoved = SDL.manager.screen.menu._MenuReplaceUtilities.removeMenuCellFromList(actualMenuCellList, menuCellToDelete._getCellId());
+            cellRemoved = SDL.manager.screen.menu._MenuReplaceUtilities.removeCellFromList(actualMenuCellList, menuCellToDelete._getCellId());
             Validator.assertTrue(cellRemoved);
             expectedMenuCellList.splice(0, 1);
             Validator.assertTrue(!expectedMenuCellList.map((menuCell, index) => menuCell.equals(actualMenuCellList[index])).includes(false));
@@ -98,7 +96,7 @@ module.exports = function (appClient) {
 
             // Add cell c5
             menuCellToAdd = newMenuList[0];
-            cellAdded = SDL.manager.screen.menu._MenuReplaceUtilities.addMenuRequestWithCommandId(menuCellToAdd._getCellId(), 4, newMenuList, actualMenuCellList);
+            cellAdded = SDL.manager.screen.menu._MenuReplaceUtilities.addCellWithCellId(menuCellToAdd._getCellId(), 4, newMenuList, actualMenuCellList);
             Validator.assertTrue(cellAdded);
             expectedMenuCellList.splice(4, 0, cloneMenuCellAndRemoveSubCells(menuCellToAdd));
             Validator.assertTrue(!expectedMenuCellList.map((menuCell, index) => menuCell.equals(actualMenuCellList[index])).includes(false));
@@ -107,7 +105,7 @@ module.exports = function (appClient) {
 
             // Add cell c5-1
             menuCellToAdd = newMenuList[0].getSubCells()[0];
-            cellAdded = SDL.manager.screen.menu._MenuReplaceUtilities.addMenuRequestWithCommandId(menuCellToAdd._getCellId(), 0, newMenuList, actualMenuCellList);
+            cellAdded = SDL.manager.screen.menu._MenuReplaceUtilities.addCellWithCellId(menuCellToAdd._getCellId(), 0, newMenuList, actualMenuCellList);
             Validator.assertTrue(cellAdded);
             expectedMenuCellList[4].getSubCells().splice(0, 0, cloneMenuCellAndRemoveSubCells(menuCellToAdd));
             Validator.assertTrue(!expectedMenuCellList.map((menuCell, index) => menuCell.equals(actualMenuCellList[index])).includes(false));
@@ -116,7 +114,7 @@ module.exports = function (appClient) {
 
             // Add cell c5-1-1
             menuCellToAdd = newMenuList[0].getSubCells()[0].getSubCells()[0];
-            cellAdded = SDL.manager.screen.menu._MenuReplaceUtilities.addMenuRequestWithCommandId(menuCellToAdd._getCellId(), 0, newMenuList, actualMenuCellList);
+            cellAdded = SDL.manager.screen.menu._MenuReplaceUtilities.addCellWithCellId(menuCellToAdd._getCellId(), 0, newMenuList, actualMenuCellList);
             Validator.assertTrue(cellAdded);
             expectedMenuCellList[4].getSubCells()[0].getSubCells().splice(0, 0, cloneMenuCellAndRemoveSubCells(menuCellToAdd));
             Validator.assertTrue(!expectedMenuCellList.map((menuCell, index) => menuCell.equals(actualMenuCellList[index])).includes(false));
@@ -126,7 +124,7 @@ module.exports = function (appClient) {
 
             // Add cell c5-2
             menuCellToAdd = newMenuList[0].getSubCells()[1];
-            cellAdded = SDL.manager.screen.menu._MenuReplaceUtilities.addMenuRequestWithCommandId(menuCellToAdd._getCellId(), 1, newMenuList, actualMenuCellList);
+            cellAdded = SDL.manager.screen.menu._MenuReplaceUtilities.addCellWithCellId(menuCellToAdd._getCellId(), 1, newMenuList, actualMenuCellList);
             Validator.assertTrue(cellAdded);
             expectedMenuCellList[4].getSubCells().splice(1, 0, cloneMenuCellAndRemoveSubCells(menuCellToAdd));
             Validator.assertTrue(!expectedMenuCellList.map((menuCell, index) => menuCell.equals(actualMenuCellList[index])).includes(false));
@@ -137,7 +135,7 @@ module.exports = function (appClient) {
 
             // Add cell c5-2-1
             menuCellToAdd = newMenuList[0].getSubCells()[1].getSubCells()[0];
-            cellAdded = SDL.manager.screen.menu._MenuReplaceUtilities.addMenuRequestWithCommandId(menuCellToAdd._getCellId(), 0, newMenuList, actualMenuCellList);
+            cellAdded = SDL.manager.screen.menu._MenuReplaceUtilities.addCellWithCellId(menuCellToAdd._getCellId(), 0, newMenuList, actualMenuCellList);
             Validator.assertTrue(cellAdded);
             expectedMenuCellList[4].getSubCells()[1].getSubCells().splice(0, 0, cloneMenuCellAndRemoveSubCells(menuCellToAdd));
             Validator.assertTrue(!expectedMenuCellList.map((menuCell, index) => menuCell.equals(actualMenuCellList[index])).includes(false));
@@ -151,41 +149,41 @@ module.exports = function (appClient) {
             let menuCell;
             let windowCapability;
             let fileManager;
-            const shouldCellIncludeImage = SDL.manager.screen.menu._MenuReplaceUtilities.shouldCellIncludeImage;
+            const shouldCellIncludePrimaryImageFromCell = SDL.manager.screen.menu._MenuReplaceUtilities.shouldCellIncludePrimaryImageFromCell;
 
             // Case 1
             menuCell = new SDL.manager.screen.menu.MenuCell(Test.GENERAL_STRING)
                 .setIcon(Test.GENERAL_ARTWORK);
             windowCapability = createWindowCapability(true, true);
             fileManager = createMockFileManager(true);
-            Validator.assertTrue(shouldCellIncludeImage(menuCell, fileManager, windowCapability, false));
+            Validator.assertTrue(shouldCellIncludePrimaryImageFromCell(menuCell, fileManager, windowCapability));
 
             // Case 2 - Image are not supported
             menuCell = new SDL.manager.screen.menu.MenuCell(Test.GENERAL_STRING)
                 .setIcon(Test.GENERAL_ARTWORK);
             windowCapability = createWindowCapability(false, false);
             fileManager = createMockFileManager(true);
-            Validator.assertTrue(!shouldCellIncludeImage(menuCell, fileManager, windowCapability, false));
+            Validator.assertTrue(!shouldCellIncludePrimaryImageFromCell(menuCell, fileManager, windowCapability));
 
             // Case 3 - Artwork is null
             menuCell = new SDL.manager.screen.menu.MenuCell(Test.GENERAL_STRING);
             windowCapability = createWindowCapability(true, true);
             fileManager = createMockFileManager(true);
-            Validator.assertTrue(!shouldCellIncludeImage(menuCell, fileManager, windowCapability, false));
+            Validator.assertTrue(!shouldCellIncludePrimaryImageFromCell(menuCell, fileManager, windowCapability));
 
             // Case 4 - Artwork has not been uploaded
             menuCell = new SDL.manager.screen.menu.MenuCell(Test.GENERAL_STRING)
                 .setIcon(Test.GENERAL_ARTWORK);
             windowCapability = createWindowCapability(true, true);
             fileManager = createMockFileManager(false);
-            Validator.assertTrue(!shouldCellIncludeImage(menuCell, fileManager, windowCapability, false));
+            Validator.assertTrue(!shouldCellIncludePrimaryImageFromCell(menuCell, fileManager, windowCapability));
 
             // Case 5 - Artwork is static icon
             menuCell = new SDL.manager.screen.menu.MenuCell(Test.GENERAL_STRING)
                 .setIcon(Test.GENERAL_ARTWORK_STATIC);
             windowCapability = createWindowCapability(true, true);
             fileManager = createMockFileManager(false);
-            Validator.assertTrue(shouldCellIncludeImage(menuCell, fileManager, windowCapability, false));
+            Validator.assertTrue(shouldCellIncludePrimaryImageFromCell(menuCell, fileManager, windowCapability));
         });
 
         /**
@@ -243,7 +241,7 @@ module.exports = function (appClient) {
                 .setSubCells([menuCell41, menuCell42]);
 
             const menuCellList = [menuCell1, menuCell2, menuCell3, menuCell4];
-            updateIdsOnMenuCells(menuCellList, SDL.manager.screen.menu._MenuManagerBase.PARENT_ID_NOT_FOUND);
+            SDL.manager.screen.menu._MenuReplaceUtilities.updateIdsOnMenuCells(menuCellList, SDL.manager.screen.menu._MenuManagerBase.PARENT_ID_NOT_FOUND);
             return menuCellList;
         }
 
@@ -273,7 +271,7 @@ module.exports = function (appClient) {
                 .setSubCells([menuCell51, menuCell52]);
 
             const newMenuList = [menuCell5];
-            updateIdsOnMenuCells(newMenuList, SDL.manager.screen.menu._MenuManagerBase.PARENT_ID_NOT_FOUND);
+            SDL.manager.screen.menu._MenuReplaceUtilities.updateIdsOnMenuCells(newMenuList, SDL.manager.screen.menu._MenuManagerBase.PARENT_ID_NOT_FOUND);
             return newMenuList;
         }
 
@@ -293,23 +291,6 @@ module.exports = function (appClient) {
             }
             return new SDL.rpc.structs.WindowCapability()
                 .setImageFields(supported);
-        }
-
-        /**
-         * Updates menu cells using the ID passed in
-         * @param {MenuCell[]} menuCells - The menu cells to update
-         * @param {Number} parentId - The ID to use
-         */
-        function updateIdsOnMenuCells (menuCells, parentId) {
-            menuCells.forEach(cell => {
-                cell._setCellId(lastMenuId++);
-                if (parentId !== SDL.manager.screen.menu._MenuManagerBase.PARENT_ID_NOT_FOUND) {
-                    cell._setParentCellId(parentId);
-                }
-                if (cell.getSubCells() !== null && cell.getSubCells().length !== 0) {
-                    updateIdsOnMenuCells(cell.getSubCells(), cell._getCellId());
-                }
-            });
         }
     });
 };
