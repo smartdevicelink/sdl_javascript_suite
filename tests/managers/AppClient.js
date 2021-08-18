@@ -49,7 +49,8 @@ class AppClient {
             )
             .setRpcNotificationListeners({
                 [SDL.rpc.enums.FunctionID.OnHMIStatus]: this._onHmiStatusListener.bind(this),
-            });
+            })
+            .setFileManagerConfig(new SDL.manager.file.FileManagerConfig());
 
         this._appConfig = new SDL.manager.AppConfig()
             .setLifecycleConfig(this._lifecycleConfig);
