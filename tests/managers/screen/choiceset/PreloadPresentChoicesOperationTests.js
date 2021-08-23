@@ -409,8 +409,9 @@ module.exports = function (appClient) {
             taskInstance._defaultMainWindowCapability.setImageFields([]);
 
             removedProperties = taskInstance._removeUnusedProperties(choiceCellList);
-            taskInstance._addUniqueNamesBasedOnStrippedCells(removedProperties, choiceCellList);
-            Validator.assertEquals(choiceCellList[1]._getUniqueText(), 'Item 1 (2)');
+            Validator.assertNull(removedProperties[1].getSecondaryText());
+            taskInstance._addUniqueNamesToCells(removedProperties, [], true);
+            Validator.assertEquals(removedProperties[1]._getUniqueTextId(), 2);
         });
 
         it('testChoicesToBeUploaded', function () {
@@ -437,7 +438,7 @@ module.exports = function (appClient) {
             taskInstance._lifecycleManager = appClient._sdlManager._lifecycleManager;
 
             taskInstance._cellsToPreload = choiceCellList;
-            taskInstance._updateCellsBasedOnLoadedChoices();
+            taskInstance._removeLoadedCellsFromPreload();
             Validator.assertEquals(taskInstance._cellsToPreload, []);
             const cell3 = new SDL.manager.screen.choiceset.ChoiceCell('Item 3')
                 .setSecondaryText('null3')
@@ -447,7 +448,7 @@ module.exports = function (appClient) {
                 .setSecondaryArtwork(null);
 
             taskInstance._cellsToPreload = [cell1, cell2, cell3];
-            taskInstance._updateCellsBasedOnLoadedChoices();
+            taskInstance._removeLoadedCellsFromPreload();
             Validator.assertEquals(taskInstance._cellsToPreload, [cell3]);
         });
 
@@ -466,15 +467,35 @@ module.exports = function (appClient) {
                 .setSecondaryText('6 miles away');
 
             const taskInstance = new SDL.manager.screen.choiceset._PreloadPresentChoicesOperation();
+            taskInstance._defaultMainWindowCapability = new SDL.rpc.structs.WindowCapability();
 
-            taskInstance._addUniqueNamesToCells([cell1, cell2, cell3, cell4, cell5, cell6]);
+            const removedProperties = taskInstance._removeUnusedProperties([cell1, cell2, cell3, cell4, cell5, cell6]);
+            Validator.assertNull(removedProperties[0].getSecondaryText());
+            taskInstance._addUniqueNamesToCells(removedProperties, [], true);
 
-            Validator.assertEquals(cell1._getUniqueText(), 'McDonalds');
-            Validator.assertEquals(cell2._getUniqueText(), 'McDonalds (2)');
-            Validator.assertEquals(cell3._getUniqueText(), 'Starbucks');
-            Validator.assertEquals(cell4._getUniqueText(), 'McDonalds (3)');
-            Validator.assertEquals(cell5._getUniqueText(), 'Starbucks (2)');
-            Validator.assertEquals(cell6._getUniqueText(), 'Meijer');
+            Validator.assertEquals(removedProperties[0]._getUniqueText(), 'McDonalds');
+            Validator.assertEquals(removedProperties[1]._getUniqueText(), 'McDonalds (2)');
+            Validator.assertEquals(removedProperties[2]._getUniqueText(), 'Starbucks');
+            Validator.assertEquals(removedProperties[3]._getUniqueText(), 'McDonalds (3)');
+            Validator.assertEquals(removedProperties[4]._getUniqueText(), 'Starbucks (2)');
+            Validator.assertEquals(removedProperties[5]._getUniqueText(), 'Meijer');
+        });
+
+        it('testAssignIdsToCells', function () {
+            const cell1 = new SDL.manager.screen.choiceset.ChoiceCell('test');
+            const cell2 = new SDL.manager.screen.choiceset.ChoiceCell('test2');
+            const cell3 = new SDL.manager.screen.choiceset.ChoiceCell('test3');
+            const cellSet = [cell1, cell2, cell3];
+            // Cells are initially set to MAX_ID
+            Validator.assertEquals(cell1._getChoiceId(), 2000000000);
+            Validator.assertEquals(cell2._getChoiceId(), 2000000000);
+            Validator.assertEquals(cell3._getChoiceId(), 2000000000);
+            const taskInstance = new SDL.manager.screen.choiceset._PreloadPresentChoicesOperation();
+            taskInstance._assignIdsToCells(cellSet);
+            // We are looking for unique IDs
+            Validator.assertTrue(cell1._getChoiceId() !== 2000000000);
+            Validator.assertTrue(cell2._getChoiceId() !== 2000000000);
+            Validator.assertTrue(cell3._getChoiceId() !== 2000000000);
         });
 
         /**

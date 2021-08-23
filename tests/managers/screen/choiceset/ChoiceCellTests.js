@@ -40,9 +40,6 @@ module.exports = function (appClient) {
 
             Validator.assertEquals(choiceCell._getUniqueText(), choiceCell.getText());
 
-            choiceCell._setUniqueText('hi');
-            Validator.assertEquals(choiceCell._getUniqueText(), 'hi');
-
             choiceCell.setText('hello');
             Validator.assertEquals(choiceCell.getText(), 'hello');
         });
@@ -68,9 +65,9 @@ module.exports = function (appClient) {
                 .setSecondaryText(Test.GENERAL_STRING)
                 .setTertiaryText(Test.GENERAL_STRING);
 
-            choiceCell._setUniqueText('1');
-            choiceCell2._setUniqueText('1');
-            choiceCell3._setUniqueText('3');
+            choiceCell._setUniqueTextId(1);
+            choiceCell2._setUniqueTextId(1);
+            choiceCell3._setUniqueTextId(3);
 
             Validator.assertTrue(choiceCell.equals(choiceCell2));
             Validator.assertTrue(!choiceCell.equals(choiceCell3));

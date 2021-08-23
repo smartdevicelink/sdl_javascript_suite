@@ -61,12 +61,6 @@ module.exports = function (appClient) {
             const choiceSet1 = new SDL.manager.screen.choiceset.ChoiceSet('test', [], choiceSetSelectionListener);
             Validator.assertTrue(!csm._setUpChoiceSet(choiceSet1));
 
-            // Identical cells will not be allowed
-            const cell1 = new SDL.manager.screen.choiceset.ChoiceCell('test');
-            const cell2 = new SDL.manager.screen.choiceset.ChoiceCell('test');
-            const choiceSet2 = new SDL.manager.screen.choiceset.ChoiceSet('test', [cell1, cell2], choiceSetSelectionListener);
-            Validator.assertTrue(!csm._setUpChoiceSet(choiceSet2));
-
             // cells that have duplicate text will be allowed if there is another property to make them unique
             // because a unique name will be assigned and used
             const cell3 = new SDL.manager.screen.choiceset.ChoiceCell('test')
@@ -100,22 +94,6 @@ module.exports = function (appClient) {
             Validator.assertTrue(csm._setUpChoiceSet(choiceSet6));
 
             stub.restore();
-        });
-
-        it('testUpdateIdsOnChoices', function () {
-            const cell1 = new SDL.manager.screen.choiceset.ChoiceCell('test');
-            const cell2 = new SDL.manager.screen.choiceset.ChoiceCell('test2');
-            const cell3 = new SDL.manager.screen.choiceset.ChoiceCell('test3');
-            const cellSet = [cell1, cell2, cell3];
-            // Cells are initially set to MAX_ID
-            Validator.assertEquals(cell1._getChoiceId(), 2000000000);
-            Validator.assertEquals(cell2._getChoiceId(), 2000000000);
-            Validator.assertEquals(cell3._getChoiceId(), 2000000000);
-            csm._updateIdsOnChoices(cellSet);
-            // We are looking for unique IDs
-            Validator.assertTrue(cell1._getChoiceId() !== 2000000000);
-            Validator.assertTrue(cell2._getChoiceId() !== 2000000000);
-            Validator.assertTrue(cell3._getChoiceId() !== 2000000000);
         });
 
         it('testKeepChoicesInBoth', function () {
