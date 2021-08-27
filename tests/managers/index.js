@@ -38,7 +38,6 @@ describe('ManagerTests', function () {
                 permissionManagerTests(appClient);
                 screenManagerTests(appClient);
                 lifecycleManagerTests(appClient);
-                fileManagerTests(appClient);
                 taskTests(appClient);
                 queueTests(appClient);
                 // tests fail if setting the two voicecommand tests below the textandgraphic tests
@@ -56,6 +55,7 @@ describe('ManagerTests', function () {
                 presentChoiceSetOperationTests(appClient);
                 presentKeyboardOperationTests(appClient);
                 softButtonManagerTests(appClient);
+                fileManagerTests(appClient);
 
                 setTimeout(function () {
                     // teardown();
