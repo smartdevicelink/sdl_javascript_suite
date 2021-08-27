@@ -498,6 +498,36 @@ module.exports = function (appClient) {
             Validator.assertTrue(cell3._getChoiceId() !== 2000000000);
         });
 
+        it('testDuplicateNonContiguousStrippedCells', async function () {
+            const loadedCell1 = new SDL.manager.screen.choiceset.ChoiceCell('Cell 2')
+                .setSecondaryText('Loaded 1');
+            const loadedCell2 = new SDL.manager.screen.choiceset.ChoiceCell('Cell 2')
+                .setSecondaryText('Loaded 2');
+            loadedCell2._setUniqueTextId(3);
+            const loadedCell3 = new SDL.manager.screen.choiceset.ChoiceCell('Cell 2')
+                .setSecondaryText('Loaded 3');
+            loadedCell3._setUniqueTextId(5);
+
+            const cellToUpload1 = new SDL.manager.screen.choiceset.ChoiceCell('Cell 2')
+                .setSecondaryText('Unique 1');
+            const cellToUpload2 = new SDL.manager.screen.choiceset.ChoiceCell('Cell 2')
+                .setSecondaryText('Unique 2');
+            const cellToUpload3 = new SDL.manager.screen.choiceset.ChoiceCell('Cell 2')
+                .setSecondaryText('Unique 3');
+            const cellToUpload4 = new SDL.manager.screen.choiceset.ChoiceCell('Cell 2')
+                .setSecondaryText('Unique 4');
+
+            const taskInstance = new SDL.manager.screen.choiceset._PreloadPresentChoicesOperation();
+            taskInstance._windowCapability = new SDL.rpc.structs.WindowCapability();
+            taskInstance._loadedCells = [loadedCell1, loadedCell2, loadedCell3];
+            taskInstance._cellsToPreload = [cellToUpload1, cellToUpload2, cellToUpload3, cellToUpload4];
+            await taskInstance._assignIdsToCells(taskInstance._cellsToPreload);
+            Validator.assertEquals(taskInstance._cellsToPreload[0].getUniqueText(), 'Cell 2 (2)');
+            Validator.assertEquals(taskInstance._cellsToPreload[1].getUniqueText(), 'Cell 2 (4)');
+            Validator.assertEquals(taskInstance._cellsToPreload[2].getUniqueText(), 'Cell 2 (6)');
+            Validator.assertEquals(taskInstance._cellsToPreload[3].getUniqueText(), 'Cell 2 (7)');
+        });
+
         /**
          * Responds to CancelInteraction requests
          * @param {Boolean} success - Whether to respond positively
