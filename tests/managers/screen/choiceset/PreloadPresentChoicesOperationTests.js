@@ -498,7 +498,7 @@ module.exports = function (appClient) {
             Validator.assertTrue(cell3._getChoiceId() !== 2000000000);
         });
 
-        it('testDuplicateNonContiguousStrippedCells', async function () {
+        it('testDuplicateNonContiguousStrippedCells', function () {
             const loadedCell1 = new SDL.manager.screen.choiceset.ChoiceCell('Cell 2')
                 .setSecondaryText('Loaded 1');
             const loadedCell2 = new SDL.manager.screen.choiceset.ChoiceCell('Cell 2')
@@ -521,11 +521,11 @@ module.exports = function (appClient) {
             taskInstance._windowCapability = new SDL.rpc.structs.WindowCapability();
             taskInstance._loadedCells = [loadedCell1, loadedCell2, loadedCell3];
             taskInstance._cellsToPreload = [cellToUpload1, cellToUpload2, cellToUpload3, cellToUpload4];
-            await taskInstance._assignIdsToCells(taskInstance._cellsToPreload);
-            Validator.assertEquals(taskInstance._cellsToPreload[0].getUniqueText(), 'Cell 2 (2)');
-            Validator.assertEquals(taskInstance._cellsToPreload[1].getUniqueText(), 'Cell 2 (4)');
-            Validator.assertEquals(taskInstance._cellsToPreload[2].getUniqueText(), 'Cell 2 (6)');
-            Validator.assertEquals(taskInstance._cellsToPreload[3].getUniqueText(), 'Cell 2 (7)');
+            taskInstance._addUniqueNamesToCells(taskInstance._cellsToPreload, taskInstance._loadedCells, false);
+            Validator.assertEquals(taskInstance._cellsToPreload[0]._getUniqueText(), 'Cell 2 (2)');
+            Validator.assertEquals(taskInstance._cellsToPreload[1]._getUniqueText(), 'Cell 2 (4)');
+            Validator.assertEquals(taskInstance._cellsToPreload[2]._getUniqueText(), 'Cell 2 (6)');
+            Validator.assertEquals(taskInstance._cellsToPreload[3]._getUniqueText(), 'Cell 2 (7)');
         });
 
         /**
