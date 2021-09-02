@@ -74,6 +74,38 @@ module.exports = function (appClient) {
             // Sleep to give time to Taskmaster to run the operations
             await sleep(500);
             Validator.assertTrue(!mm._currentMenuCells.map((menuCell, index) => menuCell.equals(cells[index])).includes(false));
+            mm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_NONE;
+            mm._currentMenuCells = [];
+        });
+
+        it('testSettingNullMenu', async function () {
+            mm._setMenuCells(null);
+            Validator.assertEquals(mm._currentHmiLevel, SDL.rpc.enums.HMILevel.HMI_NONE);
+            Validator.assertTrue(mm._currentMenuCells.length === 0);
+            // The Menu Manager should send new menu once HMI full occurs
+            sendFakeCoreOnHmiFullNotifications();
+            // Listener should be triggered - which sets new HMI level and should proceed to send our pending update
+            Validator.assertEquals(mm._currentHmiLevel, SDL.rpc.enums.HMILevel.HMI_FULL);
+            // Sleep to give time to Taskmaster to run the operations
+            await sleep(500);
+            Validator.assertTrue(mm._currentMenuCells.length === 0);
+            mm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_NONE;
+        });
+
+        it('testSettingNonUniqueCells', async function () {
+            const cell1 = new SDL.manager.screen.menu.MenuCell('cell');
+            const cell2 = new SDL.manager.screen.menu.MenuCell('cell');
+            mm._setMenuCells([cell1, cell2]);
+            Validator.assertEquals(mm._currentHmiLevel, SDL.rpc.enums.HMILevel.HMI_NONE);
+            Validator.assertTrue(mm._currentMenuCells.length === 0);
+            // The Menu Manager should send new menu once HMI full occurs
+            sendFakeCoreOnHmiFullNotifications();
+            // Listener should be triggered - which sets new HMI level and should proceed to send our pending update
+            Validator.assertEquals(mm._currentHmiLevel, SDL.rpc.enums.HMILevel.HMI_FULL);
+            // Sleep to give time to Taskmaster to run the operations
+            await sleep(500);
+            Validator.assertTrue(mm._taskQueue.length === 0);
+            mm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_NONE;
         });
 
         it('testUpdatingOldWay', async function () {

@@ -26,8 +26,6 @@ module.exports = function (appClient) {
             const currentMenu = [];
             const updatedMenu = cloneMenuCellsList([menuCell1, menuCell2]);
 
-            SDL.manager.screen.menu._MenuReplaceUtilities.updateIdsOnMenuCells(updatedMenu, SDL.manager.screen.menu._MenuManagerBase.PARENT_ID_NOT_FOUND);
-
             let callbackCount = 0;
 
             const callback = sinon.fake(async req => {

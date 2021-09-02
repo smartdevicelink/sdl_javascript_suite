@@ -241,7 +241,7 @@ module.exports = function (appClient) {
                 .setSubCells([menuCell41, menuCell42]);
 
             const menuCellList = [menuCell1, menuCell2, menuCell3, menuCell4];
-            SDL.manager.screen.menu._MenuReplaceUtilities.updateIdsOnMenuCells(menuCellList, SDL.manager.screen.menu._MenuManagerBase.PARENT_ID_NOT_FOUND);
+            SDL.manager.screen.menu._MenuReplaceUtilities.addIdsToMenuCells(menuCellList, SDL.manager.screen.menu._MenuManagerBase.PARENT_ID_NOT_FOUND);
             return menuCellList;
         }
 
@@ -271,7 +271,7 @@ module.exports = function (appClient) {
                 .setSubCells([menuCell51, menuCell52]);
 
             const newMenuList = [menuCell5];
-            SDL.manager.screen.menu._MenuReplaceUtilities.updateIdsOnMenuCells(newMenuList, SDL.manager.screen.menu._MenuManagerBase.PARENT_ID_NOT_FOUND);
+            SDL.manager.screen.menu._MenuReplaceUtilities.addIdsToMenuCells(newMenuList, SDL.manager.screen.menu._MenuManagerBase.PARENT_ID_NOT_FOUND);
             return newMenuList;
         }
 

@@ -72,8 +72,8 @@ module.exports = function (appClient) {
 
             menuCell11.setTitle('new title');
 
-            // Make sure sub cells are compared
-            Validator.assertTrue(!menuCell1.equals(menuCell2));
+            // Make sure sub cells are not compared
+            Validator.assertTrue(menuCell1.equals(menuCell2));
         });
 
         it('testClone', function () {
