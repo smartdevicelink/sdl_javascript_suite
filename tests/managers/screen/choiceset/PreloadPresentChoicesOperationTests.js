@@ -402,13 +402,15 @@ module.exports = function (appClient) {
             const taskInstance = new SDL.manager.screen.choiceset._PreloadPresentChoicesOperation();
             taskInstance._defaultMainWindowCapability = windowCapability;
 
-            let removedProperties = taskInstance._removeUnusedProperties(choiceCellList);
+            let removedProperties = choiceCellList.map(cell => cell.clone());
+            taskInstance._removeUnusedProperties(removedProperties);
             Validator.assertNotNullUndefined(removedProperties[0].getSecondaryText());
 
             taskInstance._defaultMainWindowCapability.setTextFields([]);
             taskInstance._defaultMainWindowCapability.setImageFields([]);
 
-            removedProperties = taskInstance._removeUnusedProperties(choiceCellList);
+            removedProperties = choiceCellList.map(cell => cell.clone());
+            taskInstance._removeUnusedProperties(removedProperties);
             Validator.assertNull(removedProperties[1].getSecondaryText());
             taskInstance._addUniqueNamesToCells(removedProperties, [], true);
             Validator.assertEquals(removedProperties[1]._getUniqueTextId(), 2);
@@ -469,7 +471,8 @@ module.exports = function (appClient) {
             const taskInstance = new SDL.manager.screen.choiceset._PreloadPresentChoicesOperation();
             taskInstance._defaultMainWindowCapability = new SDL.rpc.structs.WindowCapability();
 
-            const removedProperties = taskInstance._removeUnusedProperties([cell1, cell2, cell3, cell4, cell5, cell6]);
+            const removedProperties = [cell1, cell2, cell3, cell4, cell5, cell6].map(cell => cell.clone());
+            taskInstance._removeUnusedProperties(removedProperties);
             Validator.assertNull(removedProperties[0].getSecondaryText());
             taskInstance._addUniqueNamesToCells(removedProperties, [], true);
 

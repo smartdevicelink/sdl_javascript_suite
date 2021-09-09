@@ -34,7 +34,7 @@ module.exports = function (appClient) {
          */
         function loadedCellsWithStartNum (start, end) {
             const cells = [];
-            for (let index = start; index < end; index++) {
+            for (let index = start; index <= end; index++) {
                 const cell = new SDL.manager.screen.choiceset.ChoiceCell(`Cell ${index}`);
                 cell._setChoiceId(index);
                 cells.push(cell);
@@ -311,9 +311,10 @@ module.exports = function (appClient) {
                 beforeEach(function () {
                     testLoadedCells = [];
                     testCellsToLoad = cellsToUploadWithCount(50);
+                    testTask._loadedCells = testLoadedCells;
                 });
                 it('should set ids starting at 0', function (done) {
-                    testTask._assignIdsToCells(testCellsToLoad, testLoadedCells);
+                    testTask._assignIdsToCells(testCellsToLoad);
                     Validator.assertEquals(testCellsToLoad.length, 50);
                     for (let index = 0; index < testCellsToLoad.length; index++) {
                         Validator.assertEquals(testCellsToLoad[index]._getChoiceId(), index);
@@ -329,10 +330,11 @@ module.exports = function (appClient) {
 
                         testLoadedCells = [];
                         testCellsToLoad = cellsToUploadWithCount(50);
+                        testTask._loadedCells = testLoadedCells;
                     });
 
                     it('should set ids starting at the next id', function (done) {
-                        testTask._assignIdsToCells(testCellsToLoad, testLoadedCells);
+                        testTask._assignIdsToCells(testCellsToLoad);
                         Validator.assertEquals(testCellsToLoad.length, 50);
                         for (let index = 0; index < testCellsToLoad.length; index++) {
                             Validator.assertEquals(testCellsToLoad[index]._getChoiceId(), index + 100);
@@ -347,11 +349,12 @@ module.exports = function (appClient) {
                         SDL.manager.screen.choiceset._PreloadPresentChoicesOperation._choiceId = 65500;
                         testLoadedCells = loadedCellsWithStartNum(65498, 65499);
                         testCellsToLoad = cellsToUploadWithCount(35);
+                        testTask._loadedCells = testLoadedCells;
                     });
 
                     it('should set the hasReachedMaxID boolean and not loop back over yet', function (done) {
-                        testTask._assignIdsToCells(testCellsToLoad, testLoadedCells);
-                        Validator.assertEquals(testCellsToLoad, 35);
+                        testTask._assignIdsToCells(testCellsToLoad);
+                        Validator.assertEquals(testCellsToLoad.length, 35);
                         for (let index = 0; index < testCellsToLoad.length; index++) {
                             Validator.assertEquals(testCellsToLoad[index]._getChoiceId(), index + 65500);
                         }
@@ -376,14 +379,15 @@ module.exports = function (appClient) {
 
                         testLoadedCells = loadedCellsWithStartNum(0, 99);
                         testCellsToLoad = cellsToUploadWithCount(35);
+                        testTask._loadedCells = testLoadedCells;
                         done();
                     });
 
                     it('should assign ids after those', function (done) {
-                        testTask._assignIdsToCells(testCellsToLoad, testLoadedCells);
+                        testTask._assignIdsToCells(testCellsToLoad);
                         Validator.assertEquals(testCellsToLoad.length, 35);
                         for (let index = 0; index < testCellsToLoad.length; index++) {
-                            Validator.assertEquals(testCellsToLoad[index]._getChoiceId(), i + 100);
+                            Validator.assertEquals(testCellsToLoad[index]._getChoiceId(), index + 100);
                         }
                         Validator.assertTrue(SDL.manager.screen.choiceset._PreloadPresentChoicesOperation._hasReachedMaxIDs);
                         done();
@@ -396,11 +400,12 @@ module.exports = function (appClient) {
 
                         testLoadedCells = loadedCellsWithStartNum(3, 10);
                         testCellsToLoad = cellsToUploadWithCount(13);
+                        testTask._loadedCells = testLoadedCells;
                         done();
                     });
 
                     it('should start assigning from the last used id', function (done) {
-                        testTask._assignIdsToCells(testCellsToLoad, testLoadedCells);
+                        testTask._assignIdsToCells(testCellsToLoad);
                         Validator.assertEquals(testCellsToLoad.length, 13);
                         for (let index = 0; index < testCellsToLoad.length; index++) {
                             Validator.assertEquals(testCellsToLoad[index]._getChoiceId(), index + 11);
@@ -419,11 +424,12 @@ module.exports = function (appClient) {
                         testLoadedCells = testLoadedCells.concat(secondLoadedCells);
 
                         testCellsToLoad = cellsToUploadWithCount(10);
+                        testTask._loadedCells = testLoadedCells;
                         done();
                     });
 
                     it('should start from the last used id', function (done) {
-                        testTask._assignIdsToCells(testCellsToLoad, testLoadedCells);
+                        testTask._assignIdsToCells(testCellsToLoad);
                         Validator.assertEquals(testCellsToLoad.length, 10);
                         for (let index = 0; index < testCellsToLoad.length; index++) {
                             Validator.assertEquals(testCellsToLoad[index]._getChoiceId(), index + 56);
@@ -442,11 +448,12 @@ module.exports = function (appClient) {
                         testLoadedCells = testLoadedCells.concat(secondLoadedCells);
 
                         testCellsToLoad = cellsToUploadWithCount(10);
+                        testTask._loadedCells = testLoadedCells;
                         done();
                     });
 
                     it('should assign what it can and the rest should be set to MAX', function (done) {
-                        testTask._assignIdsToCells(testCellsToLoad, testLoadedCells);
+                        testTask._assignIdsToCells(testCellsToLoad);
                         Validator.assertEquals(testCellsToLoad.length, 10);
 
                         Validator.assertEquals(testCellsToLoad[0]._getChoiceId(), 65534);
@@ -471,11 +478,12 @@ module.exports = function (appClient) {
 
                         testLoadedCells = loadedCellsWithStartNum(0, 65535);
                         testCellsToLoad = cellsToUploadWithCount(10);
+                        testTask._loadedCells = testLoadedCells;
                         done();
                     });
 
                     it('should set all IDs to MAX', function (done) {
-                        testTask._assignIdsToCells(testCellsToLoad, testLoadedCells);
+                        testTask._assignIdsToCells(testCellsToLoad);
                         Validator.assertEquals(testCellsToLoad.length, 10);
                         for (let index = 0; index < testCellsToLoad.length; index++) {
                             Validator.assertEquals(testCellsToLoad[index]._getChoiceId(), 65535);
@@ -500,9 +508,6 @@ module.exports = function (appClient) {
                 ]);
 
                 primaryTextOnlyCapability = new SDL.rpc.structs.WindowCapability();
-                primaryTextOnlyCapability.setTextFields([
-                    new SDL.rpc.structs.TextField().setNameParam(SDL.rpc.enums.TextFieldName.menuName),
-                ]);
 
                 testLoadedCells = [];
                 done();
@@ -532,7 +537,7 @@ module.exports = function (appClient) {
                     describe('with full window capability', function () {
                         beforeEach(function (done) {
                             testTask._defaultMainWindowCapability = enabledWindowCapability;
-                            testTask._makeCellsToUploadUnique(testCellsToLoad.map(cell => cell.clone()), testLoadedCells.map(cell => cell.clone()));
+                            testTask._makeCellsToUploadUnique(testCellsToLoad, testLoadedCells.map(cell => cell.clone()));
                             done();
                         });
 
@@ -548,7 +553,7 @@ module.exports = function (appClient) {
                     describe('with primary text only capability', function () {
                         beforeEach(function (done) {
                             testTask._defaultMainWindowCapability = primaryTextOnlyCapability;
-                            testTask._makeCellsToUploadUnique(testCellsToLoad.map(cell => cell.clone()), testLoadedCells.map(cell => cell.clone()));
+                            testTask._makeCellsToUploadUnique(testCellsToLoad, testLoadedCells.map(cell => cell.clone()));
                             done();
                         });
 
@@ -571,7 +576,7 @@ module.exports = function (appClient) {
                             new SDL.manager.screen.choiceset.ChoiceCell('Cell 4'),
                         ];
                         testTask._defaultMainWindowCapability = enabledWindowCapability;
-                        testTask._makeCellsToUploadUnique(testCellsToLoad.map(cell => cell.clone()), testLoadedCells.map(cell => cell.clone()));
+                        testTask._makeCellsToUploadUnique(testCellsToLoad, testLoadedCells.map(cell => cell.clone()));
                         done();
                     });
 
@@ -608,7 +613,7 @@ module.exports = function (appClient) {
                     describe('with full window capability', function () {
                         beforeEach(function (done) {
                             testTask._defaultMainWindowCapability = enabledWindowCapability;
-                            testTask._makeCellsToUploadUnique(testCellsToLoad.map(cell => cell.clone()), testLoadedCells.map(cell => cell.clone()));
+                            testTask._makeCellsToUploadUnique(testCellsToLoad, testLoadedCells.map(cell => cell.clone()));
                             done();
                         });
 
@@ -624,7 +629,7 @@ module.exports = function (appClient) {
                     describe('with primary text only capability', function () {
                         beforeEach(function (done) {
                             testTask._defaultMainWindowCapability = primaryTextOnlyCapability;
-                            testTask._makeCellsToUploadUnique(testCellsToLoad.map(cell => cell.clone()), testLoadedCells.map(cell => cell.clone()));
+                            testTask._makeCellsToUploadUnique(testCellsToLoad, testLoadedCells.map(cell => cell.clone()));
                             done();
                         });
 
@@ -659,7 +664,7 @@ module.exports = function (appClient) {
                         ];
 
                         testTask._defaultMainWindowCapability = enabledWindowCapability;
-                        testTask._makeCellsToUploadUnique(testCellsToLoad.map(cell => cell.clone()), testLoadedCells.map(cell => cell.clone()));
+                        testTask._makeCellsToUploadUnique(testCellsToLoad, testLoadedCells.map(cell => cell.clone()));
                         done();
                     });
 
@@ -681,7 +686,7 @@ module.exports = function (appClient) {
                             new SDL.manager.screen.choiceset.ChoiceCell('Cell 4'),
                         ];
                         testTask._defaultMainWindowCapability = enabledWindowCapability;
-                        testTask._makeCellsToUploadUnique(testCellsToLoad.map(cell => cell.clone()), testLoadedCells.map(cell => cell.clone()));
+                        testTask._makeCellsToUploadUnique(testCellsToLoad, testLoadedCells.map(cell => cell.clone()));
                         done();
                     });
 
@@ -718,7 +723,7 @@ module.exports = function (appClient) {
                     describe('with full window capability', function () {
                         beforeEach(function (done) {
                             testTask._defaultMainWindowCapability = enabledWindowCapability;
-                            testTask._makeCellsToUploadUnique(testCellsToLoad.map(cell => cell.clone()), testLoadedCells.map(cell => cell.clone()));
+                            testTask._makeCellsToUploadUnique(testCellsToLoad, testLoadedCells.map(cell => cell.clone()));
                             done();
                         });
 
@@ -734,7 +739,7 @@ module.exports = function (appClient) {
                     describe('with primary text only capability', function () {
                         beforeEach(function (done) {
                             testTask._defaultMainWindowCapability = primaryTextOnlyCapability;
-                            testTask._makeCellsToUploadUnique(testCellsToLoad.map(cell => cell.clone()), testLoadedCells.map(cell => cell.clone()));
+                            testTask._makeCellsToUploadUnique(testCellsToLoad, testLoadedCells);
                             done();
                         });
 
@@ -781,22 +786,12 @@ module.exports = function (appClient) {
                 done();
             });
 
-            describe('when there are no loaded cells', function () {
-                it('should have all cells the same as cells to upload', function (done) {
-                    testTask._updateChoiceSet(testTask._choiceSet, [], testTask._choiceSet.getChoices());
-
-                    for (let index = 0; index < testTask._choiceSet.getChoices().length; index++) {
-                        Validator.assertEquals(testTask._choiceSet.getChoices()[index]._getChoiceId(), testCellsToLoad[index]._getChoiceId());
-                    }
-                    done();
-                });
-            });
-
             describe('when some loaded cells match', function () {
                 it('should use the loaded cells when possible', function (done) {
                     testTask._updateChoiceSet(testTask._choiceSet, testLoadedCells, testTask._choiceSet.getChoices());
                     Validator.assertEquals(testTask._choiceSet.getChoices()[0]._getChoiceId(), testLoadedCells[0]._getChoiceId());
                     Validator.assertEquals(testTask._choiceSet.getChoices()[1]._getChoiceId(), testLoadedCells[1]._getChoiceId());
+                    done();
                 });
             });
         });
