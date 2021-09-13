@@ -300,7 +300,7 @@ module.exports = function (appClient) {
         describe('assigning ids', function () {
             beforeEach(function (done) {
                 SDL.manager.screen.choiceset._PreloadPresentChoicesOperation._hasReachedMaxIDs = false;
-                SDL.manager.screen.choiceset._PreloadPresentChoicesOperation._choiceId = 0;
+                SDL.manager.screen.choiceset._PreloadPresentChoicesOperation._choiceId = 1;
                 done();
             });
 
@@ -310,11 +310,11 @@ module.exports = function (appClient) {
                     testCellsToLoad = cellsToUploadWithCount(50);
                     testTask._loadedCells = testLoadedCells;
                 });
-                it('should set ids starting at 0', function (done) {
+                it('should set ids starting at 1', function (done) {
                     testTask._assignIdsToCells(testCellsToLoad);
                     Validator.assertEquals(testCellsToLoad.length, 50);
                     for (let index = 0; index < testCellsToLoad.length; index++) {
-                        Validator.assertEquals(testCellsToLoad[index]._getChoiceId(), index);
+                        Validator.assertEquals(testCellsToLoad[index]._getChoiceId(), index + 1);
                     }
                     done();
                 });
@@ -365,7 +365,7 @@ module.exports = function (appClient) {
         describe('on subsequent loops of assigning ids', function () {
             beforeEach(function (done) {
                 SDL.manager.screen.choiceset._PreloadPresentChoicesOperation._hasReachedMaxIDs = true;
-                SDL.manager.screen.choiceset._PreloadPresentChoicesOperation._choiceId = 0;
+                SDL.manager.screen.choiceset._PreloadPresentChoicesOperation._choiceId = 1;
                 done();
             });
 
