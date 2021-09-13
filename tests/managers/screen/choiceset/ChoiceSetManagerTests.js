@@ -46,8 +46,6 @@ module.exports = function (appClient) {
             Validator.assertEquals(csm._getState(), SDL.manager._SubManagerBase.SETTING_UP);
             Validator.assertEquals(csm._currentSystemContext, SDL.rpc.enums.SystemContext.SYSCTXT_MAIN);
             Validator.assertEquals(csm._currentHmiLevel, SDL.rpc.enums.HMILevel.HMI_NONE);
-            Validator.assertEquals(SDL.manager.screen.choiceset._ChoiceSetManagerBase.CHOICE_CELL_ID_MIN, 1);
-            Validator.assertEquals(csm._nextChoiceId, 1);
             Validator.assertTrue(!csm._isVrOptional);
             Validator.assertNotNullUndefined(csm._fileManager);
             Validator.assertNotNullUndefined(csm._preloadedChoices);
@@ -65,7 +63,6 @@ module.exports = function (appClient) {
             Validator.assertNull(csm._pendingPresentOperation);
 
             Validator.assertEquals(csm._taskQueue.length, 0);
-            Validator.assertEquals(csm._nextChoiceId, 1);
 
             Validator.assertTrue(!csm._isVrOptional);
 
@@ -458,10 +455,10 @@ module.exports = function (appClient) {
 
                         Validator.assertEquals(testCellsToLoad[0]._getChoiceId(), 65534);
                         Validator.assertEquals(testCellsToLoad[1]._getChoiceId(), 65535);
-                        Validator.assertEquals(testCellsToLoad[2]._getChoiceId(), 0);
-                        Validator.assertEquals(testCellsToLoad[3]._getChoiceId(), 1);
-                        Validator.assertEquals(testCellsToLoad[4]._getChoiceId(), 2);
-                        Validator.assertEquals(testCellsToLoad[5]._getChoiceId(), 11);
+                        Validator.assertEquals(testCellsToLoad[2]._getChoiceId(), 1);
+                        Validator.assertEquals(testCellsToLoad[3]._getChoiceId(), 2);
+                        Validator.assertEquals(testCellsToLoad[4]._getChoiceId(), 11);
+                        Validator.assertEquals(testCellsToLoad[5]._getChoiceId(), 65535);
                         Validator.assertEquals(testCellsToLoad[6]._getChoiceId(), 65535);
                         Validator.assertEquals(testCellsToLoad[7]._getChoiceId(), 65535);
                         Validator.assertEquals(testCellsToLoad[8]._getChoiceId(), 65535);
