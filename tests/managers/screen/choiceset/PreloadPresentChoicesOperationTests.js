@@ -531,6 +531,61 @@ module.exports = function (appClient) {
             Validator.assertEquals(taskInstance._cellsToPreload[3]._getUniqueText(), 'Cell 2 (7)');
         });
 
+        describe('when artworks are not already on the system', function () {
+            describe('when there\'s more than one of the same artwork', function () {
+                const taskInstance = new SDL.manager.screen.choiceset._PreloadPresentChoicesOperation();
+                beforeEach(function () {
+                    taskInstance._fileManager = appClient._sdlManager._fileManager;
+                    taskInstance._cellsToPreload = [
+                        new SDL.manager.screen.choiceset.ChoiceCell('Cell 1')
+                            .setArtwork(Test.GENERAL_ARTWORK),
+                        new SDL.manager.screen.choiceset.ChoiceCell('Cell 2')
+                            .setArtwork(Test.GENERAL_ARTWORK),
+                        new SDL.manager.screen.choiceset.ChoiceCell('Cell 3')
+                            .setArtwork(Test.GENERAL_ARTWORK),
+                    ];
+                    taskInstance._loadedCells = [];
+                });
+
+                it('should only upload one of each artwork', function (done) {
+                    const artworks = taskInstance._artworksToUpload();
+                    Validator.assertNotNullUndefined(artworks);
+                    Validator.assertEquals(artworks.length, 1);
+                    done();
+                });
+            });
+
+            describe('when uploading unique artwork', function () {
+                const taskInstance = new SDL.manager.screen.choiceset._PreloadPresentChoicesOperation();
+                beforeEach(function () {
+                    taskInstance._fileManager = appClient._sdlManager._fileManager;
+                    const cell2Art = new SDL.manager.file.filetypes.SdlArtwork('sdl', SDL.rpc.enums.FileType.GRAPHIC_PNG, 'okay2', false);
+                    /**
+                     * This clone is why _artworksToUpload can't use a Set to enforce uniqueness.
+                     * Sets in JavaScript only enforce uniqueness on primitives and don't do deep comparisons of the objects here,
+                     * so both artworks could be included despite the data being exactly the same.
+                     */
+                    const cell2ArtClone = new SDL.manager.file.filetypes.SdlArtwork('sdl', SDL.rpc.enums.FileType.GRAPHIC_PNG, 'okay2', false);
+                    taskInstance._cellsToPreload = [
+                        new SDL.manager.screen.choiceset.ChoiceCell('Cell 1')
+                            .setArtwork(Test.GENERAL_ARTWORK),
+                        new SDL.manager.screen.choiceset.ChoiceCell('Cell 2')
+                            .setArtwork(cell2Art)
+                            .setSecondaryArtwork(cell2ArtClone),
+                    ];
+                    taskInstance._loadedCells = [];
+                });
+
+                it('should upload artworks', function (done) {
+                    const artworks = taskInstance._artworksToUpload();
+                    console.log(artworks);
+                    Validator.assertNotNullUndefined(artworks);
+                    Validator.assertEquals(artworks.length, 2);
+                    done();
+                });
+            });
+        });
+
         /**
          * Responds to CancelInteraction requests
          * @param {Boolean} success - Whether to respond positively
