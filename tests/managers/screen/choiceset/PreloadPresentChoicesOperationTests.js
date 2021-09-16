@@ -578,7 +578,6 @@ module.exports = function (appClient) {
 
                 it('should upload artworks', function (done) {
                     const artworks = taskInstance._artworksToUpload();
-                    console.log(artworks);
                     Validator.assertNotNullUndefined(artworks);
                     Validator.assertEquals(artworks.length, 2);
                     done();
