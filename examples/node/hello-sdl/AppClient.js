@@ -108,6 +108,34 @@ class AppClient {
     _onConnected () {
         this._managersReady = true;
         this._checkReadyState();
+        const screenManager = this._sdlManager.getScreenManager();
+        
+        // add menus
+        const menuListener = new SDL.manager.screen.menu.MenuSelectionListener()
+            .setOnTriggered(triggerSource => {
+                console.log(triggerSource);
+            });
+        const voice1 = ['Hello Menu One'];
+        const mainCell1 = new SDL.manager.screen.menu.MenuCell('Hello Menu 1')
+            .setIcon(new SDL.manager.file.filetypes.SdlArtwork('sdl-logo', SDL.rpc.enums.FileType.GRAPHIC_PNG)
+                .setFilePath(this._filePath))
+            .setVoiceCommands(voice1)
+            .setMenuSelectionListener(menuListener);
+
+        // submenu cells
+        const subCell1 = new SDL.manager.screen.menu.MenuCell('Submenu 1')
+            .setMenuSelectionListener(menuListener);
+
+        const subCell2 = new SDL.manager.screen.menu.MenuCell('Submenu 2')
+            .setMenuSelectionListener(menuListener);
+
+        const mainCell2 = new SDL.manager.screen.menu.MenuCell('Hello Menu 2')
+            .setSubCells([subCell1, subCell2])
+            ._setCellId(4);
+
+        const cellList = [mainCell1, mainCell2];
+
+        screenManager.setMenu(cellList);
     }
 
     _onHmiStatusListener (onHmiStatus) {
