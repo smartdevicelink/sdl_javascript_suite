@@ -95,7 +95,7 @@ module.exports = function (appClient) {
         async function checkForUploadFailure (fileManager, sdlFile) {
             const operation = new SDL.manager.file._UploadFileOperation(sdlManager._lifecycleManager, sdlManager.getFileManager(), new SDL.manager.file._SdlFileWrapper(sdlFile, (success, bytesAvailable, fileNames, errorMessage) => {
                 Validator.assertTrue(!success);
-            }), sdlManager._fileManager.getRemoteFileNames());
+            }));
             await operation.onExecute();
         }
 
@@ -435,7 +435,7 @@ module.exports = function (appClient) {
                     Validator.assertTrue(success);
                     sdlManager._fileManager._remoteFiles.push(artworkToUpload[1].getName());
                     resolve();
-                }), sdlManager._fileManager.getRemoteFileNames());
+                }));
                 sdlManager._fileManager._addTask(uploadOperation);
             });
             stub.restore();

@@ -1,0 +1,66 @@
+const chai = require('chai');
+chai.use(require('chai-as-promised'));
+const SDL = require('../../config.js').node;
+
+// Mocking framework
+// Used to stub an RPC call so that it isn't actually sent to Core
+const sinon = require('sinon');
+
+const Validator = require('../../Validator');
+
+module.exports = function (appClient) {
+    const sdlManager = appClient._sdlManager;
+    const fileManager = sdlManager.getFileManager();
+    const uploadOverwriteFailure = 'File is already on the head unit, aborting upload operation';
+
+    describe('UploadFileOperationTests', function () {
+        describe('when the file is already on the head unit', function () {
+            describe('when not overwriting', function () {
+                it('should not send the upload RPCs and finish the operation', async function () {
+                    const stub = sinon.stub(fileManager, 'fileNeedsUpload')
+                        .callsFake((file) => false);
+                    const testFileName = 'TestSmallMemory';
+                    const testFileData = 'test1234';
+                    const testFile = new SDL.manager.file.filetypes.SdlFile(testFileName, SDL.rpc.enums.FileType.BINARY, testFileData, true);
+
+                    const testFileWrapper = new SDL.manager.file._SdlFileWrapper(testFile, (success, bytesAvailable, fileNames, errorMessage) => {
+                        Validator.assertTrue(!success);
+                        Validator.assertNull(bytesAvailable);
+                        Validator.assertNull(fileNames);
+                        Validator.assertNotNullUndefined(errorMessage);
+                        Validator.assertEquals(errorMessage, uploadOverwriteFailure);
+                    });
+                    const operation = new SDL.manager.file._UploadFileOperation(sdlManager._lifecycleManager, sdlManager.getFileManager(), testFileWrapper);
+                    await operation._start();
+                    stub.restore();
+
+                    Validator.assertEquals(operation.getState(), SDL.manager._Task.FINISHED);
+                });
+            });
+
+            describe('when overwriting', function () {
+                it('should send the upload RPCs', async function () {
+                    const stub = sinon.stub(fileManager, 'fileNeedsUpload')
+                        .callsFake((file) => false);
+                    const testFileName = 'TestSmallMemory';
+                    const testFileData = 'test1234';
+                    const testFile = new SDL.manager.file.filetypes.SdlFile(testFileName, SDL.rpc.enums.FileType.BINARY, testFileData, true)
+                        .setOverwrite(true);
+
+                    const testFileWrapper = new SDL.manager.file._SdlFileWrapper(testFile, (success, bytesAvailable, fileNames, errorMessage) => {
+                        Validator.assertTrue(!success);
+                        Validator.assertNull(bytesAvailable);
+                        Validator.assertNull(fileNames);
+                        Validator.assertNotNullUndefined(errorMessage);
+                        Validator.assertEquals(errorMessage, uploadOverwriteFailure);
+                    });
+                    const operation = new SDL.manager.file._UploadFileOperation(sdlManager._lifecycleManager, sdlManager.getFileManager(), testFileWrapper);
+                    await operation._start();
+                    stub.restore();
+
+                    Validator.assertNotEquals(operation.getState(), SDL.manager._Task.FINISHED);
+                });
+            });
+        });
+    });
+};
