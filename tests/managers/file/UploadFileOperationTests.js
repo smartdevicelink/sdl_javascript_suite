@@ -11,8 +11,6 @@ const Validator = require('../../Validator');
 module.exports = function (appClient) {
     const sdlManager = appClient._sdlManager;
     const fileManager = sdlManager.getFileManager();
-    const uploadOverwriteFailure = 'File is already on the head unit, aborting upload operation';
-
     describe('UploadFileOperationTests', function () {
         describe('when the file is already on the head unit', function () {
             describe('when not overwriting', function () {
@@ -28,7 +26,7 @@ module.exports = function (appClient) {
                         Validator.assertNull(bytesAvailable);
                         Validator.assertNull(fileNames);
                         Validator.assertNotNullUndefined(errorMessage);
-                        Validator.assertEquals(errorMessage, uploadOverwriteFailure);
+                        Validator.assertEquals(errorMessage, SDL.manager.file._UploadFileOperation.fileManagerCannotOverwriteError);
                     });
                     const operation = new SDL.manager.file._UploadFileOperation(sdlManager._lifecycleManager, sdlManager.getFileManager(), testFileWrapper);
                     await operation._start();
