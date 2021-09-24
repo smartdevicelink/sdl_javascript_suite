@@ -41,24 +41,36 @@ module.exports = function (appClient) {
             describe('when overwriting', function () {
                 it('should send the upload RPCs', async function () {
                     const stub = sinon.stub(fileManager, 'fileNeedsUpload')
-                        .callsFake((file) => false);
+                        .callsFake((file) => true);
+                    const putFileStub = sinon.stub(sdlManager._lifecycleManager, 'sendRpcResolve');
+                    putFileStub.withArgs(sinon.match.instanceOf(SDL.rpc.messages.PutFile)).callsFake(() => {
+                        const responseFailure = new SDL.rpc.messages.PutFileResponse({
+                            functionName: SDL.rpc.enums.FunctionID.PutFile,
+                        })
+                            .setSuccess(true);
+                        sdlManager._lifecycleManager._handleRpc(responseFailure);
+
+                        return new Promise((resolve, reject) => {
+                            resolve(responseFailure);
+                        });
+                    });
                     const testFileName = 'TestSmallMemory';
                     const testFileData = 'test1234';
                     const testFile = new SDL.manager.file.filetypes.SdlFile(testFileName, SDL.rpc.enums.FileType.BINARY, testFileData, true)
                         .setOverwrite(true);
 
                     const testFileWrapper = new SDL.manager.file._SdlFileWrapper(testFile, (success, bytesAvailable, fileNames, errorMessage) => {
-                        Validator.assertTrue(!success);
-                        Validator.assertNull(bytesAvailable);
+                        Validator.assertTrue(success);
+                        Validator.assertNotNullUndefined(bytesAvailable);
                         Validator.assertNull(fileNames);
-                        Validator.assertNotNullUndefined(errorMessage);
-                        Validator.assertEquals(errorMessage, uploadOverwriteFailure);
+                        Validator.assertNull(errorMessage);
                     });
                     const operation = new SDL.manager.file._UploadFileOperation(sdlManager._lifecycleManager, sdlManager.getFileManager(), testFileWrapper);
                     await operation._start();
+                    putFileStub.restore();
                     stub.restore();
 
-                    Validator.assertNotEquals(operation.getState(), SDL.manager._Task.FINISHED);
+                    Validator.assertEquals(operation.getState(), SDL.manager._Task.FINISHED);
                 });
             });
         });

@@ -5,6 +5,8 @@ const softButtonManagerTests = require('./screen/SoftButtonManagerTests');
 const screenManagerTests = require('./screen/ScreenManagerTests');
 const lifecycleManagerTests = require('./lifecycle/LifecycleManagerTests');
 const fileManagerTests = require('./file/FileManagerTests');
+const uploadFileOperationTests = require('./file/UploadFileOperationTests');
+const sdlFileTests = require('./file/SdlFileTests');
 const taskTests = require('./TaskTests');
 const queueTests = require('./QueueTests');
 const textAndGraphicManagerTests = require('./screen/TextAndGraphicManagerTests');
@@ -54,6 +56,8 @@ describe('ManagerTests', function () {
                 presentKeyboardOperationTests(appClient);
                 softButtonManagerTests(appClient);
                 fileManagerTests(appClient);
+                uploadFileOperationTests(appClient);
+                sdlFileTests(appClient);
 
                 setTimeout(function () {
                     // teardown();
