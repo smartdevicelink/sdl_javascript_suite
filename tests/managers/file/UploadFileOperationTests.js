@@ -26,7 +26,7 @@ module.exports = function (appClient) {
                         Validator.assertNull(bytesAvailable);
                         Validator.assertNull(fileNames);
                         Validator.assertNotNullUndefined(errorMessage);
-                        Validator.assertEquals(errorMessage, SDL.manager.file._UploadFileOperation.fileManagerCannotOverwriteError);
+                        Validator.assertEquals(errorMessage, SDL.manager.file._FileManagerBase.fileManagerCannotOverwriteError);
                     });
                     const operation = new SDL.manager.file._UploadFileOperation(sdlManager._lifecycleManager, sdlManager.getFileManager(), testFileWrapper);
                     await operation._start();

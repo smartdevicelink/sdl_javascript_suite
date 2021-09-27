@@ -10,14 +10,16 @@ module.exports = function (appClient) {
     describe('SdlFileTests', function () {
         it('testFileEquality', function () {
             const fileName = 'testFile';
-            const fileData = 'it is wednesday';
+            const fileData = Uint8Array.from('it is wednesday');
             const filePath = './doesnt_go_anywhere.txt';
             const file = new SDL.manager.file.filetypes.SdlFile(fileName, SDL.rpc.enums.FileType.BINARY, fileData, true)
                 .setFilePath(filePath)
+                .setFileData(fileData)
                 .setStaticIcon(true)
                 .setOverwrite(true);
             const file2 = new SDL.manager.file.filetypes.SdlFile(fileName, SDL.rpc.enums.FileType.BINARY, fileData, true)
                 .setFilePath(filePath)
+                .setFileData(fileData)
                 .setStaticIcon(true)
                 .setOverwrite(true);
             Validator.assertTrue(file.equals(file2));
@@ -28,7 +30,7 @@ module.exports = function (appClient) {
 
             fileClone.setName('something else');
             fileClone.setFilePath('./goes_nowhere.txt');
-            fileClone.setFileData('my dudes');
+            fileClone.setFileData(Uint8Array.from('my dudes'));
             fileClone.setType(SDL.rpc.enums.FileType.JSON);
             fileClone.setPersistent(false);
             fileClone.setStaticIcon(false);
@@ -55,7 +57,7 @@ module.exports = function (appClient) {
     describe('SdlArtworkTests', function () {
         it('testFileEquality', function () {
             const fileName = 'testFile';
-            const fileData = 'it is wednesday';
+            const fileData = Uint8Array.from('it is wednesday');
             const filePath = './doesnt_go_anywhere.txt';
             const file = new SDL.manager.file.filetypes.SdlArtwork(fileName, SDL.rpc.enums.FileType.GRAPHIC_JPEG, fileData, true)
                 .setFilePath(filePath)
@@ -75,7 +77,7 @@ module.exports = function (appClient) {
 
             fileClone.setName('something else');
             fileClone.setFilePath('./goes_nowhere.txt');
-            fileClone.setFileData('my dudes');
+            fileClone.setFileData(Uint8Array.from('my dudes'));
             fileClone.setType(SDL.rpc.enums.FileType.GRAPHIC_PNG);
             fileClone.setPersistent(false);
             fileClone.setStaticIcon(false);
