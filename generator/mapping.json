@@ -71,6 +71,30 @@
         },
         "TemplateConfiguration": {
             "script": "templates/scripts/TemplateConfiguration.js"
+        },
+        "TireStatus": {
+            "script": "templates/scripts/TireStatus.js",
+            "pressureTelltale": {
+                "-methods": {}
+            },
+            "leftFront": {
+                "-methods": {}
+            },
+            "rightFront": {
+                "-methods": {}
+            },
+            "leftRear": {
+                "-methods": {}
+            },
+            "rightRear": {
+                "-methods": {}
+            },
+            "innerLeftRear": {
+                "-methods": {}
+            },
+            "innerRightRear": {
+                "-methods": {}
+            }
         }
     },
     "functions": {
