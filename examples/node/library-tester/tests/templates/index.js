@@ -61,8 +61,8 @@ module.exports = async function (catalogRpc) {
     const weatherIcon = new SDL.manager.file.filetypes.SdlArtwork('weather-icon', SDL.rpc.enums.FileType.GRAPHIC_PNG)
         .setFilePath('./tests/templates/weather-icon.png');
 
-    await sdlManager.sendRpcResolve(await fileManager._createPutFile(sdlLogo));
-    await sdlManager.sendRpcResolve(await fileManager._createPutFile(weatherIcon));
+    await fileManager.uploadFile(sdlLogo);
+    await fileManager.uploadFile(weatherIcon);
 
     const templatesSupported = sdlManager
         .getSystemCapabilityManager()

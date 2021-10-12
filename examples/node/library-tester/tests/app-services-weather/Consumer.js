@@ -96,8 +96,7 @@ module.exports = class Consumer {
             .setFilePath('./tests/app-services-weather/weather-icon.png')
             .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG);
 
-        const putFile = await fileManager._createPutFile(weatherFile);
-        await this.sdlManager.sendRpcResolve(putFile);
+        await fileManager.uploadFile(weatherFile);
 
         const show = new SDL.rpc.messages.Show()
             .setMainField1('An image of the sun from the weather app service should be shown!')

@@ -142,7 +142,7 @@ module.exports = async function (catalogRpc) {
     await sdlManager.sendRpcResolve(appUpdated);
 
     sdlManager.getScreenManager()
-        .setTextField1('Check the video resolution options for 6 resolution options')
+        .setTextField1('Check the video resolution options for 4 valid ones out of 6')
         .setTextField2('Find and click on the voice command to continue!');
 
     await new Promise((resolve, reject) => {

@@ -84,8 +84,7 @@ module.exports = class Producer1 {
             .setFilePath('./tests/app-services-weather/weather-icon.png')
             .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG);
 
-        const putFile = await fileManager._createPutFile(weatherFile);
-        await this.sdlManager.sendRpcResolve(putFile);
+        await fileManager.uploadFile(weatherFile);
 
         this.respondToAppServiceRequests();
         this.respondToPerformAppServiceInteractions();

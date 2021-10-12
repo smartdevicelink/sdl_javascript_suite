@@ -86,8 +86,7 @@ module.exports = async function (catalogRpc) {
         .setFilePath('./tests/others/sound-file.mp3')
         .setType(SDL.rpc.enums.FileType.AUDIO_MP3);
 
-    const putFile = await fileManager._createPutFile(audioFile);
-    await sdlManager.sendRpcResolve(putFile);
+    await fileManager.uploadFile(audioFile);
 
     const speak = new SDL.rpc.messages.Speak()
         .setTtsChunks([
@@ -105,8 +104,7 @@ module.exports = async function (catalogRpc) {
         .setFilePath('./tests/others/test_icon_1.png')
         .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG);
 
-    const putFile2 = await fileManager._createPutFile(logo);
-    await sdlManager.sendRpcResolve(putFile2);
+    const putFile2 = await fileManager.uploadFile(logo);
 
     const alert = new SDL.rpc.messages.Alert()
         .setAlertText1('You should see an image with this alert')
@@ -149,7 +147,10 @@ module.exports = async function (catalogRpc) {
     if (streamOptions === null) {
         streamOptions = [];
     }
-    streamOptions.push(capabilities); // push the original capability too
+    if (capabilities.getPreferredResolution() && capabilities.getScale()) {
+        streamOptions.push(capabilities); // push the original capability too
+    }
+
     streamOptions.push(new SDL.rpc.structs.VideoStreamingCapability()
         .setPreferredResolution(new SDL.rpc.structs.ImageResolution()
             .setResolutionWidth(777)
