@@ -34,7 +34,7 @@ const SDL = require('../../SDL.min.js');
 const AppHelper = require('../../AppHelper.js');
 
 module.exports = async function (catalogRpc) {
-    const appId = 'screen-choices';
+    const appId = 'screen-menu';
 
     const lifecycleConfig = new SDL.manager.LifecycleConfig()
         .setAppId(appId)
@@ -64,7 +64,7 @@ module.exports = async function (catalogRpc) {
         .setOverwrite(true);
 
     // start tests 
-    screenManager.setTitle('Find and select the appropriate menu buttons to continue');
+    screenManager.setTextField1('Find and select the appropriate menu buttons to continue');
 
     await new Promise(resolve => {
         const subCell1 = new SDL.manager.screen.menu.MenuCell('Click here to continue the test')
@@ -90,11 +90,11 @@ module.exports = async function (catalogRpc) {
         screenManager.setMenu([mainCell1]);
     });
 
-    screenManager.setTitle('The menu should no longer exist. No voice commands either');
+    screenManager.setTextField1('The menu should no longer exist. No voice commands either');
     screenManager.setMenu([]);
     await sleep(7000);
 
-    screenManager.setTitle('The menu should automatically show up. Click the appropriate menu button');
+    screenManager.setTextField1('The menu should automatically show up. Click the appropriate menu button');
 
     await new Promise(resolve => {
         let cells = ['We show up without you clicking anything!', 'Click on me once you are done!', '3', '4', '5', '6', '7', '8'].map((text, index) => {
@@ -132,7 +132,7 @@ module.exports = async function (catalogRpc) {
                 }
             });
 
-            screenManager.setTitle('The menu should now be reversed and the menu should open to show BANANAS in a subcell');
+            screenManager.setTextField1('The menu should now be reversed and the menu should open to show BANANAS in a subcell');
             cells[cells.length - 1].getSubCells()[0].setTitle('BANANAS. This cell should have opened automatically')
 
             screenManager.setMenu(cells.reverse());
@@ -165,12 +165,12 @@ module.exports = async function (catalogRpc) {
         const mainCell3 = new SDL.manager.screen.menu.MenuCell('same title')
             .setSubCells([subCell1, subCell2, subCell3]);
 
-        screenManager.setTitle('Find the menu cell to click to continue');
+        screenManager.setTextField1('Find the menu cell to click to continue');
         screenManager.setMenu([mainCell1, mainCell2, mainCell3]);
     });
 
     screenManager.setMenu([new SDL.manager.screen.menu.MenuCell('identical'), new SDL.manager.screen.menu.MenuCell('identical')]);
-    screenManager.setTitle('The menus should not have changed and no text says "identical"');
+    screenManager.setTextField1('The menus should not have changed and no text says "identical"');
     await sleep(7000);
 
     screenManager.setMenu([new SDL.manager.screen.menu.MenuCell('testing')
@@ -179,7 +179,7 @@ module.exports = async function (catalogRpc) {
                 .setVoiceCommands(['identical', 'identical', 'identical'])
         ])
     ]);
-    screenManager.setTitle('Check again for no change. Attempted duplicate voice commands.');
+    screenManager.setTextField1('Check again for no change. Attempted duplicate voice commands.');
     await sleep(7000);
 
     await new Promise(resolve => {
@@ -193,7 +193,7 @@ module.exports = async function (catalogRpc) {
                 })
             )
         ]);
-        screenManager.setTitle('Check the menu for a command with an image.');
+        screenManager.setTextField1('Check the menu for a command with an image.');
     });
 
     await new Promise(resolve => {
@@ -207,7 +207,7 @@ module.exports = async function (catalogRpc) {
                 })
             )
         ]);
-        screenManager.setTitle('Check the menu for a command with a new image.');
+        screenManager.setTextField1('Check the menu for a command with a new image.');
     });
 
     await new Promise(resolve => {
@@ -231,7 +231,7 @@ module.exports = async function (catalogRpc) {
             .setMenuLayout(SDL.rpc.enums.MenuLayout.TILES)
             .setSubMenuLayout(SDL.rpc.enums.MenuLayout.LIST))
 
-        screenManager.setTitle('The main menu should be in TILES. Click the submenu item');
+        screenManager.setTextField1('The main menu should be in TILES. Click the submenu item');
         screenManager.setMenu([mainCell1, mainCell2, mainCell3]);
     });
 
@@ -257,7 +257,7 @@ module.exports = async function (catalogRpc) {
             .setSubMenuLayout(SDL.rpc.enums.MenuLayout.TILES)
             .setSubCells([subCell1]);
 
-        screenManager.setTitle('Find the submenu in TILES format. Click to continue');
+        screenManager.setTextField1('Find the submenu in TILES format. Click to continue');
         screenManager.setMenu([mainCell1, mainCell2, mainCell3]);
     });
     
