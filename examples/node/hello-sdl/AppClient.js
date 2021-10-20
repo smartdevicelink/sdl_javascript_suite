@@ -135,7 +135,7 @@ class AppClient {
 
         const cellList = [mainCell1, mainCell2];
 
-        await screenManager.setMenu(cellList);
+        screenManager.setMenu(cellList);
     }
 
     _onHmiStatusListener (onHmiStatus) {
