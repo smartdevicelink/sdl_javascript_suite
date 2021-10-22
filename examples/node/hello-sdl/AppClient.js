@@ -105,11 +105,11 @@ class AppClient {
         this._isButtonSubscriptionRequested = false;
     }
 
-    _onConnected () {
+    async _onConnected () {
         this._managersReady = true;
         this._checkReadyState();
         const screenManager = this._sdlManager.getScreenManager();
-        
+
         // add menus
         const menuListener = new SDL.manager.screen.menu.MenuSelectionListener()
             .setOnTriggered(triggerSource => {
