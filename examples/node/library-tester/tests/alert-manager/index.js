@@ -45,7 +45,7 @@ module.exports = async function (catalogRpc) {
             SDL.rpc.enums.AppHMIType.REMOTE_CONTROL,
         ])
         .setTransportConfig(new SDL.transport.TcpClientConfig(process.env.HOST, process.env.PORT));
-        
+
     const app = new AppHelper(catalogRpc)
         .setLifecycleConfig(lifecycleConfig);
 
@@ -62,6 +62,11 @@ module.exports = async function (catalogRpc) {
     const sdlManager = app.getManager();
     const screenManager = sdlManager.getScreenManager();
 
+    /**
+     * Creates a promise that will resolve when the alert has finished presenting
+     * @param {AlertView} alertView - the AlertView to be presented
+     * @returns {Promise} - A promise that resolves when the operation is complete
+     */
     async function promisifyPresentAlert (alertView) {
         return new Promise((resolve) => {
             const alertCompletionListener = new SDL.manager.screen.utils.AlertCompletionListener()
@@ -161,7 +166,7 @@ module.exports = async function (catalogRpc) {
 
     // this should fail since the soft button has more than one state
     new Promise ((resolve, reject) => {
-        const multiStateSoftButtonAlert = new SDL.manager.screen.utils.AlertView()
+        new SDL.manager.screen.utils.AlertView()
             .setText('text1')
             .setSoftButtons([
                 new SDL.manager.screen.utils.SoftButtonObject('game', [state1, state2], 'ROCK', (id, rpc) => {
@@ -249,9 +254,19 @@ module.exports = async function (catalogRpc) {
                 if (rpc instanceof SDL.rpc.messages.OnButtonPress) {
                     console.log('First button pressed!');
                 }
-            })
+            }),
         ]);
     await promisifyPresentAlert(allPropsAlert);
+
+    // Cancel a VR only Alert
+    screenManager._alertManager._canRunTasks = false;
+    const alertView = new SDL.manager.screen.utils.AlertView()
+        .setAudio(new SDL.manager.screen.utils.AlertAudioData('You should not be hearing this message.'));
+    const alertCompletionListener = new SDL.manager.screen.utils.AlertCompletionListener()
+        .setOnComplete((success, tryAgainTime) => {});
+    screenManager.presentAlert(alertView, alertCompletionListener);
+    alertView.cancel();
+    screenManager._alertManager._canRunTasks = true;
 
     // tear down the app
     await sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
