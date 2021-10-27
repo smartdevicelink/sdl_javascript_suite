@@ -2,24 +2,53 @@ const SDL = require('../../../config.js').node;
 
 const Validator = require('../../../Validator');
 const sinon = require('sinon');
-const Test = require('../../../Test.js');
 
 module.exports = function (appClient) {
     describe('ChoiceSetManagerTests', function () {
         const sdlManager = appClient._sdlManager;
 
+        let testLoadedCells;
+        let testCellsToLoad;
+        const testTask = new SDL.manager.screen.choiceset._PreloadPresentChoicesOperation(sdlManager._lifecycleManager, sdlManager._fileManager);
+
         const csm = new SDL.manager.screen.choiceset._ChoiceSetManagerBase(sdlManager._lifecycleManager, sdlManager._fileManager);
+
+        /**
+         * Returns a list of choice cells
+         * @param {Number} count - The number of cells desired
+         * @returns {ChoiceCell[]} - list of choice cells
+         */
+        function cellsToUploadWithCount (count) {
+            const cells = [];
+            for (let index = 0; index < count; index++) {
+                cells.push(new SDL.manager.screen.choiceset.ChoiceCell(`Cell ${index}`));
+            }
+            return cells;
+        }
+
+        /**
+         * Returns a list of choice cells
+         * @param {Number} start - The starting ID
+         * @param {Number} end - The ending ID
+         * @returns {ChoiceCell[]} - list of choice cells
+         */
+        function loadedCellsWithStartNum (start, end) {
+            const cells = [];
+            for (let index = start; index <= end; index++) {
+                const cell = new SDL.manager.screen.choiceset.ChoiceCell(`Cell ${index}`);
+                cell._setChoiceId(index);
+                cells.push(cell);
+            }
+            return cells;
+        }
 
         it('setup', function () {
             Validator.assertEquals(csm._getState(), SDL.manager._SubManagerBase.SETTING_UP);
             Validator.assertEquals(csm._currentSystemContext, SDL.rpc.enums.SystemContext.SYSCTXT_MAIN);
             Validator.assertEquals(csm._currentHmiLevel, SDL.rpc.enums.HMILevel.HMI_NONE);
-            Validator.assertEquals(SDL.manager.screen.choiceset._ChoiceSetManagerBase.CHOICE_CELL_ID_MIN, 1);
-            Validator.assertEquals(csm._nextChoiceId, 1);
             Validator.assertTrue(!csm._isVrOptional);
             Validator.assertNotNullUndefined(csm._fileManager);
             Validator.assertNotNullUndefined(csm._preloadedChoices);
-            Validator.assertNotNullUndefined(csm._pendingPreloadChoices);
             Validator.assertNotNullUndefined(csm._hmiListener);
             Validator.assertNotNullUndefined(csm._onDisplayCapabilityListener);
             Validator.assertNull(csm._pendingPresentOperation);
@@ -31,11 +60,9 @@ module.exports = function (appClient) {
             Validator.assertEquals(csm._currentHmiLevel, SDL.rpc.enums.HMILevel.HMI_NONE);
             Validator.assertNull(csm._currentSystemContext);
             Validator.assertNull(csm._defaultMainWindowCapability);
-            Validator.assertNull(csm._pendingPresentationSet);
             Validator.assertNull(csm._pendingPresentOperation);
 
             Validator.assertEquals(csm._taskQueue.length, 0);
-            Validator.assertEquals(csm._nextChoiceId, 1);
 
             Validator.assertTrue(!csm._isVrOptional);
 
@@ -63,12 +90,6 @@ module.exports = function (appClient) {
             // Cannot send choice set with empty or null choice list
             const choiceSet1 = new SDL.manager.screen.choiceset.ChoiceSet('test', [], choiceSetSelectionListener);
             Validator.assertTrue(!csm._setUpChoiceSet(choiceSet1));
-
-            // Identical cells will not be allowed
-            const cell1 = new SDL.manager.screen.choiceset.ChoiceCell('test');
-            const cell2 = new SDL.manager.screen.choiceset.ChoiceCell('test');
-            const choiceSet2 = new SDL.manager.screen.choiceset.ChoiceSet('test', [cell1, cell2], choiceSetSelectionListener);
-            Validator.assertTrue(!csm._setUpChoiceSet(choiceSet2));
 
             // cells that have duplicate text will be allowed if there is another property to make them unique
             // because a unique name will be assigned and used
@@ -103,22 +124,6 @@ module.exports = function (appClient) {
             Validator.assertTrue(csm._setUpChoiceSet(choiceSet6));
 
             stub.restore();
-        });
-
-        it('testUpdateIdsOnChoices', function () {
-            const cell1 = new SDL.manager.screen.choiceset.ChoiceCell('test');
-            const cell2 = new SDL.manager.screen.choiceset.ChoiceCell('test2');
-            const cell3 = new SDL.manager.screen.choiceset.ChoiceCell('test3');
-            const cellSet = [cell1, cell2, cell3];
-            // Cells are initially set to MAX_ID
-            Validator.assertEquals(cell1._getChoiceId(), 2000000000);
-            Validator.assertEquals(cell2._getChoiceId(), 2000000000);
-            Validator.assertEquals(cell3._getChoiceId(), 2000000000);
-            csm._updateIdsOnChoices(cellSet);
-            // We are looking for unique IDs
-            Validator.assertTrue(cell1._getChoiceId() !== 2000000000);
-            Validator.assertTrue(cell2._getChoiceId() !== 2000000000);
-            Validator.assertTrue(cell3._getChoiceId() !== 2000000000);
         });
 
         it('testKeepChoicesInBoth', function () {
@@ -292,113 +297,500 @@ module.exports = function (appClient) {
             csm._defaultMainWindowCapability = originCapability;
         });
 
-        it('testAddUniqueNamesToCells', function () {
-            const cell1 = new SDL.manager.screen.choiceset.ChoiceCell('McDonalds')
-                .setSecondaryText('1 mile away');
-            const cell2 = new SDL.manager.screen.choiceset.ChoiceCell('McDonalds')
-                .setSecondaryText('2 miles away');
-            const cell3 = new SDL.manager.screen.choiceset.ChoiceCell('Starbucks')
-                .setSecondaryText('3 miles away');
-            const cell4 = new SDL.manager.screen.choiceset.ChoiceCell('McDonalds')
-                .setSecondaryText('4 miles away');
-            const cell5 = new SDL.manager.screen.choiceset.ChoiceCell('Starbucks')
-                .setSecondaryText('5 miles away');
-            const cell6 = new SDL.manager.screen.choiceset.ChoiceCell('Meijer')
-                .setSecondaryText('6 miles away');
+        describe('assigning ids', function () {
+            beforeEach(function (done) {
+                SDL.manager.screen.choiceset._PreloadPresentChoicesOperation._hasReachedMaxIDs = false;
+                SDL.manager.screen.choiceset._PreloadPresentChoicesOperation._choiceId = 1;
+                done();
+            });
 
-            csm._addUniqueNamesToCells([cell1, cell2, cell3, cell4, cell5, cell6]);
+            describe('when there\'s no ids already set', function () {
+                beforeEach(function () {
+                    testLoadedCells = [];
+                    testCellsToLoad = cellsToUploadWithCount(50);
+                    testTask._loadedCells = testLoadedCells;
+                });
+                it('should set ids starting at 1', function (done) {
+                    testTask._assignIdsToCells(testCellsToLoad);
+                    Validator.assertEquals(testCellsToLoad.length, 50);
+                    for (let index = 0; index < testCellsToLoad.length; index++) {
+                        Validator.assertEquals(testCellsToLoad[index]._getChoiceId(), index + 1);
+                    }
+                    done();
+                });
+            });
 
-            Validator.assertEquals(cell1._getUniqueText(), 'McDonalds');
-            Validator.assertEquals(cell2._getUniqueText(), 'McDonalds (2)');
-            Validator.assertEquals(cell3._getUniqueText(), 'Starbucks');
-            Validator.assertEquals(cell4._getUniqueText(), 'McDonalds (3)');
-            Validator.assertEquals(cell5._getUniqueText(), 'Starbucks (2)');
-            Validator.assertEquals(cell6._getUniqueText(), 'Meijer');
+            describe('when ids are already set', function () {
+                describe('when not reaching the max value', function () {
+                    beforeEach(function () {
+                        SDL.manager.screen.choiceset._PreloadPresentChoicesOperation._choiceId = 100;
+
+                        testLoadedCells = [];
+                        testCellsToLoad = cellsToUploadWithCount(50);
+                        testTask._loadedCells = testLoadedCells;
+                    });
+
+                    it('should set ids starting at the next id', function (done) {
+                        testTask._assignIdsToCells(testCellsToLoad);
+                        Validator.assertEquals(testCellsToLoad.length, 50);
+                        for (let index = 0; index < testCellsToLoad.length; index++) {
+                            Validator.assertEquals(testCellsToLoad[index]._getChoiceId(), index + 100);
+                        }
+                        Validator.assertTrue(!SDL.manager.screen.choiceset._PreloadPresentChoicesOperation._hasReachedMaxIDs);
+                        done();
+                    });
+                });
+
+                describe('when reaching the max value', function () {
+                    beforeEach(function () {
+                        SDL.manager.screen.choiceset._PreloadPresentChoicesOperation._choiceId = 65500;
+                        testLoadedCells = loadedCellsWithStartNum(65498, 65499);
+                        testCellsToLoad = cellsToUploadWithCount(35);
+                        testTask._loadedCells = testLoadedCells;
+                    });
+
+                    it('should set the hasReachedMaxID boolean and not loop back over yet', function (done) {
+                        testTask._assignIdsToCells(testCellsToLoad);
+                        Validator.assertEquals(testCellsToLoad.length, 35);
+                        for (let index = 0; index < testCellsToLoad.length; index++) {
+                            Validator.assertEquals(testCellsToLoad[index]._getChoiceId(), index + 65500);
+                        }
+                        Validator.assertTrue(!SDL.manager.screen.choiceset._PreloadPresentChoicesOperation._hasReachedMaxIDs);
+                        done();
+                    });
+                });
+            });
         });
 
-        it('testUniquenessForAvailableFields', function () {
-            const windowCapability = new SDL.rpc.structs.WindowCapability();
-            const secondaryText = new SDL.rpc.structs.TextField()
-                .setNameParam(SDL.rpc.enums.TextFieldName.secondaryText);
-            const tertiaryText = new SDL.rpc.structs.TextField()
-                .setNameParam(SDL.rpc.enums.TextFieldName.tertiaryText);
+        describe('on subsequent loops of assigning ids', function () {
+            beforeEach(function (done) {
+                SDL.manager.screen.choiceset._PreloadPresentChoicesOperation._hasReachedMaxIDs = true;
+                SDL.manager.screen.choiceset._PreloadPresentChoicesOperation._choiceId = 1;
+                done();
+            });
 
-            const textFields = [
-                secondaryText,
-                tertiaryText,
-            ];
-            windowCapability.setTextFields(textFields);
+            describe('when loaded cells is not full', function () {
+                describe('when loaded cells are contiguous at the beginning', function () {
+                    beforeEach(function (done) {
+                        SDL.manager.screen.choiceset._PreloadPresentChoicesOperation._choiceId = 99;
 
-            const choiceImage = new SDL.rpc.structs.ImageField()
-                .setNameParam(SDL.rpc.enums.ImageFieldName.choiceImage);
-            const choiceSecondaryImage = new SDL.rpc.structs.ImageField()
-                .setNameParam(SDL.rpc.enums.ImageFieldName.choiceSecondaryImage);
+                        testLoadedCells = loadedCellsWithStartNum(0, 99);
+                        testCellsToLoad = cellsToUploadWithCount(35);
+                        testTask._loadedCells = testLoadedCells;
+                        done();
+                    });
 
-            const imageFieldList = [
-                choiceImage,
-                choiceSecondaryImage,
-            ];
-            windowCapability.setImageFields(imageFieldList);
+                    it('should assign ids after those', function (done) {
+                        testTask._assignIdsToCells(testCellsToLoad);
+                        Validator.assertEquals(testCellsToLoad.length, 35);
+                        for (let index = 0; index < testCellsToLoad.length; index++) {
+                            Validator.assertEquals(testCellsToLoad[index]._getChoiceId(), index + 100);
+                        }
+                        Validator.assertTrue(SDL.manager.screen.choiceset._PreloadPresentChoicesOperation._hasReachedMaxIDs);
+                        done();
+                    });
+                });
 
-            csm._defaultMainWindowCapability = windowCapability;
+                describe('when those items are contiguous in the middle so that assigning cells overlap', function () {
+                    beforeEach(function (done) {
+                        SDL.manager.screen.choiceset._PreloadPresentChoicesOperation._choiceId = 10;
 
-            const cell1 = new SDL.manager.screen.choiceset.ChoiceCell('Item 1')
-                .setSecondaryText('null')
-                .setTertiaryText('tertiaryText')
-                .setVoiceCommands(null)
-                .setArtwork(Test.GENERAL_ARTWORK)
-                .setSecondaryArtwork(Test.GENERAL_ARTWORK);
-            const cell2 = new SDL.manager.screen.choiceset.ChoiceCell('Item 1')
-                .setSecondaryText('null2')
-                .setTertiaryText('tertiaryText2')
-                .setVoiceCommands(null)
-                .setArtwork(null)
-                .setSecondaryArtwork(null);
+                        testLoadedCells = loadedCellsWithStartNum(3, 10);
+                        testCellsToLoad = cellsToUploadWithCount(13);
+                        testTask._loadedCells = testLoadedCells;
+                        done();
+                    });
 
-            const choiceCellList = [
-                cell1,
-                cell2,
-            ];
+                    it('should start assigning from the last used id', function (done) {
+                        testTask._assignIdsToCells(testCellsToLoad);
+                        Validator.assertEquals(testCellsToLoad.length, 13);
+                        for (let index = 0; index < testCellsToLoad.length; index++) {
+                            Validator.assertEquals(testCellsToLoad[index]._getChoiceId(), index + 11);
+                        }
+                        Validator.assertTrue(SDL.manager.screen.choiceset._PreloadPresentChoicesOperation._hasReachedMaxIDs);
+                        done();
+                    });
+                });
 
-            let removedProperties = csm._removeUnusedProperties(choiceCellList);
-            Validator.assertNotNullUndefined(removedProperties[0].getSecondaryText());
+                describe('when there are items scattered and overlapping cells', function () {
+                    beforeEach(function (done) {
+                        SDL.manager.screen.choiceset._PreloadPresentChoicesOperation._choiceId = 10;
 
-            csm._defaultMainWindowCapability.setTextFields([]);
-            csm._defaultMainWindowCapability.setImageFields([]);
+                        testLoadedCells = loadedCellsWithStartNum(3, 10);
+                        const secondLoadedCells = loadedCellsWithStartNum(50, 55);
+                        testLoadedCells = testLoadedCells.concat(secondLoadedCells);
 
-            removedProperties = csm._removeUnusedProperties(choiceCellList);
-            csm._addUniqueNamesBasedOnStrippedCells(removedProperties, choiceCellList);
-            Validator.assertEquals(choiceCellList[1]._getUniqueText(), 'Item 1 (2)');
+                        testCellsToLoad = cellsToUploadWithCount(10);
+                        testTask._loadedCells = testLoadedCells;
+                        done();
+                    });
+
+                    it('should start from the last used id', function (done) {
+                        testTask._assignIdsToCells(testCellsToLoad);
+                        Validator.assertEquals(testCellsToLoad.length, 10);
+                        for (let index = 0; index < testCellsToLoad.length; index++) {
+                            Validator.assertEquals(testCellsToLoad[index]._getChoiceId(), index + 56);
+                        }
+                        Validator.assertTrue(SDL.manager.screen.choiceset._PreloadPresentChoicesOperation._hasReachedMaxIDs);
+                        done();
+                    });
+                });
+
+                describe('when not enough open ids are available', function () {
+                    beforeEach(function (done) {
+                        SDL.manager.screen.choiceset._PreloadPresentChoicesOperation._choiceId = 10;
+
+                        testLoadedCells = loadedCellsWithStartNum(3, 10);
+                        const secondLoadedCells = loadedCellsWithStartNum(12, 65533);
+                        testLoadedCells = testLoadedCells.concat(secondLoadedCells);
+
+                        testCellsToLoad = cellsToUploadWithCount(10);
+                        testTask._loadedCells = testLoadedCells;
+                        done();
+                    });
+
+                    it('should assign what it can and the rest should be set to MAX', function (done) {
+                        testTask._assignIdsToCells(testCellsToLoad);
+                        Validator.assertEquals(testCellsToLoad.length, 10);
+
+                        Validator.assertEquals(testCellsToLoad[0]._getChoiceId(), 65534);
+                        Validator.assertEquals(testCellsToLoad[1]._getChoiceId(), 65535);
+                        Validator.assertEquals(testCellsToLoad[2]._getChoiceId(), 1);
+                        Validator.assertEquals(testCellsToLoad[3]._getChoiceId(), 2);
+                        Validator.assertEquals(testCellsToLoad[4]._getChoiceId(), 11);
+                        Validator.assertEquals(testCellsToLoad[5]._getChoiceId(), 65535);
+                        Validator.assertEquals(testCellsToLoad[6]._getChoiceId(), 65535);
+                        Validator.assertEquals(testCellsToLoad[7]._getChoiceId(), 65535);
+                        Validator.assertEquals(testCellsToLoad[8]._getChoiceId(), 65535);
+                        Validator.assertEquals(testCellsToLoad[9]._getChoiceId(), 65535);
+
+                        Validator.assertTrue(SDL.manager.screen.choiceset._PreloadPresentChoicesOperation._hasReachedMaxIDs);
+                        done();
+                    });
+                });
+
+                describe('when loadedCells is full', function () {
+                    beforeEach(function (done) {
+                        SDL.manager.screen.choiceset._PreloadPresentChoicesOperation._choiceId = 65535;
+
+                        testLoadedCells = loadedCellsWithStartNum(0, 65535);
+                        testCellsToLoad = cellsToUploadWithCount(10);
+                        testTask._loadedCells = testLoadedCells;
+                        done();
+                    });
+
+                    it('should set all IDs to MAX', function (done) {
+                        testTask._assignIdsToCells(testCellsToLoad);
+                        Validator.assertEquals(testCellsToLoad.length, 10);
+                        for (let index = 0; index < testCellsToLoad.length; index++) {
+                            Validator.assertEquals(testCellsToLoad[index]._getChoiceId(), 65535);
+                        }
+                        Validator.assertTrue(SDL.manager.screen.choiceset._PreloadPresentChoicesOperation._hasReachedMaxIDs);
+                        done();
+                    });
+                });
+            });
         });
 
-        it('testChoicesToBeUploaded', function () {
-            const cell1 = new SDL.manager.screen.choiceset.ChoiceCell('Item 1')
-                .setSecondaryText('null')
-                .setTertiaryText('tertiaryText')
-                .setVoiceCommands(null)
-                .setArtwork(Test.GENERAL_ARTWORK)
-                .setSecondaryArtwork(Test.GENERAL_ARTWORK);
-            const cell2 = new SDL.manager.screen.choiceset.ChoiceCell('Item 2')
-                .setSecondaryText('null2')
-                .setTertiaryText('tertiaryText2')
-                .setVoiceCommands(null)
-                .setArtwork(null)
-                .setSecondaryArtwork(null);
+        describe('making cells unique', function () {
+            let enabledWindowCapability;
+            let primaryTextOnlyCapability;
 
-            const choiceCellList = [
-                cell1,
-                cell2,
-            ];
+            beforeEach(function (done) {
+                enabledWindowCapability = new SDL.rpc.structs.WindowCapability();
+                enabledWindowCapability.setTextFields([
+                    new SDL.rpc.structs.TextField().setNameParam(SDL.rpc.enums.TextFieldName.menuName),
+                    new SDL.rpc.structs.TextField().setNameParam(SDL.rpc.enums.TextFieldName.secondaryText),
+                    new SDL.rpc.structs.TextField().setNameParam(SDL.rpc.enums.TextFieldName.tertiaryText),
+                ]);
 
-            csm._preloadedChoices = choiceCellList;
-            Validator.assertEquals(csm._getChoicesToBeUploadedWithArray(choiceCellList), []);
-            const cell3 = new SDL.manager.screen.choiceset.ChoiceCell('Item 3')
-                .setSecondaryText('null3')
-                .setTertiaryText('tertiaryText3')
-                .setVoiceCommands(null)
-                .setArtwork(null)
-                .setSecondaryArtwork(null);
-            Validator.assertEquals(csm._getChoicesToBeUploadedWithArray([cell1, cell2, cell3]), [cell3]);
+                primaryTextOnlyCapability = new SDL.rpc.structs.WindowCapability();
+
+                testLoadedCells = [];
+                done();
+            });
+
+            describe('at RPC v7.1', function () {
+                beforeEach(function (done) {
+                    appClient._sdlManager._lifecycleManager._rpcSpecVersion = new SDL.util.Version(7, 1, 0);
+                    done();
+                });
+
+                describe('when cells are unique except when stripped', function () {
+                    beforeEach(function (done) {
+                        testCellsToLoad = [
+                            new SDL.manager.screen.choiceset.ChoiceCell('Cell 1')
+                                .setSecondaryText('Unique 1'),
+                            new SDL.manager.screen.choiceset.ChoiceCell('Cell 1')
+                                .setSecondaryText('Unique 2'),
+                            new SDL.manager.screen.choiceset.ChoiceCell('Cell 1')
+                                .setSecondaryText('Unique 3'),
+                            new SDL.manager.screen.choiceset.ChoiceCell('Cell 2')
+                                .setSecondaryText('Unique 1'),
+                        ];
+                        done();
+                    });
+
+                    describe('with full window capability', function () {
+                        beforeEach(function (done) {
+                            testTask._defaultMainWindowCapability = enabledWindowCapability;
+                            testTask._makeCellsToUploadUnique(testCellsToLoad, testLoadedCells.map(cell => cell.clone()));
+                            done();
+                        });
+
+                        it('should not set unique titles', function (done) {
+                            Validator.assertEquals(testCellsToLoad[0]._getUniqueText(), testCellsToLoad[0].getText());
+                            Validator.assertEquals(testCellsToLoad[1]._getUniqueText(), testCellsToLoad[1].getText());
+                            Validator.assertEquals(testCellsToLoad[2]._getUniqueText(), testCellsToLoad[2].getText());
+                            Validator.assertEquals(testCellsToLoad[3]._getUniqueText(), testCellsToLoad[3].getText());
+                            done();
+                        });
+                    });
+
+                    describe('with primary text only capability', function () {
+                        beforeEach(function (done) {
+                            testTask._defaultMainWindowCapability = primaryTextOnlyCapability;
+                            testTask._makeCellsToUploadUnique(testCellsToLoad, testLoadedCells.map(cell => cell.clone()));
+                            done();
+                        });
+
+                        it('should set unique titles', function (done) {
+                            Validator.assertEquals(testCellsToLoad[0]._getUniqueText(), testCellsToLoad[0].getText());
+                            Validator.assertNotEquals(testCellsToLoad[1]._getUniqueText(), testCellsToLoad[1].getText());
+                            Validator.assertNotEquals(testCellsToLoad[2]._getUniqueText(), testCellsToLoad[2].getText());
+                            Validator.assertEquals(testCellsToLoad[3]._getUniqueText(), testCellsToLoad[3].getText());
+                            done();
+                        });
+                    });
+                });
+
+                describe('when cells are unique', function () {
+                    beforeEach(function (done) {
+                        testCellsToLoad = [
+                            new SDL.manager.screen.choiceset.ChoiceCell('Cell 1'),
+                            new SDL.manager.screen.choiceset.ChoiceCell('Cell 2'),
+                            new SDL.manager.screen.choiceset.ChoiceCell('Cell 3'),
+                            new SDL.manager.screen.choiceset.ChoiceCell('Cell 4'),
+                        ];
+                        testTask._defaultMainWindowCapability = enabledWindowCapability;
+                        testTask._makeCellsToUploadUnique(testCellsToLoad, testLoadedCells.map(cell => cell.clone()));
+                        done();
+                    });
+
+                    it('should not set unique titles', function (done) {
+                        Validator.assertEquals(testCellsToLoad[0]._getUniqueText(), testCellsToLoad[0].getText());
+                        Validator.assertEquals(testCellsToLoad[1]._getUniqueText(), testCellsToLoad[1].getText());
+                        Validator.assertEquals(testCellsToLoad[2]._getUniqueText(), testCellsToLoad[2].getText());
+                        Validator.assertEquals(testCellsToLoad[3]._getUniqueText(), testCellsToLoad[3].getText());
+                        done();
+                    });
+                });
+
+                describe('when loaded cells match the cells when stripped', function () {
+                    beforeEach(function (done) {
+                        testLoadedCells = [
+                            new SDL.manager.screen.choiceset.ChoiceCell('Cell 1'),
+                            new SDL.manager.screen.choiceset.ChoiceCell('Cell 2'),
+                            new SDL.manager.screen.choiceset.ChoiceCell('Cell 3'),
+                        ];
+
+                        testCellsToLoad = [
+                            new SDL.manager.screen.choiceset.ChoiceCell('Cell 1')
+                                .setSecondaryText('Unique'),
+                            new SDL.manager.screen.choiceset.ChoiceCell('Cell 2')
+                                .setSecondaryText('Unique'),
+                            new SDL.manager.screen.choiceset.ChoiceCell('Cell 1')
+                                .setSecondaryText('Unique 2'),
+                            new SDL.manager.screen.choiceset.ChoiceCell('Cell 4')
+                                .setSecondaryText('Unique'),
+                        ];
+                        done();
+                    });
+
+                    describe('with full window capability', function () {
+                        beforeEach(function (done) {
+                            testTask._defaultMainWindowCapability = enabledWindowCapability;
+                            testTask._makeCellsToUploadUnique(testCellsToLoad, testLoadedCells.map(cell => cell.clone()));
+                            done();
+                        });
+
+                        it('should not make unique text', function (done) {
+                            Validator.assertEquals(testCellsToLoad[0]._getUniqueText(), testCellsToLoad[0].getText());
+                            Validator.assertEquals(testCellsToLoad[1]._getUniqueText(), testCellsToLoad[1].getText());
+                            Validator.assertEquals(testCellsToLoad[2]._getUniqueText(), testCellsToLoad[2].getText());
+                            Validator.assertEquals(testCellsToLoad[3]._getUniqueText(), testCellsToLoad[3].getText());
+                            done();
+                        });
+                    });
+
+                    describe('with primary text only capability', function () {
+                        beforeEach(function (done) {
+                            testTask._defaultMainWindowCapability = primaryTextOnlyCapability;
+                            testTask._makeCellsToUploadUnique(testCellsToLoad, testLoadedCells.map(cell => cell.clone()));
+                            done();
+                        });
+
+                        it('should not make unique text', function (done) {
+                            Validator.assertNotEquals(testCellsToLoad[0]._getUniqueText(), testCellsToLoad[0].getText());
+                            Validator.assertNotEquals(testCellsToLoad[1]._getUniqueText(), testCellsToLoad[1].getText());
+                            Validator.assertNotEquals(testCellsToLoad[2]._getUniqueText(), testCellsToLoad[2].getText());
+                            Validator.assertEquals(testCellsToLoad[3]._getUniqueText(), testCellsToLoad[3].getText());
+                            done();
+                        });
+                    });
+                });
+            });
+
+            describe('below RPC v7.1', function () {
+                beforeEach(function (done) {
+                    appClient._sdlManager._lifecycleManager._rpcSpecVersion = new SDL.util.Version(7, 0, 0);
+                    done();
+                });
+
+                describe('when cells are unique except when stripped', function () {
+                    beforeEach(function (done) {
+                        testCellsToLoad = [
+                            new SDL.manager.screen.choiceset.ChoiceCell('Cell 1')
+                                .setSecondaryText('Unique 1'),
+                            new SDL.manager.screen.choiceset.ChoiceCell('Cell 1')
+                                .setSecondaryText('Unique 2'),
+                            new SDL.manager.screen.choiceset.ChoiceCell('Cell 1')
+                                .setSecondaryText('Unique 3'),
+                            new SDL.manager.screen.choiceset.ChoiceCell('Cell 2')
+                                .setSecondaryText('Unique 1'),
+                        ];
+
+                        testTask._defaultMainWindowCapability = enabledWindowCapability;
+                        testTask._makeCellsToUploadUnique(testCellsToLoad, testLoadedCells.map(cell => cell.clone()));
+                        done();
+                    });
+
+                    it('should not set unique titles except the first and last', function (done) {
+                        Validator.assertEquals(testCellsToLoad[0]._getUniqueText(), testCellsToLoad[0].getText());
+                        Validator.assertNotEquals(testCellsToLoad[1]._getUniqueText(), testCellsToLoad[1].getText());
+                        Validator.assertNotEquals(testCellsToLoad[2]._getUniqueText(), testCellsToLoad[2].getText());
+                        Validator.assertEquals(testCellsToLoad[3]._getUniqueText(), testCellsToLoad[3].getText());
+                        done();
+                    });
+                });
+
+                describe('when cells are unique', function () {
+                    beforeEach(function (done) {
+                        testCellsToLoad = [
+                            new SDL.manager.screen.choiceset.ChoiceCell('Cell 1'),
+                            new SDL.manager.screen.choiceset.ChoiceCell('Cell 2'),
+                            new SDL.manager.screen.choiceset.ChoiceCell('Cell 3'),
+                            new SDL.manager.screen.choiceset.ChoiceCell('Cell 4'),
+                        ];
+                        testTask._defaultMainWindowCapability = enabledWindowCapability;
+                        testTask._makeCellsToUploadUnique(testCellsToLoad, testLoadedCells.map(cell => cell.clone()));
+                        done();
+                    });
+
+                    it('should not set unique titles', function (done) {
+                        Validator.assertEquals(testCellsToLoad[0]._getUniqueText(), testCellsToLoad[0].getText());
+                        Validator.assertEquals(testCellsToLoad[1]._getUniqueText(), testCellsToLoad[1].getText());
+                        Validator.assertEquals(testCellsToLoad[2]._getUniqueText(), testCellsToLoad[2].getText());
+                        Validator.assertEquals(testCellsToLoad[3]._getUniqueText(), testCellsToLoad[3].getText());
+                        done();
+                    });
+                });
+
+                describe('when loaded cells match the cells when stripped', function () {
+                    beforeEach(function (done) {
+                        testLoadedCells = [
+                            new SDL.manager.screen.choiceset.ChoiceCell('Cell 1'),
+                            new SDL.manager.screen.choiceset.ChoiceCell('Cell 2'),
+                            new SDL.manager.screen.choiceset.ChoiceCell('Cell 3'),
+                        ];
+
+                        testCellsToLoad = [
+                            new SDL.manager.screen.choiceset.ChoiceCell('Cell 1')
+                                .setSecondaryText('Unique'),
+                            new SDL.manager.screen.choiceset.ChoiceCell('Cell 2')
+                                .setSecondaryText('Unique'),
+                            new SDL.manager.screen.choiceset.ChoiceCell('Cell 1')
+                                .setSecondaryText('Unique 2'),
+                            new SDL.manager.screen.choiceset.ChoiceCell('Cell 4')
+                                .setSecondaryText('Unique'),
+                        ];
+                        done();
+                    });
+
+                    describe('with full window capability', function () {
+                        beforeEach(function (done) {
+                            testTask._defaultMainWindowCapability = enabledWindowCapability;
+                            testTask._makeCellsToUploadUnique(testCellsToLoad, testLoadedCells.map(cell => cell.clone()));
+                            done();
+                        });
+
+                        it('should make unique text', function (done) {
+                            Validator.assertNotEquals(testCellsToLoad[0]._getUniqueText(), testCellsToLoad[0].getText());
+                            Validator.assertNotEquals(testCellsToLoad[1]._getUniqueText(), testCellsToLoad[1].getText());
+                            Validator.assertNotEquals(testCellsToLoad[2]._getUniqueText(), testCellsToLoad[2].getText());
+                            Validator.assertEquals(testCellsToLoad[3]._getUniqueText(), testCellsToLoad[3].getText());
+                            done();
+                        });
+                    });
+
+                    describe('with primary text only capability', function () {
+                        beforeEach(function (done) {
+                            testTask._defaultMainWindowCapability = primaryTextOnlyCapability;
+                            testTask._makeCellsToUploadUnique(testCellsToLoad, testLoadedCells);
+                            done();
+                        });
+
+                        it('should not make unique text', function (done) {
+                            Validator.assertNotEquals(testCellsToLoad[0]._getUniqueText(), testCellsToLoad[0].getText());
+                            Validator.assertNotEquals(testCellsToLoad[1]._getUniqueText(), testCellsToLoad[1].getText());
+                            Validator.assertNotEquals(testCellsToLoad[2]._getUniqueText(), testCellsToLoad[2].getText());
+                            Validator.assertEquals(testCellsToLoad[3]._getUniqueText(), testCellsToLoad[3].getText());
+                            done();
+                        });
+                    });
+                });
+            });
+        });
+
+        describe('updating a choice set based on loaded cells and cells to upload', function () {
+            let testChoiceSet, basicChoiceCells;
+
+            beforeEach(function (done) {
+                basicChoiceCells = [
+                    new SDL.manager.screen.choiceset.ChoiceCell('Cell 1'),
+                    new SDL.manager.screen.choiceset.ChoiceCell('Cell 2'),
+                    new SDL.manager.screen.choiceset.ChoiceCell('Cell 3'),
+                ];
+
+                testChoiceSet = new SDL.manager.screen.choiceset.ChoiceSet('', basicChoiceCells);
+                testTask._choiceSet = testChoiceSet;
+                testCellsToLoad = [
+                    new SDL.manager.screen.choiceset.ChoiceCell('Cell 1'),
+                    new SDL.manager.screen.choiceset.ChoiceCell('Cell 2'),
+                    new SDL.manager.screen.choiceset.ChoiceCell('Cell 3'),
+                ];
+                for (let index = 0; index < testCellsToLoad.length; index++) {
+                    testCellsToLoad[index]._setChoiceId(index);
+                }
+
+                testLoadedCells = [
+                    new SDL.manager.screen.choiceset.ChoiceCell('Cell 1'),
+                    new SDL.manager.screen.choiceset.ChoiceCell('Cell 2'),
+                ];
+                for (let index = 0; index < testLoadedCells.length; index++) {
+                    testLoadedCells[index]._setChoiceId(index + 10);
+                }
+                done();
+            });
+
+            describe('when some loaded cells match', function () {
+                it('should use the loaded cells when possible', function (done) {
+                    testTask._updateChoiceSet(testTask._choiceSet, testLoadedCells, testTask._choiceSet.getChoices());
+                    Validator.assertEquals(testTask._choiceSet.getChoices()[0]._getChoiceId(), testLoadedCells[0]._getChoiceId());
+                    Validator.assertEquals(testTask._choiceSet.getChoices()[1]._getChoiceId(), testLoadedCells[1]._getChoiceId());
+                    done();
+                });
+            });
         });
     });
 };
