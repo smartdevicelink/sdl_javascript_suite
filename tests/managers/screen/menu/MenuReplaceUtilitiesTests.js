@@ -145,10 +145,42 @@ module.exports = function (appClient) {
             Validator.assertEquals(1, actualMenuCellList[4].getSubCells()[1].getSubCells().length);
         });
 
+
+        it('testAddMenuRequestWithCommandId', async function () {
+            let windowCapability;
+            let menuCell;
+            let lcm;
+            const windowCapFn = SDL.manager.screen.menu._MenuReplaceUtilities.windowCapabilitySupportsPrimaryImage;
+
+            // Test cases
+            const tests = [
+                { capOne: false, capTwo: true,  isSub: true,  version: createSdlMsgVersion(4, 9, 0), assert: true },
+                { capOne: false, capTwo: false, isSub: true,  version: createSdlMsgVersion(4, 9, 0), assert: false },
+                { capOne: false, capTwo: false, isSub: true,  version: createSdlMsgVersion(5, 0, 0), assert: false },
+                { capOne: true,  capTwo: false, isSub: true,  version: createSdlMsgVersion(5, 0, 0), assert: true },
+                { capOne: false, capTwo: false, isSub: true,  version: createSdlMsgVersion(6, 0, 0), assert: false },
+                { capOne: true,  capTwo: false, isSub: true,  version: createSdlMsgVersion(6, 0, 0), assert: true },
+                { capOne: false, capTwo: false, isSub: true,  version: createSdlMsgVersion(7, 0, 0), assert: false },
+                { capOne: false, capTwo: false, isSub: true,  version: createSdlMsgVersion(7, 1, 0), assert: false },
+                { capOne: false, capTwo: false, isSub: true,  version: createSdlMsgVersion(8, 0, 0), assert: false },
+                { capOne: false, capTwo: true,  isSub: true,  version: createSdlMsgVersion(8, 0, 0), assert: true },
+                { capOne: false, capTwo: false, isSub: false, version: createSdlMsgVersion(8, 0, 0), assert: false },
+                { capOne: true,  capTwo: false, isSub: false, version: createSdlMsgVersion(8, 0, 0), assert: true },
+            ];
+
+            tests.forEach(test => {
+                windowCapability = createWindowCapability(test.capOne, test.capTwo);
+                menuCell = createMockMenuCell(test.isSub);
+                lcm = createMockLifecycleManager(test.version);
+                Validator.assertEquals(windowCapFn(lcm, windowCapability, menuCell), test.assert);
+            });
+        });
+
         it('testShouldCellIncludeImage', async function () {
             let menuCell;
             let windowCapability;
             let fileManager;
+            let lcm;
             const shouldCellIncludePrimaryImageFromCell = SDL.manager.screen.menu._MenuReplaceUtilities.shouldCellIncludePrimaryImageFromCell;
 
             // Case 1
@@ -156,35 +188,54 @@ module.exports = function (appClient) {
                 .setIcon(Test.GENERAL_ARTWORK);
             windowCapability = createWindowCapability(true, true);
             fileManager = createMockFileManager(true);
-            Validator.assertTrue(shouldCellIncludePrimaryImageFromCell(menuCell, fileManager, windowCapability));
+            lcm = createMockLifecycleManager(createSdlMsgVersion(8, 0, 0));
+            Validator.assertTrue(shouldCellIncludePrimaryImageFromCell(lcm, menuCell, fileManager, windowCapability));
 
             // Case 2 - Image are not supported
             menuCell = new SDL.manager.screen.menu.MenuCell(Test.GENERAL_STRING)
                 .setIcon(Test.GENERAL_ARTWORK);
             windowCapability = createWindowCapability(false, false);
             fileManager = createMockFileManager(true);
-            Validator.assertTrue(!shouldCellIncludePrimaryImageFromCell(menuCell, fileManager, windowCapability));
+            lcm = createMockLifecycleManager(createSdlMsgVersion(8, 0, 0));
+            Validator.assertTrue(!shouldCellIncludePrimaryImageFromCell(lcm, menuCell, fileManager, windowCapability));
 
             // Case 3 - Artwork is null
             menuCell = new SDL.manager.screen.menu.MenuCell(Test.GENERAL_STRING);
             windowCapability = createWindowCapability(true, true);
             fileManager = createMockFileManager(true);
-            Validator.assertTrue(!shouldCellIncludePrimaryImageFromCell(menuCell, fileManager, windowCapability));
+            lcm = createMockLifecycleManager(createSdlMsgVersion(8, 0, 0));
+            Validator.assertTrue(!shouldCellIncludePrimaryImageFromCell(lcm, menuCell, fileManager, windowCapability));
 
             // Case 4 - Artwork has not been uploaded
             menuCell = new SDL.manager.screen.menu.MenuCell(Test.GENERAL_STRING)
                 .setIcon(Test.GENERAL_ARTWORK);
             windowCapability = createWindowCapability(true, true);
             fileManager = createMockFileManager(false);
-            Validator.assertTrue(!shouldCellIncludePrimaryImageFromCell(menuCell, fileManager, windowCapability));
+            lcm = createMockLifecycleManager(createSdlMsgVersion(8, 0, 0));
+            Validator.assertTrue(!shouldCellIncludePrimaryImageFromCell(lcm, menuCell, fileManager, windowCapability));
 
             // Case 5 - Artwork is static icon
             menuCell = new SDL.manager.screen.menu.MenuCell(Test.GENERAL_STRING)
                 .setIcon(Test.GENERAL_ARTWORK_STATIC);
             windowCapability = createWindowCapability(true, true);
             fileManager = createMockFileManager(false);
-            Validator.assertTrue(shouldCellIncludePrimaryImageFromCell(menuCell, fileManager, windowCapability));
+            lcm = createMockLifecycleManager(createSdlMsgVersion(8, 0, 0));
+            Validator.assertTrue(shouldCellIncludePrimaryImageFromCell(lcm, menuCell, fileManager, windowCapability));
         });
+
+        /**
+         * Constructs an SdlMsgVersion object
+         * @param {number} major - The major version
+         * @param {number} minor - The minor version
+         * @param {number} patch - The patch version
+         * @returns {SdlMsgVersion} - A SdlMsgVersion object
+         */
+        function createSdlMsgVersion (major, minor, patch) {
+            return new SDL.rpc.structs.SdlMsgVersion()
+                .setMajorVersion(major)
+                .setMinorVersion(minor)
+                .setPatchVersion(patch);
+        }
 
         /**
          * Makes a fake file manager object with hasUploadedFile returning a specific boolean
@@ -194,6 +245,28 @@ module.exports = function (appClient) {
         function createMockFileManager (hasUploadedFile) {
             return {
                 hasUploadedFile: () => hasUploadedFile,
+            };
+        }
+
+        /**
+         * Makes a fake lifecycle manager object with getSdlMsgVersion defined
+         * @param {SdlMsgVersion} version - The version to return when invoked
+         * @returns {Object} - A basic object with getSdlMsgVersion implemented
+         */
+        function createMockLifecycleManager (version) {
+            return {
+                getSdlMsgVersion: () => version,
+            };
+        }
+
+        /**
+         * Makes a fake MenuCell object with isSubMenuCell defined
+         * @param {boolean} isSubMenu - The boolean to return when isSubMenuCell is invoked
+         * @returns {Object} - A basic object with isSubMenuCell implemented
+         */
+        function createMockMenuCell (isSubMenu) {
+            return {
+                isSubMenuCell: () => isSubMenu,
             };
         }
 
