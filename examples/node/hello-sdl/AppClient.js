@@ -47,6 +47,7 @@ class AppClient {
             .setAppId(CONFIG.appId)
             .setAppName(CONFIG.appName)
             .setLanguageDesired(SDL.rpc.enums.Language.EN_US)
+            .setHmiDisplayLanguageDesired(SDL.rpc.enums.Language.EN_US)
             .setAppTypes([
                 SDL.rpc.enums.AppHMIType.MEDIA,
             ])
@@ -94,6 +95,11 @@ class AppClient {
             })
             .setOnError((sdlManager, info) => {
                 console.error('Error from SdlManagerListener: ', info);
+            })
+            .setManagerShouldUpdateLifecycleToLanguage((language = null, hmiLanguage = null) => {
+                return new SDL.manager.lifecycle.LifecycleConfigurationUpdate()
+                    .setAppName('Hello JS')
+                    .setTtsName([new SDL.rpc.structs.TTSChunk().setText('Hello JS')]);
             });
 
         this._sdlManager = new SDL.manager.SdlManager(this._appConfig, managerListener);
