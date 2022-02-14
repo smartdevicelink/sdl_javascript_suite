@@ -28,6 +28,14 @@ body:
         Observed Behavior:
     validations:
      required: true
+  - type: dropdown
+    id: projects
+    attributes:
+      label: Which projects have you seen this bug on?
+      multiple: true
+      options:
+        - Vanilla JavaScript
+        - Node.js
   - type: input
     id: javascript-version
     attributes:
@@ -48,12 +56,10 @@ body:
       label: Testing Environment(s)
       description: |
         For Example:
-          - Ford TDK 3.4 (19286_DEVTEST)
           - Manticore v2.9.0 (See top of the open Manticore screen)
           - SDL Core v8.0.0 + Generic_HMI v0.11.0
       placeholder: |
         For Example:
-          - Ford TDK 3.4 (19286_DEVTEST)
           - Manticore v2.9.0 (See top of the open Manticore screen)
           - SDL Core v8.0.0 + Generic_HMI v0.11.0
       render: markdown
