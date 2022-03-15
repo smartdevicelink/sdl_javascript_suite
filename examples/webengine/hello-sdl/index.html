@@ -86,6 +86,11 @@
                     })
                     .setOnError((sdlManager, info) => {
                         this._logMessage('APP:', 'Error from SdlManagerListener: ' + info, true);
+                    })
+                    .setManagerShouldUpdateLifecycleToLanguage((language = null, hmiLanguage = null) => {
+                        return new SDL.manager.lifecycle.LifecycleConfigurationUpdate()
+                            .setAppName('Hello JS')
+                            .setTtsName([new SDL.rpc.structs.TTSChunk().setText('Hello JS')]);
                     });
 
                 this._sdlManager = new SDL.manager.SdlManager(this._appConfig, managerListener);
