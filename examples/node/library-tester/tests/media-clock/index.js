@@ -56,11 +56,15 @@ module.exports = async function (catalogRpc) {
     sdlManager.getScreenManager().changeLayout(new SDL.rpc.structs.TemplateConfiguration()
         .setTemplate(SDL.rpc.enums.PredefinedLayout.MEDIA));
 
-    await sdlManager.getScreenManager().addButtonListener(SDL.rpc.enums.ButtonName.PLAY_PAUSE, () => {});
+    await sdlManager.getScreenManager().addButtonListener(SDL.rpc.enums.ButtonName.PLAY_PAUSE, (buttonName, rpc) => {
+        console.log(rpc);
+    });
     await sdlManager.getScreenManager().addButtonListener(SDL.rpc.enums.ButtonName.SEEKLEFT, (buttonName, rpc) => {
         console.log(rpc);
     });
-    await sdlManager.getScreenManager().addButtonListener(SDL.rpc.enums.ButtonName.SEEKRIGHT, () => {});
+    await sdlManager.getScreenManager().addButtonListener(SDL.rpc.enums.ButtonName.SEEKRIGHT, (buttonName, rpc) => {
+        console.log(rpc);
+    });
 
     // voice command test
     // wait for the user to click on a voice command to continue

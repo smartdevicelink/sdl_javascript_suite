@@ -56,6 +56,11 @@ module.exports = async function (catalogRpc) {
         console.log('RegisterAppInterfaceResponse not present in the lifecycle manager!');
     }
 
+    let calledSystemCapUpdate = false;
+    sdlManager.addRpcListener(SDL.rpc.enums.FunctionID.OnSystemCapabilityUpdated, onHashChange => {
+        calledSystemCapUpdate = true;
+    });
+
     // retrieve the capabilities
     const scm = sdlManager.getSystemCapabilityManager();
     for (const sct in SDL.rpc.enums.SystemCapabilityType._MAP) {
@@ -119,6 +124,9 @@ module.exports = async function (catalogRpc) {
     // check if the listener was invoked again because the layout is changed
     if (!listenerCalled) {
         console.error("DISPLAYS SCM listener not invoked as a result of changing the layout!")
+    }
+    if (!calledSystemCapUpdate) {
+        console.error("No OnSystemCapabilityUpdated RPC received!")
     }
 
     // tear down the app

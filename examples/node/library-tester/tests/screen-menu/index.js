@@ -64,6 +64,41 @@ module.exports = async function (catalogRpc) {
         .setOverwrite(true);
 
     // start tests 
+
+    // force the RPC version to change temporarily
+    const oldVersion = sdlManager._lifecycleManager._rpcSpecVersion.getMajor();
+    sdlManager._lifecycleManager._rpcSpecVersion.setMajor(6);
+    
+    screenManager.setMenu([new SDL.manager.screen.menu.MenuCell('identical').setIcon(artwork1), new SDL.manager.screen.menu.MenuCell('identical').setVoiceCommands(['I am a voice command'])]);
+    screenManager.setTextField1('The menus should have changed so one says identical (2)');
+    await sleep(7000);
+
+    sdlManager._lifecycleManager._rpcSpecVersion.setMajor(oldVersion);
+
+    // check RPC version before allowing the test to run!
+    if (SDL.manager.screen.menu._MenuReplaceUtilities.isRpcVersionBetween5And7(sdlManager._lifecycleManager)) {
+        screenManager.setTextField1('Sending a submenu with an image. It should exist.');
+
+        await new Promise(resolve => {
+           const subCell0 = new SDL.manager.screen.menu.MenuCell('Click here to continue the test')
+                .setMenuSelectionListener(new SDL.manager.screen.menu.MenuSelectionListener()
+                    .setOnTriggered(source => {
+                        if (source === SDL.rpc.enums.TriggerSource.TS_MENU) {
+                            resolve();
+                        }
+                    })
+                )
+                .setIcon(artwork2)
+                .setVoiceCommands(['I am a voice command'])
+
+            const mainCell0 = new SDL.manager.screen.menu.MenuCell('Check for an image in the menu item!')
+                .setIcon(artwork1)
+                .setSubCells([subCell0]);
+
+            screenManager.setMenu([mainCell0]); 
+        });
+    }
+
     screenManager.setTextField1('Find and select the appropriate menu buttons to continue');
 
     await new Promise(resolve => {
