@@ -114,7 +114,7 @@ module.exports = function (appClient) {
             Validator.assertEquals(mm._dynamicMenuUpdatesMode, SDL.manager.screen.menu.enums.DynamicMenuUpdatesMode.FORCE_OFF);
             // when we only send one command to update, we should only be returned one add command
             const newArray = [mainCell1, mainCell4];
-            Validator.assertEquals(SDL.manager.screen.menu._MenuReplaceUtilities.allCommandsForCells(newArray, mm._fileManager, mm._windowCapability, SDL.rpc.enums.MenuLayout.LIST).length, 4);
+            Validator.assertEquals(SDL.manager.screen.menu._MenuReplaceUtilities.allCommandsForCells(sdlManager._lifecycleManager, newArray, mm._fileManager, mm._windowCapability, SDL.rpc.enums.MenuLayout.LIST).length, 4);
             mm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_FULL;
             mm._setMenuCells(newArray);
 
