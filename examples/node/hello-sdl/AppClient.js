@@ -116,10 +116,6 @@ class AppClient {
         this._checkReadyState();
         const screenManager = this._sdlManager.getScreenManager();
         
-        // print AuthToken
-        const authToken = this._sdlManager._lifecycleManager._authToken;
-        console.log('App Authentication Token: ' + authToken);
-        
         // add menus
         const menuListener = new SDL.manager.screen.menu.MenuSelectionListener()
             .setOnTriggered(triggerSource => {
