@@ -115,7 +115,7 @@ class AppClient {
         this._managersReady = true;
         this._checkReadyState();
         const screenManager = this._sdlManager.getScreenManager();
-
+        
         // add menus
         const menuListener = new SDL.manager.screen.menu.MenuSelectionListener()
             .setOnTriggered(triggerSource => {
