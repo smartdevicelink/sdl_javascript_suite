@@ -70,12 +70,18 @@ module.exports = async function (catalogRpc) {
         .setFilePath('./tests/screen-graphics/weather-icon.png')
         .setOverwrite(true);
 
+    const staticFile = new SDL.manager.file.filetypes.SdlArtwork()
+        .setName('0x0A')
+        .setType(SDL.rpc.enums.FileType.GRAPHIC_PNG)
+        .setStaticIcon(true)
+
     const state1 = new SDL.manager.screen.utils.SoftButtonState('ONE', 'one');
     const state2 = new SDL.manager.screen.utils.SoftButtonState('TWO', 'two');
     const state3 = new SDL.manager.screen.utils.SoftButtonState('THREE', 'three');
     const state4 = new SDL.manager.screen.utils.SoftButtonState('FOUR', 'four');
     const state5 = new SDL.manager.screen.utils.SoftButtonState('FIVE', null, artwork1);
     const state6 = new SDL.manager.screen.utils.SoftButtonState('SIX', 'six', artwork1);
+    const state7 = new SDL.manager.screen.utils.SoftButtonState('SEVEN', 'seven', staticFile);
     const state6Replace = new SDL.manager.screen.utils.SoftButtonState('SIX', 'six', artworkReplace);
     // end preset data
 
@@ -204,6 +210,18 @@ module.exports = async function (catalogRpc) {
     await sleep(2000);
     changeLayout(screenManager, 'DOUBLE_GRAPHIC_WITH_SOFTBUTTONS');
     await sleep(2000);
+
+    setupScreenState(screenManager, 'Send dynamic image when HMI does not support it (only static image should be here!)');
+    screenManager._softButtonManager._isDynamicGraphicSupported = false;
+    changeLayout(screenManager, 'TEXTBUTTONS_ONLY');
+    const softButtonObjects2 = [
+        new SDL.manager.screen.utils.SoftButtonObject('no image here', [state6], 'SIX', (id, rpc) => {}),
+        new SDL.manager.screen.utils.SoftButtonObject('image here', [state7], 'SEVEN', (id, rpc) => {}),
+    ];
+    await screenManager.setSoftButtonObjects(softButtonObjects2);
+    await screenManager.commit();
+    await sleep(5000);
+    screenManager._softButtonManager._isDynamicGraphicSupported = true;
 
     changeLayout(screenManager, 'MEDIA');
     screenManager.setTextField1('Click on the SEEK_LEFT subscribed button to finish the test!');
