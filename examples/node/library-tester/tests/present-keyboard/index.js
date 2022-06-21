@@ -79,21 +79,62 @@ module.exports = async function (catalogRpc) {
 
     sdlManager.getSystemCapabilityManager().getDefaultMainWindowCapability().getKeyboardCapabilities();
 
-    keyboardProperties.setKeyboardLayout(SDL.rpc.enums.KeyboardLayout.NUMERIC);
-    screenManager.setKeyboardConfiguration(keyboardProperties);
-    screenManager.presentKeyboard('numeric keyboard', null, keyboardListener);
-
-    keyboardProperties.setMaskInputCharacters(SDL.rpc.enums.KeyboardInputMask.ENABLE_INPUT_KEY_MASK);
-    screenManager.setKeyboardConfiguration(keyboardProperties);
-    screenManager.presentKeyboard('masked input', null, keyboardListener);
-
-    keyboardProperties.setMaskInputCharacters(SDL.rpc.enums.KeyboardInputMask.USER_CHOICE_INPUT_KEY_MASK);
-    screenManager.setKeyboardConfiguration(keyboardProperties);
+    // TODO: these are all running at the same time. invoke one at a time and do a promise race between 10 sec and the user pressing submit!
     await new Promise((resolve) => {
-        keyboardListener.setOnKeyboardDidUpdateInputMask((keyboardEvent) => {
+        keyboardProperties.setKeyboardLayout(SDL.rpc.enums.KeyboardLayout.NUMERIC);
+        screenManager.setKeyboardConfiguration(keyboardProperties);
+        screenManager.presentKeyboard('numeric keyboard', null, keyboardListener);
+        let resolver1;
+        let promise1 = new Promise(resolve => {
+            resolver1 = resolve;
+        });
+        let promise2 = new Promise(resolve => setTimeout(resolve, 10000));
+        keyboardListener.setOnUserDidSubmitInput((inputText, event) => {
+            resolver1();
+        });
+        // ensure a resolve, either by waiting 10 seconds or by the user submitting the keyboard input
+        Promise.race([promise1, promise2]).then((value) => {
             resolve();
         });
+    });
+
+    await new Promise((resolve) => {
+        keyboardProperties.setMaskInputCharacters(SDL.rpc.enums.KeyboardInputMask.ENABLE_INPUT_KEY_MASK);
+        screenManager.setKeyboardConfiguration(keyboardProperties);
+        screenManager.presentKeyboard('masked input', null, keyboardListener);
+        let resolver1;
+        let promise1 = new Promise(resolve => {
+            resolver1 = resolve;
+        });
+        let promise2 = new Promise(resolve => setTimeout(resolve, 10000));
+        keyboardListener.setOnUserDidSubmitInput((inputText, event) => {
+            resolver1();
+        });
+        // ensure a resolve, either by waiting 10 seconds or by the user submitting the keyboard input
+        Promise.race([promise1, promise2]).then((value) => {
+            resolve();
+        });
+    });
+
+    await new Promise((resolve) => {
+        keyboardProperties.setMaskInputCharacters(SDL.rpc.enums.KeyboardInputMask.USER_CHOICE_INPUT_KEY_MASK);
+        screenManager.setKeyboardConfiguration(keyboardProperties);
         screenManager.presentKeyboard('change the input mask', null, keyboardListener);
+        let resolver1;
+        let promise1 = new Promise(resolve => {
+            resolver1 = resolve;
+        });
+        let promise2 = new Promise(resolve => setTimeout(resolve, 10000));
+        keyboardListener.setOnUserDidSubmitInput((inputText, event) => {
+            resolver1();
+        });
+        keyboardListener.setOnKeyboardDidUpdateInputMask((keyboardEvent) => {
+            console.log("Input mask has been changed confirmed.");
+        });
+        // ensure a resolve, either by waiting 10 seconds or by the user submitting the keyboard input
+        Promise.race([promise1, promise2]).then((value) => {
+            resolve();
+        });
     });
 
     await new Promise((resolve) => {
@@ -102,9 +143,22 @@ module.exports = async function (catalogRpc) {
             .setLanguage(SDL.rpc.enums.Language.EN_US)
             .setCustomKeys(['!', '?']);
         screenManager.setKeyboardConfiguration(keyboardProperties);
+        screenManager.presentKeyboard('press a custom button', null, keyboardListener);
+        let resolver1;
+        let promise1 = new Promise(resolve => {
+            resolver1 = resolve;
+        });
+        let promise2 = new Promise(resolve => setTimeout(resolve, 10000));
         keyboardListener.setOnUserDidSubmitInput((inputText, event) => {
+            resolver1();
+        });
+        // ensure a resolve, either by waiting 10 seconds or by the user submitting the keyboard input
+        Promise.race([promise1, promise2]).then((value) => {
             resolve();
         });
-        screenManager.presentKeyboard('press a custom button', null, keyboardListener);
     });
+
+    // tear down the app
+    await sdlManager.sendRpcResolve(new SDL.rpc.messages.UnregisterAppInterface());
+    sdlManager.dispose();
 };
