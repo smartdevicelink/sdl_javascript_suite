@@ -60,6 +60,8 @@ The transport related source code for Node.js can use Node specific libraries ne
 NodeJS, npm, and Python3 are required:
 
 ```js
+git submodule init
+git submodule update
 npm install
 npm run build
 ```
