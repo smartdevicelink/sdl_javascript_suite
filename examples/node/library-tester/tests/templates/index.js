@@ -176,7 +176,7 @@ function makeSoftButtonObject (text, id, softButtonType) {
             .setFilePath('./tests/templates/test_icon_1.png'));
     }
     if (softButtonType === SDL.rpc.enums.SoftButtonType.SBT_IMAGE) {
-        state = new SDL.manager.screen.utils.SoftButtonState('button-' + id, '', new SDL.manager.file.filetypes.SdlArtwork('sdl-logo', SDL.rpc.enums.FileType.GRAPHIC_PNG)
+        state = new SDL.manager.screen.utils.SoftButtonState('button-' + id, null, new SDL.manager.file.filetypes.SdlArtwork('sdl-logo', SDL.rpc.enums.FileType.GRAPHIC_PNG)
             .setFilePath('./tests/templates/test_icon_1.png'));
     }
     if (softButtonType === SDL.rpc.enums.SoftButtonType.SBT_TEXT) {
