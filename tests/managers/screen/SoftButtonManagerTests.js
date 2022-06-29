@@ -11,6 +11,7 @@ module.exports = function (appClient) {
 
         const screenManager = appClient._sdlManager.getScreenManager();
         const sbm = screenManager._softButtonManager;
+        sbm._isDynamicGraphicSupported = true;
         let fileManagerUploadArtworksListenerCalledCounter = 0;
         let internalInterfaceSendRpcListenerCalledCounter = 0;
         const softButtonObject1Id = 1000;
@@ -231,6 +232,26 @@ module.exports = function (appClient) {
             // Case 6 they are equal, assertTrue
             softButtonState2 = new SDL.manager.screen.utils.SoftButtonState('object1-state1', 'o1s1', artwork1);
             Validator.assertEquals(softButtonState1, softButtonState2);
+        });
+
+        it('testSoftButtonManagerGraphicNotSupported', function () {
+            sbm._isDynamicGraphicSupported = false;
+            fileManagerUploadArtworksListenerCalledCounter = 0;
+            internalInterfaceSendRpcListenerCalledCounter = 0;
+            const softButtonObjects = [softButtonObject1, softButtonObject2];
+            sbm.setSoftButtonObjects(softButtonObjects);
+            Validator.assertEquals(0, fileManagerUploadArtworksListenerCalledCounter);
+        });
+
+        it('testSoftButtonManagerDynamicImageNotSupportedNoText', function () {
+            sbm._isDynamicGraphicSupported = false;
+            fileManagerUploadArtworksListenerCalledCounter = 0;
+            internalInterfaceSendRpcListenerCalledCounter = 0;
+
+            const softButtonState = new SDL.manager.screen.utils.SoftButtonState('testState', null, new SDL.manager.file.filetypes.SdlArtwork('image', SDL.rpc.enums.FileType.GRAPHIC_PNG, '1', true));
+            const softButtonObject = new SDL.manager.screen.utils.SoftButtonObject('obj1', softButtonState, softButtonState.getName());
+            sbm.setSoftButtonObjects([softButtonObject]);
+            Validator.assertEquals(0, fileManagerUploadArtworksListenerCalledCounter);
         });
 
         /**
