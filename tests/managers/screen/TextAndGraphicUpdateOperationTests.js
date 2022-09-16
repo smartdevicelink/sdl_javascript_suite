@@ -35,6 +35,18 @@ module.exports = function (appClient) {
         let textsAndGraphicsState;
         let textAndGraphicUpdateOperation;
         let wasUploadArtworksCalled;
+        let textField1Fail;
+        let textField2Fail;
+        let textField3Fail;
+        let textField4Fail;
+        let mediaTrackFieldFail;
+        let titleFail;
+        let textFieldFailType;
+        let textAlignmentFail;
+        let testArtworkFail;
+        let configurationFail;
+        let errorTestState;
+        let errorTestState2;
 
         beforeEach(function (done) {
             testArtwork1 = new SDL.manager.file.filetypes.SdlArtwork('sdl-logo', SDL.rpc.enums.FileType.GRAPHIC_PNG)
@@ -50,10 +62,10 @@ module.exports = function (appClient) {
             mediaTrackField = 'dudes';
             title = 'dudes';
             blankArtwork = new SDL.manager.file.filetypes.SdlArtwork('blankArtwork', SDL.rpc.enums.FileType.GRAPHIC_PNG);
-            textField1Type = SDL.rpc.enums.MetadataType.MEDIA_TITLE;
-            textField2Type = SDL.rpc.enums.MetadataType.MEDIA_TITLE;
-            textField3Type = SDL.rpc.enums.MetadataType.MEDIA_TITLE;
-            textField4Type = SDL.rpc.enums.MetadataType.MEDIA_TITLE;
+            textField1Type = SDL.rpc.enums.MetadataType.mediaTitle;
+            textField2Type = SDL.rpc.enums.MetadataType.mediaTitle;
+            textField3Type = SDL.rpc.enums.MetadataType.mediaTitle;
+            textField4Type = SDL.rpc.enums.MetadataType.mediaTitle;
             textAlignment = SDL.rpc.enums.TextAlignment.CENTERED;
             configuration = new SDL.rpc.structs.TemplateConfiguration().setTemplate(SDL.rpc.enums.PredefinedLayout.GRAPHIC_WITH_TEXT);
             currentScreenData = new SDL.manager.screen._TextAndGraphicState();
@@ -71,6 +83,22 @@ module.exports = function (appClient) {
             textsAndGraphicsState = new SDL.manager.screen._TextAndGraphicState(textField1, textField2, textField3, textField4,
                 mediaTrackField, title, testArtwork1, testArtwork2, textAlignment, textField1Type, textField2Type, textField3Type, textField4Type, null);
             textAndGraphicUpdateOperation = new SDL.manager.screen._TextAndGraphicUpdateOperation(lifecycleManager, fileManager, defaultMainWindowCapability, currentScreenData, textsAndGraphicsState, listener, currentScreenDataUpdatedListener);
+
+            textField1Fail = 'It is\nbad data';
+            textField2Fail = 'Wednesday\nbad data';
+            textField3Fail = 'My\nbad data';
+            textField4Fail = 'Dudes\nbad data';
+            mediaTrackFieldFail = 'dudes\nbad data';
+            titleFail = 'dudes\nbad data';
+            textFieldFailType = SDL.rpc.enums.MetadataType.failType;
+            textAlignmentFail = SDL.rpc.enums.TextAlignment.failAlignment;
+            testArtworkFail = new SDL.manager.file.filetypes.SdlArtwork('testFileFail', SDL.rpc.enums.FileType.GRAPHIC_PNG)
+                .setFilePath('no_file');
+            configurationFail = new SDL.rpc.structs.TemplateConfiguration().setTemplate(SDL.rpc.enums.PredefinedLayout.failConfiguration);
+
+            errorTestState = new SDL.manager.screen._TextAndGraphicState();
+            errorTestState2 = new SDL.manager.screen._TextAndGraphicState();
+
             done();
         });
 
@@ -932,6 +960,190 @@ module.exports = function (appClient) {
             versionStub.restore();
             fileStub.restore();
             stub.restore();
+        });
+
+        it('testOnShowFailBadDataDoesNotUpdateScreen', async function () {
+            const stub = sinon.stub(lifecycleManager, 'sendRpcResolve')
+                .callsFake(onShowFail);
+            const fileStub = sinon.stub(fileManager, 'uploadArtworks')
+                .callsFake(onImageUploadSuccessTaskCanceled);
+            const versionStub = sinon.stub(lifecycleManager, 'getSdlMsgVersion')
+                .callsFake(function () {
+                    return new SDL.rpc.structs.SdlMsgVersion(6, 0);
+                });
+
+            const textsAndGraphicsState = new SDL.manager.screen._TextAndGraphicState();
+            textsAndGraphicsState.setTextField1(textField1Fail);
+            textsAndGraphicsState.setTextField2(textField2Fail);
+            textsAndGraphicsState.setTextField3(textField3Fail);
+            textsAndGraphicsState.setTextField4(textField4Fail);
+            textsAndGraphicsState.setTextField1Type(textFieldFailType);
+            textsAndGraphicsState.setTextField2Type(textFieldFailType);
+            textsAndGraphicsState.setTextField3Type(textFieldFailType);
+            textsAndGraphicsState.setTextField4Type(textFieldFailType);
+            textsAndGraphicsState.setMediaTrackTextField(mediaTrackFieldFail);
+            textsAndGraphicsState.setTitle(titleFail);
+            textsAndGraphicsState.setPrimaryGraphic(testArtworkFail);
+            textsAndGraphicsState.setSecondaryGraphic(testArtworkFail);
+            textsAndGraphicsState.setTextAlignment(textAlignmentFail);
+            textsAndGraphicsState.setTemplateConfiguration(configurationFail);
+
+            const textAndGraphicUpdateOperation = new SDL.manager.screen._TextAndGraphicUpdateOperation(lifecycleManager, fileManager, defaultMainWindowCapability, currentScreenData, textsAndGraphicsState, listener, currentScreenDataUpdatedListener);
+            await textAndGraphicUpdateOperation._start();
+
+            // Sending in bad data should result in no updates to the current screen
+            Validator.assertEquals('Old', textAndGraphicUpdateOperation._getCurrentScreenData().getTextField1());
+            Validator.assertEquals('Text', textAndGraphicUpdateOperation._getCurrentScreenData().getTextField2());
+            Validator.assertEquals('Not', textAndGraphicUpdateOperation._getCurrentScreenData().getTextField3());
+            Validator.assertEquals('Important', textAndGraphicUpdateOperation._getCurrentScreenData().getTextField4());
+            Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getMediaTrackTextField());
+            Validator.assertEquals(testArtwork1, textAndGraphicUpdateOperation._getCurrentScreenData().getPrimaryGraphic());
+            Validator.assertEquals(testArtwork2, textAndGraphicUpdateOperation._getCurrentScreenData().getSecondaryGraphic());
+            Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getTextAlignment());
+            Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getTextField1Type());
+            Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getTextField2Type());
+            Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getTextField3Type());
+            Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getTextField4Type());
+            Validator.assertEquals(configuration, textAndGraphicUpdateOperation._getCurrentScreenData().getTemplateConfiguration());
+
+            versionStub.restore();
+            fileStub.restore();
+            stub.restore();
+        });
+
+        it('testUpdateTargetStateWithErrorStateNullDoesNotUpdateCurrentScreen', async function () {
+            const versionStub = sinon.stub(lifecycleManager, 'getSdlMsgVersion')
+                .callsFake(function () {
+                    return new SDL.rpc.structs.SdlMsgVersion(4, 0);
+                });
+
+            errorTestState.setTextField1(null);
+            errorTestState.setTextField2(null);
+            errorTestState.setTextField3(null);
+            errorTestState.setTextField4(null);
+            errorTestState.setTextField1Type(null);
+            errorTestState.setTextField2Type(null);
+            errorTestState.setTextField3Type(null);
+            errorTestState.setTextField4Type(null);
+            errorTestState.setMediaTrackTextField(null);
+            errorTestState.setTitle(null);
+            errorTestState.setPrimaryGraphic(null);
+            errorTestState.setSecondaryGraphic(null);
+            errorTestState.setTextAlignment(null);
+            errorTestState.setTemplateConfiguration(null);
+
+            const textAndGraphicUpdateOperation = new SDL.manager.screen._TextAndGraphicUpdateOperation(lifecycleManager, fileManager, defaultMainWindowCapability, currentScreenData, errorTestState, listener, currentScreenDataUpdatedListener);
+            // Testing updateTargetStateWithErrorState method
+            textAndGraphicUpdateOperation._updateTargetStateWithErrorState(errorTestState);
+
+            await textAndGraphicUpdateOperation._start();
+
+            // Setting fields to null should result in no updates to the current screen
+            Validator.assertEquals('Old', textAndGraphicUpdateOperation._getCurrentScreenData().getTextField1());
+            Validator.assertEquals('Text', textAndGraphicUpdateOperation._getCurrentScreenData().getTextField2());
+            Validator.assertEquals('Not', textAndGraphicUpdateOperation._getCurrentScreenData().getTextField3());
+            Validator.assertEquals('Important', textAndGraphicUpdateOperation._getCurrentScreenData().getTextField4());
+            Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getMediaTrackTextField());
+            Validator.assertEquals(testArtwork1, textAndGraphicUpdateOperation._getCurrentScreenData().getPrimaryGraphic());
+            Validator.assertEquals(testArtwork2, textAndGraphicUpdateOperation._getCurrentScreenData().getSecondaryGraphic());
+            Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getTextAlignment());
+            Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getTextField1Type());
+            Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getTextField2Type());
+            Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getTextField3Type());
+            Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getTextField4Type());
+            Validator.assertEquals(configuration, textAndGraphicUpdateOperation._getCurrentScreenData().getTemplateConfiguration());
+
+            versionStub.restore();
+        });
+
+        it('testUpdateTargetStateWithErrorBadDataDoesNotUpdateCurrentScreen', async function () {
+            const versionStub = sinon.stub(lifecycleManager, 'getSdlMsgVersion')
+                .callsFake(function () {
+                    return new SDL.rpc.structs.SdlMsgVersion(4, 0);
+                });
+
+            errorTestState.setTextField1(textField1Fail);
+            errorTestState.setTextField2(textField2Fail);
+            errorTestState.setTextField3(textField3Fail);
+            errorTestState.setTextField4(textField4Fail);
+            errorTestState.setTextField1Type(textFieldFailType);
+            errorTestState.setTextField2Type(textFieldFailType);
+            errorTestState.setTextField3Type(textFieldFailType);
+            errorTestState.setTextField4Type(textFieldFailType);
+            errorTestState.setMediaTrackTextField(mediaTrackFieldFail);
+            errorTestState.setTitle(titleFail);
+            errorTestState.setPrimaryGraphic(testArtworkFail);
+            errorTestState.setSecondaryGraphic(testArtworkFail);
+            errorTestState.setTextAlignment(textAlignmentFail);
+            errorTestState.setTemplateConfiguration(configurationFail);
+
+            const textAndGraphicUpdateOperation = new SDL.manager.screen._TextAndGraphicUpdateOperation(lifecycleManager, fileManager, defaultMainWindowCapability, currentScreenData, errorTestState, listener, currentScreenDataUpdatedListener);
+            // Testing updateTargetStateWithErrorState method
+            textAndGraphicUpdateOperation._updateTargetStateWithErrorState(errorTestState);
+
+            await textAndGraphicUpdateOperation._start();
+
+            // Setting fields to null should result in no updates to the current screen
+            Validator.assertEquals('Old', textAndGraphicUpdateOperation._getCurrentScreenData().getTextField1());
+            Validator.assertEquals('Text', textAndGraphicUpdateOperation._getCurrentScreenData().getTextField2());
+            Validator.assertEquals('Not', textAndGraphicUpdateOperation._getCurrentScreenData().getTextField3());
+            Validator.assertEquals('Important', textAndGraphicUpdateOperation._getCurrentScreenData().getTextField4());
+            Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getMediaTrackTextField());
+            Validator.assertEquals(testArtwork1, textAndGraphicUpdateOperation._getCurrentScreenData().getPrimaryGraphic());
+            Validator.assertEquals(testArtwork2, textAndGraphicUpdateOperation._getCurrentScreenData().getSecondaryGraphic());
+            Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getTextAlignment());
+            Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getTextField1Type());
+            Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getTextField2Type());
+            Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getTextField3Type());
+            Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getTextField4Type());
+            Validator.assertEquals(configuration, textAndGraphicUpdateOperation._getCurrentScreenData().getTemplateConfiguration());
+
+            versionStub.restore();
+        });
+
+        it('testUpdateTargetStateWithErrorBadDataAndGoodData', async function () {
+            const versionStub = sinon.stub(lifecycleManager, 'getSdlMsgVersion')
+                .callsFake(function () {
+                    return new SDL.rpc.structs.SdlMsgVersion(4, 0);
+                });
+
+            errorTestState2.setTextField1(textField1Fail);
+            errorTestState2.setTextField2(textField2);
+            errorTestState2.setTextField3(null);
+            errorTestState2.setTextField4(textField4Fail);
+            errorTestState2.setTextField1Type(textFieldFailType);
+            errorTestState2.setTextField2Type(textFieldFailType);
+            errorTestState2.setTextField3Type(textFieldFailType);
+            errorTestState2.setTextField4Type(textFieldFailType);
+            errorTestState2.setMediaTrackTextField(mediaTrackFieldFail);
+            errorTestState2.setTitle(titleFail);
+            errorTestState2.setPrimaryGraphic(testArtworkFail);
+            errorTestState2.setSecondaryGraphic(testArtworkFail);
+            errorTestState2.setTextAlignment(textAlignmentFail);
+            errorTestState2.setTemplateConfiguration(configurationFail);
+
+            const textAndGraphicUpdateOperation = new SDL.manager.screen._TextAndGraphicUpdateOperation(lifecycleManager, fileManager, defaultMainWindowCapability, currentScreenData, errorTestState2, listener, currentScreenDataUpdatedListener);
+            // Testing updateTargetStateWithErrorState method
+            textAndGraphicUpdateOperation._updateTargetStateWithErrorState(errorTestState2);
+
+            await textAndGraphicUpdateOperation._start();
+
+            // Setting mix of good and bad data should result in only updates to those fields with good data
+            Validator.assertEquals('Old', textAndGraphicUpdateOperation._getCurrentScreenData().getTextField1());
+            Validator.assertEquals(errorTestState2.getTextField2(), textAndGraphicUpdateOperation._getCurrentScreenData().getTextField2());
+            Validator.assertEquals('Not', textAndGraphicUpdateOperation._getCurrentScreenData().getTextField3());
+            Validator.assertEquals('Important', textAndGraphicUpdateOperation._getCurrentScreenData().getTextField4());
+            Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getMediaTrackTextField());
+            Validator.assertEquals(testArtwork1, textAndGraphicUpdateOperation._getCurrentScreenData().getPrimaryGraphic());
+            Validator.assertEquals(testArtwork2, textAndGraphicUpdateOperation._getCurrentScreenData().getSecondaryGraphic());
+            Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getTextAlignment());
+            Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getTextField1Type());
+            Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getTextField2Type());
+            Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getTextField3Type());
+            Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getTextField4Type());
+            Validator.assertEquals(configuration, textAndGraphicUpdateOperation._getCurrentScreenData().getTemplateConfiguration());
+
+            versionStub.restore();
         });
 
         textAndGraphicManager._currentScreenData = blankScreenData;
