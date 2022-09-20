@@ -29,6 +29,7 @@ module.exports = function (appClient) {
         let textField4Type;
         let textAlignment;
         let configuration;
+        let configurationOld;
         let currentScreenData;
         let currentScreenDataUpdatedListener;
         let defaultMainWindowCapability;
@@ -56,6 +57,7 @@ module.exports = function (appClient) {
             textField4Type = SDL.rpc.enums.MetadataType.MEDIA_TITLE;
             textAlignment = SDL.rpc.enums.TextAlignment.CENTERED;
             configuration = new SDL.rpc.structs.TemplateConfiguration().setTemplate(SDL.rpc.enums.PredefinedLayout.GRAPHIC_WITH_TEXT);
+            configurationOld = new SDL.rpc.structs.TemplateConfiguration().setTemplate(SDL.rpc.enums.PredefinedLayout.TEXT_WITH_GRAPHIC);
             currentScreenData = new SDL.manager.screen._TextAndGraphicState();
             currentScreenData.setTextField1('Old');
             currentScreenData.setTextField2('Text');
@@ -63,7 +65,7 @@ module.exports = function (appClient) {
             currentScreenData.setTextField4('Important');
             currentScreenData.setPrimaryGraphic(testArtwork1);
             currentScreenData.setSecondaryGraphic(testArtwork2);
-            currentScreenData.setTemplateConfiguration(configuration);
+            currentScreenData.setTemplateConfiguration(configurationOld);
             currentScreenDataUpdatedListener = (asyncListener) => {
                 asyncListener().then(() => {}).catch(() => {});
             };
@@ -925,7 +927,6 @@ module.exports = function (appClient) {
                 mediaTrackField, title, testArtwork1, testArtwork2, textAlignment, textField1Type, textField2Type, textField3Type, textField4Type, configuration);
             textAndGraphicUpdateOperation = new SDL.manager.screen._TextAndGraphicUpdateOperation(lifecycleManager, fileManager, defaultMainWindowCapability, currentScreenData, textsAndGraphicsState, listener, currentScreenDataUpdatedListener);
             await textAndGraphicUpdateOperation._start();
-            Validator.assertEquals(textAndGraphicUpdateOperation._getCurrentScreenData().getTemplateConfiguration().getParameters(), configuration.getParameters());
 
             // Verifies that uploadArtworks does not get called because a sendShow failed with text and layout change
             Validator.assertTrue(!wasUploadArtworksCalled);
