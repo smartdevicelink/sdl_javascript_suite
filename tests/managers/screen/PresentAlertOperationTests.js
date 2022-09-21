@@ -23,6 +23,7 @@ module.exports = function (appClient) {
             speechCapabilities,
             alertCompletionListener,
             alertSoftButtonClearListener;
+
         /**
          * Gets the windowCapability
          * @param {Number} numberOfAlertFields - number of lines
@@ -280,6 +281,17 @@ module.exports = function (appClient) {
             await presentAlertOperation._start();
             Validator.assertTrue(callback.notCalled);
             stub.restore();
+        });
+
+        it('testNoImageSetOnFailedUpload', async function () {
+            const alertRpc = presentAlertOperation.alertRpc();
+            Validator.assertNull(alertRpc.getAlertIcon());
+        });
+
+        it('testImageSetOnSuccessfulUpload', async function () {
+            presentAlertOperation._uploadedImageNames.add(alertView.getIcon().getName());
+            const alertRpc = presentAlertOperation.alertRpc();
+            Validator.assertEquals(alertRpc.getAlertIcon().getValueParam(), alertView.getIcon().getName());
         });
     });
 };
