@@ -45,13 +45,13 @@ module.exports = function (appClient) {
             return systemCapabilityManager;
         }
 
-        function createDisplayCapabilityList(display,button, softButton) {
+        function createDisplayCapabilityList(display = null,button, softButton) {
             const windowTypeCapabilities = new SDL.rpc.structs.WindowTypeCapabilities()
                 .setType(SDL.rpc.enums.WindowType.MAIN)
                 .setMaximumNumberOfWindows(1);
 
             const displayCapability = new SDL.rpc.structs.DisplayCapability();
-            displayCapability.setDisplayName(display != null ? display.getDisplayName() : null);
+            displayCapability.setDisplayName(display !== null ? display.getDisplayName() : null);
             displayCapability.setWindowTypeSupported([windowTypeCapabilities]);
 
             const defaultWindowCapability = new SDL.rpc.structs.WindowCapability();
@@ -101,9 +101,9 @@ module.exports = function (appClient) {
             const scm = createSampleManager(lifecycleManager);
 
             const displayCapabilityList = createDisplayCapabilityList(Test.GENERAL_DISPLAYCAPABILITIES, Test.GENERAL_BUTTONCAPABILITIES_LIST, Test.GENERAL_SOFTBUTTONCAPABILITIES_LIST);
-        
-            // Validator.assertTrue(
-            //       Validator.validateDisplayCapabilityList(displayCapabilityList,scm.getCapability(SDL.rpc.enums.SystemCapabilityType.DISPLAYS)));
+
+            Validator.assertTrue(
+                   Validator.validateDisplayCapabilityList(displayCapabilityList,scm.getCapability(SDL.rpc.enums.SystemCapabilityType.DISPLAYS)));
             Validator.assertTrue(
                     Validator.validateHMICapabilities(Test.GENERAL_HMICAPABILITIES,scm.getHmiCapabilities()));
             Validator.assertTrue(
@@ -112,16 +112,16 @@ module.exports = function (appClient) {
                     Validator.validateAudioPassThruCapabilities(Test.GENERAL_AUDIOPASSTHRUCAPABILITIES_LIST, scm.getAudioPassThruCapabilities()));
             Validator.assertTrue(
                     Validator.validateButtonCapabilities(Test.GENERAL_BUTTONCAPABILITIES_LIST, scm._buttonCapabilities));
-            // Validator.assertTrue(
-            //       Validator.validateHMIZoneCapabilities(Test.GENERAL_HMIZONECAPABILITIES_LIST, scm.getHmiZoneCapabilities()));
+            Validator.assertTrue(
+                    Validator.validateHMIZoneCapabilities(Test.GENERAL_HMIZONECAPABILITIES_LIST, scm.getHmiZoneCapabilities()));
             Validator.assertTrue(
                     Validator.validatePresetBankCapabilities(Test.GENERAL_PRESETBANKCAPABILITIES,scm.getPresetBankCapabilities()));
             Validator.assertTrue(
                     Validator.validateSoftButtonCapabilities(Test.GENERAL_SOFTBUTTONCAPABILITIES_LIST, scm._softButtonCapabilities));
-            // Validator.assertTrue(
-                //    Validator.validateSpeechCapabilities(Test.GENERAL_SPEECHCAPABILITIES_LIST, scm.getSpeechCapabilities()));
-            // Validator.assertTrue(
-                  //  Validator.validatePreRecordedSpeechCapabilities(Test.GENERAL_PRERECORDEDSPEECH_LIST,scm.getPrerecordedSpeechCapabilities()));
+            Validator.assertTrue(
+                    Validator.validateSpeechCapabilities(Test.GENERAL_SPEECHCAPABILITIES_LIST, scm.getSpeechCapabilities()));
+            Validator.assertTrue(
+                    Validator.validatePreRecordedSpeechCapabilities(Test.GENERAL_PRERECORDEDSPEECH_LIST,scm.getPrerecordedSpeechCapabilities()));
             done();
         });
 
@@ -370,7 +370,6 @@ module.exports = function (appClient) {
             rpcStub.restore();
             stub.restore();*/
 
-            done();
         });
 
         it('testGetCapabilityHmiNone', async function () {
