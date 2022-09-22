@@ -27,9 +27,10 @@ module.exports = function (appClient) {
         /**
          * Gets the windowCapability
          * @param {Number} numberOfAlertFields - number of lines
+         * @param {Boolean} supportsAlertIcon - whether alert icon is supported by the capability
          * @returns {WindowCapability} - the capability
          */
-        function getWindowCapability (numberOfAlertFields) {
+        function getWindowCapability (numberOfAlertFields, supportsAlertIcon) {
             const alertText1 = new SDL.rpc.structs.TextField();
             alertText1.setNameParam(SDL.rpc.enums.TextFieldName.alertText1);
             const alertText2 = new SDL.rpc.structs.TextField();
@@ -56,13 +57,13 @@ module.exports = function (appClient) {
             const windowCapability = new SDL.rpc.structs.WindowCapability();
             windowCapability.setTextFields(returnList);
 
-            const imageField = new SDL.rpc.structs.ImageField();
-            imageField.setNameParam(SDL.rpc.enums.ImageFieldName.alertIcon);
-            const imageFieldList = [];
-            imageFieldList.push(imageField);
-            windowCapability.setImageFields(imageFieldList);
-
-            windowCapability.setImageFields(imageFieldList);
+            if (supportsAlertIcon) {
+                const imageField = new SDL.rpc.structs.ImageField();
+                imageField.setNameParam(SDL.rpc.enums.ImageFieldName.alertIcon);
+                const imageFieldList = [];
+                imageFieldList.push(imageField);
+                windowCapability.setImageFields(imageFieldList);
+            }
 
             const softButtonCapabilities = new SDL.rpc.structs.SoftButtonCapabilities();
             softButtonCapabilities.setImageSupported(true);
@@ -136,7 +137,7 @@ module.exports = function (appClient) {
             alertView.setShowWaitIndicator(true);
             alertView.canceledListener = () => {};
 
-            defaultMainWindowCapability = getWindowCapability(3);
+            defaultMainWindowCapability = getWindowCapability(3, true);
             speechCapabilities = [];
             speechCapabilities.push(SDL.rpc.enums.SpeechCapabilities.FILE);
             alertCompletionListener = new SDL.manager.screen.utils.AlertCompletionListener().setOnComplete((success, tryAgainTime) => {});
@@ -159,13 +160,13 @@ module.exports = function (appClient) {
                         .setMinorVersion(0)
                         .setPatchVersion(0);
                 });
-            let windowCapability = getWindowCapability(1);
+            let windowCapability = getWindowCapability(1, true);
             let presentAlertOperation = new SDL.manager.screen.utils._PresentAlertOperation(lifecycleManager, alertView, windowCapability, speechCapabilities, fileManager, 1, () => {}, new SDL.manager.screen._AlertManagerBase._AlertSoftButtonClearListener().setOnButtonClear(() => {}));
             let alert = presentAlertOperation.alertRpc();
 
             Validator.assertEquals(alert.getAlertText1(), `${alertView.getText()} - ${alertView.getSecondaryText()} - ${alertView.getTertiaryText()}`);
 
-            windowCapability = getWindowCapability(2);
+            windowCapability = getWindowCapability(2, true);
 
             presentAlertOperation = new SDL.manager.screen.utils._PresentAlertOperation(lifecycleManager, alertView, windowCapability, speechCapabilities, fileManager, 1, () => {}, new SDL.manager.screen._AlertManagerBase._AlertSoftButtonClearListener().setOnButtonClear(() => {}));
             alert = presentAlertOperation.alertRpc();
@@ -200,7 +201,7 @@ module.exports = function (appClient) {
             // Test Images need to be uploaded, sending text and uploading images
             await presentAlertOperation.onExecute();
 
-            // Verifies that uploadArtworks gets called only with the fist presentAlertOperation.onExecute call
+            // Verifies that uploadArtworks gets called only with the first presentAlertOperation.onExecute call
             Validator.assertTrue(artStub.calledOnce);
             Validator.assertTrue(fileStub.calledOnce);
             Validator.assertTrue(alertStub.calledOnce);
@@ -235,7 +236,7 @@ module.exports = function (appClient) {
             // Test Images need to be uploaded, sending text and uploading images
             await presentAlertOperation._start();
 
-            // Verifies that uploadArtworks gets called only with the fist presentAlertOperation.onExecute call
+            // Verifies that uploadArtworks gets called only with the first presentAlertOperation.onExecute call
             Validator.assertTrue(artStub.notCalled);
             Validator.assertTrue(fileStub.notCalled);
             Validator.assertTrue(alertStub.calledOnce);
@@ -263,7 +264,7 @@ module.exports = function (appClient) {
             // Test Images need to be uploaded, sending text and uploading images
             await presentAlertOperation._start();
 
-            // Verifies that uploadArtworks gets called only with the fist presentAlertOperation.onExecute call
+            // Verifies that uploadArtworks gets called only with the first presentAlertOperation.onExecute call
             Validator.assertTrue(artStub.calledOnce);
             Validator.assertTrue(alertStub.calledOnce);
 
@@ -289,9 +290,44 @@ module.exports = function (appClient) {
         });
 
         it('testImageSetOnSuccessfulUpload', async function () {
-            presentAlertOperation._uploadedImageNames.add(alertView.getIcon().getName());
+            presentAlertOperation._alertIconUploaded = true;
             const alertRpc = presentAlertOperation.alertRpc();
             Validator.assertEquals(alertRpc.getAlertIcon().getValueParam(), alertView.getIcon().getName());
+        });
+
+        it('testPresentStaticIcon', async function () {
+            const alertStub = sinon.stub(lifecycleManager, 'sendRpcResolve')
+                .callsFake(onAlertSuccess);
+            const artStub = sinon.stub(fileManager, 'uploadArtworks')
+                .callsFake(onArtworkUploadSuccess);
+            const fileStub = sinon.stub(fileManager, 'uploadFiles')
+                .callsFake(onArtworkUploadSuccess);
+            const versionStub = sinon.stub(lifecycleManager, 'getSdlMsgVersion')
+                .callsFake(function () {
+                    return new SDL.rpc.structs.SdlMsgVersion()
+                        .setMajorVersion(6)
+                        .setMinorVersion(0)
+                        .setPatchVersion(0);
+                });
+
+
+            testAlertArtwork = new SDL.manager.file.filetypes.SdlArtwork(SDL.manager.file.enums.StaticIconName.LEFT);
+            testAlertArtwork.setStaticIcon(true);
+            alertView.setIcon(testAlertArtwork);
+            alertView.setSoftButtons([]);
+
+            presentAlertOperation = new SDL.manager.screen.utils._PresentAlertOperation(lifecycleManager, alertView, defaultMainWindowCapability, speechCapabilities, fileManager, 1, alertCompletionListener, alertSoftButtonClearListener);
+            // Test Images need to be uploaded, sending text and uploading images
+            await presentAlertOperation._start();
+
+            // upload artworks should not be called since this is a static icon
+            Validator.assertTrue(artStub.notCalled);
+            Validator.assertTrue(alertStub.calledOnce);
+
+            versionStub.restore();
+            fileStub.restore();
+            artStub.restore();
+            alertStub.restore();
         });
     });
 };
