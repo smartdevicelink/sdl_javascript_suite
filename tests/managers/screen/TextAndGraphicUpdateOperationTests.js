@@ -1005,7 +1005,7 @@ module.exports = function (appClient) {
             Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getTextField2Type());
             Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getTextField3Type());
             Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getTextField4Type());
-            Validator.assertEquals(configuration, textAndGraphicUpdateOperation._getCurrentScreenData().getTemplateConfiguration());
+            Validator.assertEquals(configurationOld, textAndGraphicUpdateOperation._getCurrentScreenData().getTemplateConfiguration());
 
             versionStub.restore();
             fileStub.restore();
@@ -1052,7 +1052,7 @@ module.exports = function (appClient) {
             Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getTextField2Type());
             Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getTextField3Type());
             Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getTextField4Type());
-            Validator.assertEquals(configuration, textAndGraphicUpdateOperation._getCurrentScreenData().getTemplateConfiguration());
+            Validator.assertEquals(configurationOld, textAndGraphicUpdateOperation._getCurrentScreenData().getTemplateConfiguration());
 
             versionStub.restore();
         });
@@ -1097,7 +1097,7 @@ module.exports = function (appClient) {
             Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getTextField2Type());
             Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getTextField3Type());
             Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getTextField4Type());
-            Validator.assertEquals(configuration, textAndGraphicUpdateOperation._getCurrentScreenData().getTemplateConfiguration());
+            Validator.assertEquals(configurationOld, textAndGraphicUpdateOperation._getCurrentScreenData().getTemplateConfiguration());
 
             versionStub.restore();
         });
@@ -1142,7 +1142,7 @@ module.exports = function (appClient) {
             Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getTextField2Type());
             Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getTextField3Type());
             Validator.assertNull(textAndGraphicUpdateOperation._getCurrentScreenData().getTextField4Type());
-            Validator.assertEquals(configuration, textAndGraphicUpdateOperation._getCurrentScreenData().getTemplateConfiguration());
+            Validator.assertEquals(configurationOld, textAndGraphicUpdateOperation._getCurrentScreenData().getTemplateConfiguration());
 
             versionStub.restore();
         });

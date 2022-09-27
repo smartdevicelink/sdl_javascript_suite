@@ -71,9 +71,13 @@ module.exports = function (appClient) {
                 .setTemplateImage(true);
             Validator.assertTrue(file.equals(file2));
 
+            // forcibly create the image rpc
+            file.getImageRPC();
+
             const fileClone = file.clone();
             Validator.assertTrue(file !== fileClone);
             Validator.assertTrue(file.equals(file2));
+            Validator.assertNotEquals(file._imageRPC, fileClone._imageRPC);
 
             fileClone.setName('something else');
             fileClone.setFilePath('./goes_nowhere.txt');
