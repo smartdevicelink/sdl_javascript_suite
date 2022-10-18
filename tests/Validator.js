@@ -376,15 +376,8 @@ class Validator {
             expect(item1.getImageFields()).to.be.equal(item2.getImageFields());
             return true;
         }
-        expect(item1.getImageFields().length).to.be.equal(item2.getImageFields().length);
-        for (let index = 0; index < item1.getImageFields().length; index++) {
-            const val1 = item1.getImageFields()[index];
-            const val2 = item2.getImageFields()[index];
-            if (val1 === null || val2 === null) {
-                expect(val1).to.be.equal(val2);
-            }
-            Validator.validateImageFields(val1, val2);
-        }
+        
+        Validator.validateImageFields(item1.getImageFields(), item2.getImageFields());
 
         if (item1.getImageTypeSupported() === null || item2.getImageTypeSupported() === null) {
             expect(item1.getImageTypeSupported()).to.be.equal(item2.getImageTypeSupported());
@@ -398,7 +391,7 @@ class Validator {
         }
 
         Validator.validateButtonCapabilities(item1.getButtonCapabilities(), item2.getButtonCapabilities());
-        Validator.validateSoftButtonCapabilities(item1.getButtonCapabilities(), item2.getButtonCapabilities());
+        Validator.validateSoftButtonCapabilities(item1.getSoftButtonCapabilities(), item2.getSoftButtonCapabilities());
 
         return true;
     }
@@ -416,7 +409,7 @@ class Validator {
         }
 
         expect(item1.getCharacterSet()).to.be.equal(item2.getCharacterSet());
-        expect(item1.getName()).to.be.equal(item2.getName());
+        expect(item1.getNameParam()).to.be.equal(item2.getNameParam());
         expect(item1.getRows()).to.be.equal(item2.getRows());
         expect(item1.getWidth()).to.be.equal(item2.getWidth());
 
