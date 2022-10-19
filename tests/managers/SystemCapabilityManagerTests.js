@@ -535,7 +535,7 @@ module.exports = function (appClient) {
             done();
         });
 
-        it('testAddOnSystemCapabilityListenerWithSubscriptionsSupportedAndCapabilityNotCached', function (done) {
+        it('testAddOnSystemCapabilityListenerWithSubscriptionsSupportedAndCapabilityNotCached', async function () {
             const sdlManager = appClient._sdlManager;
             const lifecycleManager = sdlManager._lifecycleManager;
             const scm = createSampleManager(lifecycleManager);
@@ -576,33 +576,30 @@ module.exports = function (appClient) {
             stub.restore();
 
             // Add listener2
-            const onSystemCapabilityListener2 = sdlManager._lifecycleManager;
+            const onSystemCapabilityListener2 = sinon.fake(() => {});
             scm.addOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener2);
-            verify(onSystemCapabilityListener2, times(1)).onCapabilityRetrieved(any(Object.class));
-
+            await sleep(200);
+            Validator.assertTrue(onSystemCapabilityListener2.calledOnce);
 
             // Add listener3
-            const onSystemCapabilityListener3 = sdlManager._lifecycleManager;
+            const onSystemCapabilityListener3 = sinon.fake(() => {});
             scm.addOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener3);
-            verify(onSystemCapabilityListener3, times(1)).onCapabilityRetrieved(any(Object.class));
-
+            await sleep(200);
+            Validator.assertTrue(onSystemCapabilityListener3.calledOnce);
 
             // Remove listener1
             scm.removeOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener1);
 
-
             // Remove listener2
             scm.removeOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener2);
 
-
             // Remove listener3
             // When the last listener is removed, GetSystemCapability request should go out with subscribe=false
-            SystemCapabilityAnswer = sinon.stub(internalInterface,'sendRPC')
-                .callsFake(createOnSendGetSystemCapabilityAnswer(true, false, scm));
+            const stub2 = sinon.stub(sdlManager._lifecycleManager, 'sendRpcMessage')
+            stub2.withArgs(sinon.match.instanceOf(SDL.rpc.messages.GetSystemCapability)).callsFake(createOnSendGetSystemCapabilityAnswer(true, false, scm));
             scm.removeOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener3);
-            verify(internalInterface, times(2)).sendRPC(any(GetSystemCapability.class));
-
-            done();
+            await sleep(200);
+            Validator.assertTrue(stub.called); 
         });
 
         it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityCached', function (done) {
