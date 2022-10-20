@@ -827,7 +827,7 @@ module.exports = function (appClient) {
             done();
         });
 
-        it('testGetAndAddListenerForDisplaysCapability', function (done) {
+        it('testGetAndAddListenerForDisplaysCapability', async function () {
             const sdlManager = appClient._sdlManager;
             const lifecycleManager = sdlManager._lifecycleManager;
             const scm = new SDL.manager.SystemCapabilityManager(lifecycleManager);
@@ -835,36 +835,40 @@ module.exports = function (appClient) {
             let onSystemCapabilityListener;
             let retrievedCapability;
 
+            const hmiStatusAnswer = sinon.stub(lifecycleManager, 'addRpcListener')
+                .callsFake(function () {
+                    const responseSuccess = new SDL.rpc.messages.OnHMIStatus({
+                        functionName: SDL.rpc.enums.FunctionID.OnHMIStatus,
+                    })
+                        .setHmiLevel(SDL.rpc.enums.HMILevel.HMI_FULL);
+                });
 
             // Test case 1 (capability cached, listener not null, forceUpdate true)
-            //Raed
-            const HMIStatusAnswer = sinon.stub(lifecycleManager,'addOnRPCListener')
-                .callsFake(createOnHMIStatusAnswer(HMILevel.HMI_FULL)); 
-            scm = new SDL.manager.SystemCapabilityManager(lifecycleManager);
-            onSystemCapabilityListener = mock(OnSystemCapabilityListener.class);
-            SystemCapabilityAnswer = sinon.stub(internalInterface,'sendRPC')
-                .callsFake(createOnSendGetSystemCapabilityAnswer(true, null, scm));
-            scm._setCapability(SDL.rpc.enums.SystemCapabilityType.DISPLAYS, new DisplayCapabilities());
-            retrievedCapability = scm.getCapability(SDL.rpc.enums.SystemCapabilityType.DISPLAYS, onSystemCapabilityListener, true);
-            Validator.assertNotNull(retrievedCapability);
-            verify(internalInterface, times(0)).sendRPC(any(GetSystemCapability.class));
-            verify(onSystemCapabilityListener, times(1)).onCapabilityRetrieved(any(Object.class));
-            verify(onSystemCapabilityListener, times(0)).onError(any(String.class));
-
+            onSystemCapabilityListener = sinon.fake(() => {});
+            // SCM uses sendRpcMessage and not sendRpcResolve
+            const stub = sinon.stub(sdlManager._lifecycleManager, 'sendRpcMessage')
+            stub.withArgs(sinon.match.instanceOf(SDL.rpc.messages.GetSystemCapability)).callsFake(createOnSendGetSystemCapabilityAnswer(true, null, scm));
+            scm._setCapability(SDL.rpc.enums.SystemCapabilityType.DISPLAYS, new SDL.rpc.structs.DisplayCapabilities());
+            retrievedCapability = await scm._updateCapabilityPrivate(SDL.rpc.enums.SystemCapabilityType.DISPLAYS, null, true, onSystemCapabilityListener);
+            Validator.assertTrue(!stub.called);
+            Validator.assertTrue(onSystemCapabilityListener.calledOnce);
+            stub.restore();
 
             // Test case 2 (Add listener)
             // When the first DISPLAYS listener is added, GetSystemCapability request should not go out
-            let onSystemCapabilityListener1 = mock(OnSystemCapabilityListener.class);
+            const onSystemCapabilityListener1 = sinon.fake(() => {});
+            const stub2 = sinon.stub(sdlManager._lifecycleManager, 'sendRpcMessage')
+            stub2.withArgs(sinon.match.instanceOf(SDL.rpc.messages.GetSystemCapability)).callsFake(createOnSendGetSystemCapabilityAnswer(true, false, scm));
             scm.addOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.DISPLAYS, onSystemCapabilityListener1);
-            verify(internalInterface, times(0)).sendRPC(any(GetSystemCapability.class));
-            verify(onSystemCapabilityListener1, times(1)).onCapabilityRetrieved(any(Object.class));
-
+            await sleep(200);
+            Validator.assertTrue(!stub2.called); 
+            Validator.assertTrue(onSystemCapabilityListener1.calledOnce); 
 
             // Test case 3 (Remove listener)
             // When the last DISPLAYS listener is removed, GetSystemCapability request should not go out
             scm.removeOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.DISPLAYS, onSystemCapabilityListener1);
-            verify(internalInterface, times(0)).sendRPC(any(GetSystemCapability.class));
-            done();
+            Validator.assertTrue(!stub2.calledOnce); 
+            stub2.restore();
         });
 
         it('testMediaFieldConversion', function (done) {
