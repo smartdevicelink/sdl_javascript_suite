@@ -166,7 +166,7 @@ module.exports = function (appClient) {
             done();
         });
 
-        it('testGetVSCapability', function (done) {
+        it('testGetVSCapability', async function () {
             const vsCapability = new SDL.rpc.structs.VideoStreamingCapability();
             vsCapability.setMaxBitrate(Test.GENERAL_INT);
             vsCapability.setPreferredResolution(Test.GENERAL_IMAGERESOLUTION);
@@ -177,17 +177,28 @@ module.exports = function (appClient) {
             const sdlManager = appClient._sdlManager;
             const lifecycleManager = sdlManager._lifecycleManager;
             const scm = new SDL.manager.SystemCapabilityManager(lifecycleManager);
+
             const cap = new SDL.rpc.structs.SystemCapability();
             cap.setSystemCapabilityType(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING);
             cap.setVideoStreamingCapability(vsCapability);
 
-            const referenceCapability = cap;
-            const capability = scm.getCapability(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING);
+            const stub = sinon.stub(sdlManager._lifecycleManager, 'sendRpcMessage');
+            stub.withArgs(sinon.match.instanceOf(SDL.rpc.messages.GetSystemCapability)).callsFake(async (req) => {
+                // simulate what SCM would do after sending GetSystemCapability req
+                scm._setCapability(req.getSystemCapabilityType(), cap);
 
-            //Raed: Need to add validateVideoStreamingCapability
-            //Validator.assertEquals(Validator.validateVideoStreamingCapability(referenceCapability.getVideoStreamingCapability(),capability));
+                const response = new SDL.rpc.messages.GetSystemCapabilityResponse({
+                    functionName: SDL.rpc.enums.FunctionID.GetSystemCapability,
+                })
+                    .setSuccess(true)
+                    .setSystemCapability(systemCapability);
+                return response;
+            });
 
-            done();
+            const videoCap = await scm.updateCapability(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING);
+            Validator.assertTrue(Validator.validateVideoStreamingCapability(cap.getVideoStreamingCapability(), videoCap));
+
+            stub.restore();
         });
 
         it('testGetCapability', async function () {
@@ -890,36 +901,22 @@ module.exports = function (appClient) {
             const displayCapabilities = new SDL.rpc.structs.DisplayCapabilities();
             displayCapabilities.setGraphicSupported(false);
             
-            const textField = SDL.rpc.struct.TextField;
-            textField.setName(TextFieldName.mainField1);
+            const textField = new SDL.rpc.structs.TextField();
+            textField.setNameParam(SDL.rpc.enums.TextFieldName.mainField1);
             displayCapabilities.setTextFields([textField]);
             raiResponse.setDisplayCapabilities(displayCapabilities);
             raiResponse.setSuccess(true);
-            scm.parseRAIResponse(raiResponse);
+            scm._parseRaiResponse(raiResponse);
 
-            const windowCapability = scm.getDefaultMainWindowCapability();
+            let windowCapability = scm.getDefaultMainWindowCapability();
             Validator.assertNull(windowCapability.getTemplatesAvailable());
 
             const templates = [];
             templates.push("NON_MEDIA");
             displayCapabilities.setTemplatesAvailable(templates);
-            scm.parseRAIResponse(raiResponse);
+            scm._parseRaiResponse(raiResponse);
             windowCapability = scm.getDefaultMainWindowCapability();
-            Validator.assertTrue(windowCapability.getTemplatesAvailable().contains("NON-MEDIA"));
-            done();
-        });
-
-        it('testListConversion', function (done) {
-            const sdlManager = appClient._sdlManager;
-            const lifecycleManager = sdlManager._lifecycleManager;
-            const scm = createSampleManager(lifecycleManager);
-            capability = scm.getCapability(SDL.rpc.enums.SystemCapabilityType.SOFTBUTTON);
-            console.log('Raed')
-            console.log(capability)
-
-            Validator.assertNotNull(capability);
-            list = [capability];
-            Validator.assertNotNull(list);
+            Validator.assertTrue(windowCapability.getTemplatesAvailable().includes("NON-MEDIA"));
             done();
         });
 
@@ -1191,7 +1188,7 @@ module.exports = function (appClient) {
             const lifecycleManager = sdlManager._lifecycleManager;
             const scm = createSampleManager(lifecycleManager);
 
-            const dlRpcListener = lifecycleManager._rpcListeners.get(SDL.rpc.enums.FunctionID.SetDisplayLayout)[0];
+            const dlRpcListeners = lifecycleManager._rpcListeners.get(SDL.rpc.enums.FunctionID.SetDisplayLayout);
 
             const displayCapabilities = new SDL.rpc.structs.DisplayCapabilities();
             displayCapabilities.setGraphicSupported(true);
@@ -1204,10 +1201,10 @@ module.exports = function (appClient) {
             newLayout.setDisplayCapabilities(displayCapabilities);
             newLayout.setSuccess(true);
             newLayout.setResultCode(SDL.rpc.enums.Result.SUCCESS);
-            dlRpcListener(newLayout);
-            
+            dlRpcListeners.forEach(dl => dl(newLayout));
+
             const windowCapability = scm.getDefaultMainWindowCapability();
-            //Validator.assertTrue(windowCapability.getTemplatesAvailable().contains("NON-MEDIA"));
+            Validator.assertTrue(windowCapability.getTemplatesAvailable().includes("NON-MEDIA"));
             done();
         });
 

@@ -654,6 +654,57 @@ class Validator {
     }
 
     /**
+     * VideoStreamingCapability equals validation.
+     * @param {VideoStreamingCapability} item1 - A VideoStreamingCapability.
+     * @param {VideoStreamingCapability} item2 - A VideoStreamingCapability.
+     * @returns {Boolean} - Whether or not they're equal.
+     */
+    static validateVideoStreamingCapability (item1, item2) {
+        if (item1 === null || item2 === null) {
+            expect(item1).to.equal(item2);
+            return true;
+        }
+
+        if (!Validator.validateImageResolution(item1.getPreferredResolution(), item2.getPreferredResolution())) {
+            return false;
+        }
+
+        expect(item1.getMaxBitrate()).to.be.equal(item2.getMaxBitrate());
+
+        if (!Validator.validateVideoStreamingFormat(item1.getSupportedFormats(), item2.getSupportedFormats())) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * VideoStreamingFormat array equals validation.
+     * @param {Array<VideoStreamingFormat>} item1 - An array of VideoStreamingFormat.
+     * @param {Array<VideoStreamingFormat>} item2 - An array of VideoStreamingFormat.
+     * @returns {Boolean} - Whether or not they're equal.
+     */
+    static validateVideoStreamingFormat (item1, item2) {
+        if (item1 === null || item2 === null) {
+            expect(item1).to.be.equal(item2);
+            return true;
+        }
+        expect(Array.isArray(item1)).to.be.true;
+        expect(Array.isArray(item2)).to.be.true;
+
+        expect(item1.length).to.be.equal(item2.length);
+
+        for (let index = 0; index < item1.length; index++) {
+            const val1 = item1[index];
+            const val2 = item2[index];
+            expect(val1.getCodec()).to.be.equal(val2.getCodec());
+            expect(val1.getProtocolParam()).to.be.equal(val2.getProtocolParam());
+        }
+
+        return true;
+    }
+
+    /**
      * Assert val is true.
      * @param {*} val - value to assert
      * @param {String} msg - Message to display on failure.
