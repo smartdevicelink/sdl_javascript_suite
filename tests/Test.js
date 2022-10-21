@@ -39,6 +39,7 @@ const KeyboardCapabilities = SDL.rpc.structs.KeyboardCapabilities;
 const AppCapability = SDL.rpc.structs.AppCapability;
 const VideoStreamingCapability = SDL.rpc.structs.VideoStreamingCapability;
 const VideoStreamingFormat = SDL.rpc.structs.VideoStreamingFormat;
+const PhoneCapability = SDL.rpc.structs.PhoneCapability;
 
 // enums
 const SpeechCapabilities = SDL.rpc.enums.SpeechCapabilities;
@@ -656,5 +657,8 @@ const GENERAL_ADDITIONAL_CAPABILITY = Test.GENERAL_ADDITIONAL_CAPABILITY = new V
     .setScale(GENERAL_NUMBER);
 
 const GENERAL_ADDITIONAL_CAPABILITY_LIST = Test.GENERAL_ADDITIONAL_CAPABILITY_LIST = [GENERAL_ADDITIONAL_CAPABILITY];
+
+const GENERAL_PHONECAPABILITY = Test.GENERAL_PHONECAPABILITY = new PhoneCapability()
+    .setDialNumberEnabled(GENERAL_BOOLEAN);
 
 module.exports = Test;
