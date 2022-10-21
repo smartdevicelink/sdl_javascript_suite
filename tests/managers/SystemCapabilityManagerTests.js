@@ -372,20 +372,13 @@ module.exports = function (appClient) {
             const sdlManager = appClient._sdlManager;
             const lifecycleManager = sdlManager._lifecycleManager;
             const scm = createSampleManager(lifecycleManager);
+            scm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_NONE;
             
             const sdlMsgVersion = new SDL.rpc.structs.SdlMsgVersion()
                 .setMajorVersion(6)
                 .setMinorVersion(0)
                 .setPatchVersion(0);
 
-            const hmiStatusAnswer = sinon.stub(lifecycleManager, 'addRpcListener')
-                .callsFake(function () {
-                    const responseSuccess = new SDL.rpc.messages.OnHMIStatus({
-                        functionName: SDL.rpc.enums.FunctionID.OnHMIStatus,
-                    })
-                        .setHmiLevel(SDL.rpc.enums.HMILevel.HMI_FULL);
-                });
-            
             const versionStub = sinon.stub(lifecycleManager, 'getSdlMsgVersion')
                 .callsFake(function () {
                     return new SDL.rpc.structs.SdlMsgVersion()
@@ -405,20 +398,20 @@ module.exports = function (appClient) {
 
             scm.addOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener1);
             Validator.assertTrue(stub.calledOnce); 
-            Validator.assertTrue(onSystemCapabilityListener1.calledOnce);
+            Validator.assertTrue(onSystemCapabilityListener1.called);
             stub.restore();
 
             // Add listener2
             const onSystemCapabilityListener2 = sinon.fake(() => {});
             scm.addOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener2);
             await sleep(200);
-            Validator.assertTrue(onSystemCapabilityListener2.calledOnce);
+            Validator.assertTrue(onSystemCapabilityListener2.called);
 
             // Add listener3
             const onSystemCapabilityListener3 = sinon.fake(() => {});
             scm.addOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener3);
             await sleep(200);
-            Validator.assertTrue(onSystemCapabilityListener3.calledOnce);
+            Validator.assertTrue(onSystemCapabilityListener3.called);
 
             // Remove listener1
             scm.removeOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener1);
@@ -433,7 +426,6 @@ module.exports = function (appClient) {
             scm.removeOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener3);
             await sleep(200);
             Validator.assertTrue(stub.called); 
-            hmiStatusAnswer.restore();
             versionStub.restore();
             stub.restore();
         });
@@ -712,14 +704,6 @@ it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityN
             let onSystemCapabilityListener;
             let retrievedCapability;
 
-            const hmiStatusAnswer = sinon.stub(lifecycleManager, 'addRpcListener')
-                .callsFake(function () {
-                    const responseSuccess = new SDL.rpc.messages.OnHMIStatus({
-                        functionName: SDL.rpc.enums.FunctionID.OnHMIStatus,
-                    })
-                        .setHmiLevel(SDL.rpc.enums.HMILevel.HMI_FULL);
-                });
-
             // Test case 1 (capability cached, listener not null, forceUpdate true)
             onSystemCapabilityListener = sinon.fake(() => {});
             // SCM uses sendRpcMessage and not sendRpcResolve
@@ -746,7 +730,6 @@ it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityN
             scm.removeOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.DISPLAYS, onSystemCapabilityListener1);
             Validator.assertTrue(!stub2.calledOnce); 
             stub2.restore();
-            hmiStatusAnswer.restore();
         });
 
         it('testMediaFieldConversion', function (done) {
