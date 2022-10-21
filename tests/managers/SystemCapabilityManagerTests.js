@@ -269,17 +269,9 @@ module.exports = function (appClient) {
             const sdlManager = appClient._sdlManager;
             const lifecycleManager = sdlManager._lifecycleManager;
 
-            const hmiStatusAnswer = sinon.stub(lifecycleManager, 'addRpcListener')
-                .callsFake(function () {
-                    const responseSuccess = new SDL.rpc.messages.OnHMIStatus({
-                        functionName: SDL.rpc.enums.FunctionID.OnHMIStatus,
-                    })
-                        .setHmiLevel(SDL.rpc.enums.HMILevel.HMI_FULL);
-                    return responseSuccess;
-                });
-
             // Test case 1 (capability not cached, listener not null, forceUpdate false)
             let scm = new SDL.manager.SystemCapabilityManager(lifecycleManager);
+            scm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_FULL;
             let onSystemCapabilityListener = sinon.fake(() => {});
             // SCM uses sendRpcMessage and not sendRpcResolve
             let rpcStub = sinon.stub(lifecycleManager, 'sendRpcMessage')
@@ -293,6 +285,7 @@ module.exports = function (appClient) {
 
             // Test case 2 (capability cached, listener not null, forceUpdate true)
             scm = new SDL.manager.SystemCapabilityManager(lifecycleManager);
+            scm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_FULL;
             onSystemCapabilityListener = sinon.fake(() => {});
             // SCM uses sendRpcMessage and not sendRpcResolve
             rpcStub = sinon.stub(lifecycleManager, 'sendRpcMessage')
@@ -306,6 +299,7 @@ module.exports = function (appClient) {
 
             // Test case 3 (capability cached, listener null, forceUpdate true)
             scm = new SDL.manager.SystemCapabilityManager(lifecycleManager);
+            scm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_FULL;
             onSystemCapabilityListener = null;
             // SCM uses sendRpcMessage and not sendRpcResolve
             rpcStub = sinon.stub(lifecycleManager, 'sendRpcMessage')
@@ -318,6 +312,7 @@ module.exports = function (appClient) {
 
             // Test case 4 (capability cached, listener null, forceUpdate false)
             scm = new SDL.manager.SystemCapabilityManager(lifecycleManager);
+            scm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_FULL;
             onSystemCapabilityListener = null;
             // SCM uses sendRpcMessage and not sendRpcResolve
             rpcStub = sinon.stub(lifecycleManager, 'sendRpcMessage')
@@ -334,22 +329,8 @@ module.exports = function (appClient) {
             const sdlManager = appClient._sdlManager;
             const lifecycleManager = sdlManager._lifecycleManager;
 
-            const stub = sinon.stub(lifecycleManager, 'addRpcListener')
-                // .withArgs(sinon.match.same(SDL.rpc.enums.FunctionID.OnHMIStatus), sinon.match.func)
-                .callsFake(function () {
-                    const responseSuccess = new SDL.rpc.messages.OnHMIStatus({
-                        functionName: SDL.rpc.enums.FunctionID.OnHMIStatus,
-                    })
-                        .setHmiLevel(SDL.rpc.enums.HMILevel.HMI_NONE);
-                    // _handleRpc triggers the listener
-                    lifecycleManager._handleRpc(responseSuccess);
-
-                    return new Promise((resolve, reject) => {
-                        resolve(responseSuccess);
-                    });
-                });
-
             const scm = new SDL.manager.SystemCapabilityManager(lifecycleManager);
+            scm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_NONE;
             // when the manager tries to send an RPC, we respond with out own success
             const rpcStub = sinon.stub(lifecycleManager, 'sendRpcMessage')
                 // .withArgs(sinon.match.instanceOf(SDL.rpc.messages.GetSystemCapability))
@@ -378,26 +359,18 @@ module.exports = function (appClient) {
             Validator.assertNull(retrievedCapability);
             Validator.assertTrue(rpcStub.calledOnce);
             rpcStub.restore();
-            stub.restore();
         });
 
         it('testAddOnSystemCapabilityListenerWithSubscriptionsSupportedAndCapabilityCached', async function () {
             const sdlManager = appClient._sdlManager;
             const lifecycleManager = sdlManager._lifecycleManager;
             const scm = createSampleManager(lifecycleManager);
+            scm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_FULL;
             
             const sdlMsgVersion = new SDL.rpc.structs.SdlMsgVersion()
                 .setMajorVersion(6)
                 .setMinorVersion(0)
                 .setPatchVersion(0);
-
-            const hmiStatusAnswer = sinon.stub(lifecycleManager, 'addRpcListener')
-                .callsFake(function () {
-                    const responseSuccess = new SDL.rpc.messages.OnHMIStatus({
-                        functionName: SDL.rpc.enums.FunctionID.OnHMIStatus,
-                    })
-                        .setHmiLevel(SDL.rpc.enums.HMILevel.HMI_FULL);
-                });
             
             const versionStub = sinon.stub(lifecycleManager, 'getSdlMsgVersion')
                 .callsFake(function () {
@@ -446,7 +419,6 @@ module.exports = function (appClient) {
             scm.removeOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener3);
             await sleep(200);
             Validator.assertTrue(stub.called); 
-            hmiStatusAnswer.restore();
             versionStub.restore();
             stub.restore();
         });
@@ -455,19 +427,12 @@ module.exports = function (appClient) {
             const sdlManager = appClient._sdlManager;
             const lifecycleManager = sdlManager._lifecycleManager;
             const scm = createSampleManager(lifecycleManager);
+            scm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_FULL;
             
             const sdlMsgVersion = new SDL.rpc.structs.SdlMsgVersion()
                 .setMajorVersion(6)
                 .setMinorVersion(0)
                 .setPatchVersion(0);
-
-            const hmiStatusAnswer = sinon.stub(lifecycleManager, 'addRpcListener')
-                .callsFake(function () {
-                    const responseSuccess = new SDL.rpc.messages.OnHMIStatus({
-                        functionName: SDL.rpc.enums.FunctionID.OnHMIStatus,
-                    })
-                        .setHmiLevel(SDL.rpc.enums.HMILevel.HMI_FULL);
-                });
             
             const versionStub = sinon.stub(lifecycleManager, 'getSdlMsgVersion')
                 .callsFake(function () {
@@ -516,7 +481,6 @@ module.exports = function (appClient) {
             scm.removeOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener3);
             await sleep(200);
             Validator.assertTrue(stub.called); 
-            hmiStatusAnswer.restore();
             versionStub.restore();
             stub.restore();
         });
@@ -525,19 +489,12 @@ module.exports = function (appClient) {
             const sdlManager = appClient._sdlManager;
             const lifecycleManager = sdlManager._lifecycleManager;
             const scm = createSampleManager(lifecycleManager);
+            scm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_FULL;
             
             const sdlMsgVersion = new SDL.rpc.structs.SdlMsgVersion()
                 .setMajorVersion(5) // This version doesn't support capability subscriptions
                 .setMinorVersion(0)
                 .setPatchVersion(0);
-
-            const hmiStatusAnswer = sinon.stub(lifecycleManager, 'addRpcListener')
-                .callsFake(function () {
-                    const responseSuccess = new SDL.rpc.messages.OnHMIStatus({
-                        functionName: SDL.rpc.enums.FunctionID.OnHMIStatus,
-                    })
-                        .setHmiLevel(SDL.rpc.enums.HMILevel.HMI_FULL);
-                });
             
             const versionStub = sinon.stub(lifecycleManager, 'getSdlMsgVersion')
                 .callsFake(function () {
@@ -586,7 +543,6 @@ module.exports = function (appClient) {
             scm.removeOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener3);
             await sleep(200);
             Validator.assertTrue(stub.called); 
-            hmiStatusAnswer.restore();
             versionStub.restore();
             stub.restore();
         });
@@ -595,19 +551,12 @@ it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityN
             const sdlManager = appClient._sdlManager;
             const lifecycleManager = sdlManager._lifecycleManager;
             const scm = createSampleManager(lifecycleManager);
+            scm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_FULL;
             
             const sdlMsgVersion = new SDL.rpc.structs.SdlMsgVersion()
                 .setMajorVersion(5) // This version doesn't support capability subscriptions
                 .setMinorVersion(0)
                 .setPatchVersion(0);
-
-            const hmiStatusAnswer = sinon.stub(lifecycleManager, 'addRpcListener')
-                .callsFake(function () {
-                    const responseSuccess = new SDL.rpc.messages.OnHMIStatus({
-                        functionName: SDL.rpc.enums.FunctionID.OnHMIStatus,
-                    })
-                        .setHmiLevel(SDL.rpc.enums.HMILevel.HMI_FULL);
-                });
             
             const versionStub = sinon.stub(lifecycleManager, 'getSdlMsgVersion')
                 .callsFake(function () {
@@ -656,7 +605,6 @@ it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityN
             scm.removeOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener3);
             await sleep(200);
             Validator.assertTrue(stub.called); 
-            hmiStatusAnswer.restore();
             versionStub.restore();
             stub.restore();
         });
@@ -665,19 +613,12 @@ it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityN
             const sdlManager = appClient._sdlManager;
             const lifecycleManager = sdlManager._lifecycleManager;
             const scm = createSampleManager(lifecycleManager);
+            scm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_FULL;
             
             const sdlMsgVersion = new SDL.rpc.structs.SdlMsgVersion()
                 .setMajorVersion(5) // This version doesn't support capability subscriptions
                 .setMinorVersion(0)
                 .setPatchVersion(0);
-
-            const hmiStatusAnswer = sinon.stub(lifecycleManager, 'addRpcListener')
-                .callsFake(function () {
-                    const responseSuccess = new SDL.rpc.messages.OnHMIStatus({
-                        functionName: SDL.rpc.enums.FunctionID.OnHMIStatus,
-                    })
-                        .setHmiLevel(SDL.rpc.enums.HMILevel.HMI_FULL);
-                });
             
             const versionStub = sinon.stub(lifecycleManager, 'getSdlMsgVersion')
                 .callsFake(function () {
@@ -743,7 +684,6 @@ it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityN
             await sleep(200);
             Validator.assertTrue(stub.called); 
 
-            hmiStatusAnswer.restore();
             versionStub.restore();
             stub.restore();       
          });
@@ -752,14 +692,13 @@ it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityN
             const sdlManager = appClient._sdlManager;
             const lifecycleManager = sdlManager._lifecycleManager;
             const scm = new SDL.manager.SystemCapabilityManager(lifecycleManager);
+            scm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_FULL;
 
             let onSystemCapabilityListener;
             let retrievedCapability;
 
 
             // Test case 1 (capability cached, listener not null, forceUpdate true)
-            const HMIStatusAnswer = sinon.stub(lifecycleManager,'addOnRPCListener')
-                .callsFake(createOnHMIStatusAnswer(HMILevel.HMI_FULL)); 
             scm = new SDL.manager.SystemCapabilityManager(lifecycleManager);
             onSystemCapabilityListener = mock(OnSystemCapabilityListener.class);
             SystemCapabilityAnswer = sinon.stub(internalInterface,'sendRPC')
@@ -791,6 +730,7 @@ it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityN
             const sdlManager = appClient._sdlManager;
             const lifecycleManager = sdlManager._lifecycleManager;
             const scm = new SDL.manager.SystemCapabilityManager(lifecycleManager);
+            scm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_FULL;
 
             const raiResponse = new SDL.rpc.messages.RegisterAppInterfaceResponse();
             const displayCapabilities = new SDL.rpc.structs.DisplayCapabilities();
@@ -817,6 +757,7 @@ it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityN
 
         it('testFalsePositive', function (done) {
             const scm = new SDL.manager.SystemCapabilityManager();
+            scm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_FULL;
             scm._setCapability(SDL.rpc.enums.SystemCapabilityType.AUDIO_PASSTHROUGH, null);
             Validator.assertEquals(scm.isCapabilitySupported(SDL.rpc.enums.SystemCapabilityType.AUDIO_PASSTHROUGH),false);
             done();
@@ -826,6 +767,7 @@ it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityN
             const sdlManager = appClient._sdlManager;
             const lifecycleManager = sdlManager._lifecycleManager;
             const scm = createSampleManager(lifecycleManager);
+            scm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_FULL;
 
             const scmRpcListener = lifecycleManager._rpcListeners.get(SDL.rpc.enums.FunctionID.OnSystemCapabilityUpdated)[0];
             Validator.assertNotNull(scmRpcListener);
@@ -854,6 +796,7 @@ it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityN
             const sdlManager = appClient._sdlManager;
             const lifecycleManager = sdlManager._lifecycleManager;
             const scm = createSampleManager(lifecycleManager);
+            scm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_FULL;
 
             const scmRpcListener = lifecycleManager._rpcListeners.get(SDL.rpc.enums.FunctionID.OnSystemCapabilityUpdated)[0];
             Validator.assertNotNull(scmRpcListener);
@@ -887,6 +830,7 @@ it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityN
             const sdlManager = appClient._sdlManager;
             const lifecycleManager = sdlManager._lifecycleManager;
             const scm = createSampleManager(lifecycleManager);
+            scm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_FULL;
 
             const baseName = 'NavTest';
             const baseID = '37F98053AE';
@@ -995,6 +939,7 @@ it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityN
             const sdlManager = appClient._sdlManager;
             const lifecycleManager = sdlManager._lifecycleManager;
             const scm = createSampleManager(lifecycleManager);
+            scm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_FULL;
 
             const scmRpcListener = lifecycleManager._rpcListeners.get(SDL.rpc.enums.FunctionID.OnSystemCapabilityUpdated)[0];
             Validator.assertNotNull(scmRpcListener);
@@ -1026,6 +971,7 @@ it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityN
             const sdlManager = appClient._sdlManager;
             const lifecycleManager = sdlManager._lifecycleManager;
             const scm = createSampleManager(lifecycleManager);
+            scm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_FULL;
 
             const dlRpcListener = lifecycleManager._rpcListeners.get(SDL.rpc.enums.FunctionID.SetDisplayLayout)[0];
             Validator.assertNotNull(dlRpcListener);
@@ -1060,6 +1006,7 @@ it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityN
             const sdlManager = appClient._sdlManager;
             const lifecycleManager = sdlManager._lifecycleManager;
             const scm = new SDL.manager.SystemCapabilityManager(lifecycleManager);
+            scm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_FULL;
 
             Validator.assertNull(scm.getDefaultMainWindowCapability());
             Validator.assertNull(scm.getWindowCapability(SDL.rpc.enums.PredefinedWindows.DEFAULT_WINDOW));
@@ -1072,6 +1019,7 @@ it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityN
             const sdlManager = appClient._sdlManager;
             const lifecycleManager = sdlManager._lifecycleManager;
             const scm = createSampleManager(lifecycleManager);
+            scm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_FULL;
 
             const dlRpcListeners = lifecycleManager._rpcListeners.get(SDL.rpc.enums.FunctionID.SetDisplayLayout);
 
