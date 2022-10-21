@@ -193,6 +193,13 @@ module.exports = function (appClient) {
             return new Promise(resolve => setTimeout(resolve, timeout));
         }
 
+        beforeEach(function (done) {
+            sdlManager._lifecycleManager._rpcListeners.set(SDL.rpc.enums.FunctionID.GetSystemCapability, []);
+            sdlManager._lifecycleManager._rpcListeners.set(SDL.rpc.enums.FunctionID.SetDisplayLayout, []);
+            sdlManager._lifecycleManager._rpcListeners.set(SDL.rpc.enums.FunctionID.OnSystemCapabilityUpdated, []);
+            done();
+        });
+
         it('testParseRAI', function (done) {
             const sdlManager = appClient._sdlManager;
             const lifecycleManager = sdlManager._lifecycleManager;
@@ -461,20 +468,20 @@ module.exports = function (appClient) {
 
             scm.addOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener1);
             Validator.assertTrue(stub.calledOnce); 
-            Validator.assertTrue(onSystemCapabilityListener1.calledOnce);
+            Validator.assertTrue(onSystemCapabilityListener1.called);
             stub.restore();
 
             // Add listener2
             const onSystemCapabilityListener2 = sinon.fake(() => {});
             scm.addOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener2);
             await sleep(200);
-            Validator.assertTrue(onSystemCapabilityListener2.calledOnce);
+            Validator.assertTrue(onSystemCapabilityListener2.called);
 
             // Add listener3
             const onSystemCapabilityListener3 = sinon.fake(() => {});
             scm.addOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener3);
             await sleep(200);
-            Validator.assertTrue(onSystemCapabilityListener3.calledOnce);
+            Validator.assertTrue(onSystemCapabilityListener3.called);
 
             // Remove listener1
             scm.removeOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener1);
@@ -523,20 +530,20 @@ module.exports = function (appClient) {
 
             scm.addOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener1);
             Validator.assertTrue(stub.calledOnce); 
-            Validator.assertTrue(onSystemCapabilityListener1.calledOnce);
+            Validator.assertTrue(onSystemCapabilityListener1.called);
             stub.restore();
 
             // Add listener2
             const onSystemCapabilityListener2 = sinon.fake(() => {});
             scm.addOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener2);
             await sleep(200);
-            Validator.assertTrue(onSystemCapabilityListener2.calledOnce);
+            Validator.assertTrue(onSystemCapabilityListener2.called);
 
             // Add listener3
             const onSystemCapabilityListener3 = sinon.fake(() => {});
             scm.addOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener3);
             await sleep(200);
-            Validator.assertTrue(onSystemCapabilityListener3.calledOnce);
+            Validator.assertTrue(onSystemCapabilityListener3.called);
 
             // Remove listener1
             scm.removeOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener1);
@@ -585,20 +592,20 @@ it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityN
 
             scm.addOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener1);
             Validator.assertTrue(stub.calledOnce); 
-            Validator.assertNotNull(onSystemCapabilityListener1.calledOnce);
+            Validator.assertNotNull(onSystemCapabilityListener1.called);
             stub.restore();
 
             // Add listener2
             const onSystemCapabilityListener2 = sinon.fake(() => {});
             scm.addOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener2);
             await sleep(200);
-            Validator.assertNotNull(onSystemCapabilityListener2.calledOnce);
+            Validator.assertNotNull(onSystemCapabilityListener2.called);
 
             // Add listener3
             const onSystemCapabilityListener3 = sinon.fake(() => {});
             scm.addOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener3);
             await sleep(200);
-            Validator.assertNotNull(onSystemCapabilityListener3.calledOnce);
+            Validator.assertNotNull(onSystemCapabilityListener3.called);
 
             // Remove listener1
             scm.removeOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener1);
@@ -739,6 +746,7 @@ it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityN
             scm.removeOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.DISPLAYS, onSystemCapabilityListener1);
             Validator.assertTrue(!stub2.calledOnce); 
             stub2.restore();
+            hmiStatusAnswer.restore();
         });
 
         it('testMediaFieldConversion', function (done) {
