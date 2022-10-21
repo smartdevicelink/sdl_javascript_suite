@@ -111,14 +111,17 @@ module.exports = function (appClient) {
                 )
                 .setServiceID(serviceID)
                 .setServiceActive(isActive)
-                .setServicePublish(true);
+                .setServicePublished(true);
             return appServiceRecord;
         }
 
         function createAppServiceManifest (type, serviceName) {
             const manifest = new SDL.rpc.structs.AppServiceManifest()
                 .setServiceName(serviceName)
-                .setRpcSpecVersion(SDL.manager.lifecycle._LifecycleManager.MAX_RPC_VERSION)
+                .setRpcSpecVersion(new SDL.rpc.structs.SdlMsgVersion()
+                    .setMajorVersion(SDL.manager.lifecycle._LifecycleManager.MAX_RPC_VERSION.getMajor())
+                    .setMinorVersion(SDL.manager.lifecycle._LifecycleManager.MAX_RPC_VERSION.getMinor())
+                    .setPatchVersion(SDL.manager.lifecycle._LifecycleManager.MAX_RPC_VERSION.getPatch()))
                 .setAllowAppConsumers(true);
             const handledRPCs = [];
             const AppServiceType = SDL.rpc.enums.AppServiceType;
@@ -146,7 +149,7 @@ module.exports = function (appClient) {
                     handledRPCs.push(SDL.rpc.enums.FunctionID.UnsubscribeVehicleData);
 
                     const navigationServiceManifest = new SDL.rpc.structs.NavigationServiceManifest()
-                        .setAcceptsWaypoints(true);
+                        .setAcceptsWayPoints(true);
                     manifest.setNavigationServiceManifest(navigationServiceManifest);
                     break;
                 }
