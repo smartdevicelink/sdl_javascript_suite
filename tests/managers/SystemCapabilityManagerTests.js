@@ -269,217 +269,66 @@ module.exports = function (appClient) {
             const sdlManager = appClient._sdlManager;
             const lifecycleManager = sdlManager._lifecycleManager;
 
-            const stub = sinon.stub(lifecycleManager, 'addRpcListener')
-                .callsFake(function (functionId, callback) {
-                    if (functionId === SDL.rpc.enums.FunctionID.OnHMIStatus) 
-                    {
-                        const responseSuccess = new SDL.rpc.messages.OnHMIStatus({
-                            functionName: SDL.rpc.enums.FunctionID.OnHMIStatus,
-                        })
-                        //Raed: this is should be HMI_FULL
-                            .setHmiLevel(SDL.rpc.enums.HMILevel.HMI_NONE);
-                        //lifecycleManager._handleRpc(responseSuccess);
-
-                     //return new Promise((resolve, reject) => {
-                       // resolve(responseSuccess);
-                    //});
-                 }
-                });
-
-            const scm = new SDL.manager.SystemCapabilityManager(lifecycleManager);
-            const rpcStub = sinon.stub(lifecycleManager, 'sendRpcMessage')
+            const hmiStatusAnswer = sinon.stub(lifecycleManager, 'addRpcListener')
                 .callsFake(function () {
-                    const systemCapability = new SDL.rpc.structs.SystemCapability()
-                        .setSystemCapabilityType(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING)
-                        .setVideoStreamingCapability(new SDL.rpc.structs.VideoStreamingCapability());
-                    const responseSuccess = new SDL.rpc.messages.GetSystemCapabilityResponse({
-                        functionName: SDL.rpc.enums.FunctionID.GetSystemCapabilityResponse,
+                    const responseSuccess = new SDL.rpc.messages.OnHMIStatus({
+                        functionName: SDL.rpc.enums.FunctionID.OnHMIStatus,
                     })
-                        .setSystemCapability(systemCapability)
-                        .setResultCode('SUCCESS')
-                        .setCorrelationId(1000000)
-                        .setSuccess(true);
-                    lifecycleManager._handleRpc(responseSuccess);
-
-                    return new Promise((resolve, reject) => {
-                        resolve(responseSuccess);
-                    });
+                        .setHmiLevel(SDL.rpc.enums.HMILevel.HMI_FULL);
+                    return responseSuccess;
                 });
-            scm._videoStreamingCapability = null;
-            const retrievedCapability = scm.getCapability(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING);
-            await scm.updateCapability(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING);
-            Validator.assertNull(retrievedCapability);
-            Validator.assertTrue(rpcStub.calledOnce); 
+
+            // Test case 1 (capability not cached, listener not null, forceUpdate false)
+            let scm = new SDL.manager.SystemCapabilityManager(lifecycleManager);
+            let onSystemCapabilityListener = sinon.fake(() => {});
+            // SCM uses sendRpcMessage and not sendRpcResolve
+            let rpcStub = sinon.stub(lifecycleManager, 'sendRpcMessage')
+            rpcStub.withArgs(sinon.match.instanceOf(SDL.rpc.messages.GetSystemCapability)).callsFake(createOnSendGetSystemCapabilityAnswer(true, null, scm));
+            scm._setCapability(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, null);
+            let retrievedCapability = await scm._updateCapabilityPrivate(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, null, false, onSystemCapabilityListener);
+            Validator.assertNotNull(retrievedCapability);
+            Validator.assertTrue(rpcStub.called); 
+            Validator.assertTrue(!onSystemCapabilityListener.called);
             rpcStub.restore();
-            stub.restore();
 
             // Test case 2 (capability cached, listener not null, forceUpdate true)
-            /*lifecycleManager = sdlManager._lifecycleManager;
-            const HMIStatusAnswer = sinon.stub(internalInterface,'addOnRPCListener')
-                .callsFake(createOnHMIStatusAnswer(HMILevel.HMI_FULL));    
-            scm = new reateSampleManager(lifecycleManager);
-            SystemCapabilityAnswer = sinon.stub(internalInterface,'sendRPC')
-               .callsFake(createOnSendGetSystemCapabilityAnswer(true, null, scm)); 
+            scm = new SDL.manager.SystemCapabilityManager(lifecycleManager);
+            onSystemCapabilityListener = sinon.fake(() => {});
+            // SCM uses sendRpcMessage and not sendRpcResolve
+            rpcStub = sinon.stub(lifecycleManager, 'sendRpcMessage')
+            rpcStub.withArgs(sinon.match.instanceOf(SDL.rpc.messages.GetSystemCapability)).callsFake(createOnSendGetSystemCapabilityAnswer(true, null, scm));
             scm._setCapability(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, videoStreamingCapability);
-            retrievedCapability = scm.getCapability(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener, true);
-            Validator.assertTrue(Validator.validateVideoStreamingCapability(systemCapability.getCapabilityForType(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING), retrievedCapability));
-            verify(internalInterface, times(1)).sendRPC(any(GetSystemCapability.class));
-            verify(scm, times(1)).onCapabilityRetrieved(any(Object.class));*/
-
-            /*const stub2 = sinon.stub(lifecycleManager, 'addRpcListener')
-                .callsFake(function () {
-                    const responseSuccess = new SDL.rpc.messages.OnHMIStatus({
-                        functionName: SDL.rpc.enums.FunctionID.OnHMIStatus,
-                    })
-                    //Raed: this is should be HMI_FULL
-                        .setHmiLevel(SDL.rpc.enums.HMILevel.HMI_NONE);
-                    lifecycleManager._handleRpc(responseSuccess);
-
-                    return new Promise((resolve, reject) => {
-                        resolve(responseSuccess);
-                    });
-                });
-
-            const scm = new SDL.manager.SystemCapabilityManager(lifecycleManager);
-            const rpcStub2 = sinon.stub(lifecycleManager, 'sendRpcMessage')
-                .callsFake(function () {
-                    const systemCapability = new SDL.rpc.structs.SystemCapability()
-                        .setSystemCapabilityType(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING)
-                        .setVideoStreamingCapability(new SDL.rpc.structs.VideoStreamingCapability());
-                    const responseSuccess = new SDL.rpc.messages.GetSystemCapabilityResponse({
-                        functionName: SDL.rpc.enums.FunctionID.GetSystemCapabilityResponse,
-                    })
-                        .setSystemCapability(systemCapability)
-                        .setResultCode('SUCCESS')
-                        .setCorrelationId(1000000)
-                        .setSuccess(true);
-                    lifecycleManager._handleRpc(responseSuccess);
-
-                    return new Promise((resolve, reject) => {
-                        resolve(responseSuccess);
-                    });
-                });
-            scm._videoStreamingCapability = null;
-
-            const retrievedCapability = scm.getCapability(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING);
-            await scm.updateCapability(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING);
-            Validator.assertNull(retrievedCapability);
-            Validator.assertTrue(rpcStub.calledOnce); 
+            retrievedCapability = await scm._updateCapabilityPrivate(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, null, true, onSystemCapabilityListener);
+            Validator.assertTrue(Validator.validateVideoStreamingCapability(systemCapability.getVideoStreamingCapability(), retrievedCapability));
+            Validator.assertTrue(rpcStub.called); 
+            Validator.assertTrue(!onSystemCapabilityListener.called);
             rpcStub.restore();
-            stub.restore();
 
             // Test case 3 (capability cached, listener null, forceUpdate true)
-            /*lifecycleManager = sdlManager._lifecycleManager;
-            HMIStatusAnswer = sinon.stub(lifecycleManager,'addOnRPCListener')
-                .callsFake(createOnHMIStatusAnswer(HMILevel.HMI_FULL));    
-            scm = new reateSampleManager(lifecycleManager);
-            scm = null;
-            SystemCapabilityAnswer = sinon.stub(lifecycleManager,'sendRPC')
-                .callsFake(createOnSendGetSystemCapabilityAnswer(true, null, scm)); 
+            scm = new SDL.manager.SystemCapabilityManager(lifecycleManager);
+            onSystemCapabilityListener = null;
+            // SCM uses sendRpcMessage and not sendRpcResolve
+            rpcStub = sinon.stub(lifecycleManager, 'sendRpcMessage')
+            rpcStub.withArgs(sinon.match.instanceOf(SDL.rpc.messages.GetSystemCapability)).callsFake(createOnSendGetSystemCapabilityAnswer(true, null, scm));
             scm._setCapability(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, videoStreamingCapability);
-            retrievedCapability = scm.getCapability(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener, true);
-            Validator.assertTrue(TestValues.TRUE, Validator.validateVideoStreamingCapability(systemCapability.getCapabilityForType(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING), retrievedCapability));
-            verify(lifecycleManager, times(1)).sendRPC(any(GetSystemCapability.class));*/
-
-             /*           const stub2 = sinon.stub(lifecycleManager, 'addRpcListener')
-                .callsFake(function () {
-                    const responseSuccess = new SDL.rpc.messages.OnHMIStatus({
-                        functionName: SDL.rpc.enums.FunctionID.OnHMIStatus,
-                    })
-                    //Raed: this is should be HMI_FULL
-                        .setHmiLevel(SDL.rpc.enums.HMILevel.HMI_NONE);
-                    lifecycleManager._handleRpc(responseSuccess);
-
-                    return new Promise((resolve, reject) => {
-                        resolve(responseSuccess);
-                    });
-                });
-
-            const scm = new SDL.manager.SystemCapabilityManager(lifecycleManager);
-            const rpcStub2 = sinon.stub(lifecycleManager, 'sendRpcMessage')
-                .callsFake(function () {
-                    const systemCapability = new SDL.rpc.structs.SystemCapability()
-                        .setSystemCapabilityType(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING)
-                        .setVideoStreamingCapability(new SDL.rpc.structs.VideoStreamingCapability());
-                    const responseSuccess = new SDL.rpc.messages.GetSystemCapabilityResponse({
-                        functionName: SDL.rpc.enums.FunctionID.GetSystemCapabilityResponse,
-                    })
-                        .setSystemCapability(systemCapability)
-                        .setResultCode('SUCCESS')
-                        .setCorrelationId(1000000)
-                        .setSuccess(true);
-                    lifecycleManager._handleRpc(responseSuccess);
-
-                    return new Promise((resolve, reject) => {
-                        resolve(responseSuccess);
-                    });
-                });
-            scm._videoStreamingCapability = null;
-
-            const retrievedCapability = scm.getCapability(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING);
-            await scm.updateCapability(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING);
-            Validator.assertNull(retrievedCapability);
-            Validator.assertTrue(rpcStub.calledOnce); 
+            retrievedCapability = await scm._updateCapabilityPrivate(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, null, true, onSystemCapabilityListener);
+            Validator.assertTrue(Validator.validateVideoStreamingCapability(systemCapability.getVideoStreamingCapability(), retrievedCapability));
+            Validator.assertTrue(rpcStub.called); 
             rpcStub.restore();
-            stub.restore();
-
 
             // Test case 4 (capability cached, listener null, forceUpdate false)
-            /*lifecycleManager = sdlManager._lifecycleManager;
-            HMIStatusAnswer = sinon.stub(lifecycleManager,'addOnRPCListener')
-                .callsFake(createOnHMIStatusAnswer(HMILevel.HMI_FULL)); 
-            scm = createSampleManager(lifecycleManager);
-            scm = null;
-            SystemCapabilityAnswer = sinon.stub(lifecycleManager,'sendRPC')
-                .callsFake(createOnSendGetSystemCapabilityAnswer(true, null, scm));
+            scm = new SDL.manager.SystemCapabilityManager(lifecycleManager);
+            onSystemCapabilityListener = null;
+            // SCM uses sendRpcMessage and not sendRpcResolve
+            rpcStub = sinon.stub(lifecycleManager, 'sendRpcMessage')
+            rpcStub.withArgs(sinon.match.instanceOf(SDL.rpc.messages.GetSystemCapability)).callsFake(createOnSendGetSystemCapabilityAnswer(true, null, scm));
             scm._setCapability(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, videoStreamingCapability);
-            retrievedCapability = scm.getCapability(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener, false);
-            Validator.assertTrue(TestValues.TRUE, Validator.validateVideoStreamingCapability(systemCapability.getCapabilityForType(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING), retrievedCapability));
-            verify(lifecycleManager, times(0)).sendRPC(any(GetSystemCapability.class));*/
-
-          /*  const stub2 = sinon.stub(lifecycleManager, 'addRpcListener')
-                .callsFake(function () {
-                    const responseSuccess = new SDL.rpc.messages.OnHMIStatus({
-                        functionName: SDL.rpc.enums.FunctionID.OnHMIStatus,
-                    })
-                    //Raed: this is should be HMI_FULL
-                        .setHmiLevel(SDL.rpc.enums.HMILevel.HMI_NONE);
-                    lifecycleManager._handleRpc(responseSuccess);
-
-                    return new Promise((resolve, reject) => {
-                        resolve(responseSuccess);
-                    });
-                });
-
-            const scm = new SDL.manager.SystemCapabilityManager(lifecycleManager);
-            const rpcStub2 = sinon.stub(lifecycleManager, 'sendRpcMessage')
-                .callsFake(function () {
-                    const systemCapability = new SDL.rpc.structs.SystemCapability()
-                        .setSystemCapabilityType(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING)
-                        .setVideoStreamingCapability(new SDL.rpc.structs.VideoStreamingCapability());
-                    const responseSuccess = new SDL.rpc.messages.GetSystemCapabilityResponse({
-                        functionName: SDL.rpc.enums.FunctionID.GetSystemCapabilityResponse,
-                    })
-                        .setSystemCapability(systemCapability)
-                        .setResultCode('SUCCESS')
-                        .setCorrelationId(1000000)
-                        .setSuccess(true);
-                    lifecycleManager._handleRpc(responseSuccess);
-
-                    return new Promise((resolve, reject) => {
-                        resolve(responseSuccess);
-                    });
-                });
-            scm._videoStreamingCapability = null;
-
-            const retrievedCapability = scm.getCapability(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING);
-            await scm.updateCapability(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING);
-            Validator.assertNull(retrievedCapability);
-            Validator.assertTrue(rpcStub.calledOnce); 
+            retrievedCapability = await scm._updateCapabilityPrivate(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, null, false, onSystemCapabilityListener);
+            Validator.assertTrue(Validator.validateVideoStreamingCapability(systemCapability.getVideoStreamingCapability(), retrievedCapability));
+            Validator.assertTrue(!rpcStub.called); 
             rpcStub.restore();
-            stub.restore();*/
-
         });
+
 
         it('testGetCapabilityHmiNone', async function () {
             const sdlManager = appClient._sdlManager;
