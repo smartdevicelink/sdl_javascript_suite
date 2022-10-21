@@ -325,7 +325,7 @@ class Validator {
             expect(item1).to.be.equal(item2);
             return true;
         }
-        
+
         if (item1.getType() === null || item2.getType() === null) {
             expect(item1.getType()).to.be.equal(item2.getType());
             return true;
@@ -376,7 +376,7 @@ class Validator {
             expect(item1.getImageFields()).to.be.equal(item2.getImageFields());
             return true;
         }
-        
+
         Validator.validateImageFields(item1.getImageFields(), item2.getImageFields());
 
         if (item1.getImageTypeSupported() === null || item2.getImageTypeSupported() === null) {
