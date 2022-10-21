@@ -365,12 +365,19 @@ module.exports = function (appClient) {
             const sdlManager = appClient._sdlManager;
             const lifecycleManager = sdlManager._lifecycleManager;
             const scm = createSampleManager(lifecycleManager);
-            scm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_FULL;
             
             const sdlMsgVersion = new SDL.rpc.structs.SdlMsgVersion()
                 .setMajorVersion(6)
                 .setMinorVersion(0)
                 .setPatchVersion(0);
+
+            const hmiStatusAnswer = sinon.stub(lifecycleManager, 'addRpcListener')
+                .callsFake(function () {
+                    const responseSuccess = new SDL.rpc.messages.OnHMIStatus({
+                        functionName: SDL.rpc.enums.FunctionID.OnHMIStatus,
+                    })
+                        .setHmiLevel(SDL.rpc.enums.HMILevel.HMI_FULL);
+                });
             
             const versionStub = sinon.stub(lifecycleManager, 'getSdlMsgVersion')
                 .callsFake(function () {
@@ -419,6 +426,7 @@ module.exports = function (appClient) {
             scm.removeOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener3);
             await sleep(200);
             Validator.assertTrue(stub.called); 
+            hmiStatusAnswer.restore();
             versionStub.restore();
             stub.restore();
         });
