@@ -1,4 +1,3 @@
-const expect = require('chai').expect;
 const SDL = require('../config.js').node;
 
 // Mocking framework used so that some RPCs are not actually sent to Core, but the response mimicked
@@ -45,6 +44,13 @@ module.exports = function (appClient) {
             return systemCapabilityManager;
         }
 
+        /**
+         * Creates a DisplayCapability array
+         * @param {DisplayCapabilities} display - The DisplayCapabilities
+         * @param {ButtonCapabilities} button - The ButtonCapabilities
+         * @param {SoftButtonCapabilities} softButton - The SoftButtonCapabilities
+         * @returns {DisplayCapability[]} - The created DisplayCapability[]
+         */
         function createDisplayCapabilityList (display = null, button, softButton) {
             const windowTypeCapabilities = new SDL.rpc.structs.WindowTypeCapabilities()
                 .setType(SDL.rpc.enums.WindowType.MAIN)
@@ -81,6 +87,12 @@ module.exports = function (appClient) {
             return [displayCapability];
         }
 
+        /**
+         * Creates a DisplayCapabilities
+         * @param {String} displayName - The display name
+         * @param {WindowCapability} defaultMainWindow - The WindowCapability
+         * @returns {DisplayCapabilities} - The created DisplayCapabilities
+         */
         function createDisplayCapabilities (displayName, defaultMainWindow) {
             const convertedCapabilities = new SDL.rpc.structs.DisplayCapabilities();
             convertedCapabilities.setDisplayType(SDL.rpc.enums.DisplayType.SDL_GENERIC); // deprecated but it is mandatory...
@@ -95,6 +107,15 @@ module.exports = function (appClient) {
             return convertedCapabilities;
         }
 
+        /**
+         * Creates an AppServiceCapability
+         * @param {AppServiceType} type - The AppServiceType
+         * @param {String} serviceName - The service name
+         * @param {String} serviceID - The service ID
+         * @param {Boolean} isActive - Whether the service is active
+         * @param {ServiceUpdateReason} updateReason - The ServiceUpdateReason
+         * @returns {AppServiceCapability} - The created AppServiceCapability
+         */
         function createAppServiceCapability (type, serviceName, serviceID, isActive, updateReason) {
             const appServiceCapbility = new SDL.rpc.structs.AppServiceCapability()
                 .setUpdatedAppServiceRecord(
@@ -104,6 +125,14 @@ module.exports = function (appClient) {
             return appServiceCapbility;
         }
 
+        /**
+         * Creates an AppServiceRecord
+         * @param {AppServiceType} type - The AppServiceType
+         * @param {String} serviceName - The service name
+         * @param {String} serviceID - The service ID
+         * @param {Boolean} isActive - Whether the service is active
+         * @returns {AppServiceRecord} - The created AppServiceRecord
+         */
         function createAppServiceRecord (type, serviceName, serviceID, isActive) {
             const appServiceRecord = new SDL.rpc.structs.AppServiceRecord()
                 .setServiceManifest(
@@ -115,6 +144,12 @@ module.exports = function (appClient) {
             return appServiceRecord;
         }
 
+        /**
+         * Creates an AppServiceManifest
+         * @param {AppServiceType} type - The AppServiceType
+         * @param {String} serviceName - The service name
+         * @returns {AppServiceManifest} - The created AppServiceManifest
+         */
         function createAppServiceManifest (type, serviceName) {
             const manifest = new SDL.rpc.structs.AppServiceManifest()
                 .setServiceName(serviceName)
