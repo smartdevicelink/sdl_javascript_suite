@@ -3,6 +3,7 @@ const SDL = require('../config.js').node;
 
 // Mocking framework used so that some RPCs are not actually sent to Core, but the response mimicked
 const sinon = require('sinon');
+const { AppServiceManifest } = require('../../lib/js/src/rpc/structs/AppServiceManifest.js');
 const Test = require('../Test.js');
 const Validator = require('../Validator');
 
@@ -83,16 +84,77 @@ module.exports = function (appClient) {
 
         function createDisplayCapabilities (displayName, defaultMainWindow) {
             const convertedCapabilities = new SDL.rpc.structs.DisplayCapabilities();
-            convertedCapabilities.setDisplayType(SDL.rpc.enums.DisplayType.SDL_GENERIC); //deprecated but it is mandatory...
+            convertedCapabilities.setDisplayType(SDL.rpc.enums.DisplayType.SDL_GENERIC); // deprecated but it is mandatory...
             convertedCapabilities.setDisplayName(displayName);
             convertedCapabilities.setTextFields(defaultMainWindow.getTextFields());
             convertedCapabilities.setImageFields(defaultMainWindow.getImageFields());
             convertedCapabilities.setTemplatesAvailable(defaultMainWindow.getTemplatesAvailable());
             convertedCapabilities.setNumCustomPresetsAvailable(defaultMainWindow.getNumCustomPresetsAvailable());
-            convertedCapabilities.setMediaClockFormats([MediaClockFormat]); // mandatory field but can be empty
-            convertedCapabilities.setGraphicSupported(defaultMainWindow.getImageTypeSupported().contains(ImageType.DYNAMIC));
+            convertedCapabilities.setMediaClockFormats([]); // mandatory field but can be empty
+            convertedCapabilities.setGraphicSupported(defaultMainWindow.getImageTypeSupported().contains(SDL.rpc.enums.ImageType.DYNAMIC));
 
             return convertedCapabilities;
+        }
+
+        function createAppServiceCapability (type, serviceName, serviceID, isActive, updateReason) {
+            const appServiceCapbility = new SDL.rpc.structs.AppServiceCapability()
+                .setUpdatedAppServiceRecord(
+                    createAppServiceRecord(type, serviceName, serviceID, isActive)
+                )
+                .setUpdateReason(updateReason);
+            return appServiceCapbility;
+        }
+
+        function createAppServiceRecord (type, serviceName, serviceID, isActive) {
+            const appServiceRecord = new SDL.rpc.structs.AppServiceRecord()
+                .setServiceManifest(
+                    createAppServiceManifest(type, serviceName)
+                )
+                .setServiceID(serviceID)
+                .setServiceActive(isActive)
+                .setServicePublish(true);
+            return appServiceRecord;
+        }
+
+        function createAppServiceManifest (type, serviceName) {
+            const manifest = new SDL.rpc.structs.AppServiceManifest()
+                .setServiceName(serviceName)
+                .setRpcSpecVersion(SDL.manager.lifecycle._LifecycleManager.MAX_RPC_VERSION)
+                .setAllowAppConsumers(true);
+            const handledRPCs = [];
+            const AppServiceType = SDL.rpc.enums.AppServiceType;
+
+            switch (type) {
+                case AppServiceType.MEDIA: {
+                    handledRPCs.push(SDL.rpc.enums.FunctionID.ButtonPress);
+                    manifest.setMediaServiceManifest(new SDL.rpc.structs.MediaServiceManifest());
+                    break;
+                }
+                case AppServiceType.WEATHER: {
+                    const weatherServiceManifest = new SDL.rpc.structs.WeatherServiceManifest()
+                        .setCurrentForecastSupported(true)
+                        .setMaxHourlyForecastAmount(6)
+                        .setMaxMinutelyForecastAmount(30)
+                        .setMaxMultidayForecastAmount(5)
+                        .setWeatherForLocationSupported(true);
+                    manifest.setWeatherServiceManifest(weatherServiceManifest);
+                    break;
+                }
+                case AppServiceType.NAVIGATION: {
+                    handledRPCs.push(SDL.rpc.enums.FunctionID.SendLocation);
+                    handledRPCs.push(SDL.rpc.enums.FunctionID.GetWayPoints);
+                    handledRPCs.push(SDL.rpc.enums.FunctionID.SubscribeVehicleData);
+                    handledRPCs.push(SDL.rpc.enums.FunctionID.UnsubscribeVehicleData);
+
+                    const navigationServiceManifest = new SDL.rpc.structs.NavigationServiceManifest()
+                        .setAcceptsWaypoints(true);
+                    manifest.setNavigationServiceManifest(navigationServiceManifest);
+                    break;
+                }
+            }
+
+            manifest.setHandledRPCs(handledRPCs);
+            return manifest;
         }
 
         /**
@@ -117,7 +179,7 @@ module.exports = function (appClient) {
                     .setSuccess(success)
                     .setSystemCapability(systemCapability);
                 return response;
-            }
+            };
         }
 
         /**
@@ -137,25 +199,25 @@ module.exports = function (appClient) {
             const displayCapabilityList = createDisplayCapabilityList(Test.GENERAL_DISPLAYCAPABILITIES, Test.GENERAL_BUTTONCAPABILITIES_LIST, Test.GENERAL_SOFTBUTTONCAPABILITIES_LIST);
 
             Validator.assertTrue(
-                   Validator.validateDisplayCapabilityList(displayCapabilityList,scm.getCapability(SDL.rpc.enums.SystemCapabilityType.DISPLAYS)));
+                Validator.validateDisplayCapabilityList(displayCapabilityList,scm.getCapability(SDL.rpc.enums.SystemCapabilityType.DISPLAYS)));
             Validator.assertTrue(
-                    Validator.validateHMICapabilities(Test.GENERAL_HMICAPABILITIES,scm.getHmiCapabilities()));
+                Validator.validateHMICapabilities(Test.GENERAL_HMICAPABILITIES,scm.getHmiCapabilities()));
             Validator.assertTrue(
-                    Validator.validateDisplayCapabilities(Test.GENERAL_DISPLAYCAPABILITIES,scm.getDisplayCapabilities()));
+                Validator.validateDisplayCapabilities(Test.GENERAL_DISPLAYCAPABILITIES,scm.getDisplayCapabilities()));
             Validator.assertTrue(
-                    Validator.validateAudioPassThruCapabilities(Test.GENERAL_AUDIOPASSTHRUCAPABILITIES_LIST, scm.getAudioPassThruCapabilities()));
+                Validator.validateAudioPassThruCapabilities(Test.GENERAL_AUDIOPASSTHRUCAPABILITIES_LIST, scm.getAudioPassThruCapabilities()));
             Validator.assertTrue(
-                    Validator.validateButtonCapabilities(Test.GENERAL_BUTTONCAPABILITIES_LIST, scm._buttonCapabilities));
+                Validator.validateButtonCapabilities(Test.GENERAL_BUTTONCAPABILITIES_LIST, scm._buttonCapabilities));
             Validator.assertTrue(
-                    Validator.validateHMIZoneCapabilities(Test.GENERAL_HMIZONECAPABILITIES_LIST, scm.getHmiZoneCapabilities()));
+                Validator.validateHMIZoneCapabilities(Test.GENERAL_HMIZONECAPABILITIES_LIST, scm.getHmiZoneCapabilities()));
             Validator.assertTrue(
-                    Validator.validatePresetBankCapabilities(Test.GENERAL_PRESETBANKCAPABILITIES,scm.getPresetBankCapabilities()));
+                Validator.validatePresetBankCapabilities(Test.GENERAL_PRESETBANKCAPABILITIES,scm.getPresetBankCapabilities()));
             Validator.assertTrue(
-                    Validator.validateSoftButtonCapabilities(Test.GENERAL_SOFTBUTTONCAPABILITIES_LIST, scm._softButtonCapabilities));
+                Validator.validateSoftButtonCapabilities(Test.GENERAL_SOFTBUTTONCAPABILITIES_LIST, scm._softButtonCapabilities));
             Validator.assertTrue(
-                    Validator.validateSpeechCapabilities(Test.GENERAL_SPEECHCAPABILITIES_LIST, scm.getSpeechCapabilities()));
+                Validator.validateSpeechCapabilities(Test.GENERAL_SPEECHCAPABILITIES_LIST, scm.getSpeechCapabilities()));
             Validator.assertTrue(
-                    Validator.validatePreRecordedSpeechCapabilities(Test.GENERAL_PRERECORDEDSPEECH_LIST,scm.getPrerecordedSpeechCapabilities()));
+                Validator.validatePreRecordedSpeechCapabilities(Test.GENERAL_PRERECORDEDSPEECH_LIST,scm.getPrerecordedSpeechCapabilities()));
             done();
         });
 
@@ -935,7 +997,7 @@ module.exports = function (appClient) {
             const scmRpcListener = lifecycleManager._rpcListeners.get(SDL.rpc.enums.FunctionID.OnSystemCapabilityUpdated)[0];
             Validator.assertNotNull(scmRpcListener);
 
-            Validator.assertEquals(scm.getCapability(SDL.rpc.enums.SystemCapabilityType.APP_SERVICES).length,0);
+            Validator.assertEquals(scm.getCapability(SDL.rpc.enums.SystemCapabilityType.APP_SERVICES).length, 0);
 
             /* PERFORM A NOTIFICATION SEND THROUGH THE SCM */
             const addServiceID = SDL.rpc.struct.AppServiceFactory.createAppServiceCapability(AppServiceType.NAVIGATION, "test", "3453", true, null);
