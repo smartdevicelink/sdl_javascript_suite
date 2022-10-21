@@ -243,11 +243,11 @@ module.exports = function (appClient) {
             const displayCapabilityList = createDisplayCapabilityList(Test.GENERAL_DISPLAYCAPABILITIES, Test.GENERAL_BUTTONCAPABILITIES_LIST, Test.GENERAL_SOFTBUTTONCAPABILITIES_LIST);
 
             Validator.assertTrue(
-                Validator.validateDisplayCapabilityList(displayCapabilityList,scm.getCapability(SDL.rpc.enums.SystemCapabilityType.DISPLAYS)));
+                Validator.validateDisplayCapabilityList(displayCapabilityList, scm.getCapability(SDL.rpc.enums.SystemCapabilityType.DISPLAYS)));
             Validator.assertTrue(
-                Validator.validateHMICapabilities(Test.GENERAL_HMICAPABILITIES,scm.getHmiCapabilities()));
+                Validator.validateHMICapabilities(Test.GENERAL_HMICAPABILITIES, scm.getHmiCapabilities()));
             Validator.assertTrue(
-                Validator.validateDisplayCapabilities(Test.GENERAL_DISPLAYCAPABILITIES,scm.getDisplayCapabilities()));
+                Validator.validateDisplayCapabilities(Test.GENERAL_DISPLAYCAPABILITIES, scm.getDisplayCapabilities()));
             Validator.assertTrue(
                 Validator.validateAudioPassThruCapabilities(Test.GENERAL_AUDIOPASSTHRUCAPABILITIES_LIST, scm.getAudioPassThruCapabilities()));
             Validator.assertTrue(
@@ -255,13 +255,13 @@ module.exports = function (appClient) {
             Validator.assertTrue(
                 Validator.validateHMIZoneCapabilities(Test.GENERAL_HMIZONECAPABILITIES_LIST, scm.getHmiZoneCapabilities()));
             Validator.assertTrue(
-                Validator.validatePresetBankCapabilities(Test.GENERAL_PRESETBANKCAPABILITIES,scm.getPresetBankCapabilities()));
+                Validator.validatePresetBankCapabilities(Test.GENERAL_PRESETBANKCAPABILITIES, scm.getPresetBankCapabilities()));
             Validator.assertTrue(
                 Validator.validateSoftButtonCapabilities(Test.GENERAL_SOFTBUTTONCAPABILITIES_LIST, scm._softButtonCapabilities));
             Validator.assertTrue(
                 Validator.validateSpeechCapabilities(Test.GENERAL_SPEECHCAPABILITIES_LIST, scm.getSpeechCapabilities()));
             Validator.assertTrue(
-                Validator.validatePreRecordedSpeechCapabilities(Test.GENERAL_PRERECORDEDSPEECH_LIST,scm.getPrerecordedSpeechCapabilities()));
+                Validator.validatePreRecordedSpeechCapabilities(Test.GENERAL_PRERECORDEDSPEECH_LIST, scm.getPrerecordedSpeechCapabilities()));
             done();
         });
 
@@ -316,12 +316,12 @@ module.exports = function (appClient) {
             scm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_FULL;
             let onSystemCapabilityListener = sinon.fake(() => {});
             // SCM uses sendRpcMessage and not sendRpcResolve
-            let rpcStub = sinon.stub(lifecycleManager, 'sendRpcMessage')
+            let rpcStub = sinon.stub(lifecycleManager, 'sendRpcMessage');
             rpcStub.withArgs(sinon.match.instanceOf(SDL.rpc.messages.GetSystemCapability)).callsFake(createOnSendGetSystemCapabilityAnswer(true, null, scm));
             scm._setCapability(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, null);
             let retrievedCapability = await scm._updateCapabilityPrivate(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, null, false, onSystemCapabilityListener);
             Validator.assertNotNull(retrievedCapability);
-            Validator.assertTrue(rpcStub.called); 
+            Validator.assertTrue(rpcStub.called);
             Validator.assertTrue(!onSystemCapabilityListener.called);
             rpcStub.restore();
 
@@ -330,12 +330,12 @@ module.exports = function (appClient) {
             scm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_FULL;
             onSystemCapabilityListener = sinon.fake(() => {});
             // SCM uses sendRpcMessage and not sendRpcResolve
-            rpcStub = sinon.stub(lifecycleManager, 'sendRpcMessage')
+            rpcStub = sinon.stub(lifecycleManager, 'sendRpcMessage');
             rpcStub.withArgs(sinon.match.instanceOf(SDL.rpc.messages.GetSystemCapability)).callsFake(createOnSendGetSystemCapabilityAnswer(true, null, scm));
             scm._setCapability(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, videoStreamingCapability);
             retrievedCapability = await scm._updateCapabilityPrivate(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, null, true, onSystemCapabilityListener);
             Validator.assertTrue(Validator.validateVideoStreamingCapability(systemCapability.getVideoStreamingCapability(), retrievedCapability));
-            Validator.assertTrue(rpcStub.called); 
+            Validator.assertTrue(rpcStub.called);
             Validator.assertTrue(!onSystemCapabilityListener.called);
             rpcStub.restore();
 
@@ -344,12 +344,12 @@ module.exports = function (appClient) {
             scm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_FULL;
             onSystemCapabilityListener = null;
             // SCM uses sendRpcMessage and not sendRpcResolve
-            rpcStub = sinon.stub(lifecycleManager, 'sendRpcMessage')
+            rpcStub = sinon.stub(lifecycleManager, 'sendRpcMessage');
             rpcStub.withArgs(sinon.match.instanceOf(SDL.rpc.messages.GetSystemCapability)).callsFake(createOnSendGetSystemCapabilityAnswer(true, null, scm));
             scm._setCapability(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, videoStreamingCapability);
             retrievedCapability = await scm._updateCapabilityPrivate(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, null, true, onSystemCapabilityListener);
             Validator.assertTrue(Validator.validateVideoStreamingCapability(systemCapability.getVideoStreamingCapability(), retrievedCapability));
-            Validator.assertTrue(rpcStub.called); 
+            Validator.assertTrue(rpcStub.called);
             rpcStub.restore();
 
             // Test case 4 (capability cached, listener null, forceUpdate false)
@@ -357,12 +357,12 @@ module.exports = function (appClient) {
             scm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_FULL;
             onSystemCapabilityListener = null;
             // SCM uses sendRpcMessage and not sendRpcResolve
-            rpcStub = sinon.stub(lifecycleManager, 'sendRpcMessage')
+            rpcStub = sinon.stub(lifecycleManager, 'sendRpcMessage');
             rpcStub.withArgs(sinon.match.instanceOf(SDL.rpc.messages.GetSystemCapability)).callsFake(createOnSendGetSystemCapabilityAnswer(true, null, scm));
             scm._setCapability(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, videoStreamingCapability);
             retrievedCapability = await scm._updateCapabilityPrivate(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, null, false, onSystemCapabilityListener);
             Validator.assertTrue(Validator.validateVideoStreamingCapability(systemCapability.getVideoStreamingCapability(), retrievedCapability));
-            Validator.assertTrue(!rpcStub.called); 
+            Validator.assertTrue(!rpcStub.called);
             rpcStub.restore();
         });
 
@@ -375,7 +375,6 @@ module.exports = function (appClient) {
             scm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_NONE;
             // when the manager tries to send an RPC, we respond with out own success
             const rpcStub = sinon.stub(lifecycleManager, 'sendRpcMessage')
-                // .withArgs(sinon.match.instanceOf(SDL.rpc.messages.GetSystemCapability))
                 .callsFake(function () {
                     const systemCapability = new SDL.rpc.structs.SystemCapability()
                         .setSystemCapabilityType(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING)
@@ -408,11 +407,6 @@ module.exports = function (appClient) {
             const lifecycleManager = sdlManager._lifecycleManager;
             const scm = createSampleManager(lifecycleManager);
             scm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_NONE;
-            
-            const sdlMsgVersion = new SDL.rpc.structs.SdlMsgVersion()
-                .setMajorVersion(6)
-                .setMinorVersion(0)
-                .setPatchVersion(0);
 
             const versionStub = sinon.stub(lifecycleManager, 'getSdlMsgVersion')
                 .callsFake(function () {
@@ -428,11 +422,11 @@ module.exports = function (appClient) {
             const onSystemCapabilityListener1 = sinon.fake(() => {});
             // When the first listener is added, GetSystemCapability request should go out with subscribe=true
             // SCM uses sendRpcMessage and not sendRpcResolve
-            const stub = sinon.stub(sdlManager._lifecycleManager, 'sendRpcMessage')
+            const stub = sinon.stub(sdlManager._lifecycleManager, 'sendRpcMessage');
             stub.withArgs(sinon.match.instanceOf(SDL.rpc.messages.GetSystemCapability)).callsFake(createOnSendGetSystemCapabilityAnswer(true, true, scm));
 
             scm.addOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener1);
-            Validator.assertTrue(stub.calledOnce); 
+            Validator.assertTrue(stub.calledOnce);
             Validator.assertTrue(onSystemCapabilityListener1.called);
             stub.restore();
 
@@ -456,11 +450,11 @@ module.exports = function (appClient) {
 
             // Remove listener3
             // When the last listener is removed, GetSystemCapability request should go out with subscribe=false
-            const stub2 = sinon.stub(sdlManager._lifecycleManager, 'sendRpcMessage')
+            const stub2 = sinon.stub(sdlManager._lifecycleManager, 'sendRpcMessage');
             stub2.withArgs(sinon.match.instanceOf(SDL.rpc.messages.GetSystemCapability)).callsFake(createOnSendGetSystemCapabilityAnswer(true, false, scm));
             scm.removeOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener3);
             await sleep(200);
-            Validator.assertTrue(stub.called); 
+            Validator.assertTrue(stub.called);
             versionStub.restore();
             stub.restore();
         });
@@ -470,12 +464,7 @@ module.exports = function (appClient) {
             const lifecycleManager = sdlManager._lifecycleManager;
             const scm = createSampleManager(lifecycleManager);
             scm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_FULL;
-            
-            const sdlMsgVersion = new SDL.rpc.structs.SdlMsgVersion()
-                .setMajorVersion(6)
-                .setMinorVersion(0)
-                .setPatchVersion(0);
-            
+
             const versionStub = sinon.stub(lifecycleManager, 'getSdlMsgVersion')
                 .callsFake(function () {
                     return new SDL.rpc.structs.SdlMsgVersion()
@@ -490,11 +479,11 @@ module.exports = function (appClient) {
             const onSystemCapabilityListener1 = sinon.fake(() => {});
             // When the first listener is added, GetSystemCapability request should go out with subscribe=true
             // SCM uses sendRpcMessage and not sendRpcResolve
-            const stub = sinon.stub(sdlManager._lifecycleManager, 'sendRpcMessage')
+            const stub = sinon.stub(sdlManager._lifecycleManager, 'sendRpcMessage');
             stub.withArgs(sinon.match.instanceOf(SDL.rpc.messages.GetSystemCapability)).callsFake(createOnSendGetSystemCapabilityAnswer(true, true, scm));
 
             scm.addOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener1);
-            Validator.assertTrue(stub.calledOnce); 
+            Validator.assertTrue(stub.calledOnce);
             Validator.assertTrue(onSystemCapabilityListener1.called);
             stub.restore();
 
@@ -518,11 +507,11 @@ module.exports = function (appClient) {
 
             // Remove listener3
             // When the last listener is removed, GetSystemCapability request should go out with subscribe=false
-            const stub2 = sinon.stub(sdlManager._lifecycleManager, 'sendRpcMessage')
+            const stub2 = sinon.stub(sdlManager._lifecycleManager, 'sendRpcMessage');
             stub2.withArgs(sinon.match.instanceOf(SDL.rpc.messages.GetSystemCapability)).callsFake(createOnSendGetSystemCapabilityAnswer(true, false, scm));
             scm.removeOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener3);
             await sleep(200);
-            Validator.assertTrue(stub.called); 
+            Validator.assertTrue(stub.called);
             versionStub.restore();
             stub.restore();
         });
@@ -532,12 +521,7 @@ module.exports = function (appClient) {
             const lifecycleManager = sdlManager._lifecycleManager;
             const scm = createSampleManager(lifecycleManager);
             scm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_FULL;
-            
-            const sdlMsgVersion = new SDL.rpc.structs.SdlMsgVersion()
-                .setMajorVersion(5) // This version doesn't support capability subscriptions
-                .setMinorVersion(0)
-                .setPatchVersion(0);
-            
+
             const versionStub = sinon.stub(lifecycleManager, 'getSdlMsgVersion')
                 .callsFake(function () {
                     return new SDL.rpc.structs.SdlMsgVersion()
@@ -552,11 +536,11 @@ module.exports = function (appClient) {
             const onSystemCapabilityListener1 = sinon.fake(() => {});
             // When the first listener is added, GetSystemCapability request should not go out because subscription is not supported and the capability is cached
             // SCM uses sendRpcMessage and not sendRpcResolve
-            const stub = sinon.stub(sdlManager._lifecycleManager, 'sendRpcMessage')
+            const stub = sinon.stub(sdlManager._lifecycleManager, 'sendRpcMessage');
             stub.withArgs(sinon.match.instanceOf(SDL.rpc.messages.GetSystemCapability)).callsFake(createOnSendGetSystemCapabilityAnswer(true, true, scm));
 
             scm.addOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener1);
-            Validator.assertTrue(stub.calledOnce); 
+            Validator.assertTrue(stub.calledOnce);
             Validator.assertTrue(onSystemCapabilityListener1.called);
             stub.restore();
 
@@ -580,26 +564,21 @@ module.exports = function (appClient) {
 
             // Remove listener3
             // When the last listener is removed, GetSystemCapability request should not go out because subscription is not supported
-            const stub2 = sinon.stub(sdlManager._lifecycleManager, 'sendRpcMessage')
+            const stub2 = sinon.stub(sdlManager._lifecycleManager, 'sendRpcMessage');
             stub2.withArgs(sinon.match.instanceOf(SDL.rpc.messages.GetSystemCapability)).callsFake(createOnSendGetSystemCapabilityAnswer(true, false, scm));
             scm.removeOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener3);
             await sleep(200);
-            Validator.assertTrue(stub.called); 
+            Validator.assertTrue(stub.called);
             versionStub.restore();
             stub.restore();
         });
 
-it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityNotCached', async function ()  {
+        it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityNotCached', async function ()  {
             const sdlManager = appClient._sdlManager;
             const lifecycleManager = sdlManager._lifecycleManager;
             const scm = createSampleManager(lifecycleManager);
             scm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_FULL;
-            
-            const sdlMsgVersion = new SDL.rpc.structs.SdlMsgVersion()
-                .setMajorVersion(5) // This version doesn't support capability subscriptions
-                .setMinorVersion(0)
-                .setPatchVersion(0);
-            
+
             const versionStub = sinon.stub(lifecycleManager, 'getSdlMsgVersion')
                 .callsFake(function () {
                     return new SDL.rpc.structs.SdlMsgVersion()
@@ -614,11 +593,11 @@ it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityN
             const onSystemCapabilityListener1 = sinon.fake(() => {});
             // When the first listener is added, GetSystemCapability request should go out with subscribe=false
             // SCM uses sendRpcMessage and not sendRpcResolve
-            const stub = sinon.stub(sdlManager._lifecycleManager, 'sendRpcMessage')
+            const stub = sinon.stub(sdlManager._lifecycleManager, 'sendRpcMessage');
             stub.withArgs(sinon.match.instanceOf(SDL.rpc.messages.GetSystemCapability)).callsFake(createOnSendGetSystemCapabilityAnswer(true, false, scm));
 
             scm.addOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener1);
-            Validator.assertTrue(stub.calledOnce); 
+            Validator.assertTrue(stub.calledOnce);
             Validator.assertNotNull(onSystemCapabilityListener1.called);
             stub.restore();
 
@@ -642,26 +621,21 @@ it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityN
 
             // Remove listener3
             // When the last listener is removed, GetSystemCapability request should not go out because subscription is not supported
-            const stub2 = sinon.stub(sdlManager._lifecycleManager, 'sendRpcMessage')
+            const stub2 = sinon.stub(sdlManager._lifecycleManager, 'sendRpcMessage');
             stub2.withArgs(sinon.match.instanceOf(SDL.rpc.messages.GetSystemCapability)).callsFake(createOnSendGetSystemCapabilityAnswer(true, false, scm));
             scm.removeOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener3);
             await sleep(200);
-            Validator.assertTrue(stub.called); 
+            Validator.assertTrue(stub.called);
             versionStub.restore();
             stub.restore();
         });
 
-        it('testAddOnSystemCapabilityListenerThenGetCapabilityWhenSubscriptionsAreNotSupported', async function (){
+        it('testAddOnSystemCapabilityListenerThenGetCapabilityWhenSubscriptionsAreNotSupported', async function () {
             const sdlManager = appClient._sdlManager;
             const lifecycleManager = sdlManager._lifecycleManager;
             const scm = createSampleManager(lifecycleManager);
             scm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_FULL;
-            
-            const sdlMsgVersion = new SDL.rpc.structs.SdlMsgVersion()
-                .setMajorVersion(5) // This version doesn't support capability subscriptions
-                .setMinorVersion(0)
-                .setPatchVersion(0);
-            
+
             const versionStub = sinon.stub(lifecycleManager, 'getSdlMsgVersion')
                 .callsFake(function () {
                     return new SDL.rpc.structs.SdlMsgVersion()
@@ -676,11 +650,11 @@ it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityN
             const onSystemCapabilityListener1 = sinon.fake(() => {});
             // When the first listener is added, GetSystemCapability request should go out with subscribe=false
             // SCM uses sendRpcMessage and not sendRpcResolve
-            const stub = sinon.stub(sdlManager._lifecycleManager, 'sendRpcMessage')
+            const stub = sinon.stub(sdlManager._lifecycleManager, 'sendRpcMessage');
             stub.withArgs(sinon.match.instanceOf(SDL.rpc.messages.GetSystemCapability)).callsFake(createOnSendGetSystemCapabilityAnswer(true, false, scm));
 
             scm.addOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener1);
-            Validator.assertTrue(stub.calledOnce); 
+            Validator.assertTrue(stub.calledOnce);
             Validator.assertNotNull(onSystemCapabilityListener1.calledOnce);
             stub.restore();
 
@@ -688,7 +662,7 @@ it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityN
             const onSystemCapabilityListener2 = sinon.fake(() => {});
             scm.addOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener2);
             await sleep(200);
-            Validator.assertTrue(stub.calledOnce); 
+            Validator.assertTrue(stub.calledOnce);
             Validator.assertNotNull(onSystemCapabilityListener1.calledOnce);
             Validator.assertNotNull(onSystemCapabilityListener2.calledOnce);
 
@@ -696,7 +670,7 @@ it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityN
             const onSystemCapabilityListener3 = sinon.fake(() => {});
             scm.addOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener3);
             await sleep(200);
-            Validator.assertTrue(stub.calledOnce); 
+            Validator.assertTrue(stub.calledOnce);
             Validator.assertNotNull(onSystemCapabilityListener1.calledOnce);
             Validator.assertNotNull(onSystemCapabilityListener2.calledOnce);
             Validator.assertNotNull(onSystemCapabilityListener3.calledOnce);
@@ -704,7 +678,7 @@ it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityN
             // Remove listener1
             scm.removeOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener1);
             await sleep(200);
-            Validator.assertTrue(stub.calledOnce); 
+            Validator.assertTrue(stub.calledOnce);
             Validator.assertNotNull(onSystemCapabilityListener1.calledOnce);
             Validator.assertNotNull(onSystemCapabilityListener2.calledOnce);
             Validator.assertNotNull(onSystemCapabilityListener3.calledOnce);
@@ -712,23 +686,22 @@ it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityN
             // Remove listener1
             scm.removeOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener2);
             await sleep(200);
-            Validator.assertTrue(stub.calledOnce); 
+            Validator.assertTrue(stub.calledOnce);
             Validator.assertNotNull(onSystemCapabilityListener1.calledOnce);
             Validator.assertNotNull(onSystemCapabilityListener2.calledOnce);
             Validator.assertNotNull(onSystemCapabilityListener3.calledOnce);
 
-
             // Remove listener3
             // When the last listener is removed, GetSystemCapability request should not go out because subscription is not supported
-            const stub2 = sinon.stub(sdlManager._lifecycleManager, 'sendRpcMessage')
+            const stub2 = sinon.stub(sdlManager._lifecycleManager, 'sendRpcMessage');
             stub2.withArgs(sinon.match.instanceOf(SDL.rpc.messages.GetSystemCapability)).callsFake(createOnSendGetSystemCapabilityAnswer(true, false, scm));
             scm.removeOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.VIDEO_STREAMING, onSystemCapabilityListener3);
             await sleep(200);
-            Validator.assertTrue(stub.called); 
+            Validator.assertTrue(stub.called);
 
             versionStub.restore();
-            stub.restore();       
-         });
+            stub.restore();
+        });
 
         it('testGetAndAddListenerForDisplaysCapability', async function () {
             const sdlManager = appClient._sdlManager;
@@ -736,16 +709,14 @@ it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityN
             const scm = new SDL.manager.SystemCapabilityManager(lifecycleManager);
             scm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_FULL;
 
-            let onSystemCapabilityListener;
-            let retrievedCapability;
 
             // Test case 1 (capability cached, listener not null, forceUpdate true)
-            onSystemCapabilityListener = sinon.fake(() => {});
+            const onSystemCapabilityListener = sinon.fake(() => {});
             // SCM uses sendRpcMessage and not sendRpcResolve
-            const stub = sinon.stub(sdlManager._lifecycleManager, 'sendRpcMessage')
+            const stub = sinon.stub(sdlManager._lifecycleManager, 'sendRpcMessage');
             stub.withArgs(sinon.match.instanceOf(SDL.rpc.messages.GetSystemCapability)).callsFake(createOnSendGetSystemCapabilityAnswer(true, null, scm));
             scm._setCapability(SDL.rpc.enums.SystemCapabilityType.DISPLAYS, new SDL.rpc.structs.DisplayCapabilities());
-            retrievedCapability = await scm._updateCapabilityPrivate(SDL.rpc.enums.SystemCapabilityType.DISPLAYS, null, true, onSystemCapabilityListener);
+            await scm._updateCapabilityPrivate(SDL.rpc.enums.SystemCapabilityType.DISPLAYS, null, true, onSystemCapabilityListener);
             Validator.assertTrue(!stub.called);
             Validator.assertTrue(onSystemCapabilityListener.calledOnce);
             stub.restore();
@@ -753,17 +724,17 @@ it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityN
             // Test case 2 (Add listener)
             // When the first DISPLAYS listener is added, GetSystemCapability request should not go out
             const onSystemCapabilityListener1 = sinon.fake(() => {});
-            const stub2 = sinon.stub(sdlManager._lifecycleManager, 'sendRpcMessage')
+            const stub2 = sinon.stub(sdlManager._lifecycleManager, 'sendRpcMessage');
             stub2.withArgs(sinon.match.instanceOf(SDL.rpc.messages.GetSystemCapability)).callsFake(createOnSendGetSystemCapabilityAnswer(true, false, scm));
             scm.addOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.DISPLAYS, onSystemCapabilityListener1);
             await sleep(200);
-            Validator.assertTrue(!stub2.called); 
-            Validator.assertTrue(onSystemCapabilityListener1.calledOnce); 
+            Validator.assertTrue(!stub2.called);
+            Validator.assertTrue(onSystemCapabilityListener1.calledOnce);
 
             // Test case 3 (Remove listener)
             // When the last DISPLAYS listener is removed, GetSystemCapability request should not go out
             scm.removeOnSystemCapabilityListener(SDL.rpc.enums.SystemCapabilityType.DISPLAYS, onSystemCapabilityListener1);
-            Validator.assertTrue(!stub2.calledOnce); 
+            Validator.assertTrue(!stub2.calledOnce);
             stub2.restore();
         });
 
@@ -776,7 +747,7 @@ it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityN
             const raiResponse = new SDL.rpc.messages.RegisterAppInterfaceResponse();
             const displayCapabilities = new SDL.rpc.structs.DisplayCapabilities();
             displayCapabilities.setGraphicSupported(false);
-            
+
             const textField = new SDL.rpc.structs.TextField();
             textField.setNameParam(SDL.rpc.enums.TextFieldName.mainField1);
             displayCapabilities.setTextFields([textField]);
@@ -788,11 +759,11 @@ it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityN
             Validator.assertNull(windowCapability.getTemplatesAvailable());
 
             const templates = [];
-            templates.push("NON_MEDIA");
+            templates.push('NON_MEDIA');
             displayCapabilities.setTemplatesAvailable(templates);
             scm._parseRaiResponse(raiResponse);
             windowCapability = scm.getDefaultMainWindowCapability();
-            Validator.assertTrue(windowCapability.getTemplatesAvailable().includes("NON-MEDIA"));
+            Validator.assertTrue(windowCapability.getTemplatesAvailable().includes('NON-MEDIA'));
             done();
         });
 
@@ -800,7 +771,7 @@ it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityN
             const scm = new SDL.manager.SystemCapabilityManager();
             scm._currentHmiLevel = SDL.rpc.enums.HMILevel.HMI_FULL;
             scm._setCapability(SDL.rpc.enums.SystemCapabilityType.AUDIO_PASSTHROUGH, null);
-            Validator.assertEquals(scm.isCapabilitySupported(SDL.rpc.enums.SystemCapabilityType.AUDIO_PASSTHROUGH),false);
+            Validator.assertEquals(scm.isCapabilitySupported(SDL.rpc.enums.SystemCapabilityType.AUDIO_PASSTHROUGH), false);
             done();
         });
 
@@ -1032,9 +1003,7 @@ it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityN
 
             dlRpcListener(newLayout);
 
-            const appliedCaps = scm.getCapability(SDL.rpc.enums.SystemCapabilityType.DISPLAY);
-            //Validator.assertNotNull(appliedCaps);
-            //Validator.assertTrue(Validator.validateDisplayCapabilities(newLayout.getDisplayCapabilities(), appliedCaps));
+            scm.getCapability(SDL.rpc.enums.SystemCapabilityType.DISPLAY);
 
             const convertedCaps = scm.getCapability(SDL.rpc.enums.SystemCapabilityType.DISPLAYS);
             Validator.assertNotNull(convertedCaps);
@@ -1043,7 +1012,7 @@ it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityN
 
             const matchWindowCapability = testCaps[0].getWindowCapabilities()[0];
             const testWindowCapability = scm.getDefaultMainWindowCapability();
-            //Validator.assertTrue(Validator.validateWindowCapability(matchWindowCapability, testWindowCapability));
+            Validator.assertEquals(matchWindowCapability, testWindowCapability);
             Validator.assertNull(scm.getWindowCapability(42));
             done();
         });
@@ -1072,8 +1041,8 @@ it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityN
             const displayCapabilities = new SDL.rpc.structs.DisplayCapabilities();
             displayCapabilities.setGraphicSupported(true);
             const templatesAvailable = [];
-            templatesAvailable.push("NON_MEDIA");
-            templatesAvailable.push("MEDIA");
+            templatesAvailable.push('NON_MEDIA');
+            templatesAvailable.push('MEDIA');
             displayCapabilities.setTemplatesAvailable(templatesAvailable);
 
             const newLayout = new SDL.rpc.messages.SetDisplayLayoutResponse();
@@ -1083,7 +1052,7 @@ it('testAddOnSystemCapabilityListenerWithSubscriptionsNotSupportedAndCapabilityN
             dlRpcListeners.forEach(dl => dl(newLayout));
 
             const windowCapability = scm.getDefaultMainWindowCapability();
-            Validator.assertTrue(windowCapability.getTemplatesAvailable().includes("NON-MEDIA"));
+            Validator.assertTrue(windowCapability.getTemplatesAvailable().includes('NON-MEDIA'));
             done();
         });
 
