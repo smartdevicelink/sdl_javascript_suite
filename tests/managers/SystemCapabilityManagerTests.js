@@ -3,7 +3,6 @@ const SDL = require('../config.js').node;
 
 // Mocking framework used so that some RPCs are not actually sent to Core, but the response mimicked
 const sinon = require('sinon');
-const { AppServiceManifest } = require('../../lib/js/src/rpc/structs/AppServiceManifest.js');
 const Test = require('../Test.js');
 const Validator = require('../Validator');
 
@@ -1000,20 +999,20 @@ module.exports = function (appClient) {
             Validator.assertEquals(scm.getCapability(SDL.rpc.enums.SystemCapabilityType.APP_SERVICES).length, 0);
 
             /* PERFORM A NOTIFICATION SEND THROUGH THE SCM */
-            const addServiceID = SDL.rpc.struct.AppServiceFactory.createAppServiceCapability(AppServiceType.NAVIGATION, "test", "3453", true, null);
-            const serviceIdASC = new AppServicesCapabilities();
+            const addServiceID = createAppServiceCapability(SDL.rpc.enums.AppServiceType.NAVIGATION, 'test', '3453', true, null);
+            const serviceIdASC = new SDL.rpc.structs.AppServicesCapabilities();
             serviceIdASC.setAppServices([addServiceID]);
 
             const systemCapability = new SDL.rpc.structs.SystemCapability();
             systemCapability.setSystemCapabilityType(SDL.rpc.enums.SystemCapabilityType.APP_SERVICES);
             systemCapability.setCapabilityForType(SDL.rpc.enums.SystemCapabilityType.APP_SERVICES, serviceIdASC);
 
-            const onSystemCapabilityUpdated = new OnSystemCapabilityUpdated();
+            const onSystemCapabilityUpdated = new SDL.rpc.messages.OnSystemCapabilityUpdated();
             onSystemCapabilityUpdated.setSystemCapability(systemCapability);
 
-            scmRpcListener.onReceived(onSystemCapabilityUpdated);
+            scmRpcListener(onSystemCapabilityUpdated);
 
-            Validator.assertNotEquals(scm.getCapability(SDL.rpc.enums.SystemCapabilityType.APP_SERVICES).length,0);
+            Validator.assertNotEquals(scm.getCapability(SDL.rpc.enums.SystemCapabilityType.APP_SERVICES).length, 0);
             done();
         });
 
@@ -1032,13 +1031,12 @@ module.exports = function (appClient) {
 
             const systemCapability = new SDL.rpc.structs.SystemCapability();
             systemCapability.setSystemCapabilityType(SDL.rpc.enums.SystemCapabilityType.DISPLAYS);
-            //Raed: how
-            //systemCapability.setCapabilityForType(SDL.rpc.enums.SystemCapabilityType.DISPLAYS, newCaps);
+            systemCapability.setDisplayCapabilities(newCaps);
 
             const onSystemCapabilityUpdated = new SDL.rpc.messages.OnSystemCapabilityUpdated();
             onSystemCapabilityUpdated.setSystemCapability(systemCapability);
 
-            scmRpcListener.onReceived(onSystemCapabilityUpdated);
+            scmRpcListener(onSystemCapabilityUpdated);
 
             const appliedCaps = scm.getCapability(SDL.rpc.enums.SystemCapabilityType.DISPLAYS);
             Validator.assertNotNull(appliedCaps);
@@ -1052,15 +1050,13 @@ module.exports = function (appClient) {
         });
 
         it('testOnSystemCapabilityUpdated', function (done) {
-
             const sdlManager = appClient._sdlManager;
             const lifecycleManager = sdlManager._lifecycleManager;
             const scm = createSampleManager(lifecycleManager);
 
-            let baseName = "NavTest";
-            let baseID = "37F98053AE";
-            
-            //Raed
+            const baseName = 'NavTest';
+            const baseID = '37F98053AE';
+
             const capability1 = new SDL.rpc.structs.AppServiceCapability()
                 .setUpdateReason(SDL.rpc.enums.AppServiceType.NAVIGATION)
                 .setUpdatedAppServiceRecord(baseName);
@@ -1068,101 +1064,95 @@ module.exports = function (appClient) {
             const appServicesCapabilities = new SDL.rpc.struct.AppServicesCapabilities();
             appServicesCapabilities.setAppServices([capability1]);
 
-            assertNotNull(lifecycleManager._rpcListeners.get(SDL.rpc.enums.FunctionID.OnSystemCapabilityUpdated));
+            Validator.assertNotNull(lifecycleManager._rpcListeners.get(SDL.rpc.enums.FunctionID.OnSystemCapabilityUpdated));
             const scmRpcListener = lifecycleManager._rpcListeners.get(SDL.rpc.enums.FunctionID.OnSystemCapabilityUpdated)[0];
-            assertNotNull(scmRpcListener);
+            Validator.assertNotNull(scmRpcListener);
 
-
-            const cachedCap = scm.getCapability(SDL.rpc.enums.SystemCapabilityType.APP_SERVICES);
-            assertNull(cachedCap);
-
+            let cachedCap = scm.getCapability(SDL.rpc.enums.SystemCapabilityType.APP_SERVICES);
+            Validator.assertNull(cachedCap);
 
             scm._setCapability(SDL.rpc.enums.SystemCapabilityType.APP_SERVICES, appServicesCapabilities);
-     
-            cachedCap = scm.getCapability(SDL.rpc.enums.SystemCapabilityType.APP_SERVICES);
-            assertNotNull(cachedCap);
-       
-            assertEquals(cachedCap, appServicesCapabilities);
-            assertNull(cachedCap.getAppServices().get(0).getUpdatedAppServiceRecord().getServiceID());
 
-          
-            const addServiceID = AppServiceFactory.createAppServiceCapability(AppServiceType.NAVIGATION, baseName, baseID);
-            const serviceIdASC = new AppServicesCapabilities();
+            cachedCap = scm.getCapability(SDL.rpc.enums.SystemCapabilityType.APP_SERVICES);
+            Validator.assertNotNull(cachedCap);
+
+            Validator.assertEquals(cachedCap, appServicesCapabilities);
+            Validator.assertNull(cachedCap.getAppServices()[0].getUpdatedAppServiceRecord().getServiceID());
+
+            const addServiceID = createAppServiceCapability(SDL.rpc.enums.AppServiceType.NAVIGATION, baseName, baseID);
+            const serviceIdASC = new SDL.rpc.structs.AppServicesCapabilities();
             serviceIdASC.setAppServices([addServiceID]);
 
-            const systemCapability = new SDL.rpc.structs.SystemCapability();
+            let systemCapability = new SDL.rpc.structs.SystemCapability();
             systemCapability.setSystemCapabilityType(SDL.rpc.enums.SystemCapabilityType.APP_SERVICES);
             systemCapability.setCapabilityForType(SDL.rpc.enums.SystemCapabilityType.APP_SERVICES, serviceIdASC);
 
-            const onSystemCapabilityUpdated = new OnSystemCapabilityUpdated();
+            let onSystemCapabilityUpdated = new SDL.rpc.messages.OnSystemCapabilityUpdated();
             onSystemCapabilityUpdated.setSystemCapability(systemCapability);
 
             scmRpcListener.onReceived(onSystemCapabilityUpdated);
 
             cachedCap = scm.getCapability(SDL.rpc.enums.SystemCapabilityType.APP_SERVICES);
-            assertNotNull(cachedCap);
+            Validator.assertNotNull(cachedCap);
 
-            assertTrue(cachedCap.getAppServices().get(0).getUpdatedAppServiceRecord().getServiceID().equals(baseID));
+            Validator.assertEquals(cachedCap.getAppServices()[0].getUpdatedAppServiceRecord().getServiceID(), baseID);
 
-            appServicesCapabilities.updateAppServices(Collections.singletonList(addServiceID));
-            assertTrue(serviceIdASC.getAppServices()[0].getUpdatedAppServiceRecord().getServiceID().equalsIgnoreCase(appServicesCapabilities.getAppServices()[0].getUpdatedAppServiceRecord().getServiceID()));
+            appServicesCapabilities.updateAppServices([addServiceID]);
+            Validator.assertEquals(serviceIdASC.getAppServices()[0].getUpdatedAppServiceRecord().getServiceID(), appServicesCapabilities.getAppServices()[0].getUpdatedAppServiceRecord().getServiceID());
 
-            assertEquals(cachedCap, appServicesCapabilities);
+            Validator.assertEquals(cachedCap, appServicesCapabilities);
 
-
-         
-            const newServiceName = AppServiceFactory.createAppServiceCapability(AppServiceType.NAVIGATION, "TestNav", baseID);
-            const newServiceNameASC = new AppServicesCapabilities();
-            newServiceNameASC.setAppServices(Collections.singletonList(newServiceName));
+            const newServiceName = createAppServiceCapability(SDL.rpc.structs.AppServiceType.NAVIGATION, 'TestNav', baseID);
+            const newServiceNameASC = new SDL.rpc.structs.AppServicesCapabilities();
+            newServiceNameASC.setAppServices([newServiceName]);
 
             systemCapability = new SDL.rpc.structs.SystemCapability();
             systemCapability.setSystemCapabilityType(SDL.rpc.enums.SystemCapabilityType.APP_SERVICES);
             systemCapability.setCapabilityForType(SDL.rpc.enums.SystemCapabilityType.APP_SERVICES, newServiceNameASC);
 
-            onSystemCapabilityUpdated = new OnSystemCapabilityUpdated();
+            onSystemCapabilityUpdated = new SDL.rpc.messages.OnSystemCapabilityUpdated();
             onSystemCapabilityUpdated.setSystemCapability(systemCapability);
 
             scmRpcListener.onReceived(onSystemCapabilityUpdated);
 
             cachedCap = scm.getCapability(SDL.rpc.enums.SystemCapabilityType.APP_SERVICES);
-            assertNotNull(cachedCap);
-            assertEquals(cachedCap.getAppServices().size(), 1);
+            Validator.assertNotNull(cachedCap);
+            Validator.assertEquals(cachedCap.getAppServices().length, 1);
 
-            const newService = AppServiceFactory.createAppServiceCapability(AppServiceType.NAVIGATION, "NewNav", "eeeeeeeee");
-            const newServiceASC = new AppServicesCapabilities();
-            newServiceASC.setAppServices(Collections.singletonList(newService));
+            const newService = createAppServiceCapability(SDL.rpc.enums.AppServiceType.NAVIGATION, 'NewNav', 'eeeeeeeee');
+            const newServiceASC = new SDL.rpc.structs.AppServicesCapabilities();
+            newServiceASC.setAppServices([newService]);
 
             systemCapability = new SDL.rpc.structs.SystemCapability();
             systemCapability.setSystemCapabilityType(SDL.rpc.enums.SystemCapabilityType.APP_SERVICES);
             systemCapability.setCapabilityForType(SDL.rpc.enums.SystemCapabilityType.APP_SERVICES, newServiceASC);
 
-            onSystemCapabilityUpdated = new OnSystemCapabilityUpdated();
+            onSystemCapabilityUpdated = new SDL.rpc.messages.OnSystemCapabilityUpdated();
             onSystemCapabilityUpdated.setSystemCapability(systemCapability);
 
             scmRpcListener.onReceived(onSystemCapabilityUpdated);
 
             cachedCap = scm.getCapability(SDL.rpc.enums.SystemCapabilityType.APP_SERVICES);
-            assertNotNull(cachedCap);
-            assertEquals(cachedCap.getAppServices().size(), 2);
+            Validator.assertNotNull(cachedCap);
+            Validator.assertEquals(cachedCap.getAppServices().length, 2);
 
-         
-            const removedService = AppServiceFactory.createAppServiceCapability(AppServiceType.NAVIGATION, "NewNav", "eeeeeeeee");
-            removedService.setUpdateReason(ServiceUpdateReason.REMOVED);
-            const removedServiceASC = new AppServicesCapabilities();
-            removedServiceASC.setAppServices(Collections.singletonList(removedService));
+            const removedService = createAppServiceCapability(SDL.rpc.enums.AppServiceType.NAVIGATION, 'NewNav', 'eeeeeeeee');
+            removedService.setUpdateReason(SDL.rpc.enums.ServiceUpdateReason.REMOVED);
+            const removedServiceASC = new SDL.rpc.structs.AppServicesCapabilities();
+            removedServiceASC.setAppServices([removedService]);
 
             systemCapability = new SDL.rpc.structs.SystemCapability();
             systemCapability.setSystemCapabilityType(SDL.rpc.enums.SystemCapabilityType.APP_SERVICES);
             systemCapability.setCapabilityForType(SDL.rpc.enums.SystemCapabilityType.APP_SERVICES, removedServiceASC);
 
-            onSystemCapabilityUpdated = new OnSystemCapabilityUpdated();
+            onSystemCapabilityUpdated = new SDL.rpc.messages.OnSystemCapabilityUpdated();
             onSystemCapabilityUpdated.setSystemCapability(systemCapability);
 
             scmRpcListener.onReceived(onSystemCapabilityUpdated);
 
             cachedCap = scm.getCapability(SDL.rpc.enums.SystemCapabilityType.APP_SERVICES);
-            assertNotNull(cachedCap);
-            assertEquals(cachedCap.getAppServices().length, 1);
+            Validator.assertNotNull(cachedCap);
+            Validator.assertEquals(cachedCap.getAppServices().length, 1);
 
             done();
         });
@@ -1174,27 +1164,26 @@ module.exports = function (appClient) {
 
             const scmRpcListener = lifecycleManager._rpcListeners.get(SDL.rpc.enums.FunctionID.OnSystemCapabilityUpdated)[0];
             Validator.assertNotNull(scmRpcListener);
-            //Raed
             scm.setPhoneCapability(Test.GENERAL_PHONECAPABILITY);
             scm._setCapability(SDL.rpc.enums.SystemCapabilityType.PHONE_CALL, Test.GENERAL_PHONECAPABILITY);
 
 
             const phoneCapability = scm.getCapability(SDL.rpc.enums.SystemCapabilityType.PHONE_CALL);
             Validator.assertNotNull(phoneCapability);
-            Validator.assertEquals(phoneCapability, TestValues.GENERAL_PHONECAPABILITY);
+            Validator.assertEquals(phoneCapability, Test.GENERAL_PHONECAPABILITY);
 
-            phoneCapability.setDialNumberEnabled(!TestValues.GENERAL_PHONECAPABILITY.getDialNumberEnabled()); //Flip it
+            phoneCapability.setDialNumberEnabled(!Test.GENERAL_PHONECAPABILITY.getDialNumberEnabled()); // Flip it
             const systemCapability = new SDL.rpc.structs.SystemCapability();
             systemCapability.setSystemCapabilityType(SDL.rpc.enums.SystemCapabilityType.PHONE_CALL);
             systemCapability.setCapabilityForType(SDL.rpc.enums.SystemCapabilityType.PHONE_CALL, phoneCapability);
-            const onSystemCapabilityUpdated = new OnSystemCapabilityUpdated();
+            const onSystemCapabilityUpdated = new SDL.rpc.messages.OnSystemCapabilityUpdated();
             onSystemCapabilityUpdated.setSystemCapability(systemCapability);
 
             scmRpcListener(onSystemCapabilityUpdated);
 
             const phoneCapabilityUpdated = scm.getCapability(SDL.rpc.enums.SystemCapabilityType.PHONE_CALL);
             Validator.assertNotNull(phoneCapabilityUpdated);
-            Validator.assertFalse(phoneCapabilityUpdated.getDialNumberEnabled());
+            Validator.assertTrue(!phoneCapabilityUpdated.getDialNumberEnabled());
             Validator.assertEquals(phoneCapability, phoneCapabilityUpdated);
             done();
         });
