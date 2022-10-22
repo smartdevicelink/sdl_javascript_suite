@@ -103,6 +103,7 @@ module.exports = function (appClient) {
             convertedCapabilities.setNumCustomPresetsAvailable(defaultMainWindow.getNumCustomPresetsAvailable());
             convertedCapabilities.setMediaClockFormats([]); // mandatory field but can be empty
             convertedCapabilities.setGraphicSupported(defaultMainWindow.getImageTypeSupported().includes(SDL.rpc.enums.ImageType.DYNAMIC));
+            convertedCapabilities.setScreenParams(Test.GENERAL_SCREENPARAMS);
 
             return convertedCapabilities;
         }
@@ -851,7 +852,7 @@ module.exports = function (appClient) {
             const baseName = 'NavTest';
             const baseID = '37F98053AE';
 
-            const capability1 = createAppServiceCapability(SDL.rpc.enums.AppServiceType.NAVIGATION, baseName, 10000, true, null);
+            const capability1 = createAppServiceCapability(SDL.rpc.enums.AppServiceType.NAVIGATION, baseName, baseID, true, null);
 
             const appServicesCapabilities = new SDL.rpc.structs.AppServicesCapabilities();
             appServicesCapabilities.setAppServices([capability1]);
@@ -872,7 +873,7 @@ module.exports = function (appClient) {
             Validator.assertEquals(cachedCap, appServicesCapabilities.getAppServices());
 
             // This is different from Java Suite because Java Suite does not require a service ID and we do
-            Validator.assertEquals(cachedCap[0].getUpdatedAppServiceRecord().getServiceID(), 10000);
+            Validator.assertEquals(cachedCap[0].getUpdatedAppServiceRecord().getServiceID(), baseID);
 
             const addServiceID = createAppServiceCapability(SDL.rpc.enums.AppServiceType.NAVIGATION, baseName, baseID, true, null);
             const serviceIdASC = new SDL.rpc.structs.AppServicesCapabilities();
@@ -895,7 +896,6 @@ module.exports = function (appClient) {
             appServicesCapabilities.setAppServices([addServiceID]);
             Validator.assertEquals(serviceIdASC.getAppServices()[0].getUpdatedAppServiceRecord().getServiceID(), appServicesCapabilities.getAppServices()[0].getUpdatedAppServiceRecord().getServiceID());
 
-            // TODO: look into why this has to be the first element of each
             Validator.assertEquals(cachedCap[cachedCap.length - 1], appServicesCapabilities.getAppServices()[0]);
 
             const newServiceName = createAppServiceCapability(SDL.rpc.enums.AppServiceType.NAVIGATION, 'TestNav', baseID, true, null);
