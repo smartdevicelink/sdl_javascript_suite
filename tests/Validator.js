@@ -264,8 +264,8 @@ class Validator {
         expect(item1.getDisplayType()).to.be.equal(item2.getDisplayType());
         expect(item1.getDisplayName()).to.be.equal(item2.getDisplayName());
         expect(item1.getGraphicSupported()).to.be.equal(item2.getGraphicSupported());
-        expect(item1.getTemplatesAvailable()).to.be.equal(item2.getTemplatesAvailable());
-        expect(item1.getNumCustomPresetsAvailable()).to.be.equal(item2.getNumCustomPresetsAvailable());
+        expect(item1.getTemplatesAvailable()).deep.to.equal(item2.getTemplatesAvailable());
+        expect(item1.getNumCustomPresetsAvailable()).deep.to.equal(item2.getNumCustomPresetsAvailable());
 
         Validator.validateScreenParams(item1.getScreenParams(), item2.getScreenParams());
         return true;
