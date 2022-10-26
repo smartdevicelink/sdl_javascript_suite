@@ -829,6 +829,8 @@ class Validator {
             expect(item1).to.be.equal(item2);
             return true;
         }
+        expect(Array.isArray(item1)).to.be.true;
+        expect(Array.isArray(item2)).to.be.true;
         expect(item1.length).to.be.equal(item2.length);
         for (let index = 0; index < item1.length; index++) {
             const val1 = item1[index];
