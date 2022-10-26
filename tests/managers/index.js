@@ -34,6 +34,7 @@ const choiceSetTests = require('./screen/choiceset/ChoiceSetTests');
 const preloadPresentChoicesOperationTests = require('./screen/choiceset/PreloadPresentChoicesOperationTests');
 const presentKeyboardOperationTests = require('./screen/choiceset/PresentKeyboardOperationTests');
 const sdlManagerTests = require('./SdlManagerTests');
+const systemCapabilityManagerTests = require('./SystemCapabilityManagerTests');
 
 // connect to core and select the app on the HMI to run the tests
 describe('ManagerTests', function () {
@@ -78,6 +79,7 @@ describe('ManagerTests', function () {
                 uploadFileOperationTests(appClient);
                 sdlFileTests(appClient);
                 sdlManagerTests(appClient);
+                systemCapabilityManagerTests(appClient);
 
                 setTimeout(function () {
                     // teardown();

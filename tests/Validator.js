@@ -207,6 +207,29 @@ class Validator {
         return true;
     }
 
+    /**
+     * DisplayCapability[] equals validation.
+     * @param {DisplayCapability[]} item1 - A DisplayCapability[].
+     * @param {DisplayCapability[]} item2 - A DisplayCapability[].
+     * @returns {Boolean} - Whether or not they're equal.
+     */
+    static validateDisplayCapabilityList (item1, item2) {
+        if (item1 === null || item2 === null) {
+            expect(item1).to.be.equal(item2);
+            return true;
+        }
+        expect(item1.length).to.be.equal(item2.length);
+        for (let index = 0; index < item1.length; index++) {
+            const val1 = item1[index];
+            const val2 = item2[index];
+            if (val1 === null || val2 === null) {
+                expect(val1).to.be.equal(val2);
+            }
+            Validator.validateDisplayCapability(val1, val2);
+        }
+
+        return true;
+    }
 
     /**
      * DisplayCapabilities equals validation.
@@ -241,10 +264,155 @@ class Validator {
         expect(item1.getDisplayType()).to.be.equal(item2.getDisplayType());
         expect(item1.getDisplayName()).to.be.equal(item2.getDisplayName());
         expect(item1.getGraphicSupported()).to.be.equal(item2.getGraphicSupported());
-        expect(item1.getTemplatesAvailable()).to.be.equal(item2.getTemplatesAvailable());
-        expect(item1.getNumCustomPresetsAvailable()).to.be.equal(item2.getNumCustomPresetsAvailable());
+        expect(item1.getTemplatesAvailable()).deep.to.equal(item2.getTemplatesAvailable());
+        expect(item1.getNumCustomPresetsAvailable()).deep.to.equal(item2.getNumCustomPresetsAvailable());
 
         Validator.validateScreenParams(item1.getScreenParams(), item2.getScreenParams());
+        return true;
+    }
+
+    /**
+     * DisplayCapability equals validation.
+     * @param {DisplayCapability} item1 - A DisplayCapability.
+     * @param {DisplayCapability} item2 - A DisplayCapability.
+     * @returns {Boolean} - Whether or not they're equal.
+     */
+    static validateDisplayCapability (item1, item2) {
+        if (item1 === null || item2 === null) {
+            expect(item1).to.be.equal(item2);
+            return true;
+        }
+        expect(item1.getDisplayName()).to.be.equal(item2.getDisplayName());
+
+        if (item1.getWindowTypeSupported() === null || item2.getWindowTypeSupported() === null) {
+            expect(item1.getWindowTypeSupported()).to.be.equal(item2.getWindowTypeSupported());
+            return true;
+        }
+        expect(item1.getWindowTypeSupported().length).to.be.equal(item2.getWindowTypeSupported().length);
+        for (let index = 0; index < item1.getWindowTypeSupported().length; index++) {
+            const val1 = item1.getWindowTypeSupported()[index];
+            const val2 = item2.getWindowTypeSupported()[index];
+            if (val1 === null || val2 === null) {
+                expect(val1).to.be.equal(val2);
+            }
+            Validator.validateWindowTypeCapabilities(val1, val2);
+        }
+
+        if (item1.getWindowCapabilities() === null || item2.getWindowCapabilities() === null) {
+            expect(item1.getWindowCapabilities()).to.be.equal(item2.getWindowCapabilities());
+            return true;
+        }
+        expect(item1.getWindowCapabilities().length).to.be.equal(item2.getWindowCapabilities().length);
+        for (let index = 0; index < item1.getWindowCapabilities().length; index++) {
+            const val1 = item1.getWindowCapabilities()[index];
+            const val2 = item2.getWindowCapabilities()[index];
+            if (val1 === null || val2 === null) {
+                expect(val1).to.be.equal(val2);
+            }
+            Validator.validateWindowCapability(val1, val2);
+        }
+        return true;
+    }
+
+    /**
+     * WindowTypeCapabilities equals validation.
+     * @param {WindowTypeCapabilities} item1 - A WindowTypeCapabilities.
+     * @param {WindowTypeCapabilities} item2 - A WindowTypeCapabilities.
+     * @returns {Boolean} - Whether or not they're equal.
+     */
+    static validateWindowTypeCapabilities (item1, item2) {
+        if (item1 === null || item2 === null) {
+            expect(item1).to.be.equal(item2);
+            return true;
+        }
+
+        if (item1.getType() === null || item2.getType() === null) {
+            expect(item1.getType()).to.be.equal(item2.getType());
+            return true;
+        }
+        expect(item1.getType()).to.be.equal(item2.getType());
+
+        expect(item1.getMaximumNumberOfWindows()).to.be.equal(item2.getMaximumNumberOfWindows());
+
+        return true;
+    }
+
+    /**
+     * WindowCapability equals validation.
+     * @param {WindowCapability} item1 - A WindowCapability.
+     * @param {WindowCapability} item2 - A WindowCapability.
+     * @returns {Boolean} - Whether or not they're equal.
+     */
+    static validateWindowCapability (item1, item2) {
+        if (item1 === null || item2 === null) {
+            expect(item1).to.be.equal(item2);
+            return true;
+        }
+
+        expect(item1.getWindowID()).to.be.equal(item2.getWindowID());
+
+        if (item1.getTemplatesAvailable() === null || item2.getTemplatesAvailable() === null) {
+            Validator.assertEquals(item1.getTemplatesAvailable(), item2.getTemplatesAvailable());
+            return true;
+        }
+
+        expect(item1.getNumCustomPresetsAvailable()).to.be.equal(item2.getNumCustomPresetsAvailable());
+
+        if (item1.getTextFields() === null || item2.getTextFields() === null) {
+            expect(item1.getTextFields()).to.be.equal(item2.getTextFields());
+            return true;
+        }
+        expect(item1.getTextFields().length).to.be.equal(item2.getTextFields().length);
+        for (let index = 0; index < item1.getTextFields().length; index++) {
+            const val1 = item1.getTextFields()[index];
+            const val2 = item2.getTextFields()[index];
+            if (val1 === null || val2 === null) {
+                expect(val1).to.be.equal(val2);
+            }
+            Validator.validateTextFields(val1, val2);
+        }
+
+        if (item1.getImageFields() === null || item2.getImageFields() === null) {
+            expect(item1.getImageFields()).to.be.equal(item2.getImageFields());
+            return true;
+        }
+
+        Validator.validateImageFields(item1.getImageFields(), item2.getImageFields());
+
+        if (item1.getImageTypeSupported() === null || item2.getImageTypeSupported() === null) {
+            expect(item1.getImageTypeSupported()).to.be.equal(item2.getImageTypeSupported());
+            return true;
+        }
+        expect(item1.getImageTypeSupported().length).to.be.equal(item2.getImageTypeSupported().length);
+        for (let index = 0; index < item1.getImageTypeSupported().length; index++) {
+            const val1 = item1.getImageTypeSupported()[index];
+            const val2 = item2.getImageTypeSupported()[index];
+            expect(val1).to.be.deep.equal(val2);
+        }
+
+        Validator.validateButtonCapabilities(item1.getButtonCapabilities(), item2.getButtonCapabilities());
+        Validator.validateSoftButtonCapabilities(item1.getSoftButtonCapabilities(), item2.getSoftButtonCapabilities());
+
+        return true;
+    }
+
+    /**
+     * TextField equals validation.
+     * @param {TextField} item1 - A TextField.
+     * @param {TextField} item2 - A TextField.
+     * @returns {Boolean} - Whether or not they're equal.
+     */
+    static validateTextFields (item1, item2) {
+        if (item1 === null || item2 === null) {
+            expect(item1).to.be.equal(item2);
+            return true;
+        }
+
+        expect(item1.getCharacterSet()).to.be.equal(item2.getCharacterSet());
+        expect(item1.getNameParam()).to.be.equal(item2.getNameParam());
+        expect(item1.getRows()).to.be.equal(item2.getRows());
+        expect(item1.getWidth()).to.be.equal(item2.getWidth());
+
         return true;
     }
 
@@ -486,6 +654,57 @@ class Validator {
     }
 
     /**
+     * VideoStreamingCapability equals validation.
+     * @param {VideoStreamingCapability} item1 - A VideoStreamingCapability.
+     * @param {VideoStreamingCapability} item2 - A VideoStreamingCapability.
+     * @returns {Boolean} - Whether or not they're equal.
+     */
+    static validateVideoStreamingCapability (item1, item2) {
+        if (item1 === null || item2 === null) {
+            expect(item1).to.equal(item2);
+            return true;
+        }
+
+        if (!Validator.validateImageResolution(item1.getPreferredResolution(), item2.getPreferredResolution())) {
+            return false;
+        }
+
+        expect(item1.getMaxBitrate()).to.be.equal(item2.getMaxBitrate());
+
+        if (!Validator.validateVideoStreamingFormat(item1.getSupportedFormats(), item2.getSupportedFormats())) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * VideoStreamingFormat array equals validation.
+     * @param {VideoStreamingFormat[]} item1 - An array of VideoStreamingFormat.
+     * @param {VideoStreamingFormat[]} item2 - An array of VideoStreamingFormat.
+     * @returns {Boolean} - Whether or not they're equal.
+     */
+    static validateVideoStreamingFormat (item1, item2) {
+        if (item1 === null || item2 === null) {
+            expect(item1).to.be.equal(item2);
+            return true;
+        }
+        expect(Array.isArray(item1)).to.be.true;
+        expect(Array.isArray(item2)).to.be.true;
+
+        expect(item1.length).to.be.equal(item2.length);
+
+        for (let index = 0; index < item1.length; index++) {
+            const val1 = item1[index];
+            const val2 = item2[index];
+            expect(val1.getCodec()).to.be.equal(val2.getCodec());
+            expect(val1.getProtocolParam()).to.be.equal(val2.getProtocolParam());
+        }
+
+        return true;
+    }
+
+    /**
      * Assert val is true.
      * @param {*} val - value to assert
      * @param {String} msg - Message to display on failure.
@@ -596,6 +815,65 @@ class Validator {
         expect(item1.getDataType()).to.be.equal(item2.getDataType());
         expect(item1.getOemCustomDataType()).to.be.equal(item2.getOemCustomDataType());
         expect(item1.getResultCode()).to.be.equal(item2.getResultCode());
+        return true;
+    }
+
+    /**
+     * Generic Object[] equals validation.
+     * @param {Object[]} item1 - A Object[].
+     * @param {Object[]} item2 - A Object[].
+     * @returns {Boolean} - Whether or not they're equal.
+     */
+    static validateGenericList (item1, item2) {
+        if (item1 === null || item2 === null) {
+            expect(item1).to.be.equal(item2);
+            return true;
+        }
+        expect(Array.isArray(item1)).to.be.true;
+        expect(Array.isArray(item2)).to.be.true;
+        expect(item1.length).to.be.equal(item2.length);
+        for (let index = 0; index < item1.length; index++) {
+            const val1 = item1[index];
+            const val2 = item2[index];
+            if (val1 === null || val2 === null) {
+                expect(val1).to.be.equal(val2);
+            }
+            Validator.assertEquals(val1, val2);
+        }
+
+        return true;
+    }
+
+    /**
+     * HmiZoneCapabilities[] equals validation.
+     * @param {HmiZoneCapabilities[]} item1 - A HmiZoneCapabilities[].
+     * @param {HmiZoneCapabilities[]} item2 - A HmiZoneCapabilities[].
+     * @returns {Boolean} - Whether or not they're equal.
+     */
+    static validateHMIZoneCapabilities (item1, item2) {
+        Validator.validateGenericList(item1, item2);
+        return true;
+    }
+
+    /**
+     * SpeechCapabilities[] equals validation.
+     * @param {SpeechCapabilities[]} item1 - A SpeechCapabilities[].
+     * @param {SpeechCapabilities[]} item2 - A SpeechCapabilities[].
+     * @returns {Boolean} - Whether or not they're equal.
+     */
+    static validateSpeechCapabilities (item1, item2) {
+        Validator.validateGenericList(item1, item2);
+        return true;
+    }
+
+    /**
+     * PrerecordedSpeech[] equals validation.
+     * @param {PrerecordedSpeech[]} item1 - A PrerecordedSpeech[].
+     * @param {PrerecordedSpeech[]} item2 - A PrerecordedSpeech[].
+     * @returns {Boolean} - Whether or not they're equal.
+     */
+    static validatePreRecordedSpeechCapabilities (item1, item2) {
+        Validator.validateGenericList(item1, item2);
         return true;
     }
 }
