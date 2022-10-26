@@ -680,8 +680,8 @@ class Validator {
 
     /**
      * VideoStreamingFormat array equals validation.
-     * @param {Array<VideoStreamingFormat>} item1 - An array of VideoStreamingFormat.
-     * @param {Array<VideoStreamingFormat>} item2 - An array of VideoStreamingFormat.
+     * @param {VideoStreamingFormat[]} item1 - An array of VideoStreamingFormat.
+     * @param {VideoStreamingFormat[]} item2 - An array of VideoStreamingFormat.
      * @returns {Boolean} - Whether or not they're equal.
      */
     static validateVideoStreamingFormat (item1, item2) {
